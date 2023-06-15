@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 async function getBrowser(){
 	let browser;
 	try {
-        console.log("Opening the browser...");
+        console.log("Opening the browser ...");
         browser = await puppeteer.launch({
             headless: "new",
             args: ["--disable-setuid-sandbox"],

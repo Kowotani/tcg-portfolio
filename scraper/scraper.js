@@ -1,13 +1,11 @@
+// imports
 const browserObj = require('./browser');
-
-// get ids
-const ids = [121527, 231038]
 
 /*
 DESC: Scrapes price data for the input ids
 INPUT; Array of ids
 RETURN: Array of objects containing price data
-for each of the input ids
+    for each of the input ids
 */
 async function scrape(ids) {
 
@@ -26,7 +24,7 @@ async function scrape(ids) {
         try {
             await page.goto(url);
         } catch(err) {
-            console.log(`Error navigating to ${url}`)
+            console.log(`Error navigating to ${url}: ${err}`)
         }
 
         // wait for price guide to load
@@ -48,12 +46,10 @@ async function scrape(ids) {
             scrapeData[id] = prices
         } 
         catch(err) {
-            console.log(`Error scraping from ${url}: `, err)
+            console.log(`Error scraping from ${url}: ${err}`)
         }
     }
     return scrapeData
 }
 
-scrape(ids)
-    .then(console.log)
-    .catch(console.error)
+module.exports = { scrape }
