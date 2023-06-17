@@ -65,7 +65,7 @@ async function insertDocs(collectionName, docs) {
             ? await collection.insertOne(docs[0])
             : await collection.insertMany(docs);
         
-        console.log(results);
+        // console.log(results);
         numInserted = numDocs === 1 ? 1 : results.insertedCount;
         console.log(`Inserted: ${numInserted} document(s) into [${collectionName}]`);
         
@@ -73,7 +73,7 @@ async function insertDocs(collectionName, docs) {
     
         numInserted = err.result.insertedCount;
         console.log(`An error occurred while inserting into [${collectionName}]: ${err}`);
-        console.log(`There were ${numInserted} documents inserted`);
+        // console.log(`There were ${numInserted} documents inserted`);
     }
 
     client.close();
