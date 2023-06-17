@@ -9,8 +9,10 @@ const client = new MongoClient(url);
 const dbName = 'tcgPortfolio';
 
 /*
-DESC: Returns the tcgplayer_id of all known products in mongodb
-RETURN: Array of tcgplayer_ids
+DESC: Returns the product ids for all known products
+RETURN: Array of product objects containing
+    _id: mongo ObjectID
+    tcgplayer_id: the TCGPlayer product ID
 */
 async function getProductIds() {
     const collectionName = 'products';
@@ -23,7 +25,14 @@ async function getProductIds() {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
     const docs = await collection.find({}).toArray();
-    const ids = docs.map(doc => doc.tcgplayer_id);
+    const ids = docs.map(
+        doc => {
+            return {
+                'id': doc._id,
+                'tcgplayer_id': doc.tcgplayer_id
+            }
+        }
+    );
 
     client.close();
 
@@ -51,7 +60,7 @@ async function insertDocs(collectionName, docs) {
     const collection = db.collection(collectionName);
 
     try {
-        
+
         const results = numDocs === 1
             ? await collection.insertOne(docs[0])
             : await collection.insertMany(docs);
