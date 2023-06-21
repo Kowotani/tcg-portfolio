@@ -8,11 +8,50 @@ const client = new MongoClient(url);
 // db
 const dbName = 'tcgPortfolio';
 
+\
 /*
-DESC: Returns the product ids for all known products
-RETURN: Array of product objects containing
-    _id: mongo ObjectID
-    tcgplayer_id: the TCGPlayer product ID
+DESC
+    Retrieves one document from the input named collection by the input ID 
+    following the path to the ID
+INPUT
+    collectionName: The name of the collection
+    path: The path from the root of the doc to the ID
+    id: The ID on which to match
+RETURN
+    The first document that is found, else null
+*/
+async function getDocById(collectionName, path, id) {
+
+    let doc = null;
+
+    // connect to db
+    await client.connect();
+
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);    
+
+    try {
+        const query = {[path]: id};
+        doc = await collection.findOne(query);
+
+    } catch(err) {
+
+        console.log(`An error occurred while searching [${collectionName}] for
+            [${id}] by [${path}]: ${err}`);
+    } finally {
+        await client.close();
+    }
+    
+    return doc;
+}
+
+/*
+DESC
+    Returns the product ids for all known products
+RETURN
+    Array of product objects containing
+        _id: mongo ObjectID
+        tcgplayer_id: the TCGPlayer product ID
 */
 async function getProductIds() {
     const collectionName = 'products';
@@ -40,11 +79,13 @@ async function getProductIds() {
 }
 
 /*
-DESC: Inserts documents into the specified collection
-INPUT: 
+DESC
+    Inserts documents into the specified collection
+INPUT 
     collectionName: The name of the collection
     docs: An array of documents 
-RETURN: The number of documents inserted
+RETURN
+    The number of documents inserted
 */
 async function insertDocs(collectionName, docs) {
 
@@ -81,4 +122,4 @@ async function insertDocs(collectionName, docs) {
     return numInserted;
 }
 
-module.exports = { getProductIds, insertDocs }
+module.exports = { getDocById, getProductIds, insertDocs }

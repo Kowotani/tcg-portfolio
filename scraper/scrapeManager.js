@@ -1,6 +1,6 @@
 // imports
 const scraper = require('./scraper');
-const mongoDB = require('./mongoManager');
+const mongoDB = require('../backend/mongoManager');
 
 
 async function loadPrices() {
