@@ -8,7 +8,7 @@ const client = new MongoClient(url);
 // db
 const dbName = 'tcgPortfolio';
 
-\
+
 /*
 DESC
     Retrieves one document from the input named collection by the input ID 
@@ -132,5 +132,6 @@ async function insertDocs(collectionName, docs) {
 
     return numInserted;
 }
+
 
 module.exports = { getDocById, getProductIds, insertDocs }
