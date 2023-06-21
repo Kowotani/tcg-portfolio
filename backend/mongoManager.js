@@ -31,13 +31,14 @@ async function getDocById(collectionName, path, id) {
     const collection = db.collection(collectionName);    
 
     try {
+
         const query = {[path]: id};
         doc = await collection.findOne(query);
 
     } catch(err) {
 
-        console.log(`An error occurred while searching [${collectionName}] for
-            [${id}] by [${path}]: ${err}`);
+        console.log(`An error occurred in getDocById(): ${err}`);
+
     } finally {
         await client.close();
     }
@@ -63,17 +64,26 @@ async function getProductIds() {
     // retrieve tcgplayer_id from all known products
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
-    const docs = await collection.find({}).toArray();
-    const ids = docs.map(
-        doc => {
-            return {
-                'id': doc._id,
-                'tcgplayer_id': doc.tcgplayer_id
-            }
-        }
-    );
 
-    client.close();
+    try {
+
+        const docs = await collection.find({}).toArray();
+        const ids = docs.map(
+            doc => {
+                return {
+                    'id': doc._id,
+                    'tcgplayer_id': doc.tcgplayer_id
+                }
+            }
+        );
+
+    } catch(err) {
+
+        console.log(`An error occurred in getProductIds(): ${err}`);
+
+    } finally {
+        client.close();
+    }
 
     return ids;
 }
@@ -113,11 +123,12 @@ async function insertDocs(collectionName, docs) {
     } catch(err) {
     
         numInserted = err.result.insertedCount;
-        console.log(`An error occurred while inserting into [${collectionName}]: ${err}`);
+        console.log(`An error occurred in insertDocs(): ${err}`);
         // console.log(`There were ${numInserted} documents inserted`);
-    }
 
-    client.close();
+    } finally {
+        client.close();
+    }
 
     return numInserted;
 }
