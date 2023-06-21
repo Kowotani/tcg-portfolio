@@ -1,13 +1,15 @@
 // imports
-const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
+const { productSchema } = require('./models/productSchema');
+const utils = require('../utils');
 
 // get mongo client
-const url = 'mongodb://localhost:27017';
-const client = new MongoClient(url);
+const url = 'mongodb://localhost:27017/tcgPortfolio';
 
-// db
-const dbName = 'tcgPortfolio';
 
+// =========
+// functions
+// =========
 
 /*
 DESC
@@ -25,7 +27,7 @@ async function getDocById(collectionName, path, id) {
     let doc = null;
 
     // connect to db
-    await client.connect();
+    await mongoose.connect(url);
 
     const db = client.db(dbName);
     const collection = db.collection(collectionName);    
@@ -58,7 +60,7 @@ async function getProductIds() {
     const collectionName = 'products';
 
     // connect to db
-    await client.connect();
+    await mongoose.connect(url);
     // console.log('Connected to server')
 
     // retrieve tcgplayer_id from all known products
@@ -90,48 +92,47 @@ async function getProductIds() {
 
 /*
 DESC
-    Inserts documents into the specified collection
+    Inserts documents constructed from the input data for the specified model
 INPUT 
-    collectionName: The name of the collection
-    docs: An array of documents 
+    model: The name of the document model (mongoose automatically looks for
+        the plural lowercase version of the model as the collection)
+    data: An array of object data from which to construct the documents
 RETURN
     The number of documents inserted
 */
-async function insertDocs(collectionName, docs) {
+async function insertDocs(model, data) {
 
-    // variables
-    const numDocs = docs.length;
-    let numInserted = 0;
+    // get schema
+    let schema;
+    switch (model) {
+        case 'product':
+            schema = productSchema;
+            break;
+        case 'price':
+            schema = null;
+            break;
+    }
+    const Model = mongoose.model(model, schema);
 
     // connect to db
-    await client.connect();
-    // console.log('Connected to server')
-
-    const db = client.db(dbName);
-    const collection = db.collection(collectionName);
+    await mongoose.connect(url);
 
     try {
 
-        const results = numDocs === 1
-            ? await collection.insertOne(docs[0])
-            : await collection.insertMany(docs);
-        
-        // console.log(results);
-        numInserted = numDocs === 1 ? 1 : results.insertedCount;
-        console.log(`Inserted: ${numInserted} document(s) into [${collectionName}]`);
+        const docs = await data.map( datum => {
+            return Model.create(datum);
+        });
+
+        const res = await Model.insertMany(docs);
+        console.log(res);
         
     } catch(err) {
     
-        numInserted = err.result.insertedCount;
         console.log(`An error occurred in insertDocs(): ${err}`);
-        // console.log(`There were ${numInserted} documents inserted`);
-
-    } finally {
-        client.close();
     }
 
-    return numInserted;
+    return 0;
 }
 
 
-module.exports = { getDocById, getProductIds, insertDocs }
+module.exports = { getDocById, getProductIds, insertDocs };
