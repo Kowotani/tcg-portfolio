@@ -1,15 +1,13 @@
 // imports
 
-const bodyParser = require('body-parser');
 const express = require('express');
-const multer = require('multer');
 const mongoDB = require('./backend/mongoManager');
+const multer = require('multer');
 const utils = require('./utils');
 
 const upload = multer();
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(upload.array());    // parse multipart/form-data
 
 // app.use(express.static('public'));  // serve static files from public
