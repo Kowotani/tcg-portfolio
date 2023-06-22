@@ -1,7 +1,7 @@
 // imports
 const mongoose = require('mongoose');
 const { productSchema } = require('./models/productSchema');
-const utils = require('../utils');
+// const utils = require('../utils');
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
@@ -13,37 +13,36 @@ const url = 'mongodb://localhost:27017/tcgPortfolio';
 
 /*
 DESC
-    Retrieves one document from the input named collection by the input ID 
-    following the path to the ID
+    Retrieves the Product document by tcgplayer_id or _id
 INPUT
-    collectionName: The name of the collection
-    path: The path from the root of the doc to the ID
-    id: The ID on which to match
+    tcgplayer_id: The Product's tcgplayer_id (higher priority)
+    id: The Product's document _id
 RETURN
-    The first document that is found, else null
+    The document if found, else null
 */
-async function getDocById(collectionName, path, id) {
+async function getProduct({tcgplayer_id = null, id = null} = {}) {
+
+    // check that tcgplayer_id or id is provided
+    if (!(tcgplayer_id || id)) { return null; }
+    console.log(tcgplayer_id);
+    console.log(id);
 
     let doc = null;
 
     // connect to db
-    await mongoose.connect(url);
-
-    const db = client.db(dbName);
-    const collection = db.collection(collectionName);    
+    await mongoose.connect(url);  
 
     try {
-
-        const query = {[path]: id};
-        doc = await collection.findOne(query);
+        
+        const Product = mongoose.model('product', productSchema);
+        doc = tcgplayer_id 
+            ? await Product.find({ 'tcgplayer_id': tcgplayer_id })
+            : await Product.findById(id);
 
     } catch(err) {
 
-        console.log(`An error occurred in getDocById(): ${err}`);
-
-    } finally {
-        await client.close();
-    }
+        console.log(`An error occurred in getProduct(): ${err}`);
+    } 
     
     return doc;
 }
@@ -130,5 +129,11 @@ async function insertDocs(model, data) {
     return 0;
 }
 
+// async function main() {
+// }
 
-module.exports = { getDocById, getProductIds, insertDocs };
+// main()
+//     .then(console.log)
+//     .catch(console.error);
+
+module.exports = { getProduct, getProductIds, insertDocs };
