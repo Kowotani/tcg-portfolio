@@ -105,12 +105,10 @@ function insertDocs(model, data) {
     });
 }
 exports.insertDocs = insertDocs;
-function main() {
-    return __awaiter(this, void 0, void 0, function* () {
-        let ids = yield getProductIds();
-        console.log(ids);
-    });
-}
-main()
-    .then(console.log)
-    .catch(console.error);
+// async function main() {
+//     let ids = await getProductIds();
+//     console.log(ids);
+// }
+// main()
+//     .then(console.log)
+//     .catch(console.error);
