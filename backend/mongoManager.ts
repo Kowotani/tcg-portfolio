@@ -1,9 +1,12 @@
 // imports
-const mongoose = require('mongoose');
-const { productSchema } = require('./models/productSchema');
+import mongoose from 'mongoose';
+import { productSchema } from './models/productSchema';
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
+
+// mongoose models
+const Product = mongoose.model('product', productSchema);
 
 
 // =========
@@ -19,20 +22,25 @@ INPUT
 RETURN
     The document if found, else null
 */
-async function getProduct({tcgplayer_id = null, id = null} = {}) {
+interface GetProductParameters {
+    tcgplayer_id?: number;
+    id?: string;
+}
+export async function getProduct({ tcgplayer_id, id }: GetProductParameters = {}): Promise<any> {
 
     // check that tcgplayer_id or id is provided
-    if (!(tcgplayer_id || id)) { return null; }
+    if (tcgplayer_id === undefined && id === undefined) { 
+        return null; 
+    }
 
-    let doc = null;
+    let docs: any;
 
     // connect to db
     await mongoose.connect(url);  
 
     try {
-        
-        const Product = mongoose.model('product', productSchema);
-        doc = tcgplayer_id 
+
+        docs = tcgplayer_id !== undefined
             ? await Product.find({ 'tcgplayer_id': tcgplayer_id })
             : await Product.findById(id);
 
@@ -41,7 +49,7 @@ async function getProduct({tcgplayer_id = null, id = null} = {}) {
         console.log(`An error occurred in getProduct(): ${err}`);
     } 
     
-    return doc;
+    return docs.length > 0 ? docs[0] : null;
 }
 
 /*
@@ -52,14 +60,13 @@ RETURN
         id: Document ObjectID
         tcgplayer_id: Document tcgplayer_id
 */
-async function getProductIds() {
+export async function getProductIds(): Promise<any> {
 
     // connect to db
     await mongoose.connect(url);
 
     try {
 
-        const Product = mongoose.model('product', productSchema);
         const docs = await Product.find({});
         const ids = docs.map(
             doc => {
@@ -90,10 +97,10 @@ INPUT
 RETURN
     The number of documents inserted
 */
-async function insertDocs(model, data) {
+export async function insertDocs(model: string, data: any): Promise<any> {
 
     // get schema
-    let schema;
+    let schema: any;
     switch (model) {
         case 'product':
             schema = productSchema;
@@ -127,5 +134,3 @@ async function insertDocs(model, data) {
 // main()
 //     .then(console.log)
 //     .catch(console.error);
-
-module.exports = { getProduct, getProductIds, insertDocs };

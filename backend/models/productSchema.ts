@@ -1,8 +1,19 @@
 // imports
-const { Schema } = require('mongoose');
-const utils = require('../../utils');
+import { Schema } from 'mongoose';
+import { ProductLanguage, ProductSubType, ProductType, TCG } from '../../utils';
 
-const productSchema = new Schema({
+interface IProduct {
+    tcgplayer_id: Number;
+    tcg: TCG;
+    release_date: Date;
+    name: String;
+    type: ProductType;
+    language: ProductLanguage;
+    subtype?: ProductSubType;
+    set_code?: String;
+}
+
+export const productSchema = new Schema<IProduct>({
     tcgplayer_id: {
         type: Number,
         min: 1,
@@ -11,7 +22,7 @@ const productSchema = new Schema({
     },
     tcg: {
         type: String,
-        enum: Object.values(utils.TCG),
+        enum: TCG,
         required: true
     },
     release_date: {
@@ -24,20 +35,17 @@ const productSchema = new Schema({
     },
     type: {
         type: String,
-        enum: Object.values(utils.ProductType),
+        enum: ProductType,
         required: true
     },
     language: {
         type: String,
-        enum: Object.values(utils.ProductLanguage),
+        enum: ProductLanguage,
         required: true
     },
     subtype: {
         type: String,
-        enum: Object.values(utils.ProductSubType)
+        enum: ProductSubType
     },
     set_code: String,
 });
-
-
-module.exports = { productSchema };
