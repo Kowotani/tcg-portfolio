@@ -1,7 +1,6 @@
 // imports
 const mongoose = require('mongoose');
 const { productSchema } = require('./models/productSchema');
-// const utils = require('../utils');
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
@@ -24,8 +23,6 @@ async function getProduct({tcgplayer_id = null, id = null} = {}) {
 
     // check that tcgplayer_id or id is provided
     if (!(tcgplayer_id || id)) { return null; }
-    console.log(tcgplayer_id);
-    console.log(id);
 
     let doc = null;
 
@@ -52,23 +49,18 @@ DESC
     Returns the product ids for all known products
 RETURN
     Array of product objects containing
-        _id: mongo ObjectID
-        tcgplayer_id: the TCGPlayer product ID
+        id: Document ObjectID
+        tcgplayer_id: Document tcgplayer_id
 */
 async function getProductIds() {
-    const collectionName = 'products';
 
     // connect to db
     await mongoose.connect(url);
-    // console.log('Connected to server')
-
-    // retrieve tcgplayer_id from all known products
-    const db = client.db(dbName);
-    const collection = db.collection(collectionName);
 
     try {
 
-        const docs = await collection.find({}).toArray();
+        const Product = mongoose.model('product', productSchema);
+        const docs = await Product.find({});
         const ids = docs.map(
             doc => {
                 return {
@@ -78,15 +70,14 @@ async function getProductIds() {
             }
         );
 
+        return ids;
+
     } catch(err) {
 
         console.log(`An error occurred in getProductIds(): ${err}`);
-
-    } finally {
-        client.close();
     }
 
-    return ids;
+    return null;
 }
 
 /*
@@ -119,7 +110,6 @@ async function insertDocs(model, data) {
     try {
 
         const res = await Model.insertMany(data);
-        // console.log(res);
         
     } catch(err) {
     
@@ -130,6 +120,8 @@ async function insertDocs(model, data) {
 }
 
 // async function main() {
+//     let ids = await getProductIds();
+//     console.log(ids);
 // }
 
 // main()
