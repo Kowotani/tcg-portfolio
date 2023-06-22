@@ -119,12 +119,8 @@ async function insertDocs(model, data) {
 
     try {
 
-        const docs = await data.map( datum => {
-            return Model.create(datum);
-        });
-
-        const res = await Model.insertMany(docs);
-        console.log(res);
+        const res = await Model.insertMany(data);
+        // console.log(res);
         
     } catch(err) {
     
