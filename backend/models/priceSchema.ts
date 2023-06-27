@@ -1,25 +1,23 @@
 // imports
 import { Schema } from 'mongoose';
-import { ProductType } from '../../utils';
 
 
 // ==========
 // interfaces
 // ==========
 
-interface IPriceProduct {
+export interface IPriceProduct {
     id: Schema.Types.ObjectId;
-    type: ProductType;
-    name: String;
+    tcgplayerId: Number;
 }
 
-interface IPrice {
-    price_date: Date;
+export interface IPrice {
+    priceDate: Date;
     product: IPriceProduct;
     granularity: String;
-    market_price: Number;
-    buylist_median_price?: Number;
-    listed_median_price?: Number;
+    marketPrice: Number;
+    buylistMarketPrice?: Number;
+    listedMedianPrice?: Number;
 }
 
 
@@ -32,19 +30,14 @@ export const priceProductSchema = new Schema<IPriceProduct>({
         type: Schema.Types.ObjectId,
         required: true
     },
-    type: {
-        type: String,
-        enum: ProductType,
+    tcgplayerId: {
+        type: Number,
         required: true
     },
-    name: {
-        type: String,
-        required: true
-    }
 })
 
 export const priceSchema = new Schema<IPrice>({
-    price_date: {
+    priceDate: {
         type: Date,
         required: true
     },
@@ -52,10 +45,14 @@ export const priceSchema = new Schema<IPrice>({
         type: priceProductSchema,
         required: true
     },
-    market_price: {
+    granularity: {
+        type: String,
+        required: true
+    },
+    marketPrice: {
         type: Number,
         required: true
     }, 
-    buylist_median_price: { type: Number },
-    listed_median_price: { type: Number }
+    buylistMarketPrice: { type: Number },
+    listedMedianPrice: { type: Number }
 });

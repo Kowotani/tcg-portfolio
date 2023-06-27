@@ -1,4 +1,5 @@
 // imports
+import { Schema } from 'mongoose';
 import mongoose from 'mongoose';
 import { productSchema } from './models/productSchema';
 
@@ -22,11 +23,11 @@ INPUT
 RETURN
     The document if found, else null
 */
-interface GetProductParameters {
-    tcgplayer_id?: number;
-    id?: string;
+interface IGetProductParameters {
+    tcgplayer_id?: Number;
+    id?: String;
 }
-export async function getProduct({ tcgplayer_id, id }: GetProductParameters = {}): Promise<any> {
+export async function getProduct({ tcgplayer_id, id }: IGetProductParameters = {}): Promise<any> {
 
     // check that tcgplayer_id or id is provided
     if (tcgplayer_id === undefined && id === undefined) { 
@@ -56,11 +57,13 @@ export async function getProduct({ tcgplayer_id, id }: GetProductParameters = {}
 DESC
     Returns the product ids for all known products
 RETURN
-    Array of product objects containing
-        id: Document ObjectID
-        tcgplayer_id: Document tcgplayer_id
+    Array of IProductIds
 */
-export async function getProductIds(): Promise<any> {
+interface IProductIds {
+    id: mongoose.Types.ObjectId,
+    tcgplayerId: Number
+}
+export async function getProductIds(): Promise<IProductIds[]> {
 
     // connect to db
     await mongoose.connect(url);
@@ -68,11 +71,11 @@ export async function getProductIds(): Promise<any> {
     try {
 
         const docs = await Product.find({});
-        const ids = docs.map(
+        const ids: IProductIds[] = docs.map(
             doc => {
                 return {
-                    'id': doc._id,
-                    'tcgplayer_id': doc.tcgplayer_id
+                    id: doc._id,
+                    tcgplayerId: doc.tcgplayer_id
                 }
             }
         );
@@ -84,7 +87,7 @@ export async function getProductIds(): Promise<any> {
         console.log(`An error occurred in getProductIds(): ${err}`);
     }
 
-    return null;
+    return [];
 }
 
 /*
