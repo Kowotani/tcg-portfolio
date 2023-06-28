@@ -2,6 +2,14 @@
 // enums
 // =====
 
+// -- mongodb
+
+export enum TimeseriesGranularity {
+    Seconds = 'seconds',
+    Minutes = 'minutes',
+    Hours = 'hours'
+};
+
 // -- product features
 
 // product language

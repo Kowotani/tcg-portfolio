@@ -3,7 +3,8 @@
 // enums
 // =====
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TCG = exports.ProductType = exports.ProductSubType = exports.ProductLanguage = void 0;
+exports.getPriceFromString = exports.isPriceString = exports.isNumeric = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubType = exports.ProductLanguage = void 0;
+// -- product features
 // product language
 var ProductLanguage;
 (function (ProductLanguage) {
@@ -41,3 +42,56 @@ var TCG;
     TCG["Sorcery"] = "Sorcery";
 })(TCG || (exports.TCG = TCG = {}));
 ;
+// -- scraper 
+// TCG price types
+var TCGPriceType;
+(function (TCGPriceType) {
+    TCGPriceType["MarketPrice"] = "Market Price";
+    TCGPriceType["BuylistMarketPrice"] = "Buylist Market Price";
+    TCGPriceType["ListedMedianPrice"] = "Listed Median Price";
+})(TCGPriceType || (exports.TCGPriceType = TCGPriceType = {}));
+// =========
+// functions
+// =========
+/*
+DESC
+    Returns whether the input is a number
+INPUT
+    A value to check
+RETURN
+    TRUE if the input is a number, FALSE otherwise
+*/
+function isNumeric(value) {
+    return !isNaN(value);
+}
+exports.isNumeric = isNumeric;
+/*
+DESC
+    Returns whether the input is a valid price string
+INPUT
+    A string to check
+RETURN
+    TRUE if the input follows the following regex (which roughtly corresponds
+        to numbers like $123.45), FALSE otherwise
+    regex = \$\d+(\.\d{2})?$
+*/
+function isPriceString(value) {
+    const regexp = new RegExp('\$\d+(\.\d{2})?$');
+    return regexp.test(value);
+}
+exports.isPriceString = isPriceString;
+/*
+DESC
+    Converts a price string (determined by isPriceString()) to a number
+INPUT
+    A string to convert
+RETURN
+    The extracted price as a number from the string (eg. '$123.45' => 123.45)
+    Will return NaN if the input is not a price string
+*/
+function getPriceFromString(value) {
+    return isPriceString(value)
+        ? parseFloat(value.substring(1))
+        : NaN;
+}
+exports.getPriceFromString = getPriceFromString;
