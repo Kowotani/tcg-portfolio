@@ -5,7 +5,7 @@ exports.productSchema = void 0;
 const mongoose_1 = require("mongoose");
 const utils_1 = require("../../utils");
 exports.productSchema = new mongoose_1.Schema({
-    tcgplayer_id: {
+    tcgplayerId: {
         type: Number,
         min: 1,
         unique: true,
@@ -16,7 +16,7 @@ exports.productSchema = new mongoose_1.Schema({
         enum: utils_1.TCG,
         required: true
     },
-    release_date: {
+    releaseDate: {
         type: Date,
         required: true
     },
@@ -38,5 +38,5 @@ exports.productSchema = new mongoose_1.Schema({
         type: String,
         enum: utils_1.ProductSubType
     },
-    set_code: String,
+    setCode: String,
 });

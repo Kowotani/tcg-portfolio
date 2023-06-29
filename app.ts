@@ -25,22 +25,22 @@ app.get('/', (req: any, res: any) => {
 /*
 DESC: handle request to add a product
 INPUT: request body in multipart/form-data containing
-    tcgplayer_id - the TCGplayer product id
-    release_date - product release date in YYYY-MM-DD format
+    tcgplayerId - the TCGplayer product id
+    releaseDate - product release date in YYYY-MM-DD format
     name - product name
     type - ProductType enum
     language - ProductLanguage enum
     subtype [OPTIONAL] - ProductSubType enum
-    set_code [OPTIONAL] - product set code
+    setCode [OPTIONAL] - product set code
     
 */
 app.post('/product', upload.none(), async (req: any, res: any) => {
 
         const data = req.body;
 
-        // check if product already exists (via tcgplayer_id)
+        // check if product already exists (via tcgplayerId)
         const query = await getProduct(
-            {tcgplayer_id: Number(data.tcgplayer_id)});
+            {tcgplayerId: Number(data.tcgplayerId)});
         console.log(query);    
         if (query === null) { 
 

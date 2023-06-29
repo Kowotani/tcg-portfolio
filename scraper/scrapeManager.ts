@@ -1,57 +1,99 @@
 // imports
-import { getProductIds, insertDocs } from '../backend/mongoManager';
-import { IPrice, IPriceProduct } from '../backend/models/priceSchema';
+import { getProducts, insertPrices } from '../backend/mongoManager';
+import { IPrice } from '../backend/models/priceSchema';
 import { scrape } from './scraper';
-import { TCGPriceType } from '../utils';
+import { IPriceData, IProductPriceData, TimeseriesGranularity } from '../utils';
 
+
+// ================
+// helper functions
+// ================
+
+/*
+DESC
+    Returns the IPriceData associated with a tcgplayerId, if exists
+INPUT
+    tcgplayerId: The tcgplayerId to search for
+    priceData: The array of IProductPriceData to search
+RETURN
+    The IPriceData associated with the tcgplayerID, null otherwise
+*/
+function getPriceData(tcgplayerId: Number, priceData: IProductPriceData[]): IPriceData | null {
+
+    for (const data of priceData) {
+        if (data.tcgplayerId === tcgplayerId) {
+            return data.priceData;
+        }
+        break;
+    }
+
+    return null;
+}
+
+
+// ==============
+// main functions
+// ==============
 
 /*
 DESC
     Loads price data for all known products
 */
-async function loadPrices(): Promise<void> {
+async function loadPrices(): Promise<Number> {
 
-    // get tcgplayer_ids for scraping
-    const ids = await getProductIds();
-    // console.log(`Retrieved ids: ${JSON.stringify(ids, null, 4)}`);
+    // get all Products
+    const productDocs = await getProducts();
+    console.log(`Retrieved prods: ${JSON.stringify(productDocs, null, 4)}`);
 
     // scrape price data
-    const tcgplayerIds = ids.map( id => id.tcgplayerId );
+    const tcgplayerIds = productDocs.map( doc => doc.tcgplayerId );
     const prices = await scrape(tcgplayerIds);
-    // console.log(prices);
 
     // insert price data
     let priceDate = new Date();
     priceDate.setMinutes(0,0,0);
-    const docs = ids.map(
-        doc => {
-            
-            const priceProduct: IPriceProduct = {
-                id: doc.id,
-                tcgplayerId: doc.tcgplayerId
-            }
+
+    let priceDocs: IPrice[] = [];
+
+    // iterate through each Product
+    for (const productDoc of productDocs) {
+
+        const tcgplayerId = productDoc.tcgplayerId;
+
+        // get price data
+        const priceData = getPriceData(tcgplayerId, prices);
+
+        // handle products without price data
+        if (priceData === null) {
+
+            console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
+
+        // handle products without 
+
+        // construct IPrice object
+        } else {
 
             let price: IPrice = {
                 priceDate: priceDate,
-                product: priceProduct,
-                granularity: 'hourly',
-                marketPrice: 123
-            } 
+                product: productDoc,
+                granularity: TimeseriesGranularity.Hours,
+                marketPrice: priceData.marketPrice
+            }; 
 
-            return {
-                'price_date': priceDate,
-                'product': {
-                    'id': doc.id,
-                    'tcgplayer_id': doc.tcgplayer_id
-                },
-                'market_price': prices[doc.tcgplayer_id]['Market Price'],
-                'buylist_market_price': prices[doc.tcgplayer_id]['Buylist Market Price'],
-                'listed_median_price': prices[doc.tcgplayer_id]['Listed Median Price']
+            if (priceData.buylistMarketPrice !== null) {
+                price['buylistMarketPrice'] = priceData.buylistMarketPrice;
             }
-        }
-    );
-    console.log(JSON.stringify(docs, null, 4));
-    let numInserted = await insertDocs('prices', docs);
+
+            if (priceData.listedMedianPrice !== null) {
+                price['listedMedianPrice'] = priceData.listedMedianPrice;
+            }
+
+            priceDocs.push(price);
+        }        
+    }
+    // console.log(JSON.stringify(priceDocs, null, 4));
+    const numInserted = await insertPrices(priceDocs);
+    return numInserted;
 }
 
 loadPrices()

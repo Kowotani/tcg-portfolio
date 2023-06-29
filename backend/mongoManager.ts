@@ -1,13 +1,15 @@
 // imports
-import { Schema } from 'mongoose';
+import { Document } from 'mongoose';
 import mongoose from 'mongoose';
-import { productSchema } from './models/productSchema';
+import { IPrice, priceSchema } from './models/priceSchema';
+import { IProduct, productSchema } from './models/productSchema';
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 
 // mongoose models
 const Product = mongoose.model('product', productSchema);
+const Price = mongoose.model('price', priceSchema);
 
 
 // =========
@@ -24,46 +26,49 @@ RETURN
     The document if found, else null
 */
 interface IGetProductParameters {
-    tcgplayer_id?: Number;
-    id?: String;
+    tcgplayerId?: Number;
+    hexStringId?: String;    // 24 char hex string
 }
-export async function getProduct({ tcgplayer_id, id }: IGetProductParameters = {}): Promise<any> {
+export async function getProduct({ tcgplayerId, hexStringId }: IGetProductParameters = {}): Promise<any> {
 
     // check that tcgplayer_id or id is provided
-    if (tcgplayer_id === undefined && id === undefined) { 
+    if (tcgplayerId === undefined && hexStringId === undefined) { 
         return null; 
     }
-
-    let docs: any;
 
     // connect to db
     await mongoose.connect(url);  
 
     try {
 
-        docs = tcgplayer_id !== undefined
-            ? await Product.find({ 'tcgplayer_id': tcgplayer_id })
-            : await Product.findById(id);
+        const doc = tcgplayerId !== undefined
+            ? await Product.find({ 'tcgplayerId': tcgplayerId })
+            : await Product.findById(hexStringId);
+        if (doc !== null) { return doc; }
 
     } catch(err) {
 
         console.log(`An error occurred in getProduct(): ${err}`);
     } 
     
-    return docs.length > 0 ? docs[0] : null;
+    return null;
 }
 
 /*
 DESC
-    Returns the product ids for all known products
+    Returns all Products
 RETURN
-    Array of IProductIds
+    Array of Product docs
 */
-interface IProductIds {
-    id: mongoose.Types.ObjectId,
-    tcgplayerId: Number
-}
-export async function getProductIds(): Promise<IProductIds[]> {
+// interface IProductIds {
+//     /*
+//         hex string representation of an ObjectId 
+//         see https://masteringjs.io/tutorials/mongoose/objectid
+//     */
+//     hexStringId: String,     
+//     tcgplayerId: Number
+// }
+export async function getProducts(): Promise<any[]> {
 
     // connect to db
     await mongoose.connect(url);
@@ -71,20 +76,11 @@ export async function getProductIds(): Promise<IProductIds[]> {
     try {
 
         const docs = await Product.find({});
-        const ids: IProductIds[] = docs.map(
-            doc => {
-                return {
-                    id: doc._id,
-                    tcgplayerId: doc.tcgplayer_id
-                }
-            }
-        );
-
-        return ids;
+        return docs;
 
     } catch(err) {
 
-        console.log(`An error occurred in getProductIds(): ${err}`);
+        console.log(`An error occurred in getProducts(): ${err}`);
     }
 
     return [];
@@ -127,6 +123,31 @@ export async function insertDocs(model: string, data: any): Promise<any> {
     }
 
     return 0;
+}
+
+/*
+DESC
+    Constructs Price documents from the input data and inserts them
+INPUT 
+    An array of IPrice objects
+RETURN
+    The number of documents inserted
+*/
+export async function insertPrices(docs: IPrice[]): Promise<Number> {
+
+    // connect to db
+    await mongoose.connect(url);
+
+    try {
+
+        const res = await Price.insertMany(docs);
+        return res.length;
+        
+    } catch(err) {
+    
+        console.log(`An error occurred in insertPrices(): ${err}`);
+        return -1;
+    }
 }
 
 // async function main() {

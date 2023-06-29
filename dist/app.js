@@ -31,19 +31,19 @@ app.get('/', (req, res) => {
 /*
 DESC: handle request to add a product
 INPUT: request body in multipart/form-data containing
-    tcgplayer_id - the TCGplayer product id
-    release_date - product release date in YYYY-MM-DD format
+    tcgplayerId - the TCGplayer product id
+    releaseDate - product release date in YYYY-MM-DD format
     name - product name
     type - ProductType enum
     language - ProductLanguage enum
     subtype [OPTIONAL] - ProductSubType enum
-    set_code [OPTIONAL] - product set code
+    setCode [OPTIONAL] - product set code
     
 */
 app.post('/product', upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const data = req.body;
-    // check if product already exists (via tcgplayer_id)
-    const query = yield (0, mongoManager_1.getProduct)({ tcgplayer_id: Number(data.tcgplayer_id) });
+    // check if product already exists (via tcgplayerId)
+    const query = yield (0, mongoManager_1.getProduct)({ tcgplayerId: Number(data.tcgplayerId) });
     console.log(query);
     if (query === null) {
         res.send('Product already exists');

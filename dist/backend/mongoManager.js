@@ -12,64 +12,67 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertDocs = exports.getProductIds = exports.getProduct = void 0;
-// imports
+exports.insertPrices = exports.insertDocs = exports.getProducts = exports.getProduct = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
+const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
 const Product = mongoose_1.default.model('product', productSchema_1.productSchema);
-function getProduct({ tcgplayer_id, id } = {}) {
+const Price = mongoose_1.default.model('price', priceSchema_1.priceSchema);
+function getProduct({ tcgplayerId, hexStringId } = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         // check that tcgplayer_id or id is provided
-        if (tcgplayer_id === undefined && id === undefined) {
+        if (tcgplayerId === undefined && hexStringId === undefined) {
             return null;
         }
-        let docs;
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            docs = tcgplayer_id !== undefined
-                ? yield Product.find({ 'tcgplayer_id': tcgplayer_id })
-                : yield Product.findById(id);
+            const doc = tcgplayerId !== undefined
+                ? yield Product.find({ 'tcgplayerId': tcgplayerId })
+                : yield Product.findById(hexStringId);
+            if (doc !== null) {
+                return doc;
+            }
         }
         catch (err) {
             console.log(`An error occurred in getProduct(): ${err}`);
         }
-        return docs.length > 0 ? docs[0] : null;
+        return null;
     });
 }
 exports.getProduct = getProduct;
 /*
 DESC
-    Returns the product ids for all known products
+    Returns all Products
 RETURN
-    Array of product objects containing
-        id: Document ObjectID
-        tcgplayer_id: Document tcgplayer_id
+    Array of Product docs
 */
-function getProductIds() {
+// interface IProductIds {
+//     /*
+//         hex string representation of an ObjectId 
+//         see https://masteringjs.io/tutorials/mongoose/objectid
+//     */
+//     hexStringId: String,     
+//     tcgplayerId: Number
+// }
+function getProducts() {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
             const docs = yield Product.find({});
-            const ids = docs.map(doc => {
-                return {
-                    'id': doc._id,
-                    'tcgplayer_id': doc.tcgplayer_id
-                };
-            });
-            return ids;
+            return docs;
         }
         catch (err) {
-            console.log(`An error occurred in getProductIds(): ${err}`);
+            console.log(`An error occurred in getProducts(): ${err}`);
         }
-        return null;
+        return [];
     });
 }
-exports.getProductIds = getProductIds;
+exports.getProducts = getProducts;
 /*
 DESC
     Inserts documents constructed from the input data for the specified model
@@ -105,6 +108,29 @@ function insertDocs(model, data) {
     });
 }
 exports.insertDocs = insertDocs;
+/*
+DESC
+    Constructs Price documents from the input data and inserts them
+INPUT
+    An array of IPrice objects
+RETURN
+    The number of documents inserted
+*/
+function insertPrices(docs) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            const res = yield Price.insertMany(docs);
+            return res.length;
+        }
+        catch (err) {
+            console.log(`An error occurred in insertPrices(): ${err}`);
+            return -1;
+        }
+    });
+}
+exports.insertPrices = insertPrices;
 // async function main() {
 //     let ids = await getProductIds();
 //     console.log(ids);

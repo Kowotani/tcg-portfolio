@@ -1,40 +1,40 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.priceSchema = exports.priceProductSchema = void 0;
+exports.priceSchema = void 0;
 // imports
 const mongoose_1 = require("mongoose");
-const utils_1 = require("../../utils");
+const productSchema_1 = require("./productSchema");
 // =======
 // schemas
 // =======
-exports.priceProductSchema = new mongoose_1.Schema({
-    id: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        required: true
-    },
-    type: {
-        type: String,
-        enum: utils_1.ProductType,
-        required: true
-    },
-    name: {
-        type: String,
-        required: true
-    }
-});
+// export const priceProductSchema = new Schema<IPriceProduct>({
+//     id: {
+//         type: Schema.Types.ObjectId,
+//         required: true
+//     },
+//     tcgplayerId: {
+//         type: Number,
+//         required: true
+//     },
+// })
 exports.priceSchema = new mongoose_1.Schema({
-    price_date: {
+    priceDate: {
         type: Date,
         required: true
     },
     product: {
-        type: exports.priceProductSchema,
+        type: productSchema_1.productSchema,
+        ref: 'Product',
         required: true
     },
-    market_price: {
+    granularity: {
+        type: String,
+        required: true
+    },
+    marketPrice: {
         type: Number,
         required: true
     },
-    buylist_median_price: { type: Number },
-    listed_median_price: { type: Number }
+    buylistMarketPrice: { type: Number },
+    listedMedianPrice: { type: Number }
 });

@@ -57,6 +57,24 @@ export enum TCGPriceType {
 
 
 // =========
+// interfaces
+// =========
+
+// used with IProductPriceData for storing scraped price data
+export interface IPriceData {
+    marketPrice: Number;
+    buylistMarketPrice: Number;
+    listedMedianPrice: Number;
+}
+
+// used with IPriceData for storing scraped price data
+export interface IProductPriceData {
+    tcgplayerId: Number;
+    priceData: IPriceData;
+}
+
+
+// =========
 // functions
 // =========
 

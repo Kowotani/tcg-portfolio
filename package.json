@@ -5,7 +5,7 @@
   "main": "dist/app.js",
   "scripts": {
     "start": "tsc && node dist/app.js",
-    "test": "tsc && node dist/backend/mongoManager.js"
+    "test": "tsc && node dist/scraper/scrapeManager.js"
   },
   "author": "",
   "license": "ISC",

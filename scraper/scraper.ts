@@ -1,25 +1,17 @@
 // imports
 import { getBrowser } from './browser';
-import { getPriceFromString, isPriceString, TCGPriceType } from '../utils'
+import { getPriceFromString, IPriceData, IProductPriceData, isPriceString, 
+    isTCGPriceTypeValue, TCGPriceType } from '../utils'
 
 
 /*
 DESC
-    Scrapes price data for the input tcgplayer_ids
+    Scrapes price data for the input tcgplayerIds
 INPUT
-    Array of tcgplayer_ids
+    Array of tcgplayerIds
 RETURN
-    Array of ProductPriceData objects
+    Array of IProductPriceData objects
 */
-interface IPriceData {
-    marketPrice: Number;
-    buylistMarketPrice?: Number;
-    listedMedianPrice?: Number;
-}
-interface IProductPriceData {
-    tcgplayerId: Number;
-    priceData: IPriceData;
-}
 export async function scrape(ids: Number[]): Promise<IProductPriceData[]> {
 
     // create browser instance and page
@@ -48,53 +40,47 @@ export async function scrape(ids: Number[]): Promise<IProductPriceData[]> {
 
         // wait for price guide to load
         await page.waitForSelector('.price-guide__points');
-    
+
+        // const validText: string[] = Object.values(TCGPriceType);
+        const headerPath = '.price-guide__points > table > tr:not(.price-points__header)';
+
         // create price object
         try {
 
-            // variables
-            const validText: string[] = Object.values(TCGPriceType);
-            const headerPath = '.price-guide__points > table > tr:not(.price-points__header)';
-
-            // scrape price from divs
-            const prices = await page.$$eval(headerPath, rows => {
-                let data: any = {};
+            // scrape text from divs
+            const scrapedTexts = await page.$$eval(headerPath, rows => {
+                let scrapedText: {text: string, price: string}[] = [];
                 for (const row of rows) {
                     const divText = row?.querySelector('.text')?.textContent?.trim() ?? '';
                     const divPrice = row?.querySelector('.price')?.textContent?.trim() ?? '';
-                    if (validText.includes(divText) && isPriceString(divPrice)) {
-                        data[divText] = getPriceFromString(divPrice);
+                    if (divText.length > 0 && divPrice.length > 0) {
+                        scrapedText.push({text: divText, price: divPrice});
                     }
                 }
-                return data;
+                return scrapedText;
             })
+            
+            // parse scraped text
+            let data: any = {};
+            for (const st of scrapedTexts) {
+                if (isTCGPriceTypeValue(st.text) && isPriceString(st.price)) {
+                    data[st.text] = getPriceFromString(st.price);
+                }
+            }
 
             // create IPriceData
-            
-            // skip if market price does not exist
-            if (!(Object.keys(prices).includes(TCGPriceType.MarketPrice))) {
-                console.log(`Could not scrape Market Price for tcgplyer_id: ${id}`)
-                break;
-            }
-
             let priceData: IPriceData = {
-                marketPrice: prices[TCGPriceType.MarketPrice],
-            }
-
-            if (Object.keys(prices).includes(TCGPriceType.BuylistMarketPrice)) {
-                priceData['buylistMarketPrice'] = prices[TCGPriceType.BuylistMarketPrice];
-            }
-
-            if (Object.keys(prices).includes(TCGPriceType.ListedMedianPrice)) {
-                priceData['listedMedianPrice'] = prices[TCGPriceType.ListedMedianPrice];
-            }
+                marketPrice: data[TCGPriceType.MarketPrice] || null,
+                buylistMarketPrice: data[TCGPriceType.BuylistMarketPrice] || null,
+                listedMedianPrice: data[TCGPriceType.ListedMedianPrice] || null,
+            };
 
             // create IProductPriceData
             const productPriceData: IProductPriceData = {
                 tcgplayerId: id,
                 priceData: priceData
             }
-            scrapeData.push(productPriceData);
+            scrapeData.push(productPriceData);               
 
         } 
         catch(err) {

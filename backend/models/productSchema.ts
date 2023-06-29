@@ -2,19 +2,19 @@
 import { Schema } from 'mongoose';
 import { ProductLanguage, ProductSubType, ProductType, TCG } from '../../utils';
 
-interface IProduct {
-    tcgplayer_id: Number;
+export interface IProduct {
+    tcgplayerId: Number;
     tcg: TCG;
-    release_date: Date;
+    releaseDate: Date;
     name: String;
     type: ProductType;
     language: ProductLanguage;
     subtype?: ProductSubType;
-    set_code?: String;
+    setCode?: String;
 }
 
 export const productSchema = new Schema<IProduct>({
-    tcgplayer_id: {
+    tcgplayerId: {
         type: Number,
         min: 1,
         unique: true,
@@ -25,7 +25,7 @@ export const productSchema = new Schema<IProduct>({
         enum: TCG,
         required: true
     },
-    release_date: {
+    releaseDate: {
         type: Date,
         required: true
     }, 
@@ -47,5 +47,5 @@ export const productSchema = new Schema<IProduct>({
         type: String,
         enum: ProductSubType
     },
-    set_code: String,
+    setCode: String,
 });
