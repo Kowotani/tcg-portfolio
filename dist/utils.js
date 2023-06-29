@@ -3,7 +3,15 @@
 // enums
 // =====
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPriceFromString = exports.isPriceString = exports.isNumeric = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubType = exports.ProductLanguage = void 0;
+exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.getPriceFromString = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubType = exports.ProductLanguage = exports.TimeseriesGranularity = void 0;
+// -- mongodb
+var TimeseriesGranularity;
+(function (TimeseriesGranularity) {
+    TimeseriesGranularity["Seconds"] = "seconds";
+    TimeseriesGranularity["Minutes"] = "minutes";
+    TimeseriesGranularity["Hours"] = "hours";
+})(TimeseriesGranularity || (exports.TimeseriesGranularity = TimeseriesGranularity = {}));
+;
 // -- product features
 // product language
 var ProductLanguage;
@@ -55,6 +63,21 @@ var TCGPriceType;
 // =========
 /*
 DESC
+    Converts a price string (determined by isPriceString()) to a number
+INPUT
+    A string to convert
+RETURN
+    The extracted price as a number from the string (eg. '$123.45' => 123.45)
+    Will return NaN if the input is not a price string
+*/
+function getPriceFromString(value) {
+    return isPriceString(value)
+        ? parseFloat(value.substring(1))
+        : NaN;
+}
+exports.getPriceFromString = getPriceFromString;
+/*
+DESC
     Returns whether the input is a number
 INPUT
     A value to check
@@ -73,25 +96,23 @@ INPUT
 RETURN
     TRUE if the input follows the following regex (which roughtly corresponds
         to numbers like $123.45), FALSE otherwise
-    regex = \$\d+(\.\d{2})?$
+    regex = ^\$\d+\.\d{2}$
 */
 function isPriceString(value) {
-    const regexp = new RegExp('\$\d+(\.\d{2})?$');
+    const regexp = new RegExp('^\\$\\d+\\.\\d{2}$');
     return regexp.test(value);
 }
 exports.isPriceString = isPriceString;
 /*
 DESC
-    Converts a price string (determined by isPriceString()) to a number
+    Returns whether the input string matches a TCGPriceType value
 INPUT
-    A string to convert
+    A string to check
 RETURN
-    The extracted price as a number from the string (eg. '$123.45' => 123.45)
-    Will return NaN if the input is not a price string
+    TRUE if the input matches a TCGPriceType value
 */
-function getPriceFromString(value) {
-    return isPriceString(value)
-        ? parseFloat(value.substring(1))
-        : NaN;
+function isTCGPriceTypeValue(value) {
+    const arr = Object.values(TCGPriceType).map(v => v.toString());
+    return arr.includes(value);
 }
-exports.getPriceFromString = getPriceFromString;
+exports.isTCGPriceTypeValue = isTCGPriceTypeValue;

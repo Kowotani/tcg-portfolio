@@ -60,6 +60,22 @@ export enum TCGPriceType {
 // functions
 // =========
 
+
+/*
+DESC
+    Converts a price string (determined by isPriceString()) to a number
+INPUT
+    A string to convert
+RETURN
+    The extracted price as a number from the string (eg. '$123.45' => 123.45)
+    Will return NaN if the input is not a price string
+*/
+export function getPriceFromString(value: string): number {
+    return isPriceString(value)
+        ? parseFloat(value.substring(1))
+        : NaN
+}
+
 /*
 DESC
     Returns whether the input is a number
@@ -80,24 +96,22 @@ INPUT
 RETURN
     TRUE if the input follows the following regex (which roughtly corresponds
         to numbers like $123.45), FALSE otherwise
-    regex = \$\d+(\.\d{2})?$
+    regex = ^\$\d+\.\d{2}$
 */
 export function isPriceString(value: string): boolean {
-    const regexp = new RegExp('\$\d+(\.\d{2})?$');
+    const regexp = new RegExp('^\\$\\d+\\.\\d{2}$');
     return regexp.test(value);
 }
 
 /*
 DESC
-    Converts a price string (determined by isPriceString()) to a number
+    Returns whether the input string matches a TCGPriceType value
 INPUT
-    A string to convert
+    A string to check
 RETURN
-    The extracted price as a number from the string (eg. '$123.45' => 123.45)
-    Will return NaN if the input is not a price string
+    TRUE if the input matches a TCGPriceType value
 */
-export function getPriceFromString(value: string): number {
-    return isPriceString(value)
-        ? parseFloat(value.substring(1))
-        : NaN
+export function isTCGPriceTypeValue(value: string): boolean {
+    const arr = Object.values(TCGPriceType).map(v => v.toString());
+    return arr.includes(value);
 }
