@@ -24,7 +24,6 @@ function getPriceData(tcgplayerId: Number, priceData: IProductPriceData[]): IPri
         if (data.tcgplayerId === tcgplayerId) {
             return data.priceData;
         }
-        break;
     }
 
     return null;
@@ -68,8 +67,6 @@ async function loadPrices(): Promise<Number> {
 
             console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
 
-        // handle products without 
-
         // construct IPrice object
         } else {
 
@@ -96,6 +93,11 @@ async function loadPrices(): Promise<Number> {
     return numInserted;
 }
 
-loadPrices()
-    .then(console.log)
-    .catch(console.error);
+// async function main() {
+//     const numInserted = await loadPrices();
+//     console.log(`Inserted ${numInserted} docs`);
+// }
+
+// main()
+//     .then(console.log)
+//     .catch(console.error);

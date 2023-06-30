@@ -30,7 +30,6 @@ function getPriceData(tcgplayerId, priceData) {
         if (data.tcgplayerId === tcgplayerId) {
             return data.priceData;
         }
-        break;
     }
     return null;
 }
