@@ -12,7 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertPrices = exports.insertDocs = exports.getProducts = exports.getProduct = void 0;
+exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = void 0;
+// imports
 const mongoose_1 = __importDefault(require("mongoose"));
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
@@ -50,14 +51,6 @@ DESC
 RETURN
     Array of Product docs
 */
-// interface IProductIds {
-//     /*
-//         hex string representation of an ObjectId 
-//         see https://masteringjs.io/tutorials/mongoose/objectid
-//     */
-//     hexStringId: String,     
-//     tcgplayerId: Number
-// }
 function getProducts() {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
@@ -75,39 +68,27 @@ function getProducts() {
 exports.getProducts = getProducts;
 /*
 DESC
-    Inserts documents constructed from the input data for the specified model
+    Constructs Price documents from the input data and inserts them
 INPUT
-    model: The name of the document model (mongoose automatically looks for
-        the plural lowercase version of the model as the collection)
-    data: An array of object data from which to construct the documents
+    An array of IPrice objects
 RETURN
     The number of documents inserted
 */
-function insertDocs(model, data) {
+function insertProducts(docs) {
     return __awaiter(this, void 0, void 0, function* () {
-        // get schema
-        let schema;
-        switch (model) {
-            case 'product':
-                schema = productSchema_1.productSchema;
-                break;
-            case 'price':
-                schema = null;
-                break;
-        }
-        const Model = mongoose_1.default.model(model, schema);
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const res = yield Model.insertMany(data);
+            const res = yield Product.insertMany(docs);
+            return res.length;
         }
         catch (err) {
-            console.log(`An error occurred in insertDocs(): ${err}`);
+            console.log(`An error occurred in insertProducts(): ${err}`);
+            return -1;
         }
-        return 0;
     });
 }
-exports.insertDocs = insertDocs;
+exports.insertProducts = insertProducts;
 /*
 DESC
     Constructs Price documents from the input data and inserts them

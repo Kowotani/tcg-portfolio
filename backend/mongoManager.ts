@@ -1,5 +1,4 @@
 // imports
-import { Document } from 'mongoose';
 import mongoose from 'mongoose';
 import { IPrice, priceSchema } from './models/priceSchema';
 import { IProduct, productSchema } from './models/productSchema';
@@ -60,14 +59,6 @@ DESC
 RETURN
     Array of Product docs
 */
-// interface IProductIds {
-//     /*
-//         hex string representation of an ObjectId 
-//         see https://masteringjs.io/tutorials/mongoose/objectid
-//     */
-//     hexStringId: String,     
-//     tcgplayerId: Number
-// }
 export async function getProducts(): Promise<any[]> {
 
     // connect to db
@@ -86,44 +77,32 @@ export async function getProducts(): Promise<any[]> {
     return [];
 }
 
+
 /*
 DESC
-    Inserts documents constructed from the input data for the specified model
+    Constructs Price documents from the input data and inserts them
 INPUT 
-    model: The name of the document model (mongoose automatically looks for
-        the plural lowercase version of the model as the collection)
-    data: An array of object data from which to construct the documents
+    An array of IPrice objects
 RETURN
     The number of documents inserted
 */
-export async function insertDocs(model: string, data: any): Promise<any> {
-
-    // get schema
-    let schema: any;
-    switch (model) {
-        case 'product':
-            schema = productSchema;
-            break;
-        case 'price':
-            schema = null;
-            break;
-    }
-    const Model = mongoose.model(model, schema);
+export async function insertProducts(docs: IProduct[]): Promise<Number> {
 
     // connect to db
     await mongoose.connect(url);
 
     try {
 
-        const res = await Model.insertMany(data);
+        const res = await Product.insertMany(docs);
+        return res.length;
         
     } catch(err) {
     
-        console.log(`An error occurred in insertDocs(): ${err}`);
+        console.log(`An error occurred in insertProducts(): ${err}`);
+        return -1;
     }
-
-    return 0;
 }
+
 
 /*
 DESC

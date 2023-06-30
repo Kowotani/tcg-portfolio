@@ -80,7 +80,7 @@ function loadPrices() {
                 priceDocs.push(price);
             }
         }
-        console.log(JSON.stringify(priceDocs, null, 4));
+        // console.log(JSON.stringify(priceDocs, null, 4));
         const numInserted = yield (0, mongoManager_1.insertPrices)(priceDocs);
         return numInserted;
     });

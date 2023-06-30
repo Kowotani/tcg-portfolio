@@ -1,7 +1,7 @@
 // imports
 
 import express from 'express';
-import { insertDocs, getProduct } from './backend/mongoManager';
+import { insertProducts, getProduct } from './backend/mongoManager';
 import multer from 'multer';
 // const utils = require('./utils');
 
@@ -49,7 +49,7 @@ app.post('/product', upload.none(), async (req: any, res: any) => {
         } else {
         
             // add product
-            await insertDocs('product', [data]);
+            await insertProducts([data]);
             res.send('Product added: ' + JSON.stringify(data));
         }
     });

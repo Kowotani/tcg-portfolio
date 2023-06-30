@@ -50,7 +50,7 @@ app.post('/product', upload.none(), (req, res) => __awaiter(void 0, void 0, void
     }
     else {
         // add product
-        yield (0, mongoManager_1.insertDocs)('product', [data]);
+        yield (0, mongoManager_1.insertProducts)([data]);
         res.send('Product added: ' + JSON.stringify(data));
     }
 }));
