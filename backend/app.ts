@@ -3,15 +3,13 @@
 import express from 'express';
 import { insertProducts, getProduct } from './mongo/mongoManager';
 import multer from 'multer';
-// const utils = require('./utils');
 
 const upload = multer();
 const app = express();
 
 // app.use(upload);    // parse multipart/form-data
 
-// app.use(express.static('public'));  // serve static files from public
-const port = 3000;
+const port = 3030;
 
 app.get('/', (req: any, res: any) => {
     res.send('Hello World!');

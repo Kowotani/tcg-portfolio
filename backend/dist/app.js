@@ -21,7 +21,7 @@ const upload = (0, multer_1.default)();
 const app = (0, express_1.default)();
 // app.use(upload);    // parse multipart/form-data
 // app.use(express.static('public'));  // serve static files from public
-const port = 3000;
+const port = 3030;
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
