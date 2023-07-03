@@ -1,6 +1,6 @@
 // imports
-import { getProducts, insertPrices } from '../backend/mongoManager';
-import { IPrice } from '../backend/models/priceSchema';
+import { getProducts, insertPrices } from '../mongo/mongoManager';
+import { IPrice } from '../mongo/models/priceSchema';
 import { scrape } from './scraper';
 import { IPriceData, IProductPriceData, TimeseriesGranularity } from '../utils';
 
@@ -14,7 +14,7 @@ DESC
     Returns the IPriceData associated with a tcgplayerId, if exists
 INPUT
     tcgplayerId: The tcgplayerId to search for
-    priceData: The array of IProductPriceData to search
+    priceData: The array of IProductPriceDaxta to search
 RETURN
     The IPriceData associated with the tcgplayerID, null otherwise
 */
@@ -93,11 +93,11 @@ async function loadPrices(): Promise<Number> {
     return numInserted;
 }
 
-// async function main() {
-//     const numInserted = await loadPrices();
-//     console.log(`Inserted ${numInserted} docs`);
-// }
+async function main() {
+    const numInserted = await loadPrices();
+    console.log(`Inserted ${numInserted} docs`);
+}
 
-// main()
-//     .then(console.log)
-//     .catch(console.error);
+main()
+    .then(console.log)
+    .catch(console.error);

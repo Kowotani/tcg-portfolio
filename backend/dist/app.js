@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const mongoManager_1 = require("./backend/mongoManager");
+const mongoManager_1 = require("./mongo/mongoManager");
 const multer_1 = __importDefault(require("multer"));
 // const utils = require('./utils');
 const upload = (0, multer_1.default)();

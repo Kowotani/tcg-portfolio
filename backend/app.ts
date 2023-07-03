@@ -1,7 +1,7 @@
 // imports
 
 import express from 'express';
-import { insertProducts, getProduct } from './backend/mongoManager';
+import { insertProducts, getProduct } from './mongo/mongoManager';
 import multer from 'multer';
 // const utils = require('./utils');
 

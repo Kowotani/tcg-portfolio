@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 // imports
-const mongoManager_1 = require("../backend/mongoManager");
+const mongoManager_1 = require("../mongo/mongoManager");
 const scraper_1 = require("./scraper");
 const utils_1 = require("../utils");
 // ================
@@ -21,7 +21,7 @@ DESC
     Returns the IPriceData associated with a tcgplayerId, if exists
 INPUT
     tcgplayerId: The tcgplayerId to search for
-    priceData: The array of IProductPriceData to search
+    priceData: The array of IProductPriceDaxta to search
 RETURN
     The IPriceData associated with the tcgplayerID, null otherwise
 */
@@ -60,7 +60,6 @@ function loadPrices() {
             // handle products without price data
             if (priceData === null) {
                 console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
-                // handle products without 
                 // construct IPrice object
             }
             else {
@@ -84,6 +83,12 @@ function loadPrices() {
         return numInserted;
     });
 }
-loadPrices()
+function main() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const numInserted = yield loadPrices();
+        console.log(`Inserted ${numInserted} docs`);
+    });
+}
+main()
     .then(console.log)
     .catch(console.error);
