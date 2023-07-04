@@ -1,5 +1,6 @@
 import { FunctionComponent } from 'react';
 import { 
+    Box,
     Input, 
     InputGroup, 
     InputLeftAddon, 
@@ -54,26 +55,29 @@ export const DateInput: FunctionComponent<DateInputProps> = ({
     errorMessage = null,
 }) => {
 
+    const DateComponent = (): JSX.Element => {
+        return (
+            <Input 
+                type='date' 
+                isInvalid={isInvalid}
+                isRequired={isRequired} 
+                value={value} 
+            />
+        )
+    }
+
     return (
         <InputGroup>
             {leftLabel ? <InputLeftAddon children={leftLabel} /> : null}
             {errorMessage 
                 ? (
                     <ErrorTooltip label={errorMessage} isOpen={isInvalid}>
-                        <Input
-                            type='date' 
-                            isInvalid={isInvalid}
-                            isRequired={isRequired} 
-                            value={value} 
-                        />
+                        <Box>
+                            <DateComponent />
+                        </Box>
                     </ErrorTooltip>
                 ) : (
-                    <Input 
-                        type='date'
-                        isInvalid={isInvalid}
-                        isRequired={isRequired} 
-                        value={value} 
-                    />
+                    <DateComponent />
                 )
             }
             {rightLabel ? <InputRightAddon children={rightLabel} /> : null}
@@ -124,7 +128,9 @@ export const SelectInput: FunctionComponent<SelectInputProps> = ({
             {errorMessage 
                 ? (
                     <ErrorTooltip label={errorMessage} isOpen={isInvalid}>
-                        <SelectComponent />
+                        <Box>
+                            <SelectComponent />
+                        </Box>
                     </ErrorTooltip>
                 ) : (
                     <SelectComponent />
@@ -154,15 +160,15 @@ export const TextInput: FunctionComponent<TextInputProps> = ({
     errorMessage = null,
 }) => {
    
-    // const InputField = () => {
-    //     return (
-    //         <Input 
-    //             isInvalid={isInvalid}
-    //             isRequired={isRequired} 
-    //             placeholder={placeholder} 
-    //         />
-    //     )
-    // }
+    const InputComponent = (): JSX.Element => {
+        return (
+            <Input 
+                isInvalid={isInvalid}
+                isRequired={isRequired} 
+                placeholder={placeholder} 
+            />
+        )
+    }
 
     return (
         <InputGroup>
@@ -170,18 +176,12 @@ export const TextInput: FunctionComponent<TextInputProps> = ({
             {errorMessage 
                 ? (
                     <ErrorTooltip label={errorMessage} isOpen={isInvalid}>
-                        <Input 
-                            isInvalid={isInvalid}
-                            isRequired={isRequired} 
-                            placeholder={placeholder} 
-                        />
+                        <Box>
+                            <InputComponent />
+                        </Box>
                     </ErrorTooltip>
                 ) : (
-                    <Input 
-                        isInvalid={isInvalid}
-                        isRequired={isRequired} 
-                        placeholder={placeholder} 
-                    />
+                    <InputComponent />
                 )
             }
             {rightLabel ? <InputRightAddon children={rightLabel} /> : null}
