@@ -5,10 +5,29 @@ import {
     InputGroup, 
     InputLeftAddon, 
     InputRightAddon,
+    NumberInput,
+    NumberInputField,
     Select,
     Tooltip
 } from '@chakra-ui/react';
 
+
+// =================
+// Shared Interfaces
+// =================
+
+interface IInputProps {
+    leftLabel?: string,
+    rightLabel?: string,
+    isInvalid?: boolean,
+    isRequired?: boolean,
+    errorMessage?: string,
+}
+
+
+// ==========
+// Components
+// ==========
 
 // Error message tooltip
 interface ErrorTooltipProps {
@@ -38,15 +57,10 @@ const ErrorTooltip: FunctionComponent<ErrorTooltipProps> = ({
 
 
 // Date input
-interface DateInputProps {
+interface IDateInputProps extends IInputProps {
     value?: string
-    leftLabel?: string,
-    rightLabel?: string,
-    isInvalid?: boolean,
-    isRequired?: boolean,
-    errorMessage?: string,
 }
-export const DateInput: FunctionComponent<DateInputProps> = ({
+export const DateInput: FunctionComponent<IDateInputProps> = ({
     value = undefined, 
     leftLabel = null, 
     rightLabel = null, 
@@ -87,16 +101,11 @@ export const DateInput: FunctionComponent<DateInputProps> = ({
 
 
 // Select input
-interface SelectInputProps {
+interface ISelectInputProps extends IInputProps {
     placeholder: string,
     values: string[],
-    leftLabel?: string,
-    rightLabel?: string,
-    isInvalid?: boolean,
-    isRequired?: boolean,
-    errorMessage?: string,
 }
-export const SelectInput: FunctionComponent<SelectInputProps> = ({
+export const SelectInput: FunctionComponent<ISelectInputProps> = ({
     placeholder, 
     values,
     leftLabel = null, 
@@ -143,15 +152,10 @@ export const SelectInput: FunctionComponent<SelectInputProps> = ({
 
 
 // Text input
-interface TextInputProps {
+interface ITextInputProps extends IInputProps {
     placeholder: string
-    leftLabel?: string,
-    rightLabel?: string,
-    isInvalid?: boolean,
-    isRequired?: boolean,
-    errorMessage?: string,
 }
-export const TextInput: FunctionComponent<TextInputProps> = ({
+export const TextInput: FunctionComponent<ITextInputProps> = ({
     placeholder, 
     leftLabel = null, 
     rightLabel = null, 
