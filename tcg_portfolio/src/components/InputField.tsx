@@ -58,15 +58,15 @@ const ErrorTooltip: FunctionComponent<ErrorTooltipProps> = ({
 
 // Date input
 interface IDateInputProps extends IInputProps {
-    value?: string
+    value?: number
 }
 export const DateInput: FunctionComponent<IDateInputProps> = ({
     value = undefined, 
-    leftLabel = null, 
-    rightLabel = null, 
+    leftLabel = undefined, 
+    rightLabel = undefined, 
     isInvalid = false, 
     isRequired = false,
-    errorMessage = null,
+    errorMessage = undefined,
 }) => {
 
     const DateComponent = (): JSX.Element => {
@@ -100,6 +100,60 @@ export const DateInput: FunctionComponent<IDateInputProps> = ({
 }
 
 
+// Numeric input
+interface INumericInputProps extends IInputProps {
+    defaultValue?: number
+    max?: number
+    min?: number
+    precision?: number
+}
+export const NumericInput: FunctionComponent<INumericInputProps> = ({
+    defaultValue = undefined,
+    max = undefined,
+    min = undefined, 
+    precision = 0,
+    leftLabel = undefined, 
+    rightLabel = undefined, 
+    isInvalid = false, 
+    isRequired = false,
+    errorMessage = undefined,
+}) => {
+   
+    const NumericComponent = (): JSX.Element => {
+        return (
+            <NumberInput 
+                isInvalid={isInvalid}
+                isRequired={isRequired} 
+                defaultValue={defaultValue}
+                min={min}
+                max={max}
+                precision={precision}
+            >
+                <NumberInputField />
+            </NumberInput>
+        )
+    }
+
+    return (
+        <InputGroup>
+            {leftLabel ? <InputLeftAddon children={leftLabel} /> : null}
+            {errorMessage 
+                ? (
+                    <ErrorTooltip label={errorMessage} isOpen={isInvalid}>
+                        <Box>
+                            <NumericComponent />
+                        </Box>
+                    </ErrorTooltip>
+                ) : (
+                    <NumericComponent />
+                )
+            }
+            {rightLabel ? <InputRightAddon children={rightLabel} /> : null}
+        </InputGroup>
+    )
+}
+
+
 // Select input
 interface ISelectInputProps extends IInputProps {
     placeholder: string,
@@ -108,11 +162,11 @@ interface ISelectInputProps extends IInputProps {
 export const SelectInput: FunctionComponent<ISelectInputProps> = ({
     placeholder, 
     values,
-    leftLabel = null, 
-    rightLabel = null, 
+    leftLabel = undefined, 
+    rightLabel = undefined, 
     isInvalid = false, 
     isRequired = false,
-    errorMessage = null,
+    errorMessage = undefined,
 }) => {
 
     const SelectComponent = (): JSX.Element => {
@@ -157,11 +211,11 @@ interface ITextInputProps extends IInputProps {
 }
 export const TextInput: FunctionComponent<ITextInputProps> = ({
     placeholder, 
-    leftLabel = null, 
-    rightLabel = null, 
+    leftLabel = undefined, 
+    rightLabel = undefined, 
     isInvalid = false, 
     isRequired = false,
-    errorMessage = null,
+    errorMessage = undefined,
 }) => {
    
     const InputComponent = (): JSX.Element => {
