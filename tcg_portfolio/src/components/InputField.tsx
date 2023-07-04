@@ -25,14 +25,70 @@ const ErrorTooltip: FunctionComponent<ErrorTooltipProps> = ({
     return (
         <Tooltip 
             label={label} 
-            bg='white'
-            color='red'
+            bg='red'
+            color='white'
             placement='bottom-start'
             gutter={3} 
             isOpen={isOpen}
         >
             {children}
         </Tooltip>
+    )
+}
+
+// Date input
+interface DateInputProps {
+    value?: string
+    leftLabel?: string,
+    rightLabel?: string,
+    isInvalid?: boolean,
+    isRequired?: boolean,
+    errorMessage?: string,
+}
+export const DateInput: FunctionComponent<DateInputProps> = ({
+    value = undefined, 
+    leftLabel = null, 
+    rightLabel = null, 
+    isInvalid = false, 
+    isRequired = false,
+    errorMessage = null,
+}) => {
+   
+    // const InputField = () => {
+    //     return (
+    //         <Input 
+    //             type='date'
+    //             isInvalid={isInvalid}
+    //             isRequired={isRequired} 
+    //             value={value} 
+    //         />
+    //     )
+    // }
+
+    return (
+        <InputGroup>
+            {leftLabel ? <InputLeftAddon children={leftLabel} /> : null}
+            {errorMessage 
+                ? (
+                    <ErrorTooltip label={errorMessage} isOpen={isInvalid}>
+                        <Input
+                            type='date' 
+                            isInvalid={isInvalid}
+                            isRequired={isRequired} 
+                            value={value} 
+                        />
+                    </ErrorTooltip>
+                ) : (
+                    <Input 
+                        type='date'
+                        isInvalid={isInvalid}
+                        isRequired={isRequired} 
+                        value={value} 
+                    />
+                )
+            }
+            {rightLabel ? <InputRightAddon children={rightLabel} /> : null}
+        </InputGroup>
     )
 }
 
