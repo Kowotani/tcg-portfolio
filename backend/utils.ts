@@ -163,6 +163,25 @@ export interface IProductPriceData {
 // functions
 // =========
 
+/*
+DESC
+    Returns the instersection of two arrays
+INPUT
+    Two arrays, arr1 and arr2
+RETURN
+    The intersection of arr1 and arr2
+REF
+    https://stackoverflow.com/questions/64100785/big-o-of-finding-the-intersection-in-two-unsorted-arrays-using-filter-in-javas
+*/
+export function getArrayIntersection(arr1?: any[], arr2?: any[]) {
+    if (arr1 !== undefined && arr2 !== undefined) {
+        const set = new Set(arr1);
+        return arr2.filter(item => set.has(item));
+    } else {
+        return [];
+    }
+}
+
 
 /*
 DESC
@@ -179,6 +198,23 @@ export function getPriceFromString(value: string): number {
         : NaN
 }
 
+
+/*
+DESC
+    Returns an array of valid ProductSubtypes for the given TCG and ProductType
+INPUT
+    tcg: A TCG enum
+    productType: A ProductType enum
+RETURN
+    An array of ProductSubtypes for the given TCG and ProductType
+*/
+export function getProductSubtypes(tcg: TCG, productType: ProductType): ProductSubType[] {
+    const tcgArray = TCGToProductSubtype[tcg];
+    const productTypeArray = ProductTypeToProductSubtype[productType];
+    return getArrayIntersection(tcgArray, productTypeArray);
+}
+
+
 /*
 DESC
     Returns whether the input is a number
@@ -190,6 +226,7 @@ RETURN
 export function isNumeric(value: any): boolean {
     return !isNaN(value);
 }
+
 
 /*
 DESC
@@ -205,6 +242,7 @@ export function isPriceString(value: string): boolean {
     const regexp = new RegExp('^\\$\\d+\\.\\d{2}$');
     return regexp.test(value);
 }
+
 
 /*
 DESC
