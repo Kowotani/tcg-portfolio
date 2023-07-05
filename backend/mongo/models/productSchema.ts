@@ -1,6 +1,7 @@
 // imports
 import { Schema } from 'mongoose';
-import { ProductLanguage, ProductSubType, ProductType, TCG } from '../../utils';
+import { ProductLanguage, ProductSubType, ProductType, TCG 
+} from '../../../tcg_portfolio/src/utils';
 
 export interface IProduct {
     tcgplayerId: Number;
