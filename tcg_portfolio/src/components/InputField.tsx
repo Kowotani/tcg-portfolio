@@ -75,6 +75,7 @@ export const DateInput: FunctionComponent<IDateInputProps> = ({
         return (
             <Input 
                 type='date' 
+                isDisabled={isDisabled}
                 isInvalid={isInvalid}
                 isRequired={isRequired} 
                 value={value} 
@@ -124,7 +125,8 @@ export const NumericInput: FunctionComponent<INumericInputProps> = ({
    
     const NumericComponent = (): JSX.Element => {
         return (
-            <NumberInput 
+            <NumberInput
+                isDisabled={isDisabled} 
                 isInvalid={isInvalid}
                 isRequired={isRequired} 
                 defaultValue={defaultValue}
@@ -176,6 +178,7 @@ export const SelectInput: FunctionComponent<ISelectInputProps> = ({
     const SelectComponent = (): JSX.Element => {
         return (
             <Select
+                isDisabled={isDisabled}
                 isInvalid={isInvalid}
                 isRequired={isRequired} 
                 placeholder={placeholder} 
@@ -226,6 +229,7 @@ export const TextInput: FunctionComponent<ITextInputProps> = ({
     const InputComponent = (): JSX.Element => {
         return (
             <Input 
+                isDisabled={isDisabled}
                 isInvalid={isInvalid}
                 isRequired={isRequired} 
                 placeholder={placeholder} 
