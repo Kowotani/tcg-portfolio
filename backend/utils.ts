@@ -7,7 +7,7 @@
 export enum TimeseriesGranularity {
     Seconds = 'seconds',
     Minutes = 'minutes',
-    Hours = 'hours'
+    Hours = 'hours',
 };
 
 // -- product features
@@ -15,7 +15,7 @@ export enum TimeseriesGranularity {
 // product language
 export enum ProductLanguage {
     English = 'ENG',
-    Japanese = 'JPN'
+    Japanese = 'JPN',
 };
 
 // product subtype
@@ -23,8 +23,9 @@ export enum ProductSubType {
     Collector = 'Collector',
     Draft = 'Draft',
     FirstEdition = '1st Edition',
+    SecondEdition = '2nd Edition',
+    Set = 'Set',
     Unlimited = 'Unlimited',
-    Set = 'Set'
 };
 
 // product type
@@ -32,8 +33,10 @@ export enum ProductType {
     BoosterBox = 'Booster Box',
     Bundle = 'Bundle',
     CommanderDeck = 'Commander Deck',
+    CommanderDeckSet = 'Commander Deck Set',
     EliteTrainerBox = 'Elite Trainer Box',
-    SecretLair = 'Secret Lair'
+    SecretLair = 'Secret Lair',
+    UltraPremiumCollection = 'Ultra Premium Collection',
 };
 
 // TCG
@@ -42,7 +45,7 @@ export enum TCG {
     MagicTheGathering = 'Magic: The Gathering',
     MetaZoo = 'MetaZoo',
     Pokemon = 'Pokemon',
-    Sorcery = 'Sorcery'
+    Sorcery = 'Sorcery',
 };
 
 
@@ -52,13 +55,95 @@ export enum TCG {
 export enum TCGPriceType {
     MarketPrice = 'Market Price',
     BuylistMarketPrice = 'Buylist Market Price',
-    ListedMedianPrice = 'Listed Median Price'
+    ListedMedianPrice = 'Listed Median Price',
 }
 
 
-// =========
+// ====================
+// relationship objects
+// ====================
+
+// https://stackoverflow.com/questions/44243060/use-enum-as-restricted-key-type-in-typescript
+// TCG -> product type
+export const TCGToProductType: { [key in TCG]: ProductType[] } = {
+
+    // FAB
+    [TCG.FleshAndBlood]: [
+        ProductType.BoosterBox,
+    ],
+
+    // MTG
+    [TCG.MagicTheGathering]: [
+        ProductType.BoosterBox,
+        ProductType.Bundle,
+        ProductType.CommanderDeck,
+        ProductType.CommanderDeckSet,
+        ProductType.SecretLair,
+    ],
+
+    // Metazoo
+    [TCG.MetaZoo]: [
+        ProductType.BoosterBox,
+    ],
+
+    // Pokemon
+    [TCG.Pokemon]: [
+        ProductType.BoosterBox,
+        ProductType.Bundle,
+        ProductType.UltraPremiumCollection,
+    ],
+
+    // Sorcery
+    [TCG.Sorcery]: [
+        ProductType.BoosterBox
+    ]
+}
+
+// product type -> product subtype
+export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubType[] } = {
+
+    // Booster box
+    [ProductType.BoosterBox]: [
+        ProductSubType.Collector,
+        ProductSubType.Draft,
+        ProductSubType.FirstEdition,
+        ProductSubType.SecondEdition,
+        ProductSubType.Set,
+        ProductSubType.Unlimited,
+    ]
+}
+
+// TCG -> product subtype
+export const TCGToProductSubtype: { [key in TCG]?: ProductSubType[] } = {
+
+    // FAB
+    [TCG.FleshAndBlood]: [
+        ProductSubType.FirstEdition,
+        ProductSubType.Unlimited,
+    ],
+
+    // MTG
+    [TCG.MagicTheGathering]: [
+        ProductSubType.Collector,
+        ProductSubType.Draft,
+        ProductSubType.Set,
+    ],
+
+    // Metazoo
+    [TCG.MetaZoo]: [
+        ProductSubType.FirstEdition,
+        ProductSubType.SecondEdition,
+    ],
+
+    // Pokemon
+
+    // Sorcery
+}
+
+
+// ==========
 // interfaces
-// =========
+// ==========
 
 // used with IProductPriceData for storing scraped price data
 export interface IPriceData {
