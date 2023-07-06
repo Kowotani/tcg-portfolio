@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+      "experimentalDecorators": true,
+      "declaration": true,
+      "outDir": "dist",  
+    },
+    "include": [
+      "**/*.ts"
+    ],
+    "exclude": [
+      "node_modules",
+      "dist"
+    ],
+    "target": "es2016",
+    "module": "commonjs",
+    "lib": [
+      "es2016"
+    ]
+}
