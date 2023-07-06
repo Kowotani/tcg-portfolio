@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.productSchema = void 0;
 // imports
 const mongoose_1 = require("mongoose");
-const utils_1 = require("../../utils");
+const common_1 = require("common");
 exports.productSchema = new mongoose_1.Schema({
     tcgplayerId: {
         type: Number,
@@ -13,7 +13,7 @@ exports.productSchema = new mongoose_1.Schema({
     },
     tcg: {
         type: String,
-        enum: utils_1.TCG,
+        enum: common_1.TCG,
         required: true
     },
     releaseDate: {
@@ -26,17 +26,17 @@ exports.productSchema = new mongoose_1.Schema({
     },
     type: {
         type: String,
-        enum: utils_1.ProductType,
+        enum: common_1.ProductType,
         required: true
     },
     language: {
         type: String,
-        enum: utils_1.ProductLanguage,
+        enum: common_1.ProductLanguage,
         required: true
     },
     subtype: {
         type: String,
-        enum: utils_1.ProductSubType
+        enum: common_1.ProductSubType
     },
     setCode: String,
 });

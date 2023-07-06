@@ -2,7 +2,7 @@
 import { getProducts, insertPrices } from '../mongo/mongoManager';
 import { IPrice } from '../mongo/models/priceSchema';
 import { scrape } from './scraper';
-import { IPriceData, IProductPriceData, TimeseriesGranularity } from '../utils';
+import { IPriceData, IProductPriceData, TimeseriesGranularity } from 'common';
 
 
 // ================

@@ -1,7 +1,7 @@
 // imports
 import { getBrowser } from './browser';
 import { getPriceFromString, IPriceData, IProductPriceData, isPriceString, 
-    isTCGPriceTypeValue, TCGPriceType } from '../utils'
+    isTCGPriceTypeValue, TCGPriceType } from 'common'
 
 
 /*

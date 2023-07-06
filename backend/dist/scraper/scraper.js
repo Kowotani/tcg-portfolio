@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.scrape = void 0;
 // imports
 const browser_1 = require("./browser");
-const utils_1 = require("../utils");
+const common_1 = require("common");
 /*
 DESC
     Scrapes price data for the input tcgplayerIds
@@ -66,15 +66,15 @@ function scrape(ids) {
                 // parse scraped text
                 let data = {};
                 for (const st of scrapedTexts) {
-                    if ((0, utils_1.isTCGPriceTypeValue)(st.text) && (0, utils_1.isPriceString)(st.price)) {
-                        data[st.text] = (0, utils_1.getPriceFromString)(st.price);
+                    if ((0, common_1.isTCGPriceTypeValue)(st.text) && (0, common_1.isPriceString)(st.price)) {
+                        data[st.text] = (0, common_1.getPriceFromString)(st.price);
                     }
                 }
                 // create IPriceData
                 let priceData = {
-                    marketPrice: data[utils_1.TCGPriceType.MarketPrice] || null,
-                    buylistMarketPrice: data[utils_1.TCGPriceType.BuylistMarketPrice] || null,
-                    listedMedianPrice: data[utils_1.TCGPriceType.ListedMedianPrice] || null,
+                    marketPrice: data[common_1.TCGPriceType.MarketPrice] || null,
+                    buylistMarketPrice: data[common_1.TCGPriceType.BuylistMarketPrice] || null,
+                    listedMedianPrice: data[common_1.TCGPriceType.ListedMedianPrice] || null,
                 };
                 // create IProductPriceData
                 const productPriceData = {

@@ -16,11 +16,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const mongoManager_1 = require("./mongo/mongoManager");
 const multer_1 = __importDefault(require("multer"));
-// const utils = require('./utils');
 const upload = (0, multer_1.default)();
 const app = (0, express_1.default)();
 // app.use(upload);    // parse multipart/form-data
-// app.use(express.static('public'));  // serve static files from public
 const port = 3030;
 app.get('/', (req, res) => {
     res.send('Hello World!');

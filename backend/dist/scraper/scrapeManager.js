@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // imports
 const mongoManager_1 = require("../mongo/mongoManager");
 const scraper_1 = require("./scraper");
-const utils_1 = require("../utils");
+const common_1 = require("common");
 // ================
 // helper functions
 // ================
@@ -66,7 +66,7 @@ function loadPrices() {
                 let price = {
                     priceDate: priceDate,
                     product: productDoc,
-                    granularity: utils_1.TimeseriesGranularity.Hours,
+                    granularity: common_1.TimeseriesGranularity.Hours,
                     marketPrice: priceData.marketPrice
                 };
                 if (priceData.buylistMarketPrice !== null) {
