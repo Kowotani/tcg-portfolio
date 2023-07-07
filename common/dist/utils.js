@@ -169,7 +169,8 @@ RETURN
     TRUE if the input contains only ASCII characters, FALSE otherwise
 */
 function isASCII(value) {
-    return _.deburr(value) === value;
+    return /^[\x00-\x7F]*$/.test(value);
+    ;
 }
 exports.isASCII = isASCII;
 /*
