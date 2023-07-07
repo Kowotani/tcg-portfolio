@@ -21,7 +21,7 @@ export enum ProductLanguage {
 };
 
 // product subtype
-export enum ProductSubType {
+export enum ProductSubtype {
     Collector = 'Collector',
     Draft = 'Draft',
     FirstEdition = '1st Edition',
@@ -102,39 +102,39 @@ export const TCGToProductType: { [key in TCG]: ProductType[] } = {
 }
 
 // product type -> product subtype
-export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubType[] } = {
+export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubtype[] } = {
 
     // Booster box
     [ProductType.BoosterBox]: [
-        ProductSubType.Collector,
-        ProductSubType.Draft,
-        ProductSubType.FirstEdition,
-        ProductSubType.SecondEdition,
-        ProductSubType.Set,
-        ProductSubType.Unlimited,
+        ProductSubtype.Collector,
+        ProductSubtype.Draft,
+        ProductSubtype.FirstEdition,
+        ProductSubtype.SecondEdition,
+        ProductSubtype.Set,
+        ProductSubtype.Unlimited,
     ]
 }
 
 // TCG -> product subtype
-export const TCGToProductSubtype: { [key in TCG]?: ProductSubType[] } = {
+export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
 
     // FAB
     [TCG.FleshAndBlood]: [
-        ProductSubType.FirstEdition,
-        ProductSubType.Unlimited,
+        ProductSubtype.FirstEdition,
+        ProductSubtype.Unlimited,
     ],
 
     // MTG
     [TCG.MagicTheGathering]: [
-        ProductSubType.Collector,
-        ProductSubType.Draft,
-        ProductSubType.Set,
+        ProductSubtype.Collector,
+        ProductSubtype.Draft,
+        ProductSubtype.Set,
     ],
 
     // Metazoo
     [TCG.MetaZoo]: [
-        ProductSubType.FirstEdition,
-        ProductSubType.SecondEdition,
+        ProductSubtype.FirstEdition,
+        ProductSubtype.SecondEdition,
     ],
 
     // Pokemon
@@ -191,7 +191,7 @@ INPUT
 RETURN
     An array of ProductSubtypes for the given TCG and ProductType
 */
-export function getProductSubtypes(tcg: TCG, productType: ProductType): ProductSubType[] {
+export function getProductSubtypes(tcg: TCG, productType: ProductType): ProductSubtype[] {
     const tcgArray = TCGToProductSubtype[tcg];
     const productTypeArray = ProductTypeToProductSubtype[productType];
     return _.intersection(tcgArray, productTypeArray);

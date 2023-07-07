@@ -7,7 +7,7 @@ export declare enum ProductLanguage {
     English = "ENG",
     Japanese = "JPN"
 }
-export declare enum ProductSubType {
+export declare enum ProductSubtype {
     Collector = "Collector",
     Draft = "Draft",
     FirstEdition = "1st Edition",
@@ -40,10 +40,10 @@ export declare const TCGToProductType: {
     [key in TCG]: ProductType[];
 };
 export declare const ProductTypeToProductSubtype: {
-    [key in ProductType]?: ProductSubType[];
+    [key in ProductType]?: ProductSubtype[];
 };
 export declare const TCGToProductSubtype: {
-    [key in TCG]?: ProductSubType[];
+    [key in TCG]?: ProductSubtype[];
 };
 export interface IPriceData {
     marketPrice: Number;
@@ -55,7 +55,7 @@ export interface IProductPriceData {
     priceData: IPriceData;
 }
 export declare function getPriceFromString(value: string): number;
-export declare function getProductSubtypes(tcg: TCG, productType: ProductType): ProductSubType[];
+export declare function getProductSubtypes(tcg: TCG, productType: ProductType): ProductSubtype[];
 export declare function isNumeric(value: any): boolean;
 export declare function isPriceString(value: string): boolean;
 export declare function isTCGPriceTypeValue(value: string): boolean;

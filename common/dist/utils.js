@@ -1,7 +1,7 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.getProductSubtypes = exports.getPriceFromString = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubType = exports.ProductLanguage = exports.TimeseriesGranularity = void 0;
+exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.getProductSubtypes = exports.getPriceFromString = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = void 0;
 var _ = require("lodash");
 // =====
 // enums
@@ -23,15 +23,15 @@ var ProductLanguage;
 })(ProductLanguage = exports.ProductLanguage || (exports.ProductLanguage = {}));
 ;
 // product subtype
-var ProductSubType;
-(function (ProductSubType) {
-    ProductSubType["Collector"] = "Collector";
-    ProductSubType["Draft"] = "Draft";
-    ProductSubType["FirstEdition"] = "1st Edition";
-    ProductSubType["SecondEdition"] = "2nd Edition";
-    ProductSubType["Set"] = "Set";
-    ProductSubType["Unlimited"] = "Unlimited";
-})(ProductSubType = exports.ProductSubType || (exports.ProductSubType = {}));
+var ProductSubtype;
+(function (ProductSubtype) {
+    ProductSubtype["Collector"] = "Collector";
+    ProductSubtype["Draft"] = "Draft";
+    ProductSubtype["FirstEdition"] = "1st Edition";
+    ProductSubtype["SecondEdition"] = "2nd Edition";
+    ProductSubtype["Set"] = "Set";
+    ProductSubtype["Unlimited"] = "Unlimited";
+})(ProductSubtype = exports.ProductSubtype || (exports.ProductSubtype = {}));
 ;
 // product type
 var ProductType;
@@ -100,31 +100,31 @@ exports.TCGToProductType = (_a = {},
 exports.ProductTypeToProductSubtype = (_b = {},
     // Booster box
     _b[ProductType.BoosterBox] = [
-        ProductSubType.Collector,
-        ProductSubType.Draft,
-        ProductSubType.FirstEdition,
-        ProductSubType.SecondEdition,
-        ProductSubType.Set,
-        ProductSubType.Unlimited,
+        ProductSubtype.Collector,
+        ProductSubtype.Draft,
+        ProductSubtype.FirstEdition,
+        ProductSubtype.SecondEdition,
+        ProductSubtype.Set,
+        ProductSubtype.Unlimited,
     ],
     _b);
 // TCG -> product subtype
 exports.TCGToProductSubtype = (_c = {},
     // FAB
     _c[TCG.FleshAndBlood] = [
-        ProductSubType.FirstEdition,
-        ProductSubType.Unlimited,
+        ProductSubtype.FirstEdition,
+        ProductSubtype.Unlimited,
     ],
     // MTG
     _c[TCG.MagicTheGathering] = [
-        ProductSubType.Collector,
-        ProductSubType.Draft,
-        ProductSubType.Set,
+        ProductSubtype.Collector,
+        ProductSubtype.Draft,
+        ProductSubtype.Set,
     ],
     // Metazoo
     _c[TCG.MetaZoo] = [
-        ProductSubType.FirstEdition,
-        ProductSubType.SecondEdition,
+        ProductSubtype.FirstEdition,
+        ProductSubtype.SecondEdition,
     ],
     _c);
 // =========
