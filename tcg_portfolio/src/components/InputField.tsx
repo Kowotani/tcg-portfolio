@@ -12,6 +12,7 @@ import {
     Tooltip,
     VStack
 } from '@chakra-ui/react';
+import { error } from 'console';
 
 
 // ============
@@ -25,6 +26,13 @@ type TInputProps = ICommonProps & {
     isInvalid?: boolean,
     isRequired?: boolean,
     errorMessage?: string,
+}
+
+type TInputErrorWrapperProps = {
+    children: JSX.Element | JSX.Element[],
+    errorMessage?: string,
+    leftLabel?: string,
+    rightLabel?: string,
 }
 
 
@@ -55,6 +63,29 @@ const ErrorTooltip: FunctionComponent<ErrorTooltipProps> = ({
         >
             {children}
         </Tooltip>
+    )
+}
+
+// Input error wrapper
+export const InputErrorWrapper: FunctionComponent<TInputErrorWrapperProps> = ({
+    children,
+    errorMessage = undefined,
+    leftLabel = undefined,
+    rightLabel = undefined,
+}): ReactElement => {
+
+    return (
+        <InputGroup>
+            {leftLabel ? <InputLeftAddon children={leftLabel} /> : undefined}
+            {children}
+            {errorMessage 
+                    ? (<ErrorTooltip label={errorMessage} isOpen={true}>
+                        <Box />
+                    </ErrorTooltip>
+                    ) : undefined
+                }            
+            {rightLabel ? <InputRightAddon children={rightLabel} /> : undefined}
+        </InputGroup>
     )
 }
 
