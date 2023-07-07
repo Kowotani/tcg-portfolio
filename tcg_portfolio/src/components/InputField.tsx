@@ -1,4 +1,5 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, ReactElement } from 'react';
+import { ICommonProps } from '../react-utils';
 import { 
     Box,
     Input, 
@@ -8,15 +9,16 @@ import {
     NumberInput,
     NumberInputField,
     Select,
-    Tooltip
+    Tooltip,
+    VStack
 } from '@chakra-ui/react';
 
 
-// =================
-// Shared Interfaces
-// =================
+// ============
+// Shared Types
+// ============
 
-interface IInputProps {
+type TInputProps = ICommonProps & {
     leftLabel?: string,
     rightLabel?: string,
     isDisabled?: boolean,
@@ -31,7 +33,7 @@ interface IInputProps {
 // ==========
 
 // Error message tooltip
-interface ErrorTooltipProps {
+type ErrorTooltipProps = {
     label: string,
     children: JSX.Element | JSX.Element[],
     isOpen?: boolean,
@@ -40,7 +42,7 @@ const ErrorTooltip: FunctionComponent<ErrorTooltipProps> = ({
     label,
     children,
     isOpen = false,
-}) => {
+}): ReactElement => {
 
     return (
         <Tooltip 
@@ -58,10 +60,10 @@ const ErrorTooltip: FunctionComponent<ErrorTooltipProps> = ({
 
 
 // Date input
-interface IDateInputProps extends IInputProps {
+type DateInputProps = TInputProps & {
     value?: number
 }
-export const DateInput: FunctionComponent<IDateInputProps> = ({
+export const DateInput: FunctionComponent<DateInputProps> = ({
     value = undefined, 
     leftLabel = undefined, 
     rightLabel = undefined, 
@@ -69,7 +71,7 @@ export const DateInput: FunctionComponent<IDateInputProps> = ({
     isInvalid = false, 
     isRequired = false,
     errorMessage = undefined,
-}) => {
+}): ReactElement => {
 
     const DateComponent = (): JSX.Element => {
         return (
@@ -78,39 +80,42 @@ export const DateInput: FunctionComponent<IDateInputProps> = ({
                 isDisabled={isDisabled}
                 isInvalid={isInvalid}
                 isRequired={isRequired} 
-                value={value} 
+                value={value}
             />
         )
     }
 
     return (
         <InputGroup>
-            {leftLabel ? <InputLeftAddon children={leftLabel} /> : null}
-            {errorMessage 
-                ? (
-                    <ErrorTooltip label={errorMessage} isOpen={isInvalid}>
-                        <Box>
-                            <DateComponent />
-                        </Box>
+            {leftLabel ? <InputLeftAddon children={leftLabel} /> : undefined}
+            <VStack 
+                display='flex'
+                direction='column'
+                align='flex-start'
+                spacing={0}
+            >
+                <DateComponent />
+                {errorMessage 
+                    ? (<ErrorTooltip label={errorMessage} isOpen={isInvalid}>
+                        <Box />
                     </ErrorTooltip>
-                ) : (
-                    <DateComponent />
-                )
-            }
-            {rightLabel ? <InputRightAddon children={rightLabel} /> : null}
+                    ) : undefined
+                }
+            </VStack>
+            {rightLabel ? <InputRightAddon children={rightLabel} /> : undefined}
         </InputGroup>
     )
 }
 
 
 // Numeric input
-interface INumericInputProps extends IInputProps {
+type TNumericInputProps = TInputProps & {
     defaultValue?: number
     max?: number
     min?: number
     precision?: number
 }
-export const NumericInput: FunctionComponent<INumericInputProps> = ({
+export const NumericInput: FunctionComponent<TNumericInputProps> = ({
     defaultValue = undefined,
     max = undefined,
     min = undefined, 
@@ -142,17 +147,20 @@ export const NumericInput: FunctionComponent<INumericInputProps> = ({
     return (
         <InputGroup>
             {leftLabel ? <InputLeftAddon children={leftLabel} /> : null}
-            {errorMessage 
-                ? (
-                    <ErrorTooltip label={errorMessage} isOpen={isInvalid}>
-                        <Box>
-                            <NumericComponent />
-                        </Box>
+            <VStack 
+                display='flex'
+                direction='column'
+                align='flex-start'
+                spacing={0}
+            >
+                <NumericComponent />
+                {errorMessage 
+                    ? (<ErrorTooltip label={errorMessage} isOpen={isInvalid}>
+                        <Box />
                     </ErrorTooltip>
-                ) : (
-                    <NumericComponent />
-                )
-            }
+                    ) : undefined
+                }
+            </VStack>
             {rightLabel ? <InputRightAddon children={rightLabel} /> : null}
         </InputGroup>
     )
@@ -160,11 +168,11 @@ export const NumericInput: FunctionComponent<INumericInputProps> = ({
 
 
 // Select input
-interface ISelectInputProps extends IInputProps {
+type TSelectInputProps = TInputProps & {
     placeholder: string,
     values: string[],
 }
-export const SelectInput: FunctionComponent<ISelectInputProps> = ({
+export const SelectInput: FunctionComponent<TSelectInputProps> = ({
     placeholder, 
     values,
     leftLabel = undefined, 
@@ -195,17 +203,20 @@ export const SelectInput: FunctionComponent<ISelectInputProps> = ({
     return (
         <InputGroup>
             {leftLabel ? <InputLeftAddon children={leftLabel} /> : null}
-            {errorMessage 
-                ? (
-                    <ErrorTooltip label={errorMessage} isOpen={isInvalid}>
-                        <Box>
-                            <SelectComponent />
-                        </Box>
+            <VStack 
+                display='flex'
+                direction='column'
+                align='flex-start'
+                spacing={0}
+            >
+                <SelectComponent />
+                {errorMessage 
+                    ? (<ErrorTooltip label={errorMessage} isOpen={isInvalid}>
+                        <Box />
                     </ErrorTooltip>
-                ) : (
-                    <SelectComponent />
-                )
-            }
+                    ) : undefined
+                }
+            </VStack>
             {rightLabel ? <InputRightAddon children={rightLabel} /> : null}
         </InputGroup>
     )
@@ -213,10 +224,10 @@ export const SelectInput: FunctionComponent<ISelectInputProps> = ({
 
 
 // Text input
-interface ITextInputProps extends IInputProps {
+type TTextInputProps = TInputProps & {
     placeholder: string
 }
-export const TextInput: FunctionComponent<ITextInputProps> = ({
+export const TextInput: FunctionComponent<TTextInputProps> = ({
     placeholder, 
     leftLabel = undefined, 
     rightLabel = undefined, 
@@ -226,7 +237,7 @@ export const TextInput: FunctionComponent<ITextInputProps> = ({
     errorMessage = undefined,
 }) => {
    
-    const InputComponent = (): JSX.Element => {
+    const TextComponent = (): JSX.Element => {
         return (
             <Input 
                 isDisabled={isDisabled}
@@ -240,17 +251,20 @@ export const TextInput: FunctionComponent<ITextInputProps> = ({
     return (
         <InputGroup>
             {leftLabel ? <InputLeftAddon children={leftLabel} /> : null}
-            {errorMessage 
-                ? (
-                    <ErrorTooltip label={errorMessage} isOpen={isInvalid}>
-                        <Box>
-                            <InputComponent />
-                        </Box>
+            <VStack 
+                display='flex'
+                direction='column'
+                align='flex-start'
+                spacing={0}
+            >
+                <TextComponent />
+                {errorMessage 
+                    ? (<ErrorTooltip label={errorMessage} isOpen={isInvalid}>
+                        <Box />
                     </ErrorTooltip>
-                ) : (
-                    <InputComponent />
-                )
-            }
+                    ) : undefined
+                }
+            </VStack>
             {rightLabel ? <InputRightAddon children={rightLabel} /> : null}
         </InputGroup>
     )
