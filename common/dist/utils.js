@@ -1,7 +1,7 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.getProductSubtypes = exports.getPriceFromString = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = void 0;
+exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = void 0;
 var _ = require("lodash");
 // =====
 // enums
@@ -160,6 +160,18 @@ function getProductSubtypes(tcg, productType) {
     return _.intersection(tcgArray, productTypeArray);
 }
 exports.getProductSubtypes = getProductSubtypes;
+/*
+DESC
+    Returns whether the input string contains only ASCII characters
+INPUT
+    A string to check
+RETURN
+    TRUE if the input contains only ASCII characters, FALSE otherwise
+*/
+function isASCII(value) {
+    return _.deburr(value) === value;
+}
+exports.isASCII = isASCII;
 /*
 DESC
     Returns whether the input is a number

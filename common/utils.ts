@@ -200,6 +200,19 @@ export function getProductSubtypes(tcg: TCG, productType: ProductType): ProductS
 
 /*
 DESC
+    Returns whether the input string contains only ASCII characters
+INPUT
+    A string to check
+RETURN
+    TRUE if the input contains only ASCII characters, FALSE otherwise
+*/
+export function isASCII(value: string): boolean {
+    return _.deburr(value) === value;
+}
+
+
+/*
+DESC
     Returns whether the input is a number
 INPUT
     A value to check

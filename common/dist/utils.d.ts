@@ -56,6 +56,7 @@ export interface IProductPriceData {
 }
 export declare function getPriceFromString(value: string): number;
 export declare function getProductSubtypes(tcg: TCG, productType: ProductType): ProductSubtype[];
+export declare function isASCII(value: string): boolean;
 export declare function isNumeric(value: any): boolean;
 export declare function isPriceString(value: string): boolean;
 export declare function isTCGPriceTypeValue(value: string): boolean;
