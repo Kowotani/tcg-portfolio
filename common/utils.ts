@@ -24,9 +24,11 @@ export enum ProductLanguage {
 export enum ProductSubtype {
     Collector = 'Collector',
     Draft = 'Draft',
+    EliteTrainerBox = 'Elite Trainer Box',
     FirstEdition = '1st Edition',
     SecondEdition = '2nd Edition',
     Set = 'Set',
+    UltraPremiumCollection = 'Ultra Premium Collection',
     Unlimited = 'Unlimited',
 };
 
@@ -36,9 +38,7 @@ export enum ProductType {
     Bundle = 'Bundle',
     CommanderDeck = 'Commander Deck',
     CommanderDeckSet = 'Commander Deck Set',
-    EliteTrainerBox = 'Elite Trainer Box',
     SecretLair = 'Secret Lair',
-    UltraPremiumCollection = 'Ultra Premium Collection',
 };
 
 // TCG
@@ -92,7 +92,6 @@ export const TCGToProductType: { [key in TCG]: ProductType[] } = {
     [TCG.Pokemon]: [
         ProductType.BoosterBox,
         ProductType.Bundle,
-        ProductType.UltraPremiumCollection,
     ],
 
     // Sorcery
@@ -112,6 +111,12 @@ export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubtyp
         ProductSubtype.SecondEdition,
         ProductSubtype.Set,
         ProductSubtype.Unlimited,
+    ],
+
+    // Bundle 
+    [ProductType.Bundle]: [
+        ProductSubtype.EliteTrainerBox,
+        ProductSubtype.UltraPremiumCollection
     ]
 }
 
@@ -138,6 +143,10 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
     ],
 
     // Pokemon
+    [TCG.Pokemon]: [
+        ProductSubtype.EliteTrainerBox,
+        ProductSubtype.UltraPremiumCollection,
+    ],    
 
     // Sorcery
 }

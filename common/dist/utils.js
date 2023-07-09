@@ -27,9 +27,11 @@ var ProductSubtype;
 (function (ProductSubtype) {
     ProductSubtype["Collector"] = "Collector";
     ProductSubtype["Draft"] = "Draft";
+    ProductSubtype["EliteTrainerBox"] = "Elite Trainer Box";
     ProductSubtype["FirstEdition"] = "1st Edition";
     ProductSubtype["SecondEdition"] = "2nd Edition";
     ProductSubtype["Set"] = "Set";
+    ProductSubtype["UltraPremiumCollection"] = "Ultra Premium Collection";
     ProductSubtype["Unlimited"] = "Unlimited";
 })(ProductSubtype = exports.ProductSubtype || (exports.ProductSubtype = {}));
 ;
@@ -40,9 +42,7 @@ var ProductType;
     ProductType["Bundle"] = "Bundle";
     ProductType["CommanderDeck"] = "Commander Deck";
     ProductType["CommanderDeckSet"] = "Commander Deck Set";
-    ProductType["EliteTrainerBox"] = "Elite Trainer Box";
     ProductType["SecretLair"] = "Secret Lair";
-    ProductType["UltraPremiumCollection"] = "Ultra Premium Collection";
 })(ProductType = exports.ProductType || (exports.ProductType = {}));
 ;
 // TCG
@@ -89,7 +89,6 @@ exports.TCGToProductType = (_a = {},
     _a[TCG.Pokemon] = [
         ProductType.BoosterBox,
         ProductType.Bundle,
-        ProductType.UltraPremiumCollection,
     ],
     // Sorcery
     _a[TCG.Sorcery] = [
@@ -106,6 +105,11 @@ exports.ProductTypeToProductSubtype = (_b = {},
         ProductSubtype.SecondEdition,
         ProductSubtype.Set,
         ProductSubtype.Unlimited,
+    ],
+    // Bundle 
+    _b[ProductType.Bundle] = [
+        ProductSubtype.EliteTrainerBox,
+        ProductSubtype.UltraPremiumCollection
     ],
     _b);
 // TCG -> product subtype
@@ -125,6 +129,11 @@ exports.TCGToProductSubtype = (_c = {},
     _c[TCG.MetaZoo] = [
         ProductSubtype.FirstEdition,
         ProductSubtype.SecondEdition,
+    ],
+    // Pokemon
+    _c[TCG.Pokemon] = [
+        ProductSubtype.EliteTrainerBox,
+        ProductSubtype.UltraPremiumCollection,
     ],
     _c);
 // =========

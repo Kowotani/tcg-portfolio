@@ -10,9 +10,11 @@ export declare enum ProductLanguage {
 export declare enum ProductSubtype {
     Collector = "Collector",
     Draft = "Draft",
+    EliteTrainerBox = "Elite Trainer Box",
     FirstEdition = "1st Edition",
     SecondEdition = "2nd Edition",
     Set = "Set",
+    UltraPremiumCollection = "Ultra Premium Collection",
     Unlimited = "Unlimited"
 }
 export declare enum ProductType {
@@ -20,9 +22,7 @@ export declare enum ProductType {
     Bundle = "Bundle",
     CommanderDeck = "Commander Deck",
     CommanderDeckSet = "Commander Deck Set",
-    EliteTrainerBox = "Elite Trainer Box",
-    SecretLair = "Secret Lair",
-    UltraPremiumCollection = "Ultra Premium Collection"
+    SecretLair = "Secret Lair"
 }
 export declare enum TCG {
     FleshAndBlood = "Flesh and Blood",
