@@ -18,6 +18,7 @@ type TInputErrorWrapperProps = {
     errorMessage?: string,
     leftLabel?: string,
     rightLabel?: string,
+    width?: string,
 }
 
 
@@ -57,6 +58,7 @@ export const InputErrorWrapper: FunctionComponent<TInputErrorWrapperProps> = ({
     errorMessage = undefined,
     leftLabel = undefined,
     rightLabel = undefined,
+    width = '100%',
 }): ReactElement => {
 
     return (
@@ -67,6 +69,7 @@ export const InputErrorWrapper: FunctionComponent<TInputErrorWrapperProps> = ({
                 direction='column'
                 align='flex-start'
                 spacing={0}
+                width={width}
             >
             {children}
             {errorMessage 
