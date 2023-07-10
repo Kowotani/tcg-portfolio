@@ -1,5 +1,6 @@
 import { FunctionComponent, useEffect, useState, } from 'react';
 import { 
+    Button,
     Input,
     NumberInput,
     NumberInputField,
@@ -9,6 +10,7 @@ import {
 import { getProductSubtypes, isASCII, ProductLanguage, ProductType, 
     ProductSubtype, TCG, TCGToProductType,
 } from 'common';
+import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField';
 
 
@@ -34,7 +36,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     // ======
 
     // TCGPlayerID state
-    const [ TCGPlayerIDState, setTCGPlayerIDState ] = useState<{
+    const [ TCGPlayerIdState, setTCGPlayerIdState ] = useState<{
         tcgPlayerId: number | undefined,
         isInvalid?: boolean, 
         errorMessage?: string,
@@ -196,7 +198,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
 
         // empty state
         if (input.length === 0) {
-            setTCGPlayerIDState({
+            setTCGPlayerIdState({
                 tcgPlayerId: undefined,
                 isInvalid: true, 
                 errorMessage: 'TCGPlayerID is required',
@@ -206,7 +208,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
 
         // valid
         } else {
-            setTCGPlayerIDState({ 
+            setTCGPlayerIdState({ 
                 tcgPlayerId: parseInt(input),
                 isInvalid: false 
             })
@@ -308,6 +310,42 @@ export const AddProductForm: FunctionComponent<{}> = () => {
         }
     }
 
+    /*
+    DESC
+        Creates the body for the POST request to add a new Product
+    RETURN
+        A TPostBody with the Product data
+    */
+    type TPostBody = {
+        tcgplayerId: number,
+        name: string,
+        tcg: TCG,
+        type: ProductType,
+        releaseDate: string,
+        language: ProductLanguage,
+        subtype?: ProductSubtype,
+        setCode?: string,
+    }
+    function getPostBody(): TPostBody {
+
+        let body: TPostBody = {
+            tcgplayerId: TCGPlayerIdState.tcgPlayerId as number,
+            name: nameState.name,
+            tcg: TCGState.tcg as TCG,
+            type: productTypeState.productType as ProductType,
+            releaseDate: (releaseDateState.releaseDate?.toISOString() as string).substring(0,10),
+            language: languageState.language,
+        }
+        if (productSubtypeState.productSubtype.length > 0) {
+            body['subtype'] = productSubtypeState.productSubtype as ProductSubtype
+        }
+        if (setCodeState.setCode.length > 0) {
+            body['setCode'] = setCodeState.setCode
+        }
+
+        return body
+    }
+
 
     // handle TCG changes
     useEffect(() => {
@@ -335,165 +373,184 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     // ==============
 
     return (
+        <Formik
+            initialValues={{}}
+            onSubmit={() => {
+                // get post body
+                const body = getPostBody()
 
-        <VStack 
-            align-items='stretch'
-            display='flex'
-            flex-direction='column'
-            spacing={8}
+                // submit
+                alert(JSON.stringify(body, null, 2))
+            }}
         >
-            {/* TCGPlayer ID */}
-            <InputErrorWrapper 
-                leftLabel='TCGPlayer ID'
-                errorMessage={TCGPlayerIDState.errorMessage}
-            >
-                <NumberInput
-                    isInvalid={TCGPlayerIDState.isInvalid || false}
-                    isRequired={true} 
-                    min={1}
-                    precision={0}
-                    onBlur={e => validateTCGPlayerID(e.target.value)}
+            <Form>
+                <VStack 
+                    align-items='stretch'
+                    display='flex'
+                    flex-direction='column'
+                    spacing={8}
                 >
-                    <NumberInputField />
-                </NumberInput>
-            </InputErrorWrapper>
+                    {/* TCGPlayer ID */}
+                    <InputErrorWrapper 
+                        leftLabel='TCGPlayer ID'
+                        errorMessage={TCGPlayerIdState.errorMessage}
+                    >
+                        <NumberInput
+                            isInvalid={TCGPlayerIdState.isInvalid || false}
+                            isRequired={true} 
+                            min={1}
+                            precision={0}
+                            onBlur={e => validateTCGPlayerID(e.target.value)}
+                        >
+                            <NumberInputField />
+                        </NumberInput>
+                    </InputErrorWrapper>
 
-            {/* Name */}
-            <InputErrorWrapper 
-                leftLabel='Name'
-                errorMessage={nameState.errorMessage}
-            >
-                <Input 
-                    isInvalid={nameState.isInvalid || false}
-                    isRequired={true}
-                    placeholder='Kaladesh'
-                    onBlur={e => validateName(e.target.value)}
-                />
-            </InputErrorWrapper>
+                    {/* Name */}
+                    <InputErrorWrapper 
+                        leftLabel='Name'
+                        errorMessage={nameState.errorMessage}
+                    >
+                        <Input 
+                            isInvalid={nameState.isInvalid || false}
+                            isRequired={true}
+                            placeholder='Kaladesh'
+                            onBlur={e => validateName(e.target.value)}
+                        />
+                    </InputErrorWrapper>
 
-            {/* TCG */}
-            <InputErrorWrapper 
-                leftLabel='TCG'
-                errorMessage={TCGState.errorMessage}
-            >
-                <Select
-                    value={TCGState.tcg.length === 0
-                        ? undefined
-                        : TCGState.tcg}
-                    isInvalid={TCGState.isInvalid || false}
-                    isRequired={true} 
-                    placeholder={TCG_SELECT_DEFAULT}
-                    onBlur={e => validateTCG(e.target.value)}
-                    onChange={e => setTCGState({
-                        tcg: e.target.value as TCG,
-                        isInvalid: TCGState.isInvalid,
-                        errorMessage: TCGState.errorMessage,
-                    })}
-                >            
-                    {Object.values(TCG).map(value => {
-                        return (
-                            <option key={value} value={value}>{value}</option>
-                        )
-                    })}
-                </Select>                
-            </InputErrorWrapper>
+                    {/* TCG */}
+                    <InputErrorWrapper 
+                        leftLabel='TCG'
+                        errorMessage={TCGState.errorMessage}
+                    >
+                        <Select
+                            value={TCGState.tcg.length === 0
+                                ? undefined
+                                : TCGState.tcg}
+                            isInvalid={TCGState.isInvalid || false}
+                            isRequired={true} 
+                            placeholder={TCG_SELECT_DEFAULT}
+                            onBlur={e => validateTCG(e.target.value)}
+                            onChange={e => setTCGState({
+                                tcg: e.target.value as TCG,
+                                isInvalid: TCGState.isInvalid,
+                                errorMessage: TCGState.errorMessage,
+                            })}
+                        >            
+                            {Object.values(TCG).map(value => {
+                                return (
+                                    <option key={value} value={value}>{value}</option>
+                                )
+                            })}
+                        </Select>                
+                    </InputErrorWrapper>
 
-            {/* Product Type */}
-            <InputErrorWrapper 
-                leftLabel='Type'
-            >
-                <Select
-                    value={productTypeState.productType.length === 0
-                        ? undefined
-                        : productTypeState.productType}
-                    isDisabled={productTypeState.isDisabled}
-                    isRequired={true} 
-                    placeholder={productTypeState.isDisabled 
-                        ? PRODUCT_TYPE_PLACEHOLDER
-                        : undefined}
-                        onChange={e => setProductTypeState({
-                            productType: e.target.value as ProductType,
-                            isDisabled: productTypeState.isDisabled,
-                            values: productTypeState.values,
-                        })}                        
-                >            
-                    {productTypeState.values.map(value => {
-                        return (
-                            <option key={value} value={value}>{value}</option>
-                        )
-                    })}
-                </Select>                
-            </InputErrorWrapper>
+                    {/* Product Type */}
+                    <InputErrorWrapper 
+                        leftLabel='Type'
+                    >
+                        <Select
+                            value={productTypeState.productType.length === 0
+                                ? undefined
+                                : productTypeState.productType}
+                            isDisabled={productTypeState.isDisabled}
+                            isRequired={true} 
+                            placeholder={productTypeState.isDisabled 
+                                ? PRODUCT_TYPE_PLACEHOLDER
+                                : undefined}
+                                onChange={e => setProductTypeState({
+                                    productType: e.target.value as ProductType,
+                                    isDisabled: productTypeState.isDisabled,
+                                    values: productTypeState.values,
+                                })}                        
+                        >            
+                            {productTypeState.values.map(value => {
+                                return (
+                                    <option key={value} value={value}>{value}</option>
+                                )
+                            })}
+                        </Select>                
+                    </InputErrorWrapper>
 
-            {/* Product Subtype */}
-            <InputErrorWrapper 
-                leftLabel='Subtype'
-            >
-                <Select
-                    value={productSubtypeState.productSubtype.length === 0
-                        ? undefined
-                        : productSubtypeState.productSubtype}
-                    isDisabled={productSubtypeState.isDisabled}
-                    placeholder={productSubtypeState.isDisabled
-                        ? productTypeState.isDisabled 
-                            ? PRODUCT_SUBTYPE_DEFAULT_PLACEHOLDER
-                            : PRODUCT_SUBTYPE_EMPTY_PLACEHOLDER
-                        : undefined}
-                        onChange={e => setProductSubtypeState({
-                            productSubtype: e.target.value as ProductSubtype,
-                            isDisabled: productSubtypeState.isDisabled,
-                            values: productSubtypeState.values,
-                        })}                            
-                >            
-                    {productSubtypeState.values.map(value => {
-                        return (
-                            <option key={value} value={value}>{value}</option>
-                        )
-                    })}
-                </Select>                
-            </InputErrorWrapper>
+                    {/* Product Subtype */}
+                    <InputErrorWrapper 
+                        leftLabel='Subtype'
+                    >
+                        <Select
+                            value={productSubtypeState.productSubtype.length === 0
+                                ? undefined
+                                : productSubtypeState.productSubtype}
+                            isDisabled={productSubtypeState.isDisabled}
+                            placeholder={productSubtypeState.isDisabled
+                                ? productTypeState.isDisabled 
+                                    ? PRODUCT_SUBTYPE_DEFAULT_PLACEHOLDER
+                                    : PRODUCT_SUBTYPE_EMPTY_PLACEHOLDER
+                                : undefined}
+                                onChange={e => setProductSubtypeState({
+                                    productSubtype: e.target.value as ProductSubtype,
+                                    isDisabled: productSubtypeState.isDisabled,
+                                    values: productSubtypeState.values,
+                                })}                            
+                        >            
+                            {productSubtypeState.values.map(value => {
+                                return (
+                                    <option key={value} value={value}>{value}</option>
+                                )
+                            })}
+                        </Select>                
+                    </InputErrorWrapper>
 
-            {/* Release Date */}
-            <InputErrorWrapper 
-                leftLabel='Release Date'
-                errorMessage={releaseDateState.errorMessage}
-            >
-                <Input
-                    type='date'
-                    isInvalid={releaseDateState.isInvalid || false}
-                    isRequired={true} 
-                    onBlur={e => validateReleaseDate(e.target.value)}
-                />             
-            </InputErrorWrapper>
+                    {/* Release Date */}
+                    <InputErrorWrapper 
+                        leftLabel='Release Date'
+                        errorMessage={releaseDateState.errorMessage}
+                    >
+                        <Input
+                            type='date'
+                            isInvalid={releaseDateState.isInvalid || false}
+                            isRequired={true} 
+                            onBlur={e => validateReleaseDate(e.target.value)}
+                        />             
+                    </InputErrorWrapper>
 
-            {/* Set Code */}
-            <InputErrorWrapper 
-                leftLabel='Set Code'
-                errorMessage={setCodeState.errorMessage}
-            >
-                <Input 
-                    isInvalid={setCodeState.isInvalid}
-                    onBlur={e => validateSetCode(e.target.value)}
-                />
-            </InputErrorWrapper>
+                    {/* Set Code */}
+                    <InputErrorWrapper 
+                        leftLabel='Set Code'
+                        errorMessage={setCodeState.errorMessage}
+                    >
+                        <Input 
+                            isInvalid={setCodeState.isInvalid}
+                            onBlur={e => validateSetCode(e.target.value)}
+                        />
+                    </InputErrorWrapper>
 
-            {/* Product Language */}
-            <InputErrorWrapper 
-                leftLabel='Language'
-            >
-                <Select 
-                    value={languageState.language}
-                    onChange={e => setLanguageState({
-                        language: e.target.value as ProductLanguage
-                    })}
-                >            
-                    {Object.values(ProductLanguage).map(value => {
-                        return (
-                            <option key={value} value={value}>{value}</option>
-                        )
-                    })}
-                </Select>                
-            </InputErrorWrapper>
-        </VStack>
+                    {/* Product Language */}
+                    <InputErrorWrapper 
+                        leftLabel='Language'
+                    >
+                        <Select 
+                            value={languageState.language}
+                            onChange={e => setLanguageState({
+                                language: e.target.value as ProductLanguage
+                            })}
+                        >            
+                            {Object.values(ProductLanguage).map(value => {
+                                return (
+                                    <option key={value} value={value}>{value}</option>
+                                )
+                            })}
+                        </Select>                
+                    </InputErrorWrapper>
+                </VStack>
+
+                <Button
+                    colorScheme='teal'
+                    type='submit'
+                >
+                    Submit
+                </Button>
+            </Form>
+        </Formik>
     )
 }
