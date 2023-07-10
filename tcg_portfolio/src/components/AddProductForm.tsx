@@ -35,15 +35,21 @@ export const AddProductForm: FunctionComponent<{}> = () => {
 
     // TCGPlayerID state
     const [ TCGPlayerIDState, setTCGPlayerIDState ] = useState<{
+        tcgPlayerId: number | undefined,
         isInvalid?: boolean, 
         errorMessage?: string,
-    }>({});
+    }>({
+        tcgPlayerId: undefined,
+    });
 
     // Name state
     const [ nameState, setNameState ] = useState<{
+        name: string,
         isInvalid?: boolean, 
         errorMessage?: string,
-    }>({});
+    }>({
+        name: '',
+    });
 
     // TCG state
     const [ TCGState, setTCGState ] = useState<{
@@ -78,16 +84,28 @@ export const AddProductForm: FunctionComponent<{}> = () => {
 
     // Release Date state
     const [ releaseDateState, setReleaseDateState ] = useState<{
+        releaseDate: Date | undefined,
         isInvalid?: boolean, 
         errorMessage?: string,
-    }>({});
+    }>({
+        releaseDate: undefined,
+    });
 
     // Set Code state
     const [ setCodeState, setSetCodeState ] = useState<{
+        setCode: string,
         isInvalid: boolean, 
         errorMessage?: string,
     }>({
+        setCode: '',
         isInvalid: false,
+    });
+
+    // Language state
+    const [ languageState, setLanguageState ] = useState<{
+        language: ProductLanguage,
+    }>({
+        language: LANGUAGE_SELECT_DEFAULT,
     });
 
 
@@ -179,6 +197,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
         // empty state
         if (input.length === 0) {
             setTCGPlayerIDState({
+                tcgPlayerId: undefined,
                 isInvalid: true, 
                 errorMessage: 'TCGPlayerID is required',
             })
@@ -187,7 +206,10 @@ export const AddProductForm: FunctionComponent<{}> = () => {
 
         // valid
         } else {
-            setTCGPlayerIDState({ isInvalid: false })
+            setTCGPlayerIDState({ 
+                tcgPlayerId: parseInt(input),
+                isInvalid: false 
+            })
         }
     }
 
@@ -197,6 +219,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
         // empty state
         if (input.length === 0) {
             setNameState({
+                name: '',
                 isInvalid: true, 
                 errorMessage: 'Name is required',
             })
@@ -204,13 +227,17 @@ export const AddProductForm: FunctionComponent<{}> = () => {
         // non-ASCII characters
         } else if (!isASCII(input)) {
             setNameState({
+                name: '',
                 isInvalid: true, 
                 errorMessage: 'Name must only contain ASCII characters',
             })
 
         // valid
         } else {
-            setNameState({ isInvalid: false })
+            setNameState({ 
+                name: input,
+                isInvalid: false 
+            })
         }
     }
 
@@ -248,13 +275,17 @@ export const AddProductForm: FunctionComponent<{}> = () => {
         // default
         if (input.length === 0) {
             setReleaseDateState({
+                releaseDate: undefined, 
                 isInvalid: true, 
                 errorMessage: 'Release Date is required',
             })
 
         // valid
         } else {
-            setReleaseDateState({ isInvalid: false })
+            setReleaseDateState({ 
+                releaseDate: new Date(Date.parse(input)), 
+                isInvalid: false 
+            })
         }
     }    
 
@@ -263,13 +294,17 @@ export const AddProductForm: FunctionComponent<{}> = () => {
 
      if (input.length > 0 && !isASCII(input)) {
             setSetCodeState({
+                setCode: '',
                 isInvalid: true, 
                 errorMessage: 'Set Code must only contain ASCII characters',
             })
 
         // valid
         } else {
-            setSetCodeState({ isInvalid: false })
+            setSetCodeState({ 
+                setCode: input,
+                isInvalid: false 
+            })
         }
     }
 
@@ -300,6 +335,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     // ==============
 
     return (
+
         <VStack 
             align-items='stretch'
             display='flex'
@@ -319,7 +355,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
                     onBlur={e => validateTCGPlayerID(e.target.value)}
                 >
                     <NumberInputField />
-                </NumberInput>                
+                </NumberInput>
             </InputErrorWrapper>
 
             {/* Name */}
@@ -445,7 +481,12 @@ export const AddProductForm: FunctionComponent<{}> = () => {
             <InputErrorWrapper 
                 leftLabel='Language'
             >
-                <Select defaultValue={LANGUAGE_SELECT_DEFAULT}>            
+                <Select 
+                    value={languageState.language}
+                    onChange={e => setLanguageState({
+                        language: e.target.value as ProductLanguage
+                    })}
+                >            
                     {Object.values(ProductLanguage).map(value => {
                         return (
                             <option key={value} value={value}>{value}</option>
@@ -453,7 +494,6 @@ export const AddProductForm: FunctionComponent<{}> = () => {
                     })}
                 </Select>                
             </InputErrorWrapper>
-
         </VStack>
     )
 }
