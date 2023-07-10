@@ -1,16 +1,15 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useEffect, useState, } from 'react';
 import { 
     Input,
     NumberInput,
     NumberInputField,
     Select,
-    VStack 
+    VStack, 
 } from '@chakra-ui/react';
-import { isASCII, ProductLanguage, ProductType, ProductSubtype, TCG, 
-    TCGToProductSubtype, TCGToProductType 
+import { getProductSubtypes, isASCII, ProductLanguage, ProductType, 
+    ProductSubtype, TCG, TCGToProductType,
 } from 'common';
 import { InputErrorWrapper } from './InputField';
-
 
 
 // ==============
@@ -24,8 +23,9 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     // =========
 
     const LANGUAGE_SELECT_DEFAULT = ProductLanguage.English
-    const PRODUCT_SUBTYPE_SELECT_DEFAULT = 'Select Subtype'
-    const PRODUCT_TYPE_SELECT_DEFAULT = 'Select Type'
+    const PRODUCT_SUBTYPE_DEFAULT_PLACEHOLDER = 'Select Type first'
+    const PRODUCT_SUBTYPE_EMPTY_PLACEHOLDER = 'No Subtypes'
+    const PRODUCT_TYPE_PLACEHOLDER = 'Select TCG first'
     const TCG_SELECT_DEFAULT = 'Select TCG'
 
 
@@ -36,47 +36,56 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     // TCGPlayerID state
     const [ TCGPlayerIDState, setTCGPlayerIDState ] = useState<{
         isInvalid?: boolean, 
-        errorMessage?: string
+        errorMessage?: string,
     }>({});
 
     // Name state
     const [ nameState, setNameState ] = useState<{
         isInvalid?: boolean, 
-        errorMessage?: string
+        errorMessage?: string,
     }>({});
 
     // TCG state
     const [ TCGState, setTCGState ] = useState<{
+        tcg: TCG | '',
         isInvalid?: boolean, 
-        errorMessage?: string
-    }>({});
+        errorMessage?: string,
+    }>({
+        tcg: '',
+    });
 
     // ProductType state
-    const [ productTypetState, setProductTypeState ] = useState<{
+    const [ productTypeState, setProductTypeState ] = useState<{
+        productType: ProductType | ''
         isDisabled: boolean,
-        isInvalid?: boolean,
-        errorMessage?: string
+        values: string[],
     }>({
+        productType: '',
         isDisabled: true,
+        values: [],
     });
 
     // ProductSubtype state
     const [ productSubtypeState, setProductSubtypeState ] = useState<{
+        productSubtype: ProductSubtype | '',
         isDisabled: boolean,
+        values: string[],
     }>({
+        productSubtype: '',
         isDisabled: true,
+        values: [],
     });
 
     // Release Date state
     const [ releaseDateState, setReleaseDateState ] = useState<{
         isInvalid?: boolean, 
-        errorMessage?: string
+        errorMessage?: string,
     }>({});
 
     // Set Code state
     const [ setCodeState, setSetCodeState ] = useState<{
         isInvalid: boolean, 
-        errorMessage?: string
+        errorMessage?: string,
     }>({
         isInvalid: false,
     });
@@ -86,11 +95,89 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     // functions
     // =========
 
+    // form control
+
+    /*
+    DESC
+        Update Product Type state based on the input, which is a TCG enum 
+        or empty string
+    INPUT
+        input: TCG enum or empty string
+    */
+    
+    function updateProductTypeInput(input: string): void {
+        
+        // default
+        if (input.length === 0) {
+            setProductTypeState({
+                productType: '',
+                isDisabled: true,
+                values: []
+            })
+
+        // tcg
+        } else {
+            setProductTypeState({
+                productType: TCGToProductType[input as TCG][0],
+                isDisabled: false,
+                values: TCGToProductType[input as TCG]
+            })
+        }
+    }
+
+    /*
+    DESC
+        Update Product Subtype state based on the input, which is a TCG enum 
+        or empty string and a ProductType or empty string
+    INPUT
+        tcg_input: TCG enum or empty string
+        product_input: ProductType enum or empty string
+    */
+
+    // update Product Subtype after Product Type is selected
+    function updateProductSubypeInput(tcg_input: string, product_input: string): void {
+
+        // empty tcg or product
+        if (tcg_input.length === 0 || product_input.length === 0) {
+            setProductSubtypeState({
+                productSubtype: '',
+                isDisabled: true,
+                values: []
+            })
+
+        // tcg and product 
+        } else {
+            const productSubtypes = getProductSubtypes(
+                tcg_input as TCG, 
+                product_input as ProductType)
+            
+            // no product subtypes
+            if (productSubtypes.length === 0) {
+                setProductSubtypeState({
+                    productSubtype: '',
+                    isDisabled: true,
+                    values: []
+                })
+
+            // has product subtypes
+            } else {
+                setProductSubtypeState({
+                    productSubtype: productSubtypes[0],
+                    isDisabled: false,
+                    values: productSubtypes
+                })
+            }
+        }
+    }
+
+
+    // validation
+
     // validate TCGplayerID
-    function validateTCGPlayerID(input: string) {
+    function validateTCGPlayerID(input: string): void {
 
         // empty state
-        if (input === '') {
+        if (input.length === 0) {
             setTCGPlayerIDState({
                 isInvalid: true, 
                 errorMessage: 'TCGPlayerID is required',
@@ -105,10 +192,10 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     }
 
     // validate Name
-    function validateName(input: string) {
+    function validateName(input: string): void {
 
         // empty state
-        if (input === '') {
+        if (input.length === 0) {
             setNameState({
                 isInvalid: true, 
                 errorMessage: 'Name is required',
@@ -128,46 +215,38 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     }
 
     // validate TCG
-    function validateTCG(input: string) {
+    function validateTCG(input: string): void {
 
         // default
-        if (input === '') {
+        if (input.length === 0) {
             setTCGState({
+                tcg: '',
                 isInvalid: true, 
                 errorMessage: 'TCG is required',
             })
 
+        // unrecognized TCG
+        } else if (!Object.values(TCG).includes(input as TCG)) {
+            setTCGState({
+                tcg: '',
+                isInvalid: true, 
+                errorMessage: 'Invalid TCG',
+            })
+
         // valid
         } else {
-            setTCGState({ isInvalid: false })
+            setTCGState({ 
+                tcg: input as TCG,
+                isInvalid: false 
+            })
         }
     }
 
-    // validate Product Type
-    function validateProductType(input: string) {
-
-        // default
-        if (input === '') {
-            setProductTypeState({
-                isInvalid: true, 
-                errorMessage: 'Product Type is required',
-                ...productTypetState,
-            })
-
-        // valid
-        } else {
-            setProductTypeState({ 
-                isDisabled: false,
-                isInvalid: false, 
-            })
-        }
-    }    
-
     // validate Release Date
-    function validateReleaseDate(input: string) {
+    function validateReleaseDate(input: string): void {
 
         // default
-        if (input === '') {
+        if (input.length === 0) {
             setReleaseDateState({
                 isInvalid: true, 
                 errorMessage: 'Release Date is required',
@@ -175,14 +254,12 @@ export const AddProductForm: FunctionComponent<{}> = () => {
 
         // valid
         } else {
-            setReleaseDateState({ 
-                isInvalid: false, 
-            })
+            setReleaseDateState({ isInvalid: false })
         }
     }    
 
     // validate Set Code
-    function validateSetCode(input: string) {
+    function validateSetCode(input: string): void {
 
      if (input.length > 0 && !isASCII(input)) {
             setSetCodeState({
@@ -192,9 +269,30 @@ export const AddProductForm: FunctionComponent<{}> = () => {
 
         // valid
         } else {
-            setNameState({ isInvalid: false })
+            setSetCodeState({ isInvalid: false })
         }
     }
+
+
+    // handle TCG changes
+    useEffect(() => {
+
+        // update Product Type
+        updateProductTypeInput(TCGState.tcg)
+
+        // update Product Subtype
+        updateProductSubypeInput(TCGState.tcg, productTypeState.productType)
+
+    }, [TCGState.tcg])
+
+
+    // handle Product Type changes
+    useEffect(() => {
+
+        // update Product Subtype
+        updateProductSubypeInput(TCGState.tcg, productTypeState.productType)
+
+    }, [productTypeState.productType])
 
 
     // ==============
@@ -243,10 +341,18 @@ export const AddProductForm: FunctionComponent<{}> = () => {
                 errorMessage={TCGState.errorMessage}
             >
                 <Select
+                    value={TCGState.tcg.length === 0
+                        ? undefined
+                        : TCGState.tcg}
                     isInvalid={TCGState.isInvalid || false}
                     isRequired={true} 
                     placeholder={TCG_SELECT_DEFAULT}
                     onBlur={e => validateTCG(e.target.value)}
+                    onChange={e => setTCGState({
+                        tcg: e.target.value as TCG,
+                        isInvalid: TCGState.isInvalid,
+                        errorMessage: TCGState.errorMessage,
+                    })}
                 >            
                     {Object.values(TCG).map(value => {
                         return (
@@ -259,15 +365,23 @@ export const AddProductForm: FunctionComponent<{}> = () => {
             {/* Product Type */}
             <InputErrorWrapper 
                 leftLabel='Type'
-                errorMessage={productTypetState.errorMessage}
             >
                 <Select
-                    isInvalid={productTypetState.isInvalid || false}
+                    value={productTypeState.productType.length === 0
+                        ? undefined
+                        : productTypeState.productType}
+                    isDisabled={productTypeState.isDisabled}
                     isRequired={true} 
-                    placeholder={PRODUCT_TYPE_SELECT_DEFAULT}
-                    onBlur={e => validateProductType(e.target.value)}
+                    placeholder={productTypeState.isDisabled 
+                        ? PRODUCT_TYPE_PLACEHOLDER
+                        : undefined}
+                        onChange={e => setProductTypeState({
+                            productType: e.target.value as ProductType,
+                            isDisabled: productTypeState.isDisabled,
+                            values: productTypeState.values,
+                        })}                        
                 >            
-                    {Object.values(ProductType).map(value => {
+                    {productTypeState.values.map(value => {
                         return (
                             <option key={value} value={value}>{value}</option>
                         )
@@ -280,9 +394,22 @@ export const AddProductForm: FunctionComponent<{}> = () => {
                 leftLabel='Subtype'
             >
                 <Select
-                    placeholder={PRODUCT_SUBTYPE_SELECT_DEFAULT}
+                    value={productSubtypeState.productSubtype.length === 0
+                        ? undefined
+                        : productSubtypeState.productSubtype}
+                    isDisabled={productSubtypeState.isDisabled}
+                    placeholder={productSubtypeState.isDisabled
+                        ? productTypeState.isDisabled 
+                            ? PRODUCT_SUBTYPE_DEFAULT_PLACEHOLDER
+                            : PRODUCT_SUBTYPE_EMPTY_PLACEHOLDER
+                        : undefined}
+                        onChange={e => setProductSubtypeState({
+                            productSubtype: e.target.value as ProductSubtype,
+                            isDisabled: productSubtypeState.isDisabled,
+                            values: productSubtypeState.values,
+                        })}                            
                 >            
-                    {Object.values(ProductSubtype).map(value => {
+                    {productSubtypeState.values.map(value => {
                         return (
                             <option key={value} value={value}>{value}</option>
                         )
