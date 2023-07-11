@@ -1,10 +1,12 @@
 import { FunctionComponent, useEffect, useState, } from 'react';
+import axios from 'axios';
 import { 
     Button,
     Input,
     NumberInput,
     NumberInputField,
     Select,
+    useToast,
     VStack, 
 } from '@chakra-ui/react';
 import { getProductSubtypes, isASCII, ProductLanguage, ProductType, 
@@ -30,7 +32,9 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     const PRODUCT_TYPE_PLACEHOLDER = 'Select TCG first'
     const TCG_SELECT_DEFAULT = 'Select TCG'
     
-    
+    const ADD_PRODUCT_URL = '/product'  
+
+
     // ======
     // states
     // ======
@@ -367,6 +371,9 @@ export const AddProductForm: FunctionComponent<{}> = () => {
 
     }, [productTypeState.productType])
 
+    // Axios response toast
+    const toast = useToast()
+
 
     // ==============
     // main component
@@ -376,11 +383,51 @@ export const AddProductForm: FunctionComponent<{}> = () => {
         <Formik
             initialValues={{}}
             onSubmit={() => {
+
                 // get post body
                 const body = getPostBody()
 
                 // submit
-                alert(JSON.stringify(body, null, 2))
+                axios({
+                    method: 'post',
+                    url: ADD_PRODUCT_URL,
+                    data: body,
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                // success
+                .then(res => {
+
+                    // product was added
+                    if (res.status === 201) {
+                        toast({
+                            title: 'Success!',
+                            description: `tcgplayerId was added: ${res.data.tcgplayerId}`,
+                            status: 'success',
+                            isClosable: true,
+                        })                   
+
+                    // product already exists
+                    } else if (res.status === 202) {
+                        toast({
+                            title: 'Notice',
+                            description: `tcgplayerId already exists: ${res.data.tcgplayerId}`,
+                            status: 'info',
+                            isClosable: true,
+                        })  
+                    }
+
+                })
+                // error
+                .catch(res => {
+                    toast({
+                        title: 'Error!',
+                        description: `${res.statusText}: ${res.data}`,
+                        status: 'error',
+                        isClosable: true,
+                    })                    
+                })
             }}
         >
             <Form>
@@ -389,6 +436,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
                     display='flex'
                     flex-direction='column'
                     spacing={8}
+                    paddingBottom={8}
                 >
                     {/* TCGPlayer ID */}
                     <InputErrorWrapper 
