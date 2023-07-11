@@ -29,8 +29,8 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     const PRODUCT_SUBTYPE_EMPTY_PLACEHOLDER = 'No Subtypes'
     const PRODUCT_TYPE_PLACEHOLDER = 'Select TCG first'
     const TCG_SELECT_DEFAULT = 'Select TCG'
-
-
+    
+    
     // ======
     // states
     // ======
@@ -547,6 +547,13 @@ export const AddProductForm: FunctionComponent<{}> = () => {
                 <Button
                     colorScheme='teal'
                     type='submit'
+                    isDisabled={
+                        (TCGPlayerIdState.isInvalid ?? true)
+                        || (nameState.isInvalid ?? true)
+                        || (TCGState.isInvalid ?? true)
+                        || (releaseDateState.isInvalid ?? true)
+                        || (setCodeState.isInvalid ?? true)
+                    }
                 >
                     Submit
                 </Button>
