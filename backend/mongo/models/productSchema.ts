@@ -1,6 +1,6 @@
 // imports
 import { Schema } from 'mongoose';
-import { ProductLanguage, ProductSubType, ProductType, TCG } from 'common';
+import { ProductLanguage, ProductSubtype, ProductType, TCG } from 'common';
 
 export interface IProduct {
     tcgplayerId: Number;
@@ -9,7 +9,7 @@ export interface IProduct {
     name: String;
     type: ProductType;
     language: ProductLanguage;
-    subtype?: ProductSubType;
+    subtype?: ProductSubtype;
     setCode?: String;
 }
 
@@ -45,7 +45,7 @@ export const productSchema = new Schema<IProduct>({
     },
     subtype: {
         type: String,
-        enum: ProductSubType
+        enum: ProductSubtype
     },
     setCode: String,
 });

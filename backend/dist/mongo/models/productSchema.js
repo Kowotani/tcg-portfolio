@@ -36,7 +36,7 @@ exports.productSchema = new mongoose_1.Schema({
     },
     subtype: {
         type: String,
-        enum: common_1.ProductSubType
+        enum: common_1.ProductSubtype
     },
     setCode: String,
 });
