@@ -39,10 +39,11 @@ INPUT: request body in multipart/form-data containing
     
 */
 app.post('/product', upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const data = req.body;
+    const body = req.body;
+    const imageURL = body.imageURL;
+    const data = body.formData;
     // check if product already exists (via tcgplayerId)
     const query = yield (0, mongoManager_1.getProduct)({ tcgplayerId: Number(data.tcgplayerId) });
-    console.log(query);
     if (query.length > 0) {
         res.status(202);
         const body = {

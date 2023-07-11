@@ -37,6 +37,29 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     const ADD_PRODUCT_URL = '/product'  
 
 
+    // =====
+    // types
+    // =====
+
+    // form data for POST request
+    type TPostFormData = {
+        tcgplayerId: number,
+        name: string,
+        tcg: TCG,
+        type: ProductType,
+        releaseDate: string,
+        language: ProductLanguage,
+        subtype?: ProductSubtype,
+        setCode?: string,
+    }
+
+    // body for POST request
+    type TPostBody = {
+        formData: TPostFormData,
+        imageUrl?: string, 
+    }
+
+
     // ======
     // states
     // ======
@@ -117,7 +140,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     });
 
     // Image URL state
-    const [ imageURLState, setImageURLState ] = useState<{
+    const [ imageUrlState, setImageURLState ] = useState<{
         imageUrl: string,
         isInvalid: boolean,
         errorMessage?: string,
@@ -382,21 +405,11 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     DESC
         Creates the body for the POST request to add a new Product
     RETURN
-        A TPostBody with the Product data
+        A TPostFormData with the Product data
     */
-    type TPostBody = {
-        tcgplayerId: number,
-        name: string,
-        tcg: TCG,
-        type: ProductType,
-        releaseDate: string,
-        language: ProductLanguage,
-        subtype?: ProductSubtype,
-        setCode?: string,
-    }
-    function getPostBody(): TPostBody {
+    function getPostFormData(): TPostFormData {
 
-        let body: TPostBody = {
+        let data: TPostFormData = {
             tcgplayerId: TCGPlayerIdState.tcgPlayerId as number,
             name: nameState.name,
             tcg: TCGState.tcg as TCG,
@@ -405,13 +418,13 @@ export const AddProductForm: FunctionComponent<{}> = () => {
             language: languageState.language,
         }
         if (productSubtypeState.productSubtype.length > 0) {
-            body['subtype'] = productSubtypeState.productSubtype as ProductSubtype
+            data.subtype = productSubtypeState.productSubtype as ProductSubtype
         }
         if (setCodeState.setCode.length > 0) {
-            body['setCode'] = setCodeState.setCode
+            data.setCode = setCodeState.setCode
         }
 
-        return body
+        return data
     }
 
 
@@ -448,8 +461,15 @@ export const AddProductForm: FunctionComponent<{}> = () => {
             initialValues={{}}
             onSubmit={() => {
 
-                // get post body
-                const body = getPostBody()
+                // create POST body               
+                let body: TPostBody = {
+                    formData: getPostFormData(),
+                }
+
+                // add imageUrl, if exists
+                if (!imageUrlState.isInvalid) {
+                    body.imageUrl = imageUrlState.imageUrl
+                }
 
                 // submit
                 axios({
@@ -658,21 +678,21 @@ export const AddProductForm: FunctionComponent<{}> = () => {
                     {/* Image URL */}
                     <InputErrorWrapper 
                         leftLabel='Image URL'
-                        errorMessage={imageURLState.errorMessage}
+                        errorMessage={imageUrlState.errorMessage}
                     >
                         <Input
                             placeholder={IMAGE_URL_PLACEHOLDER}
-                            isInvalid={imageURLState.isInvalid}
+                            isInvalid={imageUrlState.isInvalid}
                             onBlur={e => validateImageURL(e.target.value)}
                         />
                     </InputErrorWrapper>
 
                     {/* Image */}
-                    { imageURLState.imageUrl.length > 0 && !imageURLState.isInvalid
+                    { imageUrlState.imageUrl.length > 0 && !imageUrlState.isInvalid
                         ? (
                             <Image 
                                 boxSize='200px'
-                                src={imageURLState.imageUrl}
+                                src={imageUrlState.imageUrl}
                             />
                         ) : undefined
                     }
@@ -688,7 +708,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
                         || (TCGState.isInvalid ?? true)
                         || (releaseDateState.isInvalid ?? true)
                         || (setCodeState.isInvalid ?? true)
-                        || (imageURLState.isInvalid ?? true)
+                        || (imageUrlState.isInvalid ?? true)
                     }
                 >
                     Submit

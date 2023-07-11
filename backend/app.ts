@@ -34,7 +34,9 @@ INPUT: request body in multipart/form-data containing
 */
 app.post('/product', upload.none(), async (req: any, res: any) => {
 
-        const data = req.body;
+        const body = req.body
+        const imageUrl = body.imageUrl
+        const data = body.formData
 
         // check if product already exists (via tcgplayerId)
         const query = await getProduct({tcgplayerId: Number(data.tcgplayerId)}); 
