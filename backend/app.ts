@@ -37,18 +37,26 @@ app.post('/product', upload.none(), async (req: any, res: any) => {
         const data = req.body;
 
         // check if product already exists (via tcgplayerId)
-        const query = await getProduct(
-            {tcgplayerId: Number(data.tcgplayerId)});
-        console.log(query);    
-        if (query === null) { 
-
-            res.send('Product already exists'); 
+        const query = await getProduct({tcgplayerId: Number(data.tcgplayerId)}); 
+        if (query !== null) { 
+            res.status(400)
+            res.send(`tcgplayerId already exists: ${data.tcgplayerId}`)
 
         } else {
         
             // add product
-            await insertProducts([data]);
-            res.send('Product added: ' + JSON.stringify(data));
+            const numInserted = await insertProducts([data]);
+
+            // success
+            if (numInserted > 0) {
+                res.status(201)
+                res.send(JSON.stringify(data))
+
+            // error
+            } else {
+                res.status(500)
+                res.send('Error inserting Product docs')
+            }
         }
     });
 

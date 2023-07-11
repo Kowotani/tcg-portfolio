@@ -86,7 +86,7 @@ INPUT
 RETURN
     The number of documents inserted
 */
-export async function insertProducts(docs: IProduct[]): Promise<Number> {
+export async function insertProducts(docs: IProduct[]): Promise<number> {
 
     // connect to db
     await mongoose.connect(url);
@@ -112,7 +112,7 @@ INPUT
 RETURN
     The number of documents inserted
 */
-export async function insertPrices(docs: IPrice[]): Promise<Number> {
+export async function insertPrices(docs: IPrice[]): Promise<number> {
 
     // connect to db
     await mongoose.connect(url);
