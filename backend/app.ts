@@ -38,9 +38,13 @@ app.post('/product', upload.none(), async (req: any, res: any) => {
 
         // check if product already exists (via tcgplayerId)
         const query = await getProduct({tcgplayerId: Number(data.tcgplayerId)}); 
-        if (query !== null) { 
-            res.status(400)
-            res.send(`tcgplayerId already exists: ${data.tcgplayerId}`)
+        if (query.length > 0) { 
+            res.status(202)
+            const body = {
+                tcgplayerId: data.tcgplayerId,
+                message: 'tcgplayerId already exists',
+            }
+            res.send(body)
 
         } else {
         
@@ -50,12 +54,21 @@ app.post('/product', upload.none(), async (req: any, res: any) => {
             // success
             if (numInserted > 0) {
                 res.status(201)
-                res.send(JSON.stringify(data))
+                const body = {
+                    tcgplayerId: data.tcgplayerId,
+                    message: 'tcgplayerId added',
+                    data: data,
+                }
+                res.send(body)
 
             // error
             } else {
                 res.status(500)
-                res.send('Error inserting Product docs')
+                const body = {
+                    tcgplayerId: data.tcgplayerId,
+                    message: 'Error creating Product doc',
+                }                
+                res.send(body)
             }
         }
     });

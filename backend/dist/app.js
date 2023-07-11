@@ -42,9 +42,14 @@ app.post('/product', upload.none(), (req, res) => __awaiter(void 0, void 0, void
     const data = req.body;
     // check if product already exists (via tcgplayerId)
     const query = yield (0, mongoManager_1.getProduct)({ tcgplayerId: Number(data.tcgplayerId) });
-    if (query !== null) {
-        res.status(400);
-        res.send(`tcgplayerId already exists: ${data.tcgplayerId}`);
+    console.log(query);
+    if (query.length > 0) {
+        res.status(202);
+        const body = {
+            tcgplayerId: data.tcgplayerId,
+            message: 'tcgplayerId already exists',
+        };
+        res.send(body);
     }
     else {
         // add product
@@ -52,12 +57,21 @@ app.post('/product', upload.none(), (req, res) => __awaiter(void 0, void 0, void
         // success
         if (numInserted > 0) {
             res.status(201);
-            res.send(JSON.stringify(data));
+            const body = {
+                tcgplayerId: data.tcgplayerId,
+                message: 'tcgplayerId added',
+                data: data,
+            };
+            res.send(body);
             // error
         }
         else {
             res.status(500);
-            res.send('Error inserting Product docs');
+            const body = {
+                tcgplayerId: data.tcgplayerId,
+                message: 'Error creating Product doc',
+            };
+            res.send(body);
         }
     }
 }));
