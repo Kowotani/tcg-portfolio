@@ -2,6 +2,7 @@ import { FunctionComponent, useEffect, useState, } from 'react';
 import axios from 'axios';
 import { 
     Button,
+    Image,
     Input,
     NumberInput,
     NumberInputField,
@@ -26,6 +27,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     // constants
     // =========
 
+    const IMAGE_URL_PLACEHOLDER = 'https://picsum.photos/'
     const LANGUAGE_SELECT_DEFAULT = ProductLanguage.English
     const PRODUCT_SUBTYPE_DEFAULT_PLACEHOLDER = 'Select Type first'
     const PRODUCT_SUBTYPE_EMPTY_PLACEHOLDER = 'No Subtypes'
@@ -112,6 +114,16 @@ export const AddProductForm: FunctionComponent<{}> = () => {
         language: ProductLanguage,
     }>({
         language: LANGUAGE_SELECT_DEFAULT,
+    });
+
+    // Image URL state
+    const [ imageURLState, setImageURLState ] = useState<{
+        imageUrl: string,
+        isInvalid: boolean,
+        errorMessage?: string,
+    }>({
+        imageUrl: '',
+        isInvalid: false,
     });
 
 
@@ -298,7 +310,8 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     // validate Set Code
     function validateSetCode(input: string): void {
 
-     if (input.length > 0 && !isASCII(input)) {
+        // ASCII only
+        if (input.length > 0 && !isASCII(input)) {
             setSetCodeState({
                 setCode: '',
                 isInvalid: true, 
@@ -313,6 +326,57 @@ export const AddProductForm: FunctionComponent<{}> = () => {
             })
         }
     }
+
+    // validate Image URL
+    function validateImageURL(input: string): void {
+
+        // ASCII only
+        if (input.length > 0 && !isASCII(input)) {
+            setImageURLState({
+                imageUrl: '',
+                isInvalid: true, 
+                errorMessage: 'Image URL must only contain ASCII characters',
+            })
+
+        // URL format
+        } else if (input.length > 0 && !isHttpUrl(input)) {
+            setImageURLState({
+                imageUrl: '',
+                isInvalid: true, 
+                errorMessage: 'URL incorrectly formatted',
+            })
+
+        // valid
+        } else {
+            setImageURLState({ 
+                imageUrl: input,
+                isInvalid: false 
+            })
+        }
+    }
+
+
+    /*
+    DESC
+        Checks if the input is a valid HTTP URL
+    INPUT
+        input: a string that may be a URL
+    RETURN
+        TRUE if the input is a valid HTTP URL, FALSE otherwise
+    REF
+        https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
+    */
+    function isHttpUrl(input: string): boolean {
+        let url;
+        
+        try {
+          url = new URL(input);
+        } catch (_) {
+          return false;  
+        }
+      
+        return url.protocol === "http:" || url.protocol === "https:";
+      }
 
     /*
     DESC
@@ -590,6 +654,29 @@ export const AddProductForm: FunctionComponent<{}> = () => {
                             })}
                         </Select>                
                     </InputErrorWrapper>
+
+                    {/* Image URL */}
+                    <InputErrorWrapper 
+                        leftLabel='Image URL'
+                        errorMessage={imageURLState.errorMessage}
+                    >
+                        <Input
+                            placeholder={IMAGE_URL_PLACEHOLDER}
+                            isInvalid={imageURLState.isInvalid}
+                            onBlur={e => validateImageURL(e.target.value)}
+                        />
+                    </InputErrorWrapper>
+
+                    {/* Image */}
+                    { imageURLState.imageUrl.length > 0 && !imageURLState.isInvalid
+                        ? (
+                            <Image 
+                                boxSize='200px'
+                                src={imageURLState.imageUrl}
+                            />
+                        ) : undefined
+                    }
+
                 </VStack>
 
                 <Button
@@ -601,6 +688,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
                         || (TCGState.isInvalid ?? true)
                         || (releaseDateState.isInvalid ?? true)
                         || (setCodeState.isInvalid ?? true)
+                        || (imageURLState.isInvalid ?? true)
                     }
                 >
                     Submit
