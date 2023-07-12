@@ -186,21 +186,9 @@ export interface IProduct {
 // types
 // =====
 
-// form data for POST request to /product
-export type TPostFormData = {
-    tcgplayerId: number,
-    name: string,
-    tcg: TCG,
-    type: ProductType,
-    releaseDate: string,
-    language: ProductLanguage,
-    subtype?: ProductSubtype,
-    setCode?: string,
-}
-
 // body for POST request to /product
-export type TPostBody = {
-    formData: TPostFormData,
+export type TProductPostBody = {
+    formData: IProduct,
     imageUrl?: string, 
 }
 

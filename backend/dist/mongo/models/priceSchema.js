@@ -6,16 +6,6 @@ const productSchema_1 = require("./productSchema");
 // =======
 // schemas
 // =======
-// export const priceProductSchema = new Schema<IPriceProduct>({
-//     id: {
-//         type: Schema.Types.ObjectId,
-//         required: true
-//     },
-//     tcgplayerId: {
-//         type: Number,
-//         required: true
-//     },
-// })
 exports.priceSchema = new mongoose_1.Schema({
     priceDate: {
         type: Date,

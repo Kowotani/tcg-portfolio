@@ -1,13 +1,11 @@
 // imports
-
+import { TProductPostBody } from 'common';
 import express from 'express';
 import { insertProducts, getProduct } from './mongo/mongoManager';
 import multer from 'multer';
 
 const upload = multer();
 const app = express();
-
-// app.use(upload);    // parse multipart/form-data
 
 const port = 3030;
 
@@ -34,12 +32,13 @@ INPUT: request body in multipart/form-data containing
 */
 app.post('/product', upload.none(), async (req: any, res: any) => {
 
-        const body = req.body
-        const imageUrl = body.imageUrl
+        // variables
+        const body: TProductPostBody = req.body
         const data = body.formData
+        const tcgPlayerId = data.tcgplayerId as number
 
         // check if product already exists (via tcgplayerId)
-        const query = await getProduct({tcgplayerId: Number(data.tcgplayerId)}); 
+        const query = await getProduct({tcgplayerId: tcgPlayerId}); 
         if (query.length > 0) { 
             res.status(202)
             const body = {

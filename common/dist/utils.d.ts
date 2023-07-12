@@ -64,18 +64,8 @@ export interface IProduct {
     subtype?: ProductSubtype;
     setCode?: String;
 }
-export declare type TPostFormData = {
-    tcgplayerId: number;
-    name: string;
-    tcg: TCG;
-    type: ProductType;
-    releaseDate: string;
-    language: ProductLanguage;
-    subtype?: ProductSubtype;
-    setCode?: string;
-};
-export declare type TPostBody = {
-    formData: TPostFormData;
+export declare type TProductPostBody = {
+    formData: IProduct;
     imageUrl?: string;
 };
 export declare function getPriceFromString(value: string): number;

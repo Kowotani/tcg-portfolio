@@ -10,8 +10,8 @@ import {
     useToast,
     VStack, 
 } from '@chakra-ui/react';
-import { getProductSubtypes, isASCII, ProductLanguage, ProductType, 
-    ProductSubtype, TCG, TCGToProductType, TPostFormData, TPostBody,
+import { getProductSubtypes, IProduct, isASCII, ProductLanguage, ProductType, 
+    ProductSubtype, TCG, TCGToProductType, TProductPostBody,
 } from 'common';
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField';
@@ -391,14 +391,14 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     RETURN
         A TPostFormData with the Product data
     */
-    function getPostFormData(): TPostFormData {
+    function getPostFormData(): IProduct {
 
-        let data: TPostFormData = {
+        let data: IProduct = {
             tcgplayerId: TCGPlayerIdState.tcgPlayerId as number,
             name: nameState.name,
             tcg: TCGState.tcg as TCG,
             type: productTypeState.productType as ProductType,
-            releaseDate: (releaseDateState.releaseDate?.toISOString() as string).substring(0,10),
+            releaseDate: releaseDateState.releaseDate as Date,
             language: languageState.language,
         }
         if (productSubtypeState.productSubtype.length > 0) {
@@ -446,7 +446,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
             onSubmit={() => {
 
                 // create POST body               
-                let body: TPostBody = {
+                let body: TProductPostBody = {
                     formData: getPostFormData(),
                 }
 

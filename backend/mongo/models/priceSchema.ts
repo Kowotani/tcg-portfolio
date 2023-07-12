@@ -7,11 +7,6 @@ import { productSchema } from './productSchema';
 // interfaces
 // ==========
 
-// export interface IPriceProduct {
-//     id: Schema.Types.ObjectId;
-//     tcgplayerId: Number;
-// }
-
 export interface IPrice {
     priceDate: Date;
     product: IProduct;
@@ -25,17 +20,6 @@ export interface IPrice {
 // =======
 // schemas
 // =======
-
-// export const priceProductSchema = new Schema<IPriceProduct>({
-//     id: {
-//         type: Schema.Types.ObjectId,
-//         required: true
-//     },
-//     tcgplayerId: {
-//         type: Number,
-//         required: true
-//     },
-// })
 
 export const priceSchema = new Schema<IPrice>({
     priceDate: {
