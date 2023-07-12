@@ -11,7 +11,7 @@ import {
     VStack, 
 } from '@chakra-ui/react';
 import { getProductSubtypes, isASCII, ProductLanguage, ProductType, 
-    ProductSubtype, TCG, TCGToProductType,
+    ProductSubtype, TCG, TCGToProductType, TPostFormData, TPostBody,
 } from 'common';
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField';
@@ -41,23 +41,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     // types
     // =====
 
-    // form data for POST request
-    type TPostFormData = {
-        tcgplayerId: number,
-        name: string,
-        tcg: TCG,
-        type: ProductType,
-        releaseDate: string,
-        language: ProductLanguage,
-        subtype?: ProductSubtype,
-        setCode?: string,
-    }
 
-    // body for POST request
-    type TPostBody = {
-        formData: TPostFormData,
-        imageUrl?: string, 
-    }
 
 
     // ======

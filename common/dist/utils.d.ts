@@ -54,6 +54,20 @@ export interface IProductPriceData {
     tcgplayerId: Number;
     priceData: IPriceData;
 }
+export declare type TPostFormData = {
+    tcgplayerId: number;
+    name: string;
+    tcg: TCG;
+    type: ProductType;
+    releaseDate: string;
+    language: ProductLanguage;
+    subtype?: ProductSubtype;
+    setCode?: string;
+};
+export declare type TPostBody = {
+    formData: TPostFormData;
+    imageUrl?: string;
+};
 export declare function getPriceFromString(value: string): number;
 export declare function getProductSubtypes(tcg: TCG, productType: ProductType): ProductSubtype[];
 export declare function isASCII(value: string): boolean;
