@@ -1,8 +1,9 @@
 // imports
-import { TProductPostBody } from 'common';
+import { ProductPostStatus, TProductPostBody } from 'common';
 import express from 'express';
 import { insertProducts, getProduct } from './mongo/mongoManager';
 import multer from 'multer';
+import { loadImageToS3 } from './aws/s3Manager';
 
 const upload = multer();
 const app = express();
@@ -43,7 +44,7 @@ app.post('/product', upload.none(), async (req: any, res: any) => {
             res.status(202)
             const body = {
                 tcgplayerId: data.tcgplayerId,
-                message: 'tcgplayerId already exists',
+                message: ProductPostStatus.AlreadyExists,
             }
             res.send(body)
 
@@ -52,12 +53,19 @@ app.post('/product', upload.none(), async (req: any, res: any) => {
             // add product
             const numInserted = await insertProducts([data]);
 
+            // load image to S3
+            const isImageLoaded = body.imageUrl
+                ? await loadImageToS3(tcgPlayerId, body.imageUrl)
+                : false
+
             // success
             if (numInserted > 0) {
                 res.status(201)
                 const body = {
                     tcgplayerId: data.tcgplayerId,
-                    message: 'tcgplayerId added',
+                    message: isImageLoaded
+                        ? ProductPostStatus.Added
+                        : ProductPostStatus.AddedWithoutImage,
                     data: data,
                 }
                 res.send(body)

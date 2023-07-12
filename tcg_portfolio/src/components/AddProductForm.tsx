@@ -10,8 +10,9 @@ import {
     useToast,
     VStack, 
 } from '@chakra-ui/react';
-import { getProductSubtypes, IProduct, isASCII, ProductLanguage, ProductType, 
-    ProductSubtype, TCG, TCGToProductType, TProductPostBody,
+import { getProductSubtypes, IProduct, isASCII, ProductLanguage, 
+    ProductPostStatus, ProductType, ProductSubtype, TCG, TCGToProductType, 
+    TProductPostBody,
 } from 'common';
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField';
@@ -469,19 +470,32 @@ export const AddProductForm: FunctionComponent<{}> = () => {
 
                     // product was added
                     if (res.status === 201) {
-                        toast({
-                            title: 'Success!',
-                            description: `tcgplayerId was added: ${res.data.tcgplayerId}`,
-                            status: 'success',
-                            isClosable: true,
-                        })                   
+
+                        // added with image
+                        if (res.data.message === ProductPostStatus.Added) {
+                            toast({
+                                title: 'Success!',
+                                description: `${ProductPostStatus.Added}: ${res.data.tcgplayerId}`,
+                                status: 'success',
+                                isClosable: true,
+                            })                
+
+                        // added without image
+                        } else if (res.data.message === ProductPostStatus.AddedWithoutImage) {
+                            toast({
+                                title: 'Partial Success',
+                                description: `${ProductPostStatus.AddedWithoutImage}: ${res.data.tcgplayerId}`,
+                                status: 'info',
+                                isClosable: true,
+                            })                
+                        }
 
                     // product already exists
                     } else if (res.status === 202) {
                         toast({
                             title: 'Notice',
-                            description: `tcgplayerId already exists: ${res.data.tcgplayerId}`,
-                            status: 'info',
+                            description: `${ProductPostStatus.AlreadyExists}: ${res.data.tcgplayerId}`,
+                            status: 'warning',
                             isClosable: true,
                         })  
                     }

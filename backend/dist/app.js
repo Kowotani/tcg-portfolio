@@ -12,9 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// imports
+const common_1 = require("common");
 const express_1 = __importDefault(require("express"));
 const mongoManager_1 = require("./mongo/mongoManager");
 const multer_1 = __importDefault(require("multer"));
+const s3Manager_1 = require("./aws/s3Manager");
 const upload = (0, multer_1.default)();
 const app = (0, express_1.default)();
 const port = 3030;
@@ -47,19 +50,25 @@ app.post('/product', upload.none(), (req, res) => __awaiter(void 0, void 0, void
         res.status(202);
         const body = {
             tcgplayerId: data.tcgplayerId,
-            message: 'tcgplayerId already exists',
+            message: common_1.ProductPostStatus.AlreadyExists,
         };
         res.send(body);
     }
     else {
         // add product
         const numInserted = yield (0, mongoManager_1.insertProducts)([data]);
+        // load image to S3
+        const isImageLoaded = body.imageUrl
+            ? yield (0, s3Manager_1.loadImageToS3)(tcgPlayerId, body.imageUrl)
+            : false;
         // success
         if (numInserted > 0) {
             res.status(201);
             const body = {
                 tcgplayerId: data.tcgplayerId,
-                message: 'tcgplayerId added',
+                message: isImageLoaded
+                    ? common_1.ProductPostStatus.Added
+                    : common_1.ProductPostStatus.AddedWithoutImage,
                 data: data,
             };
             res.send(body);

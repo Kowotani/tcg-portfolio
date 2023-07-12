@@ -4,6 +4,14 @@ import * as _ from 'lodash'
 // enums
 // =====
 
+// -- FE / BE api
+
+export enum ProductPostStatus {
+    Added = 'tcgplayerId added',
+    AddedWithoutImage = 'tcgplayerId added (without image)',
+    AlreadyExists = 'tcgplayerId already exists',
+}
+
 // -- mongodb
 
 export enum TimeseriesGranularity {

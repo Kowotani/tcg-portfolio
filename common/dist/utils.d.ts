@@ -1,3 +1,8 @@
+export declare enum ProductPostStatus {
+    Added = "tcgplayerId added",
+    AddedWithoutImage = "tcgplayerId added (without image)",
+    AlreadyExists = "tcgplayerId already exists"
+}
 export declare enum TimeseriesGranularity {
     Seconds = "seconds",
     Minutes = "minutes",
