@@ -169,6 +169,18 @@ export interface IProductPriceData {
     priceData: IPriceData;
 }
 
+// defines the required data for a Product
+export interface IProduct {
+    tcgplayerId: Number;
+    tcg: TCG;
+    releaseDate: Date;
+    name: String;
+    type: ProductType;
+    language: ProductLanguage;
+    subtype?: ProductSubtype;
+    setCode?: String;
+}
+
 
 // =====
 // types

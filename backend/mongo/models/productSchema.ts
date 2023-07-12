@@ -1,17 +1,7 @@
 // imports
 import { Schema } from 'mongoose';
-import { ProductLanguage, ProductSubtype, ProductType, TCG } from 'common';
-
-export interface IProduct {
-    tcgplayerId: Number;
-    tcg: TCG;
-    releaseDate: Date;
-    name: String;
-    type: ProductType;
-    language: ProductLanguage;
-    subtype?: ProductSubtype;
-    setCode?: String;
-}
+import { IProduct, ProductLanguage, ProductSubtype, ProductType, 
+    TCG } from 'common';
 
 export const productSchema = new Schema<IProduct>({
     tcgplayerId: {

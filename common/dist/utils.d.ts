@@ -54,6 +54,16 @@ export interface IProductPriceData {
     tcgplayerId: Number;
     priceData: IPriceData;
 }
+export interface IProduct {
+    tcgplayerId: Number;
+    tcg: TCG;
+    releaseDate: Date;
+    name: String;
+    type: ProductType;
+    language: ProductLanguage;
+    subtype?: ProductSubtype;
+    setCode?: String;
+}
 export declare type TPostFormData = {
     tcgplayerId: number;
     name: string;
