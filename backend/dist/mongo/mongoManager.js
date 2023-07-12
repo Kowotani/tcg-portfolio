@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = void 0;
-// imports
 const mongoose_1 = __importDefault(require("mongoose"));
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");

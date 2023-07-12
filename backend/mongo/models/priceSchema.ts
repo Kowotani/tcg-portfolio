@@ -1,6 +1,7 @@
 // imports
+import { IProduct } from 'common';
 import { Schema } from 'mongoose';
-import { IProduct, productSchema } from './productSchema';
+import { productSchema } from './productSchema';
 
 // ==========
 // interfaces

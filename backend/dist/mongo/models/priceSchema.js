@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.priceSchema = void 0;
-// imports
 const mongoose_1 = require("mongoose");
 const productSchema_1 = require("./productSchema");
 // =======

@@ -1,7 +1,8 @@
 // imports
+import { IProduct } from 'common';
 import mongoose from 'mongoose';
 import { IPrice, priceSchema } from './models/priceSchema';
-import { IProduct, productSchema } from './models/productSchema';
+import { productSchema } from './models/productSchema';
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
