@@ -33,6 +33,7 @@ export enum ProductSubtype {
     Collector = 'Collector',
     Draft = 'Draft',
     EliteTrainerBox = 'Elite Trainer Box',
+    FABVersionTwo = '2.0',
     FirstEdition = '1st Edition',
     SecondEdition = '2nd Edition',
     Set = 'Set',
@@ -115,6 +116,7 @@ export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubtyp
     [ProductType.BoosterBox]: [
         ProductSubtype.Collector,
         ProductSubtype.Draft,
+        ProductSubtype.FABVersionTwo,
         ProductSubtype.FirstEdition,
         ProductSubtype.SecondEdition,
         ProductSubtype.Set,
@@ -133,6 +135,7 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
 
     // FAB
     [TCG.FleshAndBlood]: [
+        ProductSubtype.FABVersionTwo,
         ProductSubtype.FirstEdition,
         ProductSubtype.Unlimited,
     ],

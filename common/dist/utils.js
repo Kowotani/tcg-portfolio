@@ -35,6 +35,7 @@ var ProductSubtype;
     ProductSubtype["Collector"] = "Collector";
     ProductSubtype["Draft"] = "Draft";
     ProductSubtype["EliteTrainerBox"] = "Elite Trainer Box";
+    ProductSubtype["FABVersionTwo"] = "2.0";
     ProductSubtype["FirstEdition"] = "1st Edition";
     ProductSubtype["SecondEdition"] = "2nd Edition";
     ProductSubtype["Set"] = "Set";
@@ -108,6 +109,7 @@ exports.ProductTypeToProductSubtype = (_b = {},
     _b[ProductType.BoosterBox] = [
         ProductSubtype.Collector,
         ProductSubtype.Draft,
+        ProductSubtype.FABVersionTwo,
         ProductSubtype.FirstEdition,
         ProductSubtype.SecondEdition,
         ProductSubtype.Set,
@@ -123,6 +125,7 @@ exports.ProductTypeToProductSubtype = (_b = {},
 exports.TCGToProductSubtype = (_c = {},
     // FAB
     _c[TCG.FleshAndBlood] = [
+        ProductSubtype.FABVersionTwo,
         ProductSubtype.FirstEdition,
         ProductSubtype.Unlimited,
     ],

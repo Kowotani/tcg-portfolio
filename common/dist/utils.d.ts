@@ -16,6 +16,7 @@ export declare enum ProductSubtype {
     Collector = "Collector",
     Draft = "Draft",
     EliteTrainerBox = "Elite Trainer Box",
+    FABVersionTwo = "2.0",
     FirstEdition = "1st Edition",
     SecondEdition = "2nd Edition",
     Set = "Set",
