@@ -33,12 +33,17 @@ var ProductLanguage;
 var ProductSubtype;
 (function (ProductSubtype) {
     ProductSubtype["Collector"] = "Collector";
+    ProductSubtype["CommanderDeck"] = "Commander Deck";
     ProductSubtype["Draft"] = "Draft";
     ProductSubtype["EliteTrainerBox"] = "Elite Trainer Box";
     ProductSubtype["FABVersionTwo"] = "2.0";
     ProductSubtype["FirstEdition"] = "1st Edition";
+    ProductSubtype["Foil"] = "Foil";
+    ProductSubtype["FoilEteched"] = "Foil Etched";
+    ProductSubtype["NonFoil"] = "Non-Foil";
     ProductSubtype["SecondEdition"] = "2nd Edition";
     ProductSubtype["Set"] = "Set";
+    ProductSubtype["TexturedFoil"] = "Textured Foil";
     ProductSubtype["UltraPremiumCollection"] = "Ultra Premium Collection";
     ProductSubtype["Unlimited"] = "Unlimited";
 })(ProductSubtype = exports.ProductSubtype || (exports.ProductSubtype = {}));
@@ -120,6 +125,14 @@ exports.ProductTypeToProductSubtype = (_b = {},
         ProductSubtype.EliteTrainerBox,
         ProductSubtype.UltraPremiumCollection
     ],
+    // Secret Lair
+    _b[ProductType.SecretLair] = [
+        ProductSubtype.CommanderDeck,
+        ProductSubtype.Foil,
+        ProductSubtype.FoilEteched,
+        ProductSubtype.NonFoil,
+        ProductSubtype.TexturedFoil,
+    ],
     _b);
 // TCG -> product subtype
 exports.TCGToProductSubtype = (_c = {},
@@ -132,8 +145,13 @@ exports.TCGToProductSubtype = (_c = {},
     // MTG
     _c[TCG.MagicTheGathering] = [
         ProductSubtype.Collector,
+        ProductSubtype.CommanderDeck,
         ProductSubtype.Draft,
+        ProductSubtype.Foil,
+        ProductSubtype.FoilEteched,
+        ProductSubtype.NonFoil,
         ProductSubtype.Set,
+        ProductSubtype.TexturedFoil,
     ],
     // Metazoo
     _c[TCG.MetaZoo] = [

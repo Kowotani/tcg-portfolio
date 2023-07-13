@@ -31,12 +31,17 @@ export enum ProductLanguage {
 // product subtype
 export enum ProductSubtype {
     Collector = 'Collector',
+    CommanderDeck = 'Commander Deck',
     Draft = 'Draft',
     EliteTrainerBox = 'Elite Trainer Box',
     FABVersionTwo = '2.0',
     FirstEdition = '1st Edition',
+    Foil = 'Foil',
+    FoilEteched = 'Foil Etched',
+    NonFoil = 'Non-Foil',
     SecondEdition = '2nd Edition',
     Set = 'Set',
+    TexturedFoil = 'Textured Foil',
     UltraPremiumCollection = 'Ultra Premium Collection',
     Unlimited = 'Unlimited',
 };
@@ -127,7 +132,16 @@ export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubtyp
     [ProductType.Bundle]: [
         ProductSubtype.EliteTrainerBox,
         ProductSubtype.UltraPremiumCollection
-    ]
+    ],
+
+    // Secret Lair
+    [ProductType.SecretLair]: [
+        ProductSubtype.CommanderDeck,
+        ProductSubtype.Foil,
+        ProductSubtype.FoilEteched,
+        ProductSubtype.NonFoil,
+        ProductSubtype.TexturedFoil,
+    ],
 }
 
 // TCG -> product subtype
@@ -143,8 +157,13 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
     // MTG
     [TCG.MagicTheGathering]: [
         ProductSubtype.Collector,
+        ProductSubtype.CommanderDeck,
         ProductSubtype.Draft,
+        ProductSubtype.Foil,
+        ProductSubtype.FoilEteched,
+        ProductSubtype.NonFoil,
         ProductSubtype.Set,
+        ProductSubtype.TexturedFoil,
     ],
 
     // Metazoo
