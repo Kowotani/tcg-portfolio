@@ -1,7 +1,7 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
+exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
 var _ = require("lodash");
 // =====
 // enums
@@ -259,3 +259,29 @@ function isTCGPriceTypeValue(value) {
     return arr.includes(value);
 }
 exports.isTCGPriceTypeValue = isTCGPriceTypeValue;
+/*
+DESC
+    Function used for sorting dates in ascending order
+INPUT
+    a: The first Date
+    b: The second Date
+RETURN
+    A negative number if a < b, otherwise a positive number if a > b
+*/
+function sortFnDateAsc(a, b) {
+    return a.getTime() - b.getTime();
+}
+exports.sortFnDateAsc = sortFnDateAsc;
+/*
+DESC
+    Function used for sorting dates in descending order
+INPUT
+    a: The first Date
+    b: The second Date
+RETURN
+    A negative number if a > b, otherwise a positive number if a < b
+*/
+function sortFnDateDesc(a, b) {
+    return b.getTime() - a.getTime();
+}
+exports.sortFnDateDesc = sortFnDateDesc;

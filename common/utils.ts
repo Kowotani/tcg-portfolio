@@ -196,6 +196,8 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
 // interfaces
 // ==========
 
+// -- Product and Price schemas
+
 // used with IProductPriceData for storing scraped price data
 export interface IPriceData {
     marketPrice: Number;
@@ -221,6 +223,8 @@ export interface IProduct {
     setCode?: String;
 }
 
+// -- Portfolio, Holding, and Transaction schemas
+
 // transaction
 export interface ITransaction {
     type: TransactionType,
@@ -234,6 +238,8 @@ export interface ITransaction {
 // types
 // =====
 
+// -- FE / BE endpoints
+
 // body for POST request to /product
 export type TProductPostBody = {
     formData: IProduct,
@@ -244,7 +250,6 @@ export type TProductPostBody = {
 // =========
 // functions
 // =========
-
 
 /*
 DESC
@@ -331,4 +336,30 @@ RETURN
 export function isTCGPriceTypeValue(value: string): boolean {
     const arr = Object.values(TCGPriceType).map(v => v.toString());
     return arr.includes(value);
+}
+
+/*
+DESC
+    Function used for sorting dates in ascending order
+INPUT
+    a: The first Date
+    b: The second Date
+RETURN
+    A negative number if a < b, otherwise a positive number if a > b
+*/
+export function sortFnDateAsc(a: Date, b: Date): number {
+    return a.getTime() - b.getTime()
+}
+
+/*
+DESC
+    Function used for sorting dates in descending order
+INPUT
+    a: The first Date
+    b: The second Date
+RETURN
+    A negative number if a > b, otherwise a positive number if a < b
+*/
+export function sortFnDateDesc(a: Date, b: Date): number {
+    return b.getTime() - a.getTime()
 }

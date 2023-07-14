@@ -95,3 +95,5 @@ export declare function isASCII(value: string): boolean;
 export declare function isNumeric(value: any): boolean;
 export declare function isPriceString(value: string): boolean;
 export declare function isTCGPriceTypeValue(value: string): boolean;
+export declare function sortFnDateAsc(a: Date, b: Date): number;
+export declare function sortFnDateDesc(a: Date, b: Date): number;
