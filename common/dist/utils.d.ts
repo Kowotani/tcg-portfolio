@@ -61,23 +61,23 @@ export declare const TCGToProductSubtype: {
     [key in TCG]?: ProductSubtype[];
 };
 export interface IPriceData {
-    marketPrice: Number;
-    buylistMarketPrice: Number;
-    listedMedianPrice: Number;
+    marketPrice: number;
+    buylistMarketPrice: number;
+    listedMedianPrice: number;
 }
 export interface IProductPriceData {
-    tcgplayerId: Number;
+    tcgplayerId: number;
     priceData: IPriceData;
 }
 export interface IProduct {
-    tcgplayerId: Number;
+    tcgplayerId: number;
     tcg: TCG;
     releaseDate: Date;
-    name: String;
+    name: string;
     type: ProductType;
     language: ProductLanguage;
     subtype?: ProductSubtype;
-    setCode?: String;
+    setCode?: string;
 }
 export interface ITransaction {
     type: TransactionType;

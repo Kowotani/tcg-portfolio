@@ -200,27 +200,27 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
 
 // used with IProductPriceData for storing scraped price data
 export interface IPriceData {
-    marketPrice: Number;
-    buylistMarketPrice: Number;
-    listedMedianPrice: Number;
+    marketPrice: number;
+    buylistMarketPrice: number;
+    listedMedianPrice: number;
 }
 
 // used with IPriceData for storing scraped price data
 export interface IProductPriceData {
-    tcgplayerId: Number;
+    tcgplayerId: number;
     priceData: IPriceData;
 }
 
 // defines the required data for a Product
 export interface IProduct {
-    tcgplayerId: Number;
+    tcgplayerId: number;
     tcg: TCG;
     releaseDate: Date;
-    name: String;
+    name: string;
     type: ProductType;
     language: ProductLanguage;
     subtype?: ProductSubtype;
-    setCode?: String;
+    setCode?: string;
 }
 
 // -- Portfolio, Holding, and Transaction schemas
