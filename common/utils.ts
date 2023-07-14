@@ -229,8 +229,34 @@ export interface IProduct {
 export interface ITransaction {
     type: TransactionType,
     date: Date,
-    price: Number,
-    quantity: Number,
+    price: number,
+    quantity: number,
+}
+
+// holding
+export interface IHolding {
+    product: IProduct,
+    transactions: ITransaction[]
+}
+
+export interface IHoldingMethods {
+
+    // CRUD transaction
+    addTransaction(txn: ITransaction): void,
+    deleteTransaction(id: string): void,
+
+    // getters
+    getPurchases(): ITransaction[],
+    getFirstPurchaseDate(): Date | undefined,
+    getLastPurchaseDate(): Date | undefined,
+    getTotalCost(): number | undefined,
+    getAvgCost(): number | undefined,
+    getMarketValue(price: number): number | undefined,
+
+    // return calculation
+    getDollarReturn(price: number): number | undefined,
+    getPercentageReturn(price: number): number | undefined,
+    getAnnualizedReturn(price: number): number | undefined,
 }
 
 

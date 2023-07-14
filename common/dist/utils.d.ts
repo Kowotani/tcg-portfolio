@@ -82,8 +82,25 @@ export interface IProduct {
 export interface ITransaction {
     type: TransactionType;
     date: Date;
-    price: Number;
-    quantity: Number;
+    price: number;
+    quantity: number;
+}
+export interface IHolding {
+    product: IProduct;
+    transactions: ITransaction[];
+}
+export interface IHoldingMethods {
+    addTransaction(txn: ITransaction): void;
+    deleteTransaction(id: string): void;
+    getPurchases(): ITransaction[];
+    getFirstPurchaseDate(): Date | undefined;
+    getLastPurchaseDate(): Date | undefined;
+    getTotalCost(): number | undefined;
+    getAvgCost(): number | undefined;
+    getMarketValue(price: number): number | undefined;
+    getDollarReturn(price: number): number | undefined;
+    getPercentageReturn(price: number): number | undefined;
+    getAnnualizedReturn(price: number): number | undefined;
 }
 export declare type TProductPostBody = {
     formData: IProduct;
