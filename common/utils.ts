@@ -6,6 +6,7 @@ import * as _ from 'lodash'
 
 // -- FE / BE api
 
+// POST to /product status
 export enum ProductPostStatus {
     Added = 'tcgplayerId added',
     AddedWithoutImage = 'tcgplayerId added (without image)',
@@ -14,6 +15,7 @@ export enum ProductPostStatus {
 
 // -- mongodb
 
+// timeseries granularity
 export enum TimeseriesGranularity {
     Seconds = 'seconds',
     Minutes = 'minutes',
@@ -72,6 +74,14 @@ export enum TCGPriceType {
     MarketPrice = 'Market Price',
     BuylistMarketPrice = 'Buylist Market Price',
     ListedMedianPrice = 'Listed Median Price',
+}
+
+// -- portfolio
+
+// transaction type
+export enum TransactionType {
+    Purchase = 'Purchase',
+    Sale = 'Sale',
 }
 
 
@@ -209,6 +219,14 @@ export interface IProduct {
     language: ProductLanguage;
     subtype?: ProductSubtype;
     setCode?: String;
+}
+
+// transaction
+export interface ITransaction {
+    type: TransactionType,
+    date: Date,
+    price: Number,
+    quantity: Number,
 }
 
 

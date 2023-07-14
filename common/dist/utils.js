@@ -1,12 +1,13 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
+exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
 var _ = require("lodash");
 // =====
 // enums
 // =====
 // -- FE / BE api
+// POST to /product status
 var ProductPostStatus;
 (function (ProductPostStatus) {
     ProductPostStatus["Added"] = "tcgplayerId added";
@@ -14,6 +15,7 @@ var ProductPostStatus;
     ProductPostStatus["AlreadyExists"] = "tcgplayerId already exists";
 })(ProductPostStatus = exports.ProductPostStatus || (exports.ProductPostStatus = {}));
 // -- mongodb
+// timeseries granularity
 var TimeseriesGranularity;
 (function (TimeseriesGranularity) {
     TimeseriesGranularity["Seconds"] = "seconds";
@@ -76,6 +78,13 @@ var TCGPriceType;
     TCGPriceType["BuylistMarketPrice"] = "Buylist Market Price";
     TCGPriceType["ListedMedianPrice"] = "Listed Median Price";
 })(TCGPriceType = exports.TCGPriceType || (exports.TCGPriceType = {}));
+// -- portfolio
+// transaction type
+var TransactionType;
+(function (TransactionType) {
+    TransactionType["Purchase"] = "Purchase";
+    TransactionType["Sale"] = "Sale";
+})(TransactionType = exports.TransactionType || (exports.TransactionType = {}));
 // ====================
 // relationship objects
 // ====================

@@ -47,6 +47,10 @@ export declare enum TCGPriceType {
     BuylistMarketPrice = "Buylist Market Price",
     ListedMedianPrice = "Listed Median Price"
 }
+export declare enum TransactionType {
+    Purchase = "Purchase",
+    Sale = "Sale"
+}
 export declare const TCGToProductType: {
     [key in TCG]: ProductType[];
 };
@@ -74,6 +78,12 @@ export interface IProduct {
     language: ProductLanguage;
     subtype?: ProductSubtype;
     setCode?: String;
+}
+export interface ITransaction {
+    type: TransactionType;
+    date: Date;
+    price: Number;
+    quantity: Number;
 }
 export declare type TProductPostBody = {
     formData: IProduct;
