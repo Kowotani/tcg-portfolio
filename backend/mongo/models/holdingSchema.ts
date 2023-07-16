@@ -3,11 +3,10 @@ import { productSchema } from './productSchema';
 import { transactionSchema } from './transactionSchema';
 import { IHolding, IHoldingMethods, ITransaction, sortFnDateAsc, sortFnDateDesc, 
     TransactionType } from 'common';
-import { textChangeRangeIsUnchanged } from 'typescript';
-
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html
 
-type THoldingModel = Model<IHolding, {}, IHoldingMethods>
+export type THoldingModel = Model<IHolding, {}, IHoldingMethods>
+
 
 // ==========
 // properties
@@ -25,6 +24,7 @@ export const holdingSchema = new Schema<IHolding, THoldingModel, IHoldingMethods
         required: true
     },
 });
+
 
 // =======
 // methods
