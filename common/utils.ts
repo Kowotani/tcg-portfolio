@@ -196,6 +196,16 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
 // interfaces
 // ==========
 
+// -- User
+
+export interface IUser {
+    userId: number,
+    userName: string,
+    passwordHash: string,
+    passwordSalt: string,
+    email: string,
+}
+
 // -- Product and Price schemas
 
 // used with IProductPriceData for storing scraped price data
@@ -364,6 +374,7 @@ export function isTCGPriceTypeValue(value: string): boolean {
     return arr.includes(value);
 }
 
+
 /*
 DESC
     Function used for sorting dates in ascending order
@@ -376,6 +387,7 @@ RETURN
 export function sortFnDateAsc(a: Date, b: Date): number {
     return a.getTime() - b.getTime()
 }
+
 
 /*
 DESC

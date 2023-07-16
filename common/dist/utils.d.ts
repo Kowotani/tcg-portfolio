@@ -60,6 +60,13 @@ export declare const ProductTypeToProductSubtype: {
 export declare const TCGToProductSubtype: {
     [key in TCG]?: ProductSubtype[];
 };
+export interface IUser {
+    userId: number;
+    userName: string;
+    passwordHash: string;
+    passwordSalt: string;
+    email: string;
+}
 export interface IPriceData {
     marketPrice: number;
     buylistMarketPrice: number;
