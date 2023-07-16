@@ -1,7 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.holdingSchema = void 0;
 const mongoose_1 = require("mongoose");
+const _ = __importStar(require("lodash"));
 const productSchema_1 = require("./productSchema");
 const transactionSchema_1 = require("./transactionSchema");
 const common_1 = require("common");
@@ -44,26 +64,28 @@ exports.holdingSchema.method('getPurchases', function getPurchases() {
 });
 // get first purchase date
 exports.holdingSchema.method('getFirstPurchaseDate', function getFirstPurchaseDate() {
+    var _a;
     return this.getPurchases().length > 0
-        ? this.getPurchases().sort((a, b) => {
-            return (0, common_1.sortFnDateAsc)(a.date, b.date);
-        })[0]
+        ? (_a = _.minBy(this.getPurchases(), (txn) => {
+            return txn.date;
+        })) === null || _a === void 0 ? void 0 : _a.date
         : undefined;
 });
 // get last purchase date
 exports.holdingSchema.method('getLastPurchaseDate', function getLastPurchaseDate() {
+    var _a;
     return this.getPurchases().length > 0
-        ? this.getPurchases().sort((a, b) => {
-            return (0, common_1.sortFnDateDesc)(a.date, b.date);
-        })[0]
+        ? (_a = _.maxBy(this.getPurchases(), (txn) => {
+            return txn.date;
+        })) === null || _a === void 0 ? void 0 : _a.date
         : undefined;
 });
 // -- return inputs
 // get total cost
 exports.holdingSchema.method('getTotalCost', function getTotalCost() {
     return this.getPurchases().length > 0
-        ? this.getPurchases().reduce((accumulator, txn) => {
-            accumulator + txn.price * txn.quantity;
+        ? _.sumBy(this.getPurchases(), (txn) => {
+            return txn.quantity * txn.price;
         })
         : undefined;
 });
@@ -76,8 +98,8 @@ exports.holdingSchema.method('getAvgCost', function getAvgCost() {
 // get market value
 exports.holdingSchema.method('getMarketValue', function getMarketValue(price) {
     return this.getPurchases().length > 0
-        ? this.getPurchases().reduce((accumulator, txn) => {
-            accumulator + txn.quantity * price;
+        ? _.sumBy(this.getPurchases(), (txn) => {
+            return txn.quantity * price;
         })
         : undefined;
 });

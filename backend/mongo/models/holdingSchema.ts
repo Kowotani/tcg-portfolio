@@ -1,8 +1,8 @@
 import { Model, Schema } from 'mongoose';
+import * as _ from 'lodash';
 import { productSchema } from './productSchema';
 import { transactionSchema } from './transactionSchema';
-import { IHolding, IHoldingMethods, ITransaction, sortFnDateAsc, sortFnDateDesc, 
-    TransactionType } from 'common';
+import { IHolding, IHoldingMethods, ITransaction, TransactionType } from 'common';
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html
 
 export type THoldingModel = Model<IHolding, {}, IHoldingMethods>
@@ -61,10 +61,9 @@ holdingSchema.method('getPurchases',
 holdingSchema.method('getFirstPurchaseDate', 
     function getFirstPurchaseDate(): Date | undefined {
         return this.getPurchases().length > 0 
-            ? this.getPurchases().sort(
-                (a: ITransaction, b: ITransaction) => {
-                    return sortFnDateAsc(a.date, b.date)
-                })[0]
+            ? _.minBy(this.getPurchases(), (txn: ITransaction) => {
+                    return txn.date
+                })?.date
             : undefined
 });
 
@@ -72,10 +71,9 @@ holdingSchema.method('getFirstPurchaseDate',
 holdingSchema.method('getLastPurchaseDate', 
     function getLastPurchaseDate(): Date | undefined {
         return this.getPurchases().length > 0
-            ? this.getPurchases().sort(
-                (a: ITransaction, b: ITransaction) => {
-                    return sortFnDateDesc(a.date, b.date)
-                })[0]
+            ? _.maxBy(this.getPurchases(), (txn: ITransaction) => {
+                return txn.date
+            })?.date
             : undefined
 });
 
@@ -85,10 +83,9 @@ holdingSchema.method('getLastPurchaseDate',
 holdingSchema.method('getTotalCost', 
     function getTotalCost(): number | undefined {
         return this.getPurchases().length > 0
-            ? this.getPurchases().reduce( 
-                (accumulator: number, txn: ITransaction) => {
-                    accumulator + txn.price * txn.quantity
-                })
+            ? _.sumBy(this.getPurchases(), (txn: ITransaction) => {
+                return txn.quantity * txn.price
+            })
             : undefined
 });
 
@@ -104,9 +101,8 @@ holdingSchema.method('getAvgCost',
 holdingSchema.method('getMarketValue', 
     function getMarketValue(price: number): number | undefined {
         return this.getPurchases().length > 0
-            ? this.getPurchases().reduce(
-                (accumulator: number, txn: ITransaction) => {
-                    accumulator + txn.quantity * price
+            ? _.sumBy(this.getPurchases(), (txn: ITransaction) => {
+                    return txn.quantity * price
                 })
             : undefined
 });
