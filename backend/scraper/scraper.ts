@@ -12,7 +12,7 @@ INPUT
 RETURN
     Array of IProductPriceData objects
 */
-export async function scrape(ids: Number[]): Promise<IProductPriceData[]> {
+export async function scrape(ids: number[]): Promise<IProductPriceData[]> {
 
     // create browser instance and page
     const browser = await getBrowser();
