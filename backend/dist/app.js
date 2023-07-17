@@ -46,7 +46,7 @@ app.post('/product', upload.none(), (req, res) => __awaiter(void 0, void 0, void
     const tcgPlayerId = data.tcgplayerId;
     // check if product already exists (via tcgplayerId)
     const query = yield (0, mongoManager_1.getProduct)({ tcgplayerId: tcgPlayerId });
-    if (query.length > 0) {
+    if (query !== null) {
         res.status(202);
         const body = {
             tcgplayerId: data.tcgplayerId,

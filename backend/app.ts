@@ -40,7 +40,7 @@ app.post('/product', upload.none(), async (req: any, res: any) => {
 
         // check if product already exists (via tcgplayerId)
         const query = await getProduct({tcgplayerId: tcgPlayerId}); 
-        if (query.length > 0) { 
+        if (query !== null) { 
             res.status(202)
             const body = {
                 tcgplayerId: data.tcgplayerId,
