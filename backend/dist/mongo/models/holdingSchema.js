@@ -56,14 +56,6 @@ exports.holdingSchema.method('deleteTransaction', function deleteTransaction(id)
     });
 });
 // -- getters
-// get product
-exports.holdingSchema.method('getProduct', function getProduct() {
-    return this.product;
-});
-// get transactions
-exports.holdingSchema.method('getTransactions', function getTransactions() {
-    return this.transactions;
-});
 // get purchases
 exports.holdingSchema.method('getPurchases', function getPurchases() {
     return this.transactions.filter((txn) => {
@@ -115,13 +107,13 @@ exports.holdingSchema.method('getMarketValue', function getMarketValue(price) {
 // get dollar return
 exports.holdingSchema.method('getDollarReturn', function getDollarReturn(price) {
     return this.getPurchases().length > 0
-        ? this.getMarketValue() - this.getTotalCost()
+        ? this.getMarketValue(price) - this.getTotalCost()
         : undefined;
 });
 // get percentage return
 exports.holdingSchema.method('getPercentageReturn', function getPercentageReturn(price) {
     return this.getPurchases().length > 0
-        ? this.getMarketValue() / this.getTotalCost() - 1
+        ? this.getMarketValue(price) / this.getTotalCost() - 1
         : undefined;
 });
 // get annualized return

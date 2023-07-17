@@ -1,18 +1,19 @@
 // imports
-import { IHolding, IPortfolio, IProduct } from 'common';
+import { IHolding, IProduct } from 'common';
 import mongoose from 'mongoose';
 import { holdingSchema } from './models/holdingSchema';
-import { portfolioSchema } from './models/portfolioSchema';
+import { IMPortfolio, portfolioSchema } from './models/portfolioSchema';
 import { IPrice, priceSchema } from './models/priceSchema';
-import { productSchema } from './models/productSchema';
+import { IMProduct, productSchema } from './models/productSchema';
+import { TCG, ProductType, ProductSubtype, ProductLanguage } from 'common';
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 
 // mongoose models
 const Holding = mongoose.model('holding', holdingSchema);
-const Portfolio = mongoose.model('portfolio', portfolioSchema);
-const Product = mongoose.model('product', productSchema);
+const Portfolio = mongoose.model<IMPortfolio>('portfolio', portfolioSchema);
+const Product = mongoose.model<IMProduct>('product', productSchema);
 const Price = mongoose.model('price', priceSchema);
 
 
@@ -21,8 +22,54 @@ const Price = mongoose.model('price', priceSchema);
 // =========
 
 // ---------
-// portfolio
+// Portfolio
 // ---------
+
+/*
+DESC
+    Adds a Portfolio based on the given inputs
+INPUT
+    userId: The associated userId
+    portfolioName: The portfolio's name
+    holdings: An array of Holdings
+RETURN
+    TRUE if the Portfolio was successfully created, FALSE otherwise
+*/
+export async function addPortfolio(
+    userId: number, 
+    portfolioName: string, 
+    holdings: IHolding[],
+): Promise<boolean> {
+
+    // connect to db
+    await mongoose.connect(url);  
+
+    try {
+
+        // check if portfolioName exists for this userId
+        const doc = await getPortfolio(userId, portfolioName)
+
+        if (doc !== null) {
+            console.log(`${portfolioName} already exists for userId: ${userId}`)
+
+        // create the portfolio
+        } else {
+            
+            const res = await Portfolio.create({
+                userId,
+                portfolioName,
+                holdings,
+            })
+            return true
+        }
+
+    } catch(err) {
+
+        console.log(`An error occurred in addPortfolio(): ${err}`);
+    }
+
+    return false
+}
 
 /*
 DESC
@@ -80,7 +127,7 @@ RETURN
 export async function getPortfolio(
     userId: number, 
     portfolioName: string,
-): Promise<any> {
+): Promise<IMPortfolio | null> {
 
     // connect to db
     await mongoose.connect(url);  
@@ -101,55 +148,9 @@ export async function getPortfolio(
     return null;
 }
 
-/*
-DESC
-    Adds a Portfolio based on the given inputs
-INPUT
-    userId: The associated userId
-    portfolioName: The portfolio's name
-    holdings: An array of Holdings
-RETURN
-    TRUE if the Portfolio was successfully created, FALSE otherwise
-*/
-export async function addPortfolio(
-    userId: number, 
-    portfolioName: string, 
-    holdings: IHolding[],
-): Promise<boolean> {
-
-    // connect to db
-    await mongoose.connect(url);  
-
-    try {
-
-        // check if portfolioName exists for this userId
-        const doc = await getPortfolio(userId, portfolioName)
-
-        if (doc !== null) {
-            console.log(`${portfolioName} already exists for userId: ${userId}`)
-
-        // create the portfolio
-        } else {
-            
-            const res = await Portfolio.create({
-                userId,
-                portfolioName,
-                holdings,
-            })
-            return true
-        }
-
-    } catch(err) {
-
-        console.log(`An error occurred in addPortfolio(): ${err}`);
-    }
-
-    return false
-}
-
 
 // -------
-// product
+// Product
 // -------
 
 /*
@@ -167,7 +168,7 @@ interface IGetProductParameters {
 }
 export async function getProduct(
     { tcgplayerId, hexStringId }: IGetProductParameters = {}
-): Promise<any> {
+): Promise<IMProduct | null> {
 
     // check that tcgplayer_id or id is provided
     if (tcgplayerId === undefined && hexStringId === undefined) { 
@@ -198,7 +199,7 @@ DESC
 RETURN
     Array of Product docs
 */
-export async function getProducts(): Promise<any[]> {
+export async function getProducts(): Promise<IMProduct[]> {
 
     // connect to db
     await mongoose.connect(url);
@@ -221,7 +222,7 @@ export async function getProducts(): Promise<any[]> {
 DESC
     Constructs Price documents from the input data and inserts them
 INPUT 
-    An array of IPrice objects
+    An array of IProducts
 RETURN
     The number of documents inserted
 */
@@ -244,14 +245,14 @@ export async function insertProducts(docs: IProduct[]): Promise<number> {
 
 
 // -----
-// price
+// Price
 // -----
 
 /*
 DESC
     Constructs Price documents from the input data and inserts them
 INPUT 
-    An array of IPrice objects
+    An array of IPrices
 RETURN
     The number of documents inserted
 */
@@ -272,28 +273,41 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
     }
 }
 
-// async function main(): Promise<number> {
-//     const userId = 123
-//     const portfolioName = 'Cardboard'
-//     const holdings = [] as IHolding[]
+async function main(): Promise<number> {
 
-//     let res = await addPortfolio(userId, portfolioName, holdings)
-//     if (res) {
-//         console.log('Portfolio successfully created')
-//     } else {
-//         console.log('Portfolio not created')
-//     }
+    const product: IProduct = {
+        tcgplayerId: 123,
+        tcg: TCG.MagicTheGathering,
+        releaseDate: new Date(),
+        name: 'Foo',
+        type: ProductType.BoosterBox,
+        language: ProductLanguage.Japanese,
+    }
 
-//     res = await deletePortfolio(userId, portfolioName)
-//     if (res) {
-//         console.log('Portfolio successfully deleted')
-//     } else {
-//         console.log('Portfolio not deleted')
-//     }
+    const res = await insertProducts([product])
+    console.log(res)
 
-//     return 0
-// }
+    // const userId = 123
+    // const portfolioName = 'Cardboard'
+    // const holdings = [] as IHolding[]
 
-// main()
-//     .then(console.log)
-//     .catch(console.error);
+    // let res = await addPortfolio(userId, portfolioName, holdings)
+    // if (res) {
+    //     console.log('Portfolio successfully created')
+    // } else {
+    //     console.log('Portfolio not created')
+    // }
+
+    // res = await deletePortfolio(userId, portfolioName)
+    // if (res) {
+    //     console.log('Portfolio successfully deleted')
+    // } else {
+    //     console.log('Portfolio not deleted')
+    // }
+
+    return 0
+}
+
+main()
+    .then(console.log)
+    .catch(console.error);

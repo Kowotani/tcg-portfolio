@@ -53,7 +53,7 @@ exports.portfolioSchema.method('addHolding', function addHolding(holding) {
 // delete holding
 exports.portfolioSchema.method('deleteHolding', function deleteHolding(tcgplayerId) {
     this.holdings.filter((holding) => {
-        return holding.methods.getProduct().tcgplayerId !== tcgplayerId;
+        return holding.product.tcgplayerId !== tcgplayerId;
     });
 });
 // -- getters
@@ -73,7 +73,7 @@ exports.portfolioSchema.method('getFirstPurchaseDate', function getFirstPurchase
 exports.portfolioSchema.method('getLastPurchaseDate', function getLastPurchaseDate() {
     return this.getHoldings().length > 0
         ? _.max(this.getHoldings().map((holding) => {
-            return holding.methods.getFirstPurchaseDate();
+            return holding.methods.getLastPurchaseDate();
         }))
         : undefined;
 });

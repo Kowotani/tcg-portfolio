@@ -1,19 +1,25 @@
 import { Model, Schema } from 'mongoose';
 import * as _ from 'lodash';
 import { productSchema } from './productSchema';
-import { transactionSchema } from './transactionSchema';
-import { IHolding, IHoldingMethods, IProduct, ITransaction, 
-    TransactionType } from 'common';
+import { IMTransaction, transactionSchema } from './transactionSchema';
+import { IHolding, IHoldingMethods, TransactionType } from 'common';
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html
 
-export type THoldingModel = Model<IHolding, {}, IHoldingMethods>
+
+// ==========
+// interfaces
+// ==========
+
+export interface IMHolding extends IHolding, Document {}
+
+export type THoldingModel = Model<IMHolding, {}, IHoldingMethods>
 
 
 // ==========
 // properties
 // ==========
 
-export const holdingSchema = new Schema<IHolding, THoldingModel, IHoldingMethods>({
+export const holdingSchema = new Schema<IMHolding, THoldingModel, IHoldingMethods>({
     product: {
         type: productSchema,
         ref: 'Product',
@@ -35,7 +41,7 @@ export const holdingSchema = new Schema<IHolding, THoldingModel, IHoldingMethods
 
 // add transaction
 holdingSchema.method('addTransaction', 
-    function addTransaction(txn: ITransaction): void {
+    function addTransaction(txn: IMTransaction): void {
         this.transactions.push(txn)
 });
 
@@ -50,22 +56,10 @@ holdingSchema.method('deleteTransaction',
 
 // -- getters
 
-// get product
-holdingSchema.method('getProduct', 
-    function getProduct(): IProduct[] {
-        return this.product
-});
-
-// get transactions
-holdingSchema.method('getTransactions', 
-    function getTransactions(): ITransaction[] {
-        return this.transactions
-});
-
 // get purchases
 holdingSchema.method('getPurchases', 
-    function getPurchases(): ITransaction[] {
-        return this.transactions.filter((txn: ITransaction) => {
+    function getPurchases(): IMTransaction[] {
+        return this.transactions.filter((txn: IMTransaction) => {
             return txn.type === TransactionType.Purchase
         })
 });
@@ -74,7 +68,7 @@ holdingSchema.method('getPurchases',
 holdingSchema.method('getFirstPurchaseDate', 
     function getFirstPurchaseDate(): Date | undefined {
         return this.getPurchases().length > 0 
-            ? _.minBy(this.getPurchases(), (txn: ITransaction) => {
+            ? _.minBy(this.getPurchases(), (txn: IMTransaction) => {
                     return txn.date
                 })?.date
             : undefined
@@ -84,7 +78,7 @@ holdingSchema.method('getFirstPurchaseDate',
 holdingSchema.method('getLastPurchaseDate', 
     function getLastPurchaseDate(): Date | undefined {
         return this.getPurchases().length > 0
-            ? _.maxBy(this.getPurchases(), (txn: ITransaction) => {
+            ? _.maxBy(this.getPurchases(), (txn: IMTransaction) => {
                 return txn.date
             })?.date
             : undefined
@@ -96,7 +90,7 @@ holdingSchema.method('getLastPurchaseDate',
 holdingSchema.method('getTotalCost', 
     function getTotalCost(): number | undefined {
         return this.getPurchases().length > 0
-            ? _.sumBy(this.getPurchases(), (txn: ITransaction) => {
+            ? _.sumBy(this.getPurchases(), (txn: IMTransaction) => {
                 return txn.quantity * txn.price
             })
             : undefined
@@ -114,7 +108,7 @@ holdingSchema.method('getAvgCost',
 holdingSchema.method('getMarketValue', 
     function getMarketValue(price: number): number | undefined {
         return this.getPurchases().length > 0
-            ? _.sumBy(this.getPurchases(), (txn: ITransaction) => {
+            ? _.sumBy(this.getPurchases(), (txn: IMTransaction) => {
                     return txn.quantity * price
                 })
             : undefined
@@ -126,7 +120,7 @@ holdingSchema.method('getMarketValue',
 holdingSchema.method('getDollarReturn', 
     function getDollarReturn(price: number): number | undefined {
         return this.getPurchases().length > 0
-            ? this.getMarketValue() - this.getTotalCost()
+            ? this.getMarketValue(price) - this.getTotalCost()
             : undefined
 });
 
@@ -134,7 +128,7 @@ holdingSchema.method('getDollarReturn',
 holdingSchema.method('getPercentageReturn', 
     function getPercentageReturn(price: number): number | undefined {
         return this.getPurchases().length > 0
-            ? this.getMarketValue() / this.getTotalCost() - 1
+            ? this.getMarketValue(price) / this.getTotalCost() - 1
             : undefined
 });
 

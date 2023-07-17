@@ -1,17 +1,24 @@
-import { Model, Schema } from 'mongoose';
-import { holdingSchema } from './holdingSchema';
+import { Document, Model, Schema } from 'mongoose';
+import { IMHolding, holdingSchema, THoldingModel } from './holdingSchema';
 import * as _ from 'lodash';
 import { IHolding, IPortfolio, IPortfolioMethods } from 'common';
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html
 
-export type TPortfolioModel = Model<IPortfolio, {}, IPortfolioMethods>
+
+// ==========
+// interfaces
+// ==========
+
+export interface IMPortfolio extends IPortfolio, Document {}
+
+export type TPortfolioModel = Model<IMPortfolio, {}, IPortfolioMethods>
 
 
 // ==========
 // properties
 // ==========
 
-export const portfolioSchema = new Schema<IPortfolio, TPortfolioModel, IPortfolioMethods>({
+export const portfolioSchema = new Schema<IMPortfolio, TPortfolioModel, IPortfolioMethods>({
     userId: {
         type: Number,
         required: true
@@ -44,8 +51,8 @@ portfolioSchema.method('addHolding',
 // delete holding
 portfolioSchema.method('deleteHolding',
     function deleteHolding(tcgplayerId: number): void {
-        this.holdings.filter((holding: typeof holdingSchema) => {
-            return holding.methods.getProduct().tcgplayerId !== tcgplayerId
+        this.holdings.filter((holding: IMHolding) => {
+            return holding.product.tcgplayerId !== tcgplayerId
         })
 });
 
@@ -74,7 +81,7 @@ portfolioSchema.method('getLastPurchaseDate',
         return this.getHoldings().length > 0 
             ? _.max(this.getHoldings().map(
                 (holding: typeof holdingSchema) => { 
-                    return holding.methods.getFirstPurchaseDate()
+                    return holding.methods.getLastPurchaseDate()
                 }))
             : undefined
 });

@@ -12,12 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = exports.addPortfolio = exports.getPortfolio = exports.deletePortfolio = void 0;
+exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = exports.getPortfolio = exports.deletePortfolio = exports.addPortfolio = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const holdingSchema_1 = require("./models/holdingSchema");
 const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
+const common_1 = require("common");
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
@@ -29,8 +30,45 @@ const Price = mongoose_1.default.model('price', priceSchema_1.priceSchema);
 // functions
 // =========
 // ---------
-// portfolio
+// Portfolio
 // ---------
+/*
+DESC
+    Adds a Portfolio based on the given inputs
+INPUT
+    userId: The associated userId
+    portfolioName: The portfolio's name
+    holdings: An array of Holdings
+RETURN
+    TRUE if the Portfolio was successfully created, FALSE otherwise
+*/
+function addPortfolio(userId, portfolioName, holdings) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            // check if portfolioName exists for this userId
+            const doc = yield getPortfolio(userId, portfolioName);
+            if (doc !== null) {
+                console.log(`${portfolioName} already exists for userId: ${userId}`);
+                // create the portfolio
+            }
+            else {
+                const res = yield Portfolio.create({
+                    userId,
+                    portfolioName,
+                    holdings,
+                });
+                return true;
+            }
+        }
+        catch (err) {
+            console.log(`An error occurred in addPortfolio(): ${err}`);
+        }
+        return false;
+    });
+}
+exports.addPortfolio = addPortfolio;
 /*
 DESC
     Deletes the Portfolio document by userId and portfolioName
@@ -95,43 +133,6 @@ function getPortfolio(userId, portfolioName) {
     });
 }
 exports.getPortfolio = getPortfolio;
-/*
-DESC
-    Adds a Portfolio based on the given inputs
-INPUT
-    userId: The associated userId
-    portfolioName: The portfolio's name
-    holdings: An array of Holdings
-RETURN
-    TRUE if the Portfolio was successfully created, FALSE otherwise
-*/
-function addPortfolio(userId, portfolioName, holdings) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // connect to db
-        yield mongoose_1.default.connect(url);
-        try {
-            // check if portfolioName exists for this userId
-            const doc = yield getPortfolio(userId, portfolioName);
-            if (doc !== null) {
-                console.log(`${portfolioName} already exists for userId: ${userId}`);
-                // create the portfolio
-            }
-            else {
-                const res = yield Portfolio.create({
-                    userId,
-                    portfolioName,
-                    holdings,
-                });
-                return true;
-            }
-        }
-        catch (err) {
-            console.log(`An error occurred in addPortfolio(): ${err}`);
-        }
-        return false;
-    });
-}
-exports.addPortfolio = addPortfolio;
 function getProduct({ tcgplayerId, hexStringId } = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         // check that tcgplayer_id or id is provided
@@ -180,7 +181,7 @@ exports.getProducts = getProducts;
 DESC
     Constructs Price documents from the input data and inserts them
 INPUT
-    An array of IPrice objects
+    An array of IProducts
 RETURN
     The number of documents inserted
 */
@@ -200,13 +201,13 @@ function insertProducts(docs) {
 }
 exports.insertProducts = insertProducts;
 // -----
-// price
+// Price
 // -----
 /*
 DESC
     Constructs Price documents from the input data and inserts them
 INPUT
-    An array of IPrice objects
+    An array of IPrices
 RETURN
     The number of documents inserted
 */
@@ -225,24 +226,36 @@ function insertPrices(docs) {
     });
 }
 exports.insertPrices = insertPrices;
-// async function main(): Promise<number> {
-//     const userId = 123
-//     const portfolioName = 'Cardboard'
-//     const holdings = [] as IHolding[]
-//     let res = await addPortfolio(userId, portfolioName, holdings)
-//     if (res) {
-//         console.log('Portfolio successfully created')
-//     } else {
-//         console.log('Portfolio not created')
-//     }
-//     res = await deletePortfolio(userId, portfolioName)
-//     if (res) {
-//         console.log('Portfolio successfully deleted')
-//     } else {
-//         console.log('Portfolio not deleted')
-//     }
-//     return 0
-// }
-// main()
-//     .then(console.log)
-//     .catch(console.error);
+function main() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const product = {
+            tcgplayerId: 123,
+            tcg: common_1.TCG.MagicTheGathering,
+            releaseDate: new Date(),
+            name: 'Foo',
+            type: common_1.ProductType.BoosterBox,
+            language: common_1.ProductLanguage.Japanese,
+        };
+        const res = yield insertProducts([product]);
+        console.log(res);
+        // const userId = 123
+        // const portfolioName = 'Cardboard'
+        // const holdings = [] as IHolding[]
+        // let res = await addPortfolio(userId, portfolioName, holdings)
+        // if (res) {
+        //     console.log('Portfolio successfully created')
+        // } else {
+        //     console.log('Portfolio not created')
+        // }
+        // res = await deletePortfolio(userId, portfolioName)
+        // if (res) {
+        //     console.log('Portfolio successfully deleted')
+        // } else {
+        //     console.log('Portfolio not deleted')
+        // }
+        return 0;
+    });
+}
+main()
+    .then(console.log)
+    .catch(console.error);

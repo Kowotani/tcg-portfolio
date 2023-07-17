@@ -3,6 +3,17 @@ import { Schema } from 'mongoose';
 import { IProduct, ProductLanguage, ProductSubtype, ProductType, 
     TCG } from 'common';
 
+// ==========
+// interfaces
+// ==========
+
+export interface IMProduct extends IProduct, Document {}
+
+
+// ==========
+// properties
+// ==========
+
 export const productSchema = new Schema<IProduct>({
     tcgplayerId: {
         type: Number,

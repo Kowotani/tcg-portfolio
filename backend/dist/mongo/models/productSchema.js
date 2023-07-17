@@ -4,6 +4,9 @@ exports.productSchema = void 0;
 // imports
 const mongoose_1 = require("mongoose");
 const common_1 = require("common");
+// ==========
+// properties
+// ==========
 exports.productSchema = new mongoose_1.Schema({
     tcgplayerId: {
         type: Number,

@@ -1,7 +1,19 @@
 import { Schema } from 'mongoose';
 import { ITransaction, TransactionType } from 'common';
 
-export const transactionSchema = new Schema<ITransaction>({
+
+// ==========
+// interfaces
+// ==========
+
+export interface IMTransaction extends ITransaction, Document {}
+
+
+// ==========
+// properties
+// ==========
+
+export const transactionSchema = new Schema<IMTransaction>({
     type: {
         type: String,
         enum: TransactionType,
