@@ -101,14 +101,9 @@ export async function getPortfolio(
     return null;
 }
 
-// type TAddPortfolioParameters = {
-//     userId: number,
-//     portfolioName: string,
-//     holdings: IHolding[]
-// }
 /*
 DESC
-    Inserts a Portfolio based on the given inputs
+    Adds a Portfolio based on the given inputs
 INPUT
     userId: The associated userId
     portfolioName: The portfolio's name
@@ -116,7 +111,7 @@ INPUT
 RETURN
     TRUE if the Portfolio was successfully created, FALSE otherwise
 */
-export async function insertPortfolio(
+export async function addPortfolio(
     userId: number, 
     portfolioName: string, 
     holdings: IHolding[],
@@ -146,7 +141,7 @@ export async function insertPortfolio(
 
     } catch(err) {
 
-        console.log(`An error occurred in insertPortfolio(): ${err}`);
+        console.log(`An error occurred in addPortfolio(): ${err}`);
     }
 
     return false
@@ -282,7 +277,7 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
 //     const portfolioName = 'Cardboard'
 //     const holdings = [] as IHolding[]
 
-//     let res = await insertPortfolio(userId, portfolioName, holdings)
+//     let res = await addPortfolio(userId, portfolioName, holdings)
 //     if (res) {
 //         console.log('Portfolio successfully created')
 //     } else {

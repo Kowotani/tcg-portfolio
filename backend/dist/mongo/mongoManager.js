@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = exports.insertPortfolio = exports.getPortfolio = exports.deletePortfolio = void 0;
+exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = exports.addPortfolio = exports.getPortfolio = exports.deletePortfolio = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const holdingSchema_1 = require("./models/holdingSchema");
 const portfolioSchema_1 = require("./models/portfolioSchema");
@@ -95,14 +95,9 @@ function getPortfolio(userId, portfolioName) {
     });
 }
 exports.getPortfolio = getPortfolio;
-// type TAddPortfolioParameters = {
-//     userId: number,
-//     portfolioName: string,
-//     holdings: IHolding[]
-// }
 /*
 DESC
-    Inserts a Portfolio based on the given inputs
+    Adds a Portfolio based on the given inputs
 INPUT
     userId: The associated userId
     portfolioName: The portfolio's name
@@ -110,7 +105,7 @@ INPUT
 RETURN
     TRUE if the Portfolio was successfully created, FALSE otherwise
 */
-function insertPortfolio(userId, portfolioName, holdings) {
+function addPortfolio(userId, portfolioName, holdings) {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
@@ -131,12 +126,12 @@ function insertPortfolio(userId, portfolioName, holdings) {
             }
         }
         catch (err) {
-            console.log(`An error occurred in insertPortfolio(): ${err}`);
+            console.log(`An error occurred in addPortfolio(): ${err}`);
         }
         return false;
     });
 }
-exports.insertPortfolio = insertPortfolio;
+exports.addPortfolio = addPortfolio;
 function getProduct({ tcgplayerId, hexStringId } = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         // check that tcgplayer_id or id is provided
@@ -234,7 +229,7 @@ exports.insertPrices = insertPrices;
 //     const userId = 123
 //     const portfolioName = 'Cardboard'
 //     const holdings = [] as IHolding[]
-//     let res = await insertPortfolio(userId, portfolioName, holdings)
+//     let res = await addPortfolio(userId, portfolioName, holdings)
 //     if (res) {
 //         console.log('Portfolio successfully created')
 //     } else {
