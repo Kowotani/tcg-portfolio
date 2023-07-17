@@ -246,7 +246,7 @@ export interface ITransaction {
 // holding
 export interface IHolding {
     product: IProduct,
-    transactions: ITransaction[]
+    transactions: ITransaction[],
 }
 
 export interface IHoldingMethods {
@@ -256,6 +256,8 @@ export interface IHoldingMethods {
     deleteTransaction(id: string): void,
 
     // getters
+    getProduct(): IProduct,
+    getTransactions(): ITransaction[],
     getPurchases(): ITransaction[],
     getFirstPurchaseDate(): Date | undefined,
     getLastPurchaseDate(): Date | undefined,
@@ -267,6 +269,31 @@ export interface IHoldingMethods {
     getDollarReturn(price: number): number | undefined,
     getPercentageReturn(price: number): number | undefined,
     getAnnualizedReturn(price: number): number | undefined,
+}
+
+// portfolio
+
+export interface IPortfolio {
+    userId: number,
+    portfolioName: string,
+    holdings: IHolding[],
+}
+
+export interface IPortfolioMethods {
+
+    // CRUD transaction
+    addHolding(holding: IHolding): void,
+    deleteHolding(tcgplayerId: number): void, 
+
+    // getters
+    getHoldings(): IHolding[],
+    getTotalCost(): number | undefined,
+    getMarketValue(prices: Map<number, number>): number | undefined,
+
+    // return calculation
+    getDollarReturn(prices: Map<number, number>): number | undefined,
+    getPercentageReturn(prices: Map<number, number>): number | undefined,
+    getAnnualizedReturn(prices: Map<number, number>): number | undefined,
 }
 
 

@@ -56,6 +56,14 @@ exports.holdingSchema.method('deleteTransaction', function deleteTransaction(id)
     });
 });
 // -- getters
+// get product
+exports.holdingSchema.method('getProduct', function getProduct() {
+    return this.product;
+});
+// get transactions
+exports.holdingSchema.method('getTransactions', function getTransactions() {
+    return this.transactions;
+});
 // get purchases
 exports.holdingSchema.method('getPurchases', function getPurchases() {
     return this.transactions.filter((txn) => {
@@ -123,5 +131,5 @@ exports.holdingSchema.method('getAnnualizedReturn', function getAnnualizedReturn
     }
     const elapsedDays = (new Date().getTime()
         - this.getFirstPurchaseDate().getTime()) / 86400 / 1000;
-    return Math.pow(1 + this.getTimeWeightedReturn(price), 365 / elapsedDays) - 1;
+    return Math.pow(1 + this.getPercentageReturn(price), 365 / elapsedDays) - 1;
 });

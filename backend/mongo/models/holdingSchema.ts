@@ -2,7 +2,8 @@ import { Model, Schema } from 'mongoose';
 import * as _ from 'lodash';
 import { productSchema } from './productSchema';
 import { transactionSchema } from './transactionSchema';
-import { IHolding, IHoldingMethods, ITransaction, TransactionType } from 'common';
+import { IHolding, IHoldingMethods, IProduct, ITransaction, 
+    TransactionType } from 'common';
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html
 
 export type THoldingModel = Model<IHolding, {}, IHoldingMethods>
@@ -48,6 +49,18 @@ holdingSchema.method('deleteTransaction',
 });
 
 // -- getters
+
+// get product
+holdingSchema.method('getProduct', 
+    function getProduct(): IProduct[] {
+        return this.product
+});
+
+// get transactions
+holdingSchema.method('getTransactions', 
+    function getTransactions(): ITransaction[] {
+        return this.transactions
+});
 
 // get purchases
 holdingSchema.method('getPurchases', 
@@ -136,5 +149,5 @@ holdingSchema.method('getAnnualizedReturn',
         const elapsedDays = (new Date().getTime() 
             - this.getFirstPurchaseDate().getTime()) / 86400 / 1000
 
-        return Math.pow(1 + this.getTimeWeightedReturn(price), 365 / elapsedDays) - 1
+        return Math.pow(1 + this.getPercentageReturn(price), 365 / elapsedDays) - 1
 });

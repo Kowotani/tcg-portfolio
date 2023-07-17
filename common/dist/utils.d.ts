@@ -99,6 +99,8 @@ export interface IHolding {
 export interface IHoldingMethods {
     addTransaction(txn: ITransaction): void;
     deleteTransaction(id: string): void;
+    getProduct(): IProduct;
+    getTransactions(): ITransaction[];
     getPurchases(): ITransaction[];
     getFirstPurchaseDate(): Date | undefined;
     getLastPurchaseDate(): Date | undefined;
@@ -108,6 +110,21 @@ export interface IHoldingMethods {
     getDollarReturn(price: number): number | undefined;
     getPercentageReturn(price: number): number | undefined;
     getAnnualizedReturn(price: number): number | undefined;
+}
+export interface IPortfolio {
+    userId: number;
+    portfolioName: string;
+    holdings: IHolding[];
+}
+export interface IPortfolioMethods {
+    addHolding(holding: IHolding): void;
+    deleteHolding(tcgplayerId: number): void;
+    getHoldings(): IHolding[];
+    getTotalCost(): number | undefined;
+    getMarketValue(prices: Map<number, number>): number | undefined;
+    getDollarReturn(prices: Map<number, number>): number | undefined;
+    getPercentageReturn(prices: Map<number, number>): number | undefined;
+    getAnnualizedReturn(prices: Map<number, number>): number | undefined;
 }
 export declare type TProductPostBody = {
     formData: IProduct;
