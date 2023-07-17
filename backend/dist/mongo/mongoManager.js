@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = exports.insertPortfolio = exports.getPortfolio = void 0;
+exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = exports.insertPortfolio = exports.getPortfolio = exports.deletePortfolio = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const holdingSchema_1 = require("./models/holdingSchema");
 const portfolioSchema_1 = require("./models/portfolioSchema");
@@ -33,7 +33,42 @@ const Price = mongoose_1.default.model('price', priceSchema_1.priceSchema);
 // ---------
 /*
 DESC
-    Retrieves the Portfolio document by userId and
+    Deletes the Portfolio document by userId and portfolioName
+INPUT
+    userId: The associated userId
+    portfolioName: The portfolio's name
+RETURN
+    TRUE if the Portfolio was successfully created, FALSE otherwise
+*/
+function deletePortfolio(userId, portfolioName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            // check if portfolioName exists for this userId
+            const doc = yield getPortfolio(userId, portfolioName);
+            if (doc === null) {
+                console.log(`${portfolioName} does not exist for userId: ${userId}`);
+                // delete the portfolio
+            }
+            else {
+                const res = yield Portfolio.deleteOne({
+                    'userId': userId,
+                    'portfolioName': portfolioName,
+                });
+                return res.deletedCount === 1;
+            }
+        }
+        catch (err) {
+            console.log(`An error occurred in deletePortfolio(): ${err}`);
+        }
+        return false;
+    });
+}
+exports.deletePortfolio = deletePortfolio;
+/*
+DESC
+    Retrieves the Portfolio document by userId and portfolioName
 INPUT
     userId: The associated userId
     portfolioName: The portfolio's name
@@ -195,20 +230,24 @@ function insertPrices(docs) {
     });
 }
 exports.insertPrices = insertPrices;
-function main() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const userId = 123;
-        const portfolioName = 'Cardboard';
-        const holdings = [];
-        const res = yield insertPortfolio(userId, portfolioName, holdings);
-        if (res) {
-            console.log('Portfolio successfully created');
-        }
-        else {
-            console.log('Portfolio not created');
-        }
-    });
-}
-main()
-    .then(console.log)
-    .catch(console.error);
+// async function main(): Promise<number> {
+//     const userId = 123
+//     const portfolioName = 'Cardboard'
+//     const holdings = [] as IHolding[]
+//     let res = await insertPortfolio(userId, portfolioName, holdings)
+//     if (res) {
+//         console.log('Portfolio successfully created')
+//     } else {
+//         console.log('Portfolio not created')
+//     }
+//     res = await deletePortfolio(userId, portfolioName)
+//     if (res) {
+//         console.log('Portfolio successfully deleted')
+//     } else {
+//         console.log('Portfolio not deleted')
+//     }
+//     return 0
+// }
+// main()
+//     .then(console.log)
+//     .catch(console.error);

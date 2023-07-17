@@ -26,7 +26,51 @@ const Price = mongoose.model('price', priceSchema);
 
 /*
 DESC
-    Retrieves the Portfolio document by userId and 
+    Deletes the Portfolio document by userId and portfolioName
+INPUT
+    userId: The associated userId
+    portfolioName: The portfolio's name
+RETURN
+    TRUE if the Portfolio was successfully created, FALSE otherwise
+*/
+export async function deletePortfolio(
+    userId: number, 
+    portfolioName: string,
+): Promise<boolean> {
+
+    // connect to db
+    await mongoose.connect(url);  
+
+    try {
+
+        // check if portfolioName exists for this userId
+        const doc = await getPortfolio(userId, portfolioName)
+
+        if (doc === null) {
+            console.log(`${portfolioName} does not exist for userId: ${userId}`)
+
+        // delete the portfolio
+        } else {
+            
+            const res = await Portfolio.deleteOne({
+                'userId': userId,
+                'portfolioName': portfolioName,
+            })
+            return res.deletedCount === 1
+        }
+
+    } catch(err) {
+
+        console.log(`An error occurred in deletePortfolio(): ${err}`);
+    }
+
+    return false
+
+}
+
+/*
+DESC
+    Retrieves the Portfolio document by userId and portfolioName
 INPUT
     userId: The associated userId
     portfolioName: The portfolio's name
@@ -107,6 +151,7 @@ export async function insertPortfolio(
 
     return false
 }
+
 
 // -------
 // product
@@ -232,18 +277,28 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
     }
 }
 
-async function main() {
-    const userId = 123
-    const portfolioName = 'Cardboard'
-    const holdings = [] as IHolding[]
-    const res = await insertPortfolio(userId, portfolioName, holdings)
-    if (res) {
-        console.log('Portfolio successfully created')
-    } else {
-        console.log('Portfolio not created')
-    }
-}
+// async function main(): Promise<number> {
+//     const userId = 123
+//     const portfolioName = 'Cardboard'
+//     const holdings = [] as IHolding[]
 
-main()
-    .then(console.log)
-    .catch(console.error);
+//     let res = await insertPortfolio(userId, portfolioName, holdings)
+//     if (res) {
+//         console.log('Portfolio successfully created')
+//     } else {
+//         console.log('Portfolio not created')
+//     }
+
+//     res = await deletePortfolio(userId, portfolioName)
+//     if (res) {
+//         console.log('Portfolio successfully deleted')
+//     } else {
+//         console.log('Portfolio not deleted')
+//     }
+
+//     return 0
+// }
+
+// main()
+//     .then(console.log)
+//     .catch(console.error);
