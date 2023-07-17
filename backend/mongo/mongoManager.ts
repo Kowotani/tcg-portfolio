@@ -69,12 +69,14 @@ INPUT
     userId: The associated userId
     portfolioName: The portfolio's name
     holdings: An array of Holdings
+RETURN
+    TRUE if the Portfolio was successfully created, FALSE otherwise
 */
 export async function insertPortfolio(
     userId: number, 
     portfolioName: string, 
     holdings: IHolding[],
-): Promise<void> {
+): Promise<boolean> {
 
     // connect to db
     await mongoose.connect(url);  
@@ -95,13 +97,15 @@ export async function insertPortfolio(
                 portfolioName,
                 holdings,
             })
-            console.log(`Portfolio added response: ${res}`)
+            return true
         }
 
     } catch(err) {
 
         console.log(`An error occurred in insertPortfolio(): ${err}`);
     }
+
+    return false
 }
 
 // -------
@@ -233,7 +237,11 @@ async function main() {
     const portfolioName = 'Cardboard'
     const holdings = [] as IHolding[]
     const res = await insertPortfolio(userId, portfolioName, holdings)
-    console.log(res)
+    if (res) {
+        console.log('Portfolio successfully created')
+    } else {
+        console.log('Portfolio not created')
+    }
 }
 
 main()

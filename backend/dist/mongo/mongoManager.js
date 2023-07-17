@@ -72,6 +72,8 @@ INPUT
     userId: The associated userId
     portfolioName: The portfolio's name
     holdings: An array of Holdings
+RETURN
+    TRUE if the Portfolio was successfully created, FALSE otherwise
 */
 function insertPortfolio(userId, portfolioName, holdings) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -90,12 +92,13 @@ function insertPortfolio(userId, portfolioName, holdings) {
                     portfolioName,
                     holdings,
                 });
-                console.log(`Portfolio added response: ${res}`);
+                return true;
             }
         }
         catch (err) {
             console.log(`An error occurred in insertPortfolio(): ${err}`);
         }
+        return false;
     });
 }
 exports.insertPortfolio = insertPortfolio;
@@ -198,7 +201,12 @@ function main() {
         const portfolioName = 'Cardboard';
         const holdings = [];
         const res = yield insertPortfolio(userId, portfolioName, holdings);
-        console.log(res);
+        if (res) {
+            console.log('Portfolio successfully created');
+        }
+        else {
+            console.log('Portfolio not created');
+        }
     });
 }
 main()
