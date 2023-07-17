@@ -13,26 +13,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoManager_1 = require("../mongo/mongoManager");
 const scraper_1 = require("./scraper");
 const common_1 = require("common");
-// ================
-// helper functions
-// ================
-/*
-DESC
-    Returns the IPriceData associated with a tcgplayerId, if exists
-INPUT
-    tcgplayerId: The tcgplayerId to search for
-    priceData: The array of IProductPriceDaxta to search
-RETURN
-    The IPriceData associated with the tcgplayerID, null otherwise
-*/
-function getPriceData(tcgplayerId, priceData) {
-    for (const data of priceData) {
-        if (data.tcgplayerId === tcgplayerId) {
-            return data.priceData;
-        }
-    }
-    return null;
-}
 // ==============
 // main functions
 // ==============
@@ -56,9 +36,9 @@ function loadPrices() {
         for (const productDoc of productDocs) {
             const tcgplayerId = productDoc.tcgplayerId;
             // get price data
-            const priceData = getPriceData(tcgplayerId, prices);
+            const priceData = prices.get(tcgplayerId);
             // handle products without price data
-            if (priceData === null) {
+            if (priceData === undefined) {
                 console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
                 // construct IPrice object
             }
@@ -70,10 +50,10 @@ function loadPrices() {
                     marketPrice: priceData.marketPrice
                 };
                 if (priceData.buylistMarketPrice !== null) {
-                    price['buylistMarketPrice'] = priceData.buylistMarketPrice;
+                    price.buylistMarketPrice = priceData.buylistMarketPrice;
                 }
                 if (priceData.listedMedianPrice !== null) {
-                    price['listedMedianPrice'] = priceData.listedMedianPrice;
+                    price.listedMedianPrice = priceData.listedMedianPrice;
                 }
                 priceDocs.push(price);
             }

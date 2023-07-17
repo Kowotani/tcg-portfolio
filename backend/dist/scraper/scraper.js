@@ -26,12 +26,12 @@ function scrape(ids) {
         // create browser instance and page
         const browser = yield (0, browser_1.getBrowser)();
         if (browser === undefined) {
-            console.log('Browser not instantiated. Returning empty array');
-            return [];
+            console.log('Browser not instantiated. Returning empty map');
+            return new Map();
         }
         const page = yield browser.newPage();
         // store return data
-        let scrapeData = [];
+        let scrapeData = new Map();
         // iterate through ids
         const baseUrl = 'https://www.tcgplayer.com/product/';
         for (const id of ids) {
@@ -76,12 +76,7 @@ function scrape(ids) {
                     buylistMarketPrice: data[common_1.TCGPriceType.BuylistMarketPrice] || null,
                     listedMedianPrice: data[common_1.TCGPriceType.ListedMedianPrice] || null,
                 };
-                // create IProductPriceData
-                const productPriceData = {
-                    tcgplayerId: id,
-                    priceData: priceData
-                };
-                scrapeData.push(productPriceData);
+                scrapeData.set(id, priceData);
             }
             catch (err) {
                 console.log(`Error scraping from ${url}: ${err}`);

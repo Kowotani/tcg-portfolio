@@ -2,32 +2,7 @@
 import { getProducts, insertPrices } from '../mongo/mongoManager';
 import { IPrice } from '../mongo/models/priceSchema';
 import { scrape } from './scraper';
-import { IPriceData, IProductPriceData, TimeseriesGranularity } from 'common';
-
-
-// ================
-// helper functions
-// ================
-
-/*
-DESC
-    Returns the IPriceData associated with a tcgplayerId, if exists
-INPUT
-    tcgplayerId: The tcgplayerId to search for
-    priceData: The array of IProductPriceDaxta to search
-RETURN
-    The IPriceData associated with the tcgplayerID, null otherwise
-*/
-function getPriceData(tcgplayerId: Number, priceData: IProductPriceData[]): IPriceData | null {
-
-    for (const data of priceData) {
-        if (data.tcgplayerId === tcgplayerId) {
-            return data.priceData;
-        }
-    }
-
-    return null;
-}
+import { TimeseriesGranularity } from 'common';
 
 
 // ==============
@@ -38,7 +13,7 @@ function getPriceData(tcgplayerId: Number, priceData: IProductPriceData[]): IPri
 DESC
     Loads price data for all known products
 */
-async function loadPrices(): Promise<Number> {
+async function loadPrices(): Promise<number> {
 
     // get all Products
     const productDocs = await getProducts();
@@ -60,10 +35,10 @@ async function loadPrices(): Promise<Number> {
         const tcgplayerId = productDoc.tcgplayerId;
 
         // get price data
-        const priceData = getPriceData(tcgplayerId, prices);
+        const priceData = prices.get(tcgplayerId)
 
         // handle products without price data
-        if (priceData === null) {
+        if (priceData === undefined) {
 
             console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
 
@@ -78,11 +53,11 @@ async function loadPrices(): Promise<Number> {
             }; 
 
             if (priceData.buylistMarketPrice !== null) {
-                price['buylistMarketPrice'] = priceData.buylistMarketPrice;
+                price.buylistMarketPrice = priceData.buylistMarketPrice;
             }
 
             if (priceData.listedMedianPrice !== null) {
-                price['listedMedianPrice'] = priceData.listedMedianPrice;
+                price.listedMedianPrice = priceData.listedMedianPrice;
             }
 
             priceDocs.push(price);

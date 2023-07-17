@@ -215,12 +215,6 @@ export interface IPriceData {
     listedMedianPrice: number;
 }
 
-// used with IPriceData for storing scraped price data
-export interface IProductPriceData {
-    tcgplayerId: number;
-    priceData: IPriceData;
-}
-
 // defines the required data for a Product
 export interface IProduct {
     tcgplayerId: number;

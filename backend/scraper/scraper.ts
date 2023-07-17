@@ -1,6 +1,6 @@
 // imports
 import { getBrowser } from './browser';
-import { getPriceFromString, IPriceData, IProductPriceData, isPriceString, 
+import { getPriceFromString, IPriceData, isPriceString, 
     isTCGPriceTypeValue, TCGPriceType } from 'common'
 
 
@@ -12,18 +12,18 @@ INPUT
 RETURN
     Array of IProductPriceData objects
 */
-export async function scrape(ids: number[]): Promise<IProductPriceData[]> {
+export async function scrape(ids: number[]): Promise<Map<number, IPriceData>> {
 
     // create browser instance and page
     const browser = await getBrowser();
     if (browser === undefined) {
-        console.log('Browser not instantiated. Returning empty array')
-        return [];
+        console.log('Browser not instantiated. Returning empty map')
+        return new Map<number, IPriceData>();
     }
     const page = await browser.newPage();
 
     // store return data
-    let scrapeData: IProductPriceData[] = [];
+    let scrapeData: Map<number, IPriceData> = new Map<number, IPriceData>();
 
     // iterate through ids
     const baseUrl = 'https://www.tcgplayer.com/product/';
@@ -75,12 +75,7 @@ export async function scrape(ids: number[]): Promise<IProductPriceData[]> {
                 listedMedianPrice: data[TCGPriceType.ListedMedianPrice] || null,
             };
 
-            // create IProductPriceData
-            const productPriceData: IProductPriceData = {
-                tcgplayerId: id,
-                priceData: priceData
-            }
-            scrapeData.push(productPriceData);               
+            scrapeData.set(id, priceData);               
 
         } 
         catch(err) {

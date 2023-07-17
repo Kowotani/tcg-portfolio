@@ -72,10 +72,6 @@ export interface IPriceData {
     buylistMarketPrice: number;
     listedMedianPrice: number;
 }
-export interface IProductPriceData {
-    tcgplayerId: number;
-    priceData: IPriceData;
-}
 export interface IProduct {
     tcgplayerId: number;
     tcg: TCG;
