@@ -1,7 +1,7 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
+exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
 var _ = require("lodash");
 // =====
 // enums
@@ -176,6 +176,19 @@ exports.TCGToProductSubtype = (_c = {},
 // =========
 // functions
 // =========
+/*
+DESC
+    Basic assertion function
+INPUT
+    condition: A condition to assert is true
+    msg: An optional message to display
+*/
+function assert(condition, msg) {
+    if (!condition) {
+        throw new Error('Assertion Error: ' + msg);
+    }
+}
+exports.assert = assert;
 /*
 DESC
     Converts a price string (determined by isPriceString()) to a number

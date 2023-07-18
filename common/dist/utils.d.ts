@@ -126,6 +126,7 @@ export declare type TProductPostBody = {
     formData: IProduct;
     imageUrl?: string;
 };
+export declare function assert(condition: any, msg?: string): asserts condition;
 export declare function getPriceFromString(value: string): number;
 export declare function getProductSubtypes(tcg: TCG, productType: ProductType): ProductSubtype[];
 export declare function isASCII(value: string): boolean;

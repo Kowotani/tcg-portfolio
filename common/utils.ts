@@ -310,6 +310,19 @@ export type TProductPostBody = {
 
 /*
 DESC
+    Basic assertion function
+INPUT
+    condition: A condition to assert is true
+    msg: An optional message to display
+*/
+export function assert(condition: any, msg?: string): asserts condition {
+    if (!condition) {
+      throw new Error('Assertion Error: ' + msg);
+    }
+  }
+
+/*
+DESC
     Converts a price string (determined by isPriceString()) to a number
 INPUT
     A string to convert
