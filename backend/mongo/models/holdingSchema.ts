@@ -1,8 +1,8 @@
 import { Model, Schema } from 'mongoose';
 import * as _ from 'lodash';
 import { productSchema } from './productSchema';
-import { IMTransaction, transactionSchema } from './transactionSchema';
-import { IHolding, IHoldingMethods, TransactionType } from 'common';
+import { transactionSchema } from './transactionSchema';
+import { IHolding, IHoldingMethods, ITransaction, TransactionType } from 'common';
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html
 
 
@@ -12,7 +12,7 @@ import { IHolding, IHoldingMethods, TransactionType } from 'common';
 
 export interface IMHolding extends IHolding, Document {}
 
-export type THoldingModel = Model<IMHolding, {}, IHoldingMethods>
+export type THoldingModel = Model<IHolding, {}, IHoldingMethods>
 
 
 // ==========
@@ -27,7 +27,6 @@ export const holdingSchema = new Schema<IMHolding, THoldingModel, IHoldingMethod
     },
     transactions: {
         type: [transactionSchema],
-        ref: 'Transaction',
         required: true
     },
 });
@@ -41,34 +40,41 @@ export const holdingSchema = new Schema<IMHolding, THoldingModel, IHoldingMethod
 
 // add transaction
 holdingSchema.method('addTransaction', 
-    function addTransaction(txn: IMTransaction): void {
+    function addTransaction(txn: ITransaction): void {
         this.transactions.push(txn)
+        this.parent.save()
 });
 
-// TODO: fix the txn type in the filter
 // delete transaction
 holdingSchema.method('deleteTransaction',
-    function deleteTransaction(id: string): void {
-        this.transactions.filter((txn: any) => {
-            return txn.id !== id
-        })
+    function deleteTransaction(
+        type: TransactionType,
+        date: Date,
+        price: number,
+        quantity: number
+    ): void {
+        this.transactions.findOne({
+            'type': type,
+            'date': date,
+            'price': price,
+            'quantity': quantity
+        }).deleteOne()
+        this.parent.save()        
 });
 
 // -- getters
 
 // get purchases
 holdingSchema.method('getPurchases', 
-    function getPurchases(): IMTransaction[] {
-        return this.transactions.filter((txn: IMTransaction) => {
-            return txn.type === TransactionType.Purchase
-        })
+    function getPurchases(): ITransaction[] {
+        return this.transactions.filter({'type': TransactionType.Purchase})
 });
 
 // get first purchase date
 holdingSchema.method('getFirstPurchaseDate', 
     function getFirstPurchaseDate(): Date | undefined {
         return this.getPurchases().length > 0 
-            ? _.minBy(this.getPurchases(), (txn: IMTransaction) => {
+            ? _.minBy(this.getPurchases(), (txn: ITransaction) => {
                     return txn.date
                 })?.date
             : undefined
@@ -78,7 +84,7 @@ holdingSchema.method('getFirstPurchaseDate',
 holdingSchema.method('getLastPurchaseDate', 
     function getLastPurchaseDate(): Date | undefined {
         return this.getPurchases().length > 0
-            ? _.maxBy(this.getPurchases(), (txn: IMTransaction) => {
+            ? _.maxBy(this.getPurchases(), (txn: ITransaction) => {
                 return txn.date
             })?.date
             : undefined
@@ -90,7 +96,7 @@ holdingSchema.method('getLastPurchaseDate',
 holdingSchema.method('getTotalCost', 
     function getTotalCost(): number | undefined {
         return this.getPurchases().length > 0
-            ? _.sumBy(this.getPurchases(), (txn: IMTransaction) => {
+            ? _.sumBy(this.getPurchases(), (txn: ITransaction) => {
                 return txn.quantity * txn.price
             })
             : undefined
@@ -108,7 +114,7 @@ holdingSchema.method('getAvgCost',
 holdingSchema.method('getMarketValue', 
     function getMarketValue(price: number): number | undefined {
         return this.getPurchases().length > 0
-            ? _.sumBy(this.getPurchases(), (txn: IMTransaction) => {
+            ? _.sumBy(this.getPurchases(), (txn: ITransaction) => {
                     return txn.quantity * price
                 })
             : undefined

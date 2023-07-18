@@ -1,5 +1,5 @@
 import { Document, Model, Schema } from 'mongoose';
-import { IMHolding, holdingSchema, THoldingModel } from './holdingSchema';
+import { holdingSchema } from './holdingSchema';
 import * as _ from 'lodash';
 import { IHolding, IPortfolio, IPortfolioMethods } from 'common';
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html
@@ -29,7 +29,6 @@ export const portfolioSchema = new Schema<IMPortfolio, TPortfolioModel, IPortfol
     },
     holdings: {
         type: [holdingSchema],
-        ref: 'Holding',
         required: true
     },
 });
@@ -45,15 +44,15 @@ export const portfolioSchema = new Schema<IMPortfolio, TPortfolioModel, IPortfol
 portfolioSchema.method('addHolding', 
     function addHolding(holding: IHolding): void {
         this.holdings.push(holding)
+        this.save()
 });
 
 // TODO: should this be ObjectId or tcgplayerId?
 // delete holding
 portfolioSchema.method('deleteHolding',
     function deleteHolding(tcgplayerId: number): void {
-        this.holdings.filter((holding: IMHolding) => {
-            return holding.product.tcgplayerId !== tcgplayerId
-        })
+        this.holdings.findOne({'tcgplayerId': tcgplayerId}).deleteOne()
+        this.save()
 });
 
 // -- getters

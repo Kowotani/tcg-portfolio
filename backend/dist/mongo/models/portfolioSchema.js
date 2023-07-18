@@ -37,7 +37,6 @@ exports.portfolioSchema = new mongoose_1.Schema({
     },
     holdings: {
         type: [holdingSchema_1.holdingSchema],
-        ref: 'Holding',
         required: true
     },
 });
@@ -48,13 +47,13 @@ exports.portfolioSchema = new mongoose_1.Schema({
 // add holding
 exports.portfolioSchema.method('addHolding', function addHolding(holding) {
     this.holdings.push(holding);
+    this.save();
 });
 // TODO: should this be ObjectId or tcgplayerId?
 // delete holding
 exports.portfolioSchema.method('deleteHolding', function deleteHolding(tcgplayerId) {
-    this.holdings.filter((holding) => {
-        return holding.product.tcgplayerId !== tcgplayerId;
-    });
+    this.holdings.findOne({ 'tcgplayerId': tcgplayerId }).deleteOne();
+    this.save();
 });
 // -- getters
 // get holdings

@@ -36,7 +36,6 @@ exports.holdingSchema = new mongoose_1.Schema({
     },
     transactions: {
         type: [transactionSchema_1.transactionSchema],
-        ref: 'Transaction',
         required: true
     },
 });
@@ -47,20 +46,22 @@ exports.holdingSchema = new mongoose_1.Schema({
 // add transaction
 exports.holdingSchema.method('addTransaction', function addTransaction(txn) {
     this.transactions.push(txn);
+    this.parent.save();
 });
-// TODO: fix the txn type in the filter
 // delete transaction
-exports.holdingSchema.method('deleteTransaction', function deleteTransaction(id) {
-    this.transactions.filter((txn) => {
-        return txn.id !== id;
-    });
+exports.holdingSchema.method('deleteTransaction', function deleteTransaction(type, date, price, quantity) {
+    this.transactions.findOne({
+        'type': type,
+        'date': date,
+        'price': price,
+        'quantity': quantity
+    }).deleteOne();
+    this.parent.save();
 });
 // -- getters
 // get purchases
 exports.holdingSchema.method('getPurchases', function getPurchases() {
-    return this.transactions.filter((txn) => {
-        return txn.type === common_1.TransactionType.Purchase;
-    });
+    return this.transactions.filter({ 'type': common_1.TransactionType.Purchase });
 });
 // get first purchase date
 exports.holdingSchema.method('getFirstPurchaseDate', function getFirstPurchaseDate() {
