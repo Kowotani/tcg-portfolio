@@ -37,6 +37,10 @@ exports.productSchema = new mongoose_1.Schema({
         enum: common_1.ProductLanguage,
         required: true
     },
+    msrp: {
+        type: Number,
+        // required: true
+    },
     subtype: {
         type: String,
         enum: common_1.ProductSubtype

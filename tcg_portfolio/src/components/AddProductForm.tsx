@@ -24,6 +24,7 @@ import { InputErrorWrapper } from './InputField';
 
 export const AddProductForm: FunctionComponent<{}> = () => {
 
+
     // =========
     // constants
     // =========
@@ -36,13 +37,6 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     const TCG_SELECT_DEFAULT = 'Select TCG'
     
     const ADD_PRODUCT_URL = '/product'  
-
-
-    // =====
-    // types
-    // =====
-
-
 
 
     // ======
@@ -123,6 +117,11 @@ export const AddProductForm: FunctionComponent<{}> = () => {
     }>({
         language: LANGUAGE_SELECT_DEFAULT,
     });
+
+    // MSRP state
+    const [ msrpState, setMsrpState ] = useState<{
+        msrp?: number,
+    }>({});
 
     // Image URL state
     const [ imageUrlState, setImageURLState ] = useState<{
@@ -402,6 +401,9 @@ export const AddProductForm: FunctionComponent<{}> = () => {
             releaseDate: releaseDateState.releaseDate as Date,
             language: languageState.language,
         }
+        if (msrpState.msrp !== undefined) {
+            data.msrp = msrpState.msrp
+        }
         if (productSubtypeState.productSubtype.length > 0) {
             data.subtype = productSubtypeState.productSubtype as ProductSubtype
         }
@@ -531,6 +533,7 @@ export const AddProductForm: FunctionComponent<{}> = () => {
                             min={1}
                             precision={0}
                             onBlur={e => validateTCGPlayerID(e.target.value)}
+                            width='100%'
                         >
                             <NumberInputField />
                         </NumberInput>
@@ -671,6 +674,20 @@ export const AddProductForm: FunctionComponent<{}> = () => {
                                 )
                             })}
                         </Select>                
+                    </InputErrorWrapper>
+
+                    {/* MSRP */}
+                    <InputErrorWrapper 
+                        leftLabel='MSRP'
+                    >
+                        <NumberInput
+                            min={1}
+                            precision={2}
+                            width='100%'
+                            onBlur={e => setMsrpState({msrp: Number(e.target.value)})}
+                        >
+                            <NumberInputField />
+                        </NumberInput>
                     </InputErrorWrapper>
 
                     {/* Image URL */}

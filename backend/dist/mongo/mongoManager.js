@@ -13,8 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = exports.getPortfolio = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHolding = void 0;
-// imports
-const common_1 = require("common");
 const mongoose_1 = __importDefault(require("mongoose"));
 const holdingSchema_1 = require("./models/holdingSchema");
 const portfolioSchema_1 = require("./models/portfolioSchema");
@@ -297,10 +295,10 @@ function main() {
         // }
         // const res = await insertProducts([product])
         // console.log(res)
-        const userId = 1234;
-        const portfolioName = 'Cardboard';
-        const holdings = [];
-        let res;
+        // const userId = 1234
+        // const portfolioName = 'Cardboard'
+        // const holdings = [] as IMHolding[]
+        // let res
         // res = await addPortfolio(userId, portfolioName, holdings)
         // if (res) {
         //     console.log('Portfolio successfully created')
@@ -313,26 +311,28 @@ function main() {
         // } else {
         //     console.log('Portfolio not deleted')
         // }
-        const holding = {
-            productHexStringId: '64b046db10138e6973996b64',
-            transactions: [{
-                    type: common_1.TransactionType.Purchase,
-                    date: new Date(),
-                    price: 4.56,
-                    quantity: 999
-                }]
-        };
-        res = yield addPortfolioHolding({
-            userId: userId,
-            portfolioName: portfolioName,
-            holdings: holdings,
-        }, holding);
-        if (res) {
-            console.log('Holding successfully added');
-        }
-        else {
-            console.log('Holding not added');
-        }
+        // const holding: IHolding = {
+        //     productHexStringId: '64b046db10138e6973996b64',
+        //     transactions: [{
+        //         type: TransactionType.Purchase,
+        //         date: new Date(),
+        //         price: 4.56,
+        //         quantity: 999
+        //     }]
+        // }
+        // res = await addPortfolioHolding(
+        //     {
+        //         userId: userId,
+        //         portfolioName: portfolioName,
+        //         holdings: holdings,
+        //     },
+        //     holding
+        // )
+        // if (res) {
+        //     console.log('Holding successfully added')
+        // } else {
+        //     console.log('Holding not added')
+        // }
         return 0;
     });
 }
