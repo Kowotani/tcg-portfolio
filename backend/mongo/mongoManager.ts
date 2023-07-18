@@ -1,20 +1,24 @@
 // imports
-import { IHolding, IProduct } from 'common';
+import { assert, IHolding, IPortfolio, IPortfolioMethods, IProduct, ITransaction, TransactionType } from 'common';
+import * as _ from 'lodash';
 import mongoose from 'mongoose';
-import { holdingSchema } from './models/holdingSchema';
+import { HydratedDocument} from 'mongoose';
+import { IMHolding, holdingSchema } from './models/holdingSchema';
 import { IMPortfolio, portfolioSchema } from './models/portfolioSchema';
 import { IPrice, priceSchema } from './models/priceSchema';
 import { IMProduct, productSchema } from './models/productSchema';
+import { IMTransaction, transactionSchema } from './models/transactionSchema';
 import { TCG, ProductType, ProductSubtype, ProductLanguage } from 'common';
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 
 // mongoose models
-const Holding = mongoose.model('holding', holdingSchema);
-const Portfolio = mongoose.model<IMPortfolio>('portfolio', portfolioSchema);
-const Product = mongoose.model<IMProduct>('product', productSchema);
-const Price = mongoose.model('price', priceSchema);
+const Holding = mongoose.model('Holding', holdingSchema);
+const Portfolio = mongoose.model('Portfolio', portfolioSchema);
+const Product = mongoose.model('Product', productSchema);
+const Price = mongoose.model('Price', priceSchema);
+const Transaction = mongoose.model('Transaction', transactionSchema);
 
 
 // =========
@@ -24,6 +28,59 @@ const Price = mongoose.model('price', priceSchema);
 // ---------
 // Portfolio
 // ---------
+
+/*
+DESC
+    Adds a Holding to a Portfolio
+INPUT
+    portfolio: The Portfolio to contain the holding
+    holding: The Holding to add
+RETURN
+    TRUE if the Holding was successfully added to the Portfolio, FALSE otherwise
+*/
+export async function addPortfolioHolding(
+    portfolio: IPortfolio, 
+    holding: IHolding,
+): Promise<boolean> {
+
+    // connect to db
+    await mongoose.connect(url);  
+
+    try {
+
+        // check if portfolio exists
+        const portfolioDoc = await getPortfolio(portfolio.userId, portfolio.portfolioName)
+        if (portfolioDoc === null) {
+            console.log(`${portfolio.portfolioName} does not exist for userId: ${portfolio.userId}`)
+            return false
+        
+        } else {
+
+            const existingHoldings = portfolioDoc.holdings.map(
+                (holding: IHolding) => {
+                    return holding.product.tcgplayerId
+                })
+
+            // check if holding already exists
+            if (existingHoldings.includes(holding.product.tcgplayerId)) {
+                console.log(`tcgplayerId: ${holding.product.tcgplayerId} already exists in portfolio: (${portfolio.userId}, ${portfolio.portfolioName} )`)
+                return false
+
+            } else {
+
+                // add holding
+                portfolioDoc.addHolding(holding)
+                return true
+            }
+        }
+
+    } catch(err) {
+        
+        console.log(`An error occurred in addPortfolioHolding(): ${err}`);
+    }
+
+    return false
+}
 
 /*
 DESC
@@ -55,7 +112,7 @@ export async function addPortfolio(
         // create the portfolio
         } else {
             
-            const res = await Portfolio.create({
+            await Portfolio.create({
                 userId,
                 portfolioName,
                 holdings,
@@ -127,7 +184,7 @@ RETURN
 export async function getPortfolio(
     userId: number, 
     portfolioName: string,
-): Promise<IMPortfolio | null> {
+): Promise<HydratedDocument<IMPortfolio, IPortfolioMethods> | null> {
 
     // connect to db
     await mongoose.connect(url);  
@@ -168,7 +225,7 @@ interface IGetProductParameters {
 }
 export async function getProduct(
     { tcgplayerId, hexStringId }: IGetProductParameters = {}
-): Promise<IMProduct | null> {
+): Promise<HydratedDocument<IProduct> | null> {
 
     // check that tcgplayer_id or id is provided
     if (tcgplayerId === undefined && hexStringId === undefined) { 
@@ -189,7 +246,7 @@ export async function getProduct(
 
         console.log(`An error occurred in getProduct(): ${err}`);
     } 
-    
+
     return null;
 }
 
@@ -199,7 +256,7 @@ DESC
 RETURN
     Array of Product docs
 */
-export async function getProducts(): Promise<IMProduct[]> {
+export async function getProducts(): Promise<IProduct[]> {
 
     // connect to db
     await mongoose.connect(url);
@@ -284,19 +341,19 @@ async function main(): Promise<number> {
         language: ProductLanguage.Japanese,
     }
 
-    const res = await insertProducts([product])
-    console.log(res)
+    // const res = await insertProducts([product])
+    // console.log(res)
 
-    // const userId = 123
-    // const portfolioName = 'Cardboard'
-    // const holdings = [] as IHolding[]
+    const userId = 123
+    const portfolioName = 'Cardboard'
+    const holdings = [] as IHolding[]
 
-    // let res = await addPortfolio(userId, portfolioName, holdings)
-    // if (res) {
-    //     console.log('Portfolio successfully created')
-    // } else {
-    //     console.log('Portfolio not created')
-    // }
+    let res = await addPortfolio(userId, portfolioName, holdings)
+    if (res) {
+        console.log('Portfolio successfully created')
+    } else {
+        console.log('Portfolio not created')
+    }
 
     // res = await deletePortfolio(userId, portfolioName)
     // if (res) {
@@ -304,6 +361,30 @@ async function main(): Promise<number> {
     // } else {
     //     console.log('Portfolio not deleted')
     // }
+
+    const holding = {
+        product: product,
+        transactions: [{
+            type: TransactionType.Purchase,
+            date: new Date(),
+            price: 4.56,
+            quantity: 999
+        }]
+    }
+
+    res = await addPortfolioHolding(
+        {
+            userId: userId,
+            portfolioName: portfolioName,
+            holdings: holdings,
+        },
+        holding
+    )
+    if (res) {
+        console.log('Holding successfully added')
+    } else {
+        console.log('Holding not added')
+    }
 
     return 0
 }

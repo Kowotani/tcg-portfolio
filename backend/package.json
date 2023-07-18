@@ -6,7 +6,8 @@
   "scripts": {
     "start": "tsc && node dist/app.js",
     "mongoManager": "tsc && node dist/mongo/mongoManager.js",
-    "s3Manager": "tsc && node dist/aws/s3Manager.js"
+    "s3Manager": "tsc && node dist/aws/s3Manager.js",
+    "scraper": "tsc && node dist/scraper/scrapeManager.js"
   },
   "author": "",
   "license": "ISC",

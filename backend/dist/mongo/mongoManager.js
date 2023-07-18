@@ -12,26 +12,73 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = exports.getPortfolio = exports.deletePortfolio = exports.addPortfolio = void 0;
+exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = exports.getPortfolio = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHolding = void 0;
+// imports
+const common_1 = require("common");
 const mongoose_1 = __importDefault(require("mongoose"));
 const holdingSchema_1 = require("./models/holdingSchema");
 const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
-const common_1 = require("common");
+const transactionSchema_1 = require("./models/transactionSchema");
+const common_2 = require("common");
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
-const Holding = mongoose_1.default.model('holding', holdingSchema_1.holdingSchema);
-const Portfolio = mongoose_1.default.model('portfolio', portfolioSchema_1.portfolioSchema);
-const Product = mongoose_1.default.model('product', productSchema_1.productSchema);
-const Price = mongoose_1.default.model('price', priceSchema_1.priceSchema);
+const Holding = mongoose_1.default.model('Holding', holdingSchema_1.holdingSchema);
+const Portfolio = mongoose_1.default.model('Portfolio', portfolioSchema_1.portfolioSchema);
+const Product = mongoose_1.default.model('Product', productSchema_1.productSchema);
+const Price = mongoose_1.default.model('Price', priceSchema_1.priceSchema);
+const Transaction = mongoose_1.default.model('Transaction', transactionSchema_1.transactionSchema);
 // =========
 // functions
 // =========
 // ---------
 // Portfolio
 // ---------
+/*
+DESC
+    Adds a Holding to a Portfolio
+INPUT
+    portfolio: The Portfolio to contain the holding
+    holding: The Holding to add
+RETURN
+    TRUE if the Holding was successfully added to the Portfolio, FALSE otherwise
+*/
+function addPortfolioHolding(portfolio, holding) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            // check if portfolio exists
+            const portfolioDoc = yield getPortfolio(portfolio.userId, portfolio.portfolioName);
+            if (portfolioDoc === null) {
+                console.log(`${portfolio.portfolioName} does not exist for userId: ${portfolio.userId}`);
+                return false;
+            }
+            else {
+                const existingHoldings = portfolioDoc.holdings.map((holding) => {
+                    return holding.product.tcgplayerId;
+                });
+                // check if holding already exists
+                if (existingHoldings.includes(holding.product.tcgplayerId)) {
+                    console.log(`tcgplayerId: ${holding.product.tcgplayerId} already exists in portfolio: (${portfolio.userId}, ${portfolio.portfolioName} )`);
+                    return false;
+                }
+                else {
+                    // add holding
+                    portfolioDoc.addHolding(holding);
+                    return true;
+                }
+            }
+        }
+        catch (err) {
+            console.log(`An error occurred in addPortfolioHolding(): ${err}`);
+        }
+        return false;
+    });
+}
+exports.addPortfolioHolding = addPortfolioHolding;
 /*
 DESC
     Adds a Portfolio based on the given inputs
@@ -54,7 +101,7 @@ function addPortfolio(userId, portfolioName, holdings) {
                 // create the portfolio
             }
             else {
-                const res = yield Portfolio.create({
+                yield Portfolio.create({
                     userId,
                     portfolioName,
                     holdings,
@@ -230,29 +277,50 @@ function main() {
     return __awaiter(this, void 0, void 0, function* () {
         const product = {
             tcgplayerId: 123,
-            tcg: common_1.TCG.MagicTheGathering,
+            tcg: common_2.TCG.MagicTheGathering,
             releaseDate: new Date(),
             name: 'Foo',
-            type: common_1.ProductType.BoosterBox,
-            language: common_1.ProductLanguage.Japanese,
+            type: common_2.ProductType.BoosterBox,
+            language: common_2.ProductLanguage.Japanese,
         };
-        const res = yield insertProducts([product]);
-        console.log(res);
-        // const userId = 123
-        // const portfolioName = 'Cardboard'
-        // const holdings = [] as IHolding[]
-        // let res = await addPortfolio(userId, portfolioName, holdings)
-        // if (res) {
-        //     console.log('Portfolio successfully created')
-        // } else {
-        //     console.log('Portfolio not created')
-        // }
+        // const res = await insertProducts([product])
+        // console.log(res)
+        const userId = 123;
+        const portfolioName = 'Cardboard';
+        const holdings = [];
+        let res = yield addPortfolio(userId, portfolioName, holdings);
+        if (res) {
+            console.log('Portfolio successfully created');
+        }
+        else {
+            console.log('Portfolio not created');
+        }
         // res = await deletePortfolio(userId, portfolioName)
         // if (res) {
         //     console.log('Portfolio successfully deleted')
         // } else {
         //     console.log('Portfolio not deleted')
         // }
+        const holding = {
+            product: product,
+            transactions: [{
+                    type: common_1.TransactionType.Purchase,
+                    date: new Date(),
+                    price: 4.56,
+                    quantity: 999
+                }]
+        };
+        res = yield addPortfolioHolding({
+            userId: userId,
+            portfolioName: portfolioName,
+            holdings: holdings,
+        }, holding);
+        if (res) {
+            console.log('Holding successfully added');
+        }
+        else {
+            console.log('Holding not added');
+        }
         return 0;
     });
 }
