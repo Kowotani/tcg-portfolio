@@ -44,6 +44,10 @@ export const productSchema = new Schema<IProduct>({
         enum: ProductLanguage,
         required: true
     },
+    msrp: {
+        type: Number,
+        // required: true
+    },
     subtype: {
         type: String,
         enum: ProductSubtype

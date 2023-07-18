@@ -79,6 +79,7 @@ export interface IProduct {
     name: string;
     type: ProductType;
     language: ProductLanguage;
+    msrp?: number;
     subtype?: ProductSubtype;
     setCode?: string;
 }
