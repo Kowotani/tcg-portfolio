@@ -1,6 +1,6 @@
 import { Model, Schema } from 'mongoose';
+import mongoose from 'mongoose';
 import * as _ from 'lodash';
-import { productSchema } from './productSchema';
 import { transactionSchema } from './transactionSchema';
 import { IHolding, IHoldingMethods, ITransaction, TransactionType } from 'common';
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html
@@ -10,7 +10,9 @@ import { IHolding, IHoldingMethods, ITransaction, TransactionType } from 'common
 // interfaces
 // ==========
 
-export interface IMHolding extends IHolding, Document {}
+export interface IMHolding extends IHolding, Document {
+    product: mongoose.Types.ObjectId
+}
 
 export type THoldingModel = Model<IHolding, {}, IHoldingMethods>
 
@@ -20,8 +22,12 @@ export type THoldingModel = Model<IHolding, {}, IHoldingMethods>
 // ==========
 
 export const holdingSchema = new Schema<IMHolding, THoldingModel, IHoldingMethods>({
+    productHexStringId: {
+        type: String,
+        required: true
+    },
     product: {
-        type: productSchema,
+        type: Schema.Types.ObjectId,
         ref: 'Product',
         required: true
     },

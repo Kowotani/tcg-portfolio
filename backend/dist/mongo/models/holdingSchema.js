@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -22,15 +26,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.holdingSchema = void 0;
 const mongoose_1 = require("mongoose");
 const _ = __importStar(require("lodash"));
-const productSchema_1 = require("./productSchema");
 const transactionSchema_1 = require("./transactionSchema");
 const common_1 = require("common");
 // ==========
 // properties
 // ==========
 exports.holdingSchema = new mongoose_1.Schema({
+    productHexStringId: {
+        type: String,
+        required: true
+    },
     product: {
-        type: productSchema_1.productSchema,
+        type: mongoose_1.Schema.Types.ObjectId,
         ref: 'Product',
         required: true
     },

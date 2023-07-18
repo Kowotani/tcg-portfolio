@@ -21,7 +21,6 @@ const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
 const transactionSchema_1 = require("./models/transactionSchema");
-const common_2 = require("common");
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
@@ -57,18 +56,31 @@ function addPortfolioHolding(portfolio, holding) {
                 return false;
             }
             else {
-                const existingHoldings = portfolioDoc.holdings.map((holding) => {
-                    return holding.product.tcgplayerId;
-                });
-                // check if holding already exists
-                if (existingHoldings.includes(holding.product.tcgplayerId)) {
-                    console.log(`tcgplayerId: ${holding.product.tcgplayerId} already exists in portfolio: (${portfolio.userId}, ${portfolio.portfolioName} )`);
+                const holdingProductDoc = yield getProduct({ hexStringId: holding.productHexStringId });
+                // check if product exists
+                if (holdingProductDoc === null) {
+                    console.log(`Product not found for hexStringId: ${holding.productHexStringId}`);
                     return false;
                 }
                 else {
-                    // add holding
-                    portfolioDoc.addHolding(holding);
-                    return true;
+                    const existingHoldings = yield Promise.all(portfolioDoc.holdings.map((holding) => __awaiter(this, void 0, void 0, function* () {
+                        const productDoc = yield getProduct({ hexStringId: holding.productHexStringId });
+                        return productDoc === null || productDoc === void 0 ? void 0 : productDoc.tcgplayerId;
+                    })));
+                    // check if holding already exists
+                    if (existingHoldings.includes(holdingProductDoc.tcgplayerId)) {
+                        console.log(`tcgplayerId: ${holdingProductDoc.tcgplayerId} already exists in portfolio: (${portfolio.userId}, ${portfolio.portfolioName} )`);
+                        return false;
+                    }
+                    else {
+                        // add holding
+                        portfolioDoc.addHolding({
+                            product: holdingProductDoc._id,
+                            productHexStringId: holding.productHexStringId,
+                            transactions: holding.transactions
+                        });
+                        return true;
+                    }
                 }
             }
         }
@@ -275,26 +287,26 @@ function insertPrices(docs) {
 exports.insertPrices = insertPrices;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        const product = {
-            tcgplayerId: 123,
-            tcg: common_2.TCG.MagicTheGathering,
-            releaseDate: new Date(),
-            name: 'Foo',
-            type: common_2.ProductType.BoosterBox,
-            language: common_2.ProductLanguage.Japanese,
-        };
+        // const product: IProduct = {
+        //     tcgplayerId: 123,
+        //     tcg: TCG.MagicTheGathering,
+        //     releaseDate: new Date(),
+        //     name: 'Foo',
+        //     type: ProductType.BoosterBox,
+        //     language: ProductLanguage.Japanese,
+        // }
         // const res = await insertProducts([product])
         // console.log(res)
-        const userId = 123;
+        const userId = 1234;
         const portfolioName = 'Cardboard';
         const holdings = [];
-        let res = yield addPortfolio(userId, portfolioName, holdings);
-        if (res) {
-            console.log('Portfolio successfully created');
-        }
-        else {
-            console.log('Portfolio not created');
-        }
+        let res;
+        // res = await addPortfolio(userId, portfolioName, holdings)
+        // if (res) {
+        //     console.log('Portfolio successfully created')
+        // } else {
+        //     console.log('Portfolio not created')
+        // }
         // res = await deletePortfolio(userId, portfolioName)
         // if (res) {
         //     console.log('Portfolio successfully deleted')
@@ -302,7 +314,7 @@ function main() {
         //     console.log('Portfolio not deleted')
         // }
         const holding = {
-            product: product,
+            productHexStringId: '64b046db10138e6973996b64',
             transactions: [{
                     type: common_1.TransactionType.Purchase,
                     date: new Date(),

@@ -239,7 +239,7 @@ export interface ITransaction {
 
 // holding
 export interface IHolding {
-    product: IProduct,
+    productHexStringId: string,
     transactions: ITransaction[],
 }
 

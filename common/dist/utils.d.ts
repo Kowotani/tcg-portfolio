@@ -89,7 +89,7 @@ export interface ITransaction {
     quantity: number;
 }
 export interface IHolding {
-    product: IProduct;
+    productHexStringId: string;
     transactions: ITransaction[];
 }
 export interface IHoldingMethods {

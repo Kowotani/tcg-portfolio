@@ -1,13 +1,13 @@
 // imports
-import { assert, IHolding, IPortfolio, IPortfolioMethods, IProduct, ITransaction, TransactionType } from 'common';
+import { assert, IHolding, IPortfolio, IPortfolioMethods, IProduct } from 'common';
 import * as _ from 'lodash';
 import mongoose from 'mongoose';
 import { HydratedDocument} from 'mongoose';
 import { IMHolding, holdingSchema } from './models/holdingSchema';
 import { IMPortfolio, portfolioSchema } from './models/portfolioSchema';
 import { IPrice, priceSchema } from './models/priceSchema';
-import { IMProduct, productSchema } from './models/productSchema';
-import { IMTransaction, transactionSchema } from './models/transactionSchema';
+import { productSchema } from './models/productSchema';
+import { transactionSchema } from './models/transactionSchema';
 import { TCG, ProductType, ProductSubtype, ProductLanguage } from 'common';
 
 // get mongo client
@@ -56,21 +56,38 @@ export async function addPortfolioHolding(
         
         } else {
 
-            const existingHoldings = portfolioDoc.holdings.map(
-                (holding: IHolding) => {
-                    return holding.product.tcgplayerId
-                })
+            const holdingProductDoc = await getProduct({hexStringId: holding.productHexStringId})
 
-            // check if holding already exists
-            if (existingHoldings.includes(holding.product.tcgplayerId)) {
-                console.log(`tcgplayerId: ${holding.product.tcgplayerId} already exists in portfolio: (${portfolio.userId}, ${portfolio.portfolioName} )`)
+            // check if product exists
+            if (holdingProductDoc === null) {
+                console.log(`Product not found for hexStringId: ${holding.productHexStringId}`)
                 return false
 
             } else {
 
-                // add holding
-                portfolioDoc.addHolding(holding)
-                return true
+                const existingHoldings = await Promise.all(
+                    portfolioDoc.holdings.map(
+                        async (holding: IHolding) => {
+                            const productDoc = await getProduct({hexStringId: holding.productHexStringId})
+                            return productDoc?.tcgplayerId
+                    }))
+
+                // check if holding already exists
+                if (existingHoldings.includes(holdingProductDoc.tcgplayerId)) {
+                    console.log(`tcgplayerId: ${holdingProductDoc.tcgplayerId} already exists in portfolio: (${portfolio.userId}, ${portfolio.portfolioName} )`)
+                    return false
+
+                } else {
+
+                    // add holding
+                    portfolioDoc.addHolding({
+                        product: holdingProductDoc._id,
+                        productHexStringId: holding.productHexStringId,
+                        transactions: holding.transactions
+                    } as IMHolding)
+
+                    return true
+                }
             }
         }
 
@@ -332,28 +349,29 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
 
 async function main(): Promise<number> {
 
-    const product: IProduct = {
-        tcgplayerId: 123,
-        tcg: TCG.MagicTheGathering,
-        releaseDate: new Date(),
-        name: 'Foo',
-        type: ProductType.BoosterBox,
-        language: ProductLanguage.Japanese,
-    }
+    // const product: IProduct = {
+    //     tcgplayerId: 123,
+    //     tcg: TCG.MagicTheGathering,
+    //     releaseDate: new Date(),
+    //     name: 'Foo',
+    //     type: ProductType.BoosterBox,
+    //     language: ProductLanguage.Japanese,
+    // }
 
     // const res = await insertProducts([product])
     // console.log(res)
 
-    const userId = 123
-    const portfolioName = 'Cardboard'
-    const holdings = [] as IHolding[]
+    // const userId = 1234
+    // const portfolioName = 'Cardboard'
+    // const holdings = [] as IMHolding[]
+    // let res
 
-    let res = await addPortfolio(userId, portfolioName, holdings)
-    if (res) {
-        console.log('Portfolio successfully created')
-    } else {
-        console.log('Portfolio not created')
-    }
+    // res = await addPortfolio(userId, portfolioName, holdings)
+    // if (res) {
+    //     console.log('Portfolio successfully created')
+    // } else {
+    //     console.log('Portfolio not created')
+    // }
 
     // res = await deletePortfolio(userId, portfolioName)
     // if (res) {
@@ -362,29 +380,29 @@ async function main(): Promise<number> {
     //     console.log('Portfolio not deleted')
     // }
 
-    const holding = {
-        product: product,
-        transactions: [{
-            type: TransactionType.Purchase,
-            date: new Date(),
-            price: 4.56,
-            quantity: 999
-        }]
-    }
+    // const holding: IHolding = {
+    //     productHexStringId: '64b046db10138e6973996b64',
+    //     transactions: [{
+    //         type: TransactionType.Purchase,
+    //         date: new Date(),
+    //         price: 4.56,
+    //         quantity: 999
+    //     }]
+    // }
 
-    res = await addPortfolioHolding(
-        {
-            userId: userId,
-            portfolioName: portfolioName,
-            holdings: holdings,
-        },
-        holding
-    )
-    if (res) {
-        console.log('Holding successfully added')
-    } else {
-        console.log('Holding not added')
-    }
+    // res = await addPortfolioHolding(
+    //     {
+    //         userId: userId,
+    //         portfolioName: portfolioName,
+    //         holdings: holdings,
+    //     },
+    //     holding
+    // )
+    // if (res) {
+    //     console.log('Holding successfully added')
+    // } else {
+    //     console.log('Holding not added')
+    // }
 
     return 0
 }

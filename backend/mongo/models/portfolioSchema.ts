@@ -1,5 +1,5 @@
 import { Document, Model, Schema } from 'mongoose';
-import { holdingSchema } from './holdingSchema';
+import { IMHolding, holdingSchema } from './holdingSchema';
 import * as _ from 'lodash';
 import { IHolding, IPortfolio, IPortfolioMethods } from 'common';
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html
@@ -42,7 +42,7 @@ export const portfolioSchema = new Schema<IMPortfolio, TPortfolioModel, IPortfol
 
 // add holding
 portfolioSchema.method('addHolding', 
-    function addHolding(holding: IHolding): void {
+    function addHolding(holding: IMHolding): void {
         this.holdings.push(holding)
         this.save()
 });
@@ -59,7 +59,7 @@ portfolioSchema.method('deleteHolding',
 
 // get holdings
 portfolioSchema.method('getHoldings', 
-    function getHoldings(): IHolding[] {
+    function getHoldings(): IMHolding[] {
         return this.holdings
 });
 
