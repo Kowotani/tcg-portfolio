@@ -47,37 +47,42 @@ export async function addPortfolioHolding(
     // connect to db
     await mongoose.connect(url);  
 
+    const userId = portfolio.userId
+    const portfolioName = portfolio.portfolioName
+    const tcgplayerId = holding.tcgplayerId
+    const transactions = holding.transactions
+
     try {
 
         // check if portfolio exists
-        const portfolioDoc = await getPortfolio(portfolio.userId, portfolio.portfolioName)
+        const portfolioDoc = await getPortfolio(portfolio)
         if (portfolioDoc === null) {
-            console.log(`${portfolio.portfolioName} does not exist for userId: ${portfolio.userId}`)
+            console.log(`${portfolioName} does not exist for userId: ${userId}`)
             return false
         
         } else {
 
-            const holdingProductDoc = await getProduct({tcgplayerId: holding.tcgplayerId})
+            const productDoc = await getProduct({tcgplayerId: tcgplayerId})
 
             // check if product exists
-            if (holdingProductDoc === null) {
-                console.log(`Product not found for tcgplayerId: ${holding.tcgplayerId}`)
+            if (productDoc === null) {
+                console.log(`Product not found for tcgplayerId: ${tcgplayerId}`)
                 return false
 
             } else {
 
                 // check if holding already exists
-                if (portfolioDoc.hasHolding(holding.tcgplayerId)) {
-                    console.log(`tcgplayerId: ${holding.tcgplayerId} already exists in portfolio: (${portfolio.userId}, ${portfolio.portfolioName})`)
+                if (portfolioDoc.hasHolding(tcgplayerId)) {
+                    console.log(`tcgplayerId: ${tcgplayerId} already exists in portfolio: (${userId}, ${portfolioName})`)
                     return false
 
                 } else {
 
                     // add holding
                     portfolioDoc.addHolding({
-                        product: holdingProductDoc._id,
-                        tcgplayerId: holding.tcgplayerId,
-                        transactions: holding.transactions
+                        product: productDoc._id,
+                        tcgplayerId: tcgplayerId,
+                        transactions: transactions
                     } as IMHolding)
 
                     return true
@@ -103,19 +108,19 @@ INPUT
 RETURN
     TRUE if the Portfolio was successfully created, FALSE otherwise
 */
-export async function addPortfolio(
-    userId: number, 
-    portfolioName: string, 
-    holdings: IHolding[],
-): Promise<boolean> {
+export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
 
     // connect to db
     await mongoose.connect(url);  
 
+    const userId = portfolio.userId
+    const portfolioName = portfolio.portfolioName
+    const holdings = portfolio.holdings
+
     try {
 
         // check if portfolioName exists for this userId
-        const doc = await getPortfolio(userId, portfolioName)
+        const doc = await getPortfolio(portfolio)
 
         if (doc !== null) {
             console.log(`${portfolioName} already exists for userId: ${userId}`)
@@ -148,18 +153,18 @@ INPUT
 RETURN
     TRUE if the Portfolio was successfully created, FALSE otherwise
 */
-export async function deletePortfolio(
-    userId: number, 
-    portfolioName: string,
-): Promise<boolean> {
+export async function deletePortfolio(portfolio: IPortfolio): Promise<boolean> {
 
     // connect to db
     await mongoose.connect(url);  
 
+    const userId = portfolio.userId
+    const portfolioName = portfolio.portfolioName
+
     try {
 
         // check if portfolioName exists for this userId
-        const doc = await getPortfolio(userId, portfolioName)
+        const doc = await getPortfolio(portfolio)
 
         if (doc === null) {
             console.log(`${portfolioName} does not exist for userId: ${userId}`)
@@ -200,20 +205,23 @@ export async function deletePortfolioHolding(
     // connect to db
     await mongoose.connect(url);  
 
+    const userId = portfolio.userId
+    const portfolioName = portfolio.portfolioName
+
     try {    
 
         // check if portfolio exists
-        const portfolioDoc = await getPortfolio(portfolio.userId, portfolio.portfolioName)
+        const portfolioDoc = await getPortfolio(portfolio)
 
         if (portfolioDoc === null) {
-            console.log(`${portfolio.portfolioName} does not exist for userId: ${portfolio.userId}`)
+            console.log(`${portfolio.portfolioName} does not exist for userId: ${userId}`)
             return false
 
         } else {
         
             // check if holding exists
             if (!portfolioDoc.hasHolding(tcgplayerId)) {
-                console.log(`tcgplayerId: ${tcgplayerId} does not exist in portfolio: (${portfolio.userId}, ${portfolio.portfolioName})`)
+                console.log(`tcgplayerId: ${tcgplayerId} does not exist in portfolio: (${userId}, ${portfolioName})`)
                 return false
 
             // remove the holding
@@ -242,8 +250,7 @@ RETURN
     The document if found, else null
 */
 export async function getPortfolio(
-    userId: number, 
-    portfolioName: string,
+    portfolio: IPortfolio
 ): Promise<HydratedDocument<IMPortfolio, IPortfolioMethods> | null> {
 
     // connect to db
@@ -252,8 +259,8 @@ export async function getPortfolio(
     try {
 
         const doc = await Portfolio.findOne({
-            'userId': userId,
-            'portfolioName': portfolioName,
+            'userId': portfolio.userId,
+            'portfolioName': portfolio.portfolioName,
         })
         if (doc !== null) { return doc; }
 

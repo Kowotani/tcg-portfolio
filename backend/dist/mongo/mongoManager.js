@@ -46,32 +46,36 @@ function addPortfolioHolding(portfolio, holding) {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
+        const userId = portfolio.userId;
+        const portfolioName = portfolio.portfolioName;
+        const tcgplayerId = holding.tcgplayerId;
+        const transactions = holding.transactions;
         try {
             // check if portfolio exists
-            const portfolioDoc = yield getPortfolio(portfolio.userId, portfolio.portfolioName);
+            const portfolioDoc = yield getPortfolio(portfolio);
             if (portfolioDoc === null) {
-                console.log(`${portfolio.portfolioName} does not exist for userId: ${portfolio.userId}`);
+                console.log(`${portfolioName} does not exist for userId: ${userId}`);
                 return false;
             }
             else {
-                const holdingProductDoc = yield getProduct({ tcgplayerId: holding.tcgplayerId });
+                const productDoc = yield getProduct({ tcgplayerId: tcgplayerId });
                 // check if product exists
-                if (holdingProductDoc === null) {
-                    console.log(`Product not found for tcgplayerId: ${holding.tcgplayerId}`);
+                if (productDoc === null) {
+                    console.log(`Product not found for tcgplayerId: ${tcgplayerId}`);
                     return false;
                 }
                 else {
                     // check if holding already exists
-                    if (portfolioDoc.hasHolding(holding.tcgplayerId)) {
-                        console.log(`tcgplayerId: ${holding.tcgplayerId} already exists in portfolio: (${portfolio.userId}, ${portfolio.portfolioName})`);
+                    if (portfolioDoc.hasHolding(tcgplayerId)) {
+                        console.log(`tcgplayerId: ${tcgplayerId} already exists in portfolio: (${userId}, ${portfolioName})`);
                         return false;
                     }
                     else {
                         // add holding
                         portfolioDoc.addHolding({
-                            product: holdingProductDoc._id,
-                            tcgplayerId: holding.tcgplayerId,
-                            transactions: holding.transactions
+                            product: productDoc._id,
+                            tcgplayerId: tcgplayerId,
+                            transactions: transactions
                         });
                         return true;
                     }
@@ -95,13 +99,16 @@ INPUT
 RETURN
     TRUE if the Portfolio was successfully created, FALSE otherwise
 */
-function addPortfolio(userId, portfolioName, holdings) {
+function addPortfolio(portfolio) {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
+        const userId = portfolio.userId;
+        const portfolioName = portfolio.portfolioName;
+        const holdings = portfolio.holdings;
         try {
             // check if portfolioName exists for this userId
-            const doc = yield getPortfolio(userId, portfolioName);
+            const doc = yield getPortfolio(portfolio);
             if (doc !== null) {
                 console.log(`${portfolioName} already exists for userId: ${userId}`);
                 // create the portfolio
@@ -131,13 +138,15 @@ INPUT
 RETURN
     TRUE if the Portfolio was successfully created, FALSE otherwise
 */
-function deletePortfolio(userId, portfolioName) {
+function deletePortfolio(portfolio) {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
+        const userId = portfolio.userId;
+        const portfolioName = portfolio.portfolioName;
         try {
             // check if portfolioName exists for this userId
-            const doc = yield getPortfolio(userId, portfolioName);
+            const doc = yield getPortfolio(portfolio);
             if (doc === null) {
                 console.log(`${portfolioName} does not exist for userId: ${userId}`);
                 // delete the portfolio
@@ -170,17 +179,19 @@ function deletePortfolioHolding(portfolio, tcgplayerId) {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
+        const userId = portfolio.userId;
+        const portfolioName = portfolio.portfolioName;
         try {
             // check if portfolio exists
-            const portfolioDoc = yield getPortfolio(portfolio.userId, portfolio.portfolioName);
+            const portfolioDoc = yield getPortfolio(portfolio);
             if (portfolioDoc === null) {
-                console.log(`${portfolio.portfolioName} does not exist for userId: ${portfolio.userId}`);
+                console.log(`${portfolio.portfolioName} does not exist for userId: ${userId}`);
                 return false;
             }
             else {
                 // check if holding exists
                 if (!portfolioDoc.hasHolding(tcgplayerId)) {
-                    console.log(`tcgplayerId: ${tcgplayerId} does not exist in portfolio: (${portfolio.userId}, ${portfolio.portfolioName})`);
+                    console.log(`tcgplayerId: ${tcgplayerId} does not exist in portfolio: (${userId}, ${portfolioName})`);
                     return false;
                     // remove the holding
                 }
@@ -206,14 +217,14 @@ INPUT
 RETURN
     The document if found, else null
 */
-function getPortfolio(userId, portfolioName) {
+function getPortfolio(portfolio) {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
             const doc = yield Portfolio.findOne({
-                'userId': userId,
-                'portfolioName': portfolioName,
+                'userId': portfolio.userId,
+                'portfolioName': portfolio.portfolioName,
             });
             if (doc !== null) {
                 return doc;
