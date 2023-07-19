@@ -59,13 +59,16 @@ holdingSchema.method('deleteTransaction',
         price: number,
         quantity: number
     ): void {
-        this.transactions.findOne({
-            'type': type,
-            'date': date,
-            'price': price,
-            'quantity': quantity
-        }).deleteOne()
-        this.parent.save()        
+        const ix = this.transactions.findIndex((txn: ITransaction) => {
+            return txn.type === type 
+                && txn.date === date
+                && txn.price === price
+                && txn.quantity === quantity
+        })
+        if (ix >= 0) {
+            this.transactions = this.transactions.splice(ix, 1)
+            this.parent.save()        
+        }
 });
 
 // -- getters

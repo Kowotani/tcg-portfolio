@@ -53,13 +53,16 @@ exports.holdingSchema.method('addTransaction', function addTransaction(txn) {
 });
 // delete transaction
 exports.holdingSchema.method('deleteTransaction', function deleteTransaction(type, date, price, quantity) {
-    this.transactions.findOne({
-        'type': type,
-        'date': date,
-        'price': price,
-        'quantity': quantity
-    }).deleteOne();
-    this.parent.save();
+    const ix = this.transactions.findIndex((txn) => {
+        return txn.type === type
+            && txn.date === date
+            && txn.price === price
+            && txn.quantity === quantity;
+    });
+    if (ix >= 0) {
+        this.transactions = this.transactions.splice(ix, 1);
+        this.parent.save();
+    }
 });
 // -- getters
 // get purchases
