@@ -61,13 +61,9 @@ function addPortfolioHolding(portfolio, holding) {
                     return false;
                 }
                 else {
-                    const existingHoldings = yield Promise.all(portfolioDoc.holdings.map((holding) => __awaiter(this, void 0, void 0, function* () {
-                        const productDoc = yield getProduct({ tcgplayerId: holding.tcgplayerId });
-                        return productDoc === null || productDoc === void 0 ? void 0 : productDoc.tcgplayerId;
-                    })));
                     // check if holding already exists
-                    if (existingHoldings.includes(holdingProductDoc.tcgplayerId)) {
-                        console.log(`tcgplayerId: ${holdingProductDoc.tcgplayerId} already exists in portfolio: (${portfolio.userId}, ${portfolio.portfolioName} )`);
+                    if (portfolioDoc.hasHolding(holding.tcgplayerId)) {
+                        console.log(`tcgplayerId: ${holding.tcgplayerId} already exists in portfolio: (${portfolio.userId}, ${portfolio.portfolioName})`);
                         return false;
                     }
                     else {

@@ -66,16 +66,9 @@ export async function addPortfolioHolding(
 
             } else {
 
-                const existingHoldings = await Promise.all(
-                    portfolioDoc.holdings.map(
-                        async (holding: IHolding) => {
-                            const productDoc = await getProduct({tcgplayerId: holding.tcgplayerId})
-                            return productDoc?.tcgplayerId
-                    }))
-
                 // check if holding already exists
-                if (existingHoldings.includes(holdingProductDoc.tcgplayerId)) {
-                    console.log(`tcgplayerId: ${holdingProductDoc.tcgplayerId} already exists in portfolio: (${portfolio.userId}, ${portfolio.portfolioName} )`)
+                if (portfolioDoc.hasHolding(holding.tcgplayerId)) {
+                    console.log(`tcgplayerId: ${holding.tcgplayerId} already exists in portfolio: (${portfolio.userId}, ${portfolio.portfolioName})`)
                     return false
 
                 } else {
