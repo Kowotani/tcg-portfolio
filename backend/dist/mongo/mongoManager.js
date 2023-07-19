@@ -13,6 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = exports.getPortfolio = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHolding = void 0;
+// imports
+const common_1 = require("common");
 const mongoose_1 = __importDefault(require("mongoose"));
 const holdingSchema_1 = require("./models/holdingSchema");
 const portfolioSchema_1 = require("./models/portfolioSchema");
@@ -57,35 +59,32 @@ function addPortfolioHolding(portfolio, holding) {
                 console.log(`${portfolioName} does not exist for userId: ${userId}`);
                 return false;
             }
-            else {
-                const productDoc = yield getProduct({ tcgplayerId: tcgplayerId });
-                // check if product exists
-                if (productDoc === null) {
-                    console.log(`Product not found for tcgplayerId: ${tcgplayerId}`);
-                    return false;
-                }
-                else {
-                    // check if holding already exists
-                    if (portfolioDoc.hasHolding(tcgplayerId)) {
-                        console.log(`tcgplayerId: ${tcgplayerId} already exists in portfolio: (${userId}, ${portfolioName})`);
-                        return false;
-                    }
-                    else {
-                        // add holding
-                        portfolioDoc.addHolding({
-                            product: productDoc._id,
-                            tcgplayerId: tcgplayerId,
-                            transactions: transactions
-                        });
-                        return true;
-                    }
-                }
+            (0, common_1.assert)(portfolioDoc !== null);
+            // check if product exists
+            const productDoc = yield getProduct({ tcgplayerId: tcgplayerId });
+            if (productDoc === null) {
+                console.log(`Product not found for tcgplayerId: ${tcgplayerId}`);
+                return false;
             }
+            (0, common_1.assert)(productDoc !== null);
+            // check if holding already exists
+            const holdingExists = portfolioDoc.hasHolding(tcgplayerId);
+            if (holdingExists) {
+                console.log(`tcgplayerId: ${tcgplayerId} already exists in portfolio: (${userId}, ${portfolioName})`);
+                return false;
+            }
+            // add holding
+            portfolioDoc.addHolding({
+                product: productDoc._id,
+                tcgplayerId: tcgplayerId,
+                transactions: transactions
+            });
+            return true;
         }
         catch (err) {
             console.log(`An error occurred in addPortfolioHolding(): ${err}`);
+            return false;
         }
-        return false;
     });
 }
 exports.addPortfolioHolding = addPortfolioHolding;
@@ -111,21 +110,20 @@ function addPortfolio(portfolio) {
             const doc = yield getPortfolio(portfolio);
             if (doc !== null) {
                 console.log(`${portfolioName} already exists for userId: ${userId}`);
-                // create the portfolio
+                return false;
             }
-            else {
-                yield Portfolio.create({
-                    userId,
-                    portfolioName,
-                    holdings,
-                });
-                return true;
-            }
+            // create the portfolio    
+            yield Portfolio.create({
+                userId,
+                portfolioName,
+                holdings,
+            });
+            return true;
         }
         catch (err) {
             console.log(`An error occurred in addPortfolio(): ${err}`);
+            return false;
         }
-        return false;
     });
 }
 exports.addPortfolio = addPortfolio;
@@ -149,20 +147,19 @@ function deletePortfolio(portfolio) {
             const doc = yield getPortfolio(portfolio);
             if (doc === null) {
                 console.log(`${portfolioName} does not exist for userId: ${userId}`);
-                // delete the portfolio
+                return false;
             }
-            else {
-                const res = yield Portfolio.deleteOne({
-                    'userId': userId,
-                    'portfolioName': portfolioName,
-                });
-                return res.deletedCount === 1;
-            }
+            // delete the portfolio    
+            const res = yield Portfolio.deleteOne({
+                'userId': userId,
+                'portfolioName': portfolioName,
+            });
+            return res.deletedCount === 1;
         }
         catch (err) {
             console.log(`An error occurred in deletePortfolio(): ${err}`);
+            return false;
         }
-        return false;
     });
 }
 exports.deletePortfolio = deletePortfolio;
@@ -188,23 +185,20 @@ function deletePortfolioHolding(portfolio, tcgplayerId) {
                 console.log(`${portfolio.portfolioName} does not exist for userId: ${userId}`);
                 return false;
             }
-            else {
-                // check if holding exists
-                if (!portfolioDoc.hasHolding(tcgplayerId)) {
-                    console.log(`tcgplayerId: ${tcgplayerId} does not exist in portfolio: (${userId}, ${portfolioName})`);
-                    return false;
-                    // remove the holding
-                }
-                else {
-                    portfolioDoc.deleteHolding(tcgplayerId);
-                    return true;
-                }
+            (0, common_1.assert)(portfolioDoc !== null);
+            // check if holding exists
+            if (!portfolioDoc.hasHolding(tcgplayerId)) {
+                console.log(`tcgplayerId: ${tcgplayerId} does not exist in portfolio: (${userId}, ${portfolioName})`);
+                return false;
             }
+            // remove the holding
+            portfolioDoc.deleteHolding(tcgplayerId);
+            return true;
         }
         catch (err) {
             console.log(`An error occurred in deletePortfolioHolding(): ${err}`);
+            return false;
         }
-        return false;
     });
 }
 exports.deletePortfolioHolding = deletePortfolioHolding;
@@ -226,12 +220,11 @@ function getPortfolio(portfolio) {
                 'userId': portfolio.userId,
                 'portfolioName': portfolio.portfolioName,
             });
-            if (doc !== null) {
-                return doc;
-            }
+            return doc;
         }
         catch (err) {
-            console.log(`An error occurred in getProduct(): ${err}`);
+            console.log(`An error occurred in getPortfolio(): ${err}`);
+            return null;
         }
         return null;
     });
@@ -241,6 +234,7 @@ function getProduct({ tcgplayerId, hexStringId } = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         // check that tcgplayer_id or id is provided
         if (tcgplayerId === undefined && hexStringId === undefined) {
+            console.log('No tcgplayerId or hexStringId provided to getProduct()');
             return null;
         }
         // connect to db
@@ -249,14 +243,12 @@ function getProduct({ tcgplayerId, hexStringId } = {}) {
             const doc = tcgplayerId !== undefined
                 ? yield Product.findOne({ 'tcgplayerId': tcgplayerId })
                 : yield Product.findById(hexStringId);
-            if (doc !== null) {
-                return doc;
-            }
+            return doc;
         }
         catch (err) {
             console.log(`An error occurred in getProduct(): ${err}`);
+            return null;
         }
-        return null;
     });
 }
 exports.getProduct = getProduct;
@@ -276,8 +268,8 @@ function getProducts() {
         }
         catch (err) {
             console.log(`An error occurred in getProducts(): ${err}`);
+            return [];
         }
-        return [];
     });
 }
 exports.getProducts = getProducts;

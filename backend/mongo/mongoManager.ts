@@ -10,6 +10,7 @@ import { IMPrice, priceSchema } from './models/priceSchema';
 import { IMProduct, productSchema } from './models/productSchema';
 import { transactionSchema } from './models/transactionSchema';
 import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
+import { isAssertEntry } from 'typescript';
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
@@ -45,7 +46,7 @@ export async function addPortfolioHolding(
 ): Promise<boolean> {
 
     // connect to db
-    await mongoose.connect(url);  
+    await mongoose.connect(url)
 
     const userId = portfolio.userId
     const portfolioName = portfolio.portfolioName
@@ -59,43 +60,38 @@ export async function addPortfolioHolding(
         if (portfolioDoc === null) {
             console.log(`${portfolioName} does not exist for userId: ${userId}`)
             return false
-        
-        } else {
-
-            const productDoc = await getProduct({tcgplayerId: tcgplayerId})
-
-            // check if product exists
-            if (productDoc === null) {
-                console.log(`Product not found for tcgplayerId: ${tcgplayerId}`)
-                return false
-
-            } else {
-
-                // check if holding already exists
-                if (portfolioDoc.hasHolding(tcgplayerId)) {
-                    console.log(`tcgplayerId: ${tcgplayerId} already exists in portfolio: (${userId}, ${portfolioName})`)
-                    return false
-
-                } else {
-
-                    // add holding
-                    portfolioDoc.addHolding({
-                        product: productDoc._id,
-                        tcgplayerId: tcgplayerId,
-                        transactions: transactions
-                    } as IMHolding)
-
-                    return true
-                }
-            }
         }
+        assert(portfolioDoc !== null)
+ 
+        // check if product exists
+        const productDoc = await getProduct({tcgplayerId: tcgplayerId})
+        if (productDoc === null) {
+            console.log(`Product not found for tcgplayerId: ${tcgplayerId}`)
+            return false
+        }
+        assert(productDoc !== null)
 
+        // check if holding already exists
+        const holdingExists = portfolioDoc.hasHolding(tcgplayerId)
+        if (holdingExists) {
+            console.log(`tcgplayerId: ${tcgplayerId} already exists in portfolio: (${userId}, ${portfolioName})`)
+            return false
+        } 
+
+        // add holding
+        portfolioDoc.addHolding({
+            product: productDoc._id,
+            tcgplayerId: tcgplayerId,
+            transactions: transactions
+        } as IMHolding)
+
+        return true
+        
     } catch(err) {
         
-        console.log(`An error occurred in addPortfolioHolding(): ${err}`);
+        console.log(`An error occurred in addPortfolioHolding(): ${err}`)
+        return false
     }
-
-    return false
 }
 
 /*
@@ -111,7 +107,7 @@ RETURN
 export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
 
     // connect to db
-    await mongoose.connect(url);  
+    await mongoose.connect(url)
 
     const userId = portfolio.userId
     const portfolioName = portfolio.portfolioName
@@ -121,27 +117,25 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
 
         // check if portfolioName exists for this userId
         const doc = await getPortfolio(portfolio)
-
         if (doc !== null) {
             console.log(`${portfolioName} already exists for userId: ${userId}`)
+            return false
+        } 
 
-        // create the portfolio
-        } else {
-            
-            await Portfolio.create({
-                userId,
-                portfolioName,
-                holdings,
-            })
-            return true
-        }
+        // create the portfolio    
+        await Portfolio.create({
+            userId,
+            portfolioName,
+            holdings,
+        })
+
+        return true
 
     } catch(err) {
 
-        console.log(`An error occurred in addPortfolio(): ${err}`);
+        console.log(`An error occurred in addPortfolio(): ${err}`)
+        return false
     }
-
-    return false
 }
 
 /*
@@ -156,7 +150,7 @@ RETURN
 export async function deletePortfolio(portfolio: IPortfolio): Promise<boolean> {
 
     // connect to db
-    await mongoose.connect(url);  
+    await mongoose.connect(url)
 
     const userId = portfolio.userId
     const portfolioName = portfolio.portfolioName
@@ -165,27 +159,23 @@ export async function deletePortfolio(portfolio: IPortfolio): Promise<boolean> {
 
         // check if portfolioName exists for this userId
         const doc = await getPortfolio(portfolio)
-
         if (doc === null) {
             console.log(`${portfolioName} does not exist for userId: ${userId}`)
-
-        // delete the portfolio
-        } else {
-            
-            const res = await Portfolio.deleteOne({
-                'userId': userId,
-                'portfolioName': portfolioName,
-            })
-            return res.deletedCount === 1
+            return false
         }
+
+        // delete the portfolio    
+        const res = await Portfolio.deleteOne({
+            'userId': userId,
+            'portfolioName': portfolioName,
+        })
+        return res.deletedCount === 1
 
     } catch(err) {
 
-        console.log(`An error occurred in deletePortfolio(): ${err}`);
+        console.log(`An error occurred in deletePortfolio(): ${err}`)
+        return false
     }
-
-    return false
-
 }
 
 /*
@@ -203,7 +193,7 @@ export async function deletePortfolioHolding(
 ): Promise<boolean> {
 
     // connect to db
-    await mongoose.connect(url);  
+    await mongoose.connect(url)
 
     const userId = portfolio.userId
     const portfolioName = portfolio.portfolioName
@@ -212,32 +202,28 @@ export async function deletePortfolioHolding(
 
         // check if portfolio exists
         const portfolioDoc = await getPortfolio(portfolio)
-
         if (portfolioDoc === null) {
             console.log(`${portfolio.portfolioName} does not exist for userId: ${userId}`)
             return false
 
-        } else {
-        
-            // check if holding exists
-            if (!portfolioDoc.hasHolding(tcgplayerId)) {
-                console.log(`tcgplayerId: ${tcgplayerId} does not exist in portfolio: (${userId}, ${portfolioName})`)
-                return false
-
-            // remove the holding
-            } else {
-
-                portfolioDoc.deleteHolding(tcgplayerId)
-                return true
-            }
         }
+        assert(portfolioDoc !== null)
+        
+        // check if holding exists
+        if (!portfolioDoc.hasHolding(tcgplayerId)) {
+            console.log(`tcgplayerId: ${tcgplayerId} does not exist in portfolio: (${userId}, ${portfolioName})`)
+            return false
+        } 
 
+        // remove the holding
+        portfolioDoc.deleteHolding(tcgplayerId)
+        return true
+        
     } catch(err) {
 
-        console.log(`An error occurred in deletePortfolioHolding(): ${err}`);
+        console.log(`An error occurred in deletePortfolioHolding(): ${err}`)
+        return false
     }
-
-    return false
 }
 
 /*
@@ -254,7 +240,7 @@ export async function getPortfolio(
 ): Promise<HydratedDocument<IMPortfolio, IPortfolioMethods> | null> {
 
     // connect to db
-    await mongoose.connect(url);  
+    await mongoose.connect(url)
 
     try {
 
@@ -262,11 +248,12 @@ export async function getPortfolio(
             'userId': portfolio.userId,
             'portfolioName': portfolio.portfolioName,
         })
-        if (doc !== null) { return doc; }
+        return doc
 
     } catch(err) {
 
-        console.log(`An error occurred in getProduct(): ${err}`);
+        console.log(`An error occurred in getPortfolio(): ${err}`)
+        return null
     } 
     
     return null;
@@ -295,26 +282,26 @@ export async function getProduct(
 ): Promise<HydratedDocument<IProduct> | null> {
 
     // check that tcgplayer_id or id is provided
-    if (tcgplayerId === undefined && hexStringId === undefined) { 
-        return null; 
+    if (tcgplayerId === undefined && hexStringId === undefined) {
+        console.log('No tcgplayerId or hexStringId provided to getProduct()') 
+        return null
     }
 
     // connect to db
-    await mongoose.connect(url);  
+    await mongoose.connect(url)
 
     try {
 
         const doc = tcgplayerId !== undefined 
             ? await Product.findOne({ 'tcgplayerId': tcgplayerId })
             : await Product.findById(hexStringId);
-        if (doc !== null) { return doc; }
+        return doc
 
     } catch(err) {
 
-        console.log(`An error occurred in getProduct(): ${err}`);
+        console.log(`An error occurred in getProduct(): ${err}`)
+        return null
     } 
-
-    return null;
 }
 
 /*
@@ -331,14 +318,13 @@ export async function getProducts(): Promise<HydratedDocument<IMProduct>[]> {
     try {
 
         const docs = await Product.find({});
-        return docs;
+        return docs
 
     } catch(err) {
 
-        console.log(`An error occurred in getProducts(): ${err}`);
+        console.log(`An error occurred in getProducts(): ${err}`)
+        return []
     }
-
-    return [];
 }
 
 
@@ -353,17 +339,17 @@ RETURN
 export async function insertProducts(docs: IProduct[]): Promise<number> {
 
     // connect to db
-    await mongoose.connect(url);
+    await mongoose.connect(url)
 
     try {
 
-        const res = await Product.insertMany(docs);
-        return res.length;
+        const res = await Product.insertMany(docs)
+        return res.length
         
     } catch(err) {
     
-        console.log(`An error occurred in insertProducts(): ${err}`);
-        return -1;
+        console.log(`An error occurred in insertProducts(): ${err}`)
+        return -1
     }
 }
 
@@ -383,7 +369,7 @@ RETURN
 export async function insertPrices(docs: IPrice[]): Promise<number> {
 
     // connect to db
-    await mongoose.connect(url);
+    await mongoose.connect(url)
 
     try {
 
@@ -403,12 +389,12 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
         })
 
         const res = await Price.insertMany(priceDocs);
-        return res.length;
+        return res.length
         
     } catch(err) {
     
         console.log(`An error occurred in insertPrices(): ${err}`);
-        return -1;
+        return -1
     }
 }
 
@@ -497,4 +483,4 @@ async function main(): Promise<number> {
 
 main()
     .then(console.log)
-    .catch(console.error);
+    .catch(console.error)
