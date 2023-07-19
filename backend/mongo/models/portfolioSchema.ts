@@ -51,7 +51,7 @@ portfolioSchema.method('addHolding',
 portfolioSchema.method('deleteHolding',
     function deleteHolding(tcgplayerId: number): void {
         this.holdings = this.holdings.filter((holding: IMHolding) => {
-            holding.tcgplayerId !== tcgplayerId
+            return holding.tcgplayerId !== tcgplayerId
         })
         this.save()
 });
@@ -92,7 +92,7 @@ portfolioSchema.method('getLastPurchaseDate',
 portfolioSchema.method('hasHolding',
     function hasHolding(tcgplayerId: number): boolean {
         return this.holdings.filter((holding: IMHolding) => {
-            holding.tcgplayerId === tcgplayerId
+            return holding.tcgplayerId === tcgplayerId
         }).length > 0
     }
 )

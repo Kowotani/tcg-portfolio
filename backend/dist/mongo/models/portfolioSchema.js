@@ -52,7 +52,7 @@ exports.portfolioSchema.method('addHolding', function addHolding(holding) {
 // delete holding
 exports.portfolioSchema.method('deleteHolding', function deleteHolding(tcgplayerId) {
     this.holdings = this.holdings.filter((holding) => {
-        holding.tcgplayerId !== tcgplayerId;
+        return holding.tcgplayerId !== tcgplayerId;
     });
     this.save();
 });
@@ -81,7 +81,7 @@ exports.portfolioSchema.method('getLastPurchaseDate', function getLastPurchaseDa
 // holding exists
 exports.portfolioSchema.method('hasHolding', function hasHolding(tcgplayerId) {
     return this.holdings.filter((holding) => {
-        holding.tcgplayerId === tcgplayerId;
+        return holding.tcgplayerId === tcgplayerId;
     }).length > 0;
 });
 // -- return inputs

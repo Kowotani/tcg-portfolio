@@ -192,6 +192,55 @@ export async function deletePortfolio(
 
 /*
 DESC
+    Deletes the Holding for the input tcgplayerId from the input Portfolio
+INPUT
+    portfolio: The Portfolio to contain the holding
+    tcgplayerId: The tcgplayerId of the Holding to delete
+RETURN
+    TRUE if the Holding was successfully deleted from the Portfolio, FALSE otherwise
+*/
+export async function deletePortfolioHolding(
+    portfolio: IPortfolio, 
+    tcgplayerId: number,
+): Promise<boolean> {
+
+    // connect to db
+    await mongoose.connect(url);  
+
+    try {    
+
+        // check if portfolio exists
+        const portfolioDoc = await getPortfolio(portfolio.userId, portfolio.portfolioName)
+
+        if (portfolioDoc === null) {
+            console.log(`${portfolio.portfolioName} does not exist for userId: ${portfolio.userId}`)
+            return false
+
+        } else {
+        
+            // check if holding exists
+            if (!portfolioDoc.hasHolding(tcgplayerId)) {
+                console.log(`tcgplayerId: ${tcgplayerId} does not exist in portfolio: (${portfolio.userId}, ${portfolio.portfolioName})`)
+                return false
+
+            // remove the holding
+            } else {
+
+                portfolioDoc.deleteHolding(tcgplayerId)
+                return true
+            }
+        }
+
+    } catch(err) {
+
+        console.log(`An error occurred in deletePortfolioHolding(): ${err}`);
+    }
+
+    return false
+}
+
+/*
+DESC
     Retrieves the Portfolio document by userId and portfolioName
 INPUT
     userId: The associated userId
@@ -380,7 +429,10 @@ async function main(): Promise<number> {
     // const userId = 1234
     // const portfolioName = 'Cardboard'
     // const holdings = [] as IMHolding[]
+    // const tcgplayerId = 233232
     // let res
+
+    // // -- Add portfolio
 
     // res = await addPortfolio(userId, portfolioName, holdings)
     // if (res) {
@@ -389,6 +441,8 @@ async function main(): Promise<number> {
     //     console.log('Portfolio not created')
     // }
 
+    // // -- Delete portfolio
+
     // res = await deletePortfolio(userId, portfolioName)
     // if (res) {
     //     console.log('Portfolio successfully deleted')
@@ -396,13 +450,15 @@ async function main(): Promise<number> {
     //     console.log('Portfolio not deleted')
     // }
 
+    // // -- Add portfolio holding
+
     // const holding: IHolding = {
     //     tcgplayerId: 233232,
     //     transactions: [{
     //         type: TransactionType.Purchase,
     //         date: new Date(),
-    //         price: 4.56,
-    //         quantity: 999
+    //         price: 1.23,
+    //         quantity: 1
     //     }]
     // }
 
@@ -410,7 +466,7 @@ async function main(): Promise<number> {
     //     {
     //         userId: userId,
     //         portfolioName: portfolioName,
-    //         holdings: holdings,
+    //         holdings: [],
     //     },
     //     holding
     // )
@@ -418,6 +474,22 @@ async function main(): Promise<number> {
     //     console.log('Holding successfully added')
     // } else {
     //     console.log('Holding not added')
+    // }
+
+    // // -- Delete portfolio holding
+
+    // res = await deletePortfolioHolding(
+    //     {
+    //         userId: userId,
+    //         portfolioName: portfolioName,
+    //         holdings: []
+    //     },
+    //     233232
+    // )
+    // if (res) {
+    //     console.log('Holding successfully deleted')
+    // } else {
+    //     console.log('Holding not deleted')
     // }
 
     return 0
