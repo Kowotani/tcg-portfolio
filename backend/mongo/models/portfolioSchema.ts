@@ -47,11 +47,12 @@ portfolioSchema.method('addHolding',
         this.save()
 });
 
-// TODO: should this be ObjectId or tcgplayerId?
 // delete holding
 portfolioSchema.method('deleteHolding',
     function deleteHolding(tcgplayerId: number): void {
-        this.holdings.findOne({'tcgplayerId': tcgplayerId}).deleteOne()
+        this.holdings = this.holdings.filter((holding: IMHolding) => {
+            holding.tcgplayerId !== tcgplayerId
+        })
         this.save()
 });
 
@@ -84,6 +85,17 @@ portfolioSchema.method('getLastPurchaseDate',
                 }))
             : undefined
 });
+
+// -- checkers
+
+// holding exists
+portfolioSchema.method('hasHolding',
+    function hasHolding(tcgplayerId: number): boolean {
+        return this.holdings.filter((holding: IMHolding) => {
+            holding.tcgplayerId === tcgplayerId
+        }).length > 0
+    }
+)
 
 // -- return inputs
 

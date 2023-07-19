@@ -125,6 +125,7 @@ export interface IPortfolioMethods {
     getHoldings(): IHolding[];
     getTotalCost(): number | undefined;
     getMarketValue(prices: Map<number, number>): number | undefined;
+    hasHolding(tcgplayerId: number): boolean;
     getDollarReturn(prices: Map<number, number>): number | undefined;
     getPercentageReturn(prices: Map<number, number>): number | undefined;
     getAnnualizedReturn(prices: Map<number, number>): number | undefined;

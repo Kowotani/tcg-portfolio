@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -53,10 +49,11 @@ exports.portfolioSchema.method('addHolding', function addHolding(holding) {
     this.holdings.push(holding);
     this.save();
 });
-// TODO: should this be ObjectId or tcgplayerId?
 // delete holding
 exports.portfolioSchema.method('deleteHolding', function deleteHolding(tcgplayerId) {
-    this.holdings.findOne({ 'tcgplayerId': tcgplayerId }).deleteOne();
+    this.holdings = this.holdings.filter((holding) => {
+        holding.tcgplayerId !== tcgplayerId;
+    });
     this.save();
 });
 // -- getters
@@ -79,6 +76,13 @@ exports.portfolioSchema.method('getLastPurchaseDate', function getLastPurchaseDa
             return holding.methods.getLastPurchaseDate();
         }))
         : undefined;
+});
+// -- checkers
+// holding exists
+exports.portfolioSchema.method('hasHolding', function hasHolding(tcgplayerId) {
+    return this.holdings.filter((holding) => {
+        holding.tcgplayerId === tcgplayerId;
+    }).length > 0;
 });
 // -- return inputs
 // get total cost

@@ -295,6 +295,9 @@ export interface IPortfolioMethods {
     getTotalCost(): number | undefined,
     getMarketValue(prices: Map<number, number>): number | undefined,
 
+    // checkers
+    hasHolding(tcgplayerId: number): boolean,
+
     // return calculation
     getDollarReturn(prices: Map<number, number>): number | undefined,
     getPercentageReturn(prices: Map<number, number>): number | undefined,
