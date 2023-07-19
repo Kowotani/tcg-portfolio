@@ -22,8 +22,8 @@ export type THoldingModel = Model<IHolding, {}, IHoldingMethods>
 // ==========
 
 export const holdingSchema = new Schema<IMHolding, THoldingModel, IHoldingMethods>({
-    productHexStringId: {
-        type: String,
+    tcgplayerId: {
+        type: Number,
         required: true
     },
     product: {

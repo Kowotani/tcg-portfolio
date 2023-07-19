@@ -90,7 +90,7 @@ export interface ITransaction {
     quantity: number;
 }
 export interface IHolding {
-    productHexStringId: string;
+    tcgplayerId: number;
     transactions: ITransaction[];
 }
 export interface IHoldingMethods {

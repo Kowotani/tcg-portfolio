@@ -240,7 +240,7 @@ export interface ITransaction {
 
 // holding
 export interface IHolding {
-    productHexStringId: string,
+    tcgplayerId: number,
     transactions: ITransaction[],
 }
 

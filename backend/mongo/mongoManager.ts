@@ -8,7 +8,7 @@ import { IMPortfolio, portfolioSchema } from './models/portfolioSchema';
 import { IPrice, priceSchema } from './models/priceSchema';
 import { productSchema } from './models/productSchema';
 import { transactionSchema } from './models/transactionSchema';
-import { TCG, ProductType, ProductSubtype, ProductLanguage } from 'common';
+import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
@@ -56,11 +56,11 @@ export async function addPortfolioHolding(
         
         } else {
 
-            const holdingProductDoc = await getProduct({hexStringId: holding.productHexStringId})
+            const holdingProductDoc = await getProduct({tcgplayerId: holding.tcgplayerId})
 
             // check if product exists
             if (holdingProductDoc === null) {
-                console.log(`Product not found for hexStringId: ${holding.productHexStringId}`)
+                console.log(`Product not found for tcgplayerId: ${holding.tcgplayerId}`)
                 return false
 
             } else {
@@ -68,7 +68,7 @@ export async function addPortfolioHolding(
                 const existingHoldings = await Promise.all(
                     portfolioDoc.holdings.map(
                         async (holding: IHolding) => {
-                            const productDoc = await getProduct({hexStringId: holding.productHexStringId})
+                            const productDoc = await getProduct({tcgplayerId: holding.tcgplayerId})
                             return productDoc?.tcgplayerId
                     }))
 
@@ -82,7 +82,7 @@ export async function addPortfolioHolding(
                     // add holding
                     portfolioDoc.addHolding({
                         product: holdingProductDoc._id,
-                        productHexStringId: holding.productHexStringId,
+                        tcgplayerId: holding.tcgplayerId,
                         transactions: holding.transactions
                     } as IMHolding)
 
@@ -381,7 +381,7 @@ async function main(): Promise<number> {
     // }
 
     // const holding: IHolding = {
-    //     productHexStringId: '64b046db10138e6973996b64',
+    //     tcgplayerId: 233232,
     //     transactions: [{
     //         type: TransactionType.Purchase,
     //         date: new Date(),

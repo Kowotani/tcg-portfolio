@@ -32,8 +32,8 @@ const common_1 = require("common");
 // properties
 // ==========
 exports.holdingSchema = new mongoose_1.Schema({
-    productHexStringId: {
-        type: String,
+    tcgplayerId: {
+        type: Number,
         required: true
     },
     product: {

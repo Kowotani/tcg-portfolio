@@ -19,6 +19,7 @@ const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
 const transactionSchema_1 = require("./models/transactionSchema");
+const common_1 = require("common");
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
@@ -54,15 +55,15 @@ function addPortfolioHolding(portfolio, holding) {
                 return false;
             }
             else {
-                const holdingProductDoc = yield getProduct({ hexStringId: holding.productHexStringId });
+                const holdingProductDoc = yield getProduct({ tcgplayerId: holding.tcgplayerId });
                 // check if product exists
                 if (holdingProductDoc === null) {
-                    console.log(`Product not found for hexStringId: ${holding.productHexStringId}`);
+                    console.log(`Product not found for tcgplayerId: ${holding.tcgplayerId}`);
                     return false;
                 }
                 else {
                     const existingHoldings = yield Promise.all(portfolioDoc.holdings.map((holding) => __awaiter(this, void 0, void 0, function* () {
-                        const productDoc = yield getProduct({ hexStringId: holding.productHexStringId });
+                        const productDoc = yield getProduct({ tcgplayerId: holding.tcgplayerId });
                         return productDoc === null || productDoc === void 0 ? void 0 : productDoc.tcgplayerId;
                     })));
                     // check if holding already exists
@@ -74,7 +75,7 @@ function addPortfolioHolding(portfolio, holding) {
                         // add holding
                         portfolioDoc.addHolding({
                             product: holdingProductDoc._id,
-                            productHexStringId: holding.productHexStringId,
+                            tcgplayerId: holding.tcgplayerId,
                             transactions: holding.transactions
                         });
                         return true;
@@ -295,44 +296,43 @@ function main() {
         // }
         // const res = await insertProducts([product])
         // console.log(res)
-        // const userId = 1234
-        // const portfolioName = 'Cardboard'
-        // const holdings = [] as IMHolding[]
-        // let res
-        // res = await addPortfolio(userId, portfolioName, holdings)
-        // if (res) {
-        //     console.log('Portfolio successfully created')
-        // } else {
-        //     console.log('Portfolio not created')
-        // }
+        const userId = 1234;
+        const portfolioName = 'Cardboard';
+        const holdings = [];
+        let res;
+        res = yield addPortfolio(userId, portfolioName, holdings);
+        if (res) {
+            console.log('Portfolio successfully created');
+        }
+        else {
+            console.log('Portfolio not created');
+        }
         // res = await deletePortfolio(userId, portfolioName)
         // if (res) {
         //     console.log('Portfolio successfully deleted')
         // } else {
         //     console.log('Portfolio not deleted')
         // }
-        // const holding: IHolding = {
-        //     productHexStringId: '64b046db10138e6973996b64',
-        //     transactions: [{
-        //         type: TransactionType.Purchase,
-        //         date: new Date(),
-        //         price: 4.56,
-        //         quantity: 999
-        //     }]
-        // }
-        // res = await addPortfolioHolding(
-        //     {
-        //         userId: userId,
-        //         portfolioName: portfolioName,
-        //         holdings: holdings,
-        //     },
-        //     holding
-        // )
-        // if (res) {
-        //     console.log('Holding successfully added')
-        // } else {
-        //     console.log('Holding not added')
-        // }
+        const holding = {
+            tcgplayerId: 233232,
+            transactions: [{
+                    type: common_1.TransactionType.Purchase,
+                    date: new Date(),
+                    price: 4.56,
+                    quantity: 999
+                }]
+        };
+        res = yield addPortfolioHolding({
+            userId: userId,
+            portfolioName: portfolioName,
+            holdings: holdings,
+        }, holding);
+        if (res) {
+            console.log('Holding successfully added');
+        }
+        else {
+            console.log('Holding not added');
+        }
         return 0;
     });
 }
