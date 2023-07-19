@@ -67,10 +67,16 @@ export interface IUser {
     passwordSalt: string;
     email: string;
 }
+export interface IPrice {
+    priceDate: Date;
+    tcgplayerId: number;
+    granularity: string;
+    prices: IPriceData;
+}
 export interface IPriceData {
     marketPrice: number;
-    buylistMarketPrice: number;
-    listedMedianPrice: number;
+    buylistMarketPrice?: number;
+    listedMedianPrice?: number;
 }
 export interface IProduct {
     tcgplayerId: number;

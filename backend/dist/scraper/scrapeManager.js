@@ -27,7 +27,7 @@ function loadPrices() {
         console.log(`Retrieved prods: ${JSON.stringify(productDocs, null, 4)}`);
         // scrape price data
         const tcgplayerIds = productDocs.map(doc => doc.tcgplayerId);
-        const prices = yield (0, scraper_1.scrape)(tcgplayerIds);
+        const scrapedPrices = yield (0, scraper_1.scrape)(tcgplayerIds);
         // insert price data
         let priceDate = new Date();
         priceDate.setMinutes(0, 0, 0);
@@ -36,25 +36,28 @@ function loadPrices() {
         for (const productDoc of productDocs) {
             const tcgplayerId = productDoc.tcgplayerId;
             // get price data
-            const priceData = prices.get(tcgplayerId);
+            const priceData = scrapedPrices.get(tcgplayerId);
             // handle products without price data
             if (priceData === undefined) {
                 console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
                 // construct IPrice object
             }
             else {
-                let price = {
-                    priceDate: priceDate,
-                    product: productDoc,
-                    granularity: common_1.TimeseriesGranularity.Hours,
+                let prices = {
                     marketPrice: priceData.marketPrice
                 };
                 if (priceData.buylistMarketPrice !== null) {
-                    price.buylistMarketPrice = priceData.buylistMarketPrice;
+                    prices.buylistMarketPrice = priceData.buylistMarketPrice;
                 }
                 if (priceData.listedMedianPrice !== null) {
-                    price.listedMedianPrice = priceData.listedMedianPrice;
+                    prices.listedMedianPrice = priceData.listedMedianPrice;
                 }
+                const price = {
+                    priceDate: priceDate,
+                    tcgplayerId: tcgplayerId,
+                    granularity: common_1.TimeseriesGranularity.Hours,
+                    prices: prices
+                };
                 priceDocs.push(price);
             }
         }

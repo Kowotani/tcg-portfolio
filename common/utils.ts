@@ -206,14 +206,24 @@ export interface IUser {
     email: string,
 }
 
-// -- Product and Price schemas
+// -- Price
 
-// used with IProductPriceData for storing scraped price data
+// stores the price snapshot data
+export interface IPrice {
+    priceDate: Date;
+    tcgplayerId: number;
+    granularity: string;
+    prices: IPriceData;
+}
+
+// stores the scraped price data
 export interface IPriceData {
     marketPrice: number;
-    buylistMarketPrice: number;
-    listedMedianPrice: number;
+    buylistMarketPrice?: number;
+    listedMedianPrice?: number;
 }
+
+// -- Product
 
 // defines the required data for a Product
 export interface IProduct {

@@ -19,7 +19,6 @@ const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
 const transactionSchema_1 = require("./models/transactionSchema");
-const common_1 = require("common");
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
@@ -274,7 +273,17 @@ function insertPrices(docs) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const res = yield Price.insertMany(docs);
+            // create map of Product tcgplayerId -> ObjectId
+            const productDocs = yield getProducts();
+            let idMap = new Map();
+            productDocs.forEach(doc => {
+                idMap.set(doc.tcgplayerId, doc._id);
+            });
+            // convert IPrice[] into IMPrice[]
+            const priceDocs = docs.map(doc => {
+                return Object.assign({ product: idMap.get(doc.tcgplayerId) }, doc);
+            });
+            const res = yield Price.insertMany(priceDocs);
             return res.length;
         }
         catch (err) {
@@ -296,43 +305,44 @@ function main() {
         // }
         // const res = await insertProducts([product])
         // console.log(res)
-        const userId = 1234;
-        const portfolioName = 'Cardboard';
-        const holdings = [];
-        let res;
-        res = yield addPortfolio(userId, portfolioName, holdings);
-        if (res) {
-            console.log('Portfolio successfully created');
-        }
-        else {
-            console.log('Portfolio not created');
-        }
+        // const userId = 1234
+        // const portfolioName = 'Cardboard'
+        // const holdings = [] as IMHolding[]
+        // let res
+        // res = await addPortfolio(userId, portfolioName, holdings)
+        // if (res) {
+        //     console.log('Portfolio successfully created')
+        // } else {
+        //     console.log('Portfolio not created')
+        // }
         // res = await deletePortfolio(userId, portfolioName)
         // if (res) {
         //     console.log('Portfolio successfully deleted')
         // } else {
         //     console.log('Portfolio not deleted')
         // }
-        const holding = {
-            tcgplayerId: 233232,
-            transactions: [{
-                    type: common_1.TransactionType.Purchase,
-                    date: new Date(),
-                    price: 4.56,
-                    quantity: 999
-                }]
-        };
-        res = yield addPortfolioHolding({
-            userId: userId,
-            portfolioName: portfolioName,
-            holdings: holdings,
-        }, holding);
-        if (res) {
-            console.log('Holding successfully added');
-        }
-        else {
-            console.log('Holding not added');
-        }
+        // const holding: IHolding = {
+        //     tcgplayerId: 233232,
+        //     transactions: [{
+        //         type: TransactionType.Purchase,
+        //         date: new Date(),
+        //         price: 4.56,
+        //         quantity: 999
+        //     }]
+        // }
+        // res = await addPortfolioHolding(
+        //     {
+        //         userId: userId,
+        //         portfolioName: portfolioName,
+        //         holdings: holdings,
+        //     },
+        //     holding
+        // )
+        // if (res) {
+        //     console.log('Holding successfully added')
+        // } else {
+        //     console.log('Holding not added')
+        // }
         return 0;
     });
 }

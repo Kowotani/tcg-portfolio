@@ -14,7 +14,7 @@ export interface IMProduct extends IProduct, Document {}
 // properties
 // ==========
 
-export const productSchema = new Schema<IProduct>({
+export const productSchema = new Schema<IMProduct>({
     tcgplayerId: {
         type: Number,
         min: 1,

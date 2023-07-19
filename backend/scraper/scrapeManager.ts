@@ -1,8 +1,7 @@
 // imports
 import { getProducts, insertPrices } from '../mongo/mongoManager';
-import { IPrice } from '../mongo/models/priceSchema';
 import { scrape } from './scraper';
-import { TimeseriesGranularity } from 'common';
+import { IPrice, IPriceData, TimeseriesGranularity } from 'common';
 
 
 // ==============
@@ -21,7 +20,7 @@ async function loadPrices(): Promise<number> {
 
     // scrape price data
     const tcgplayerIds = productDocs.map( doc => doc.tcgplayerId );
-    const prices = await scrape(tcgplayerIds);
+    const scrapedPrices = await scrape(tcgplayerIds);
 
     // insert price data
     let priceDate = new Date();
@@ -35,7 +34,7 @@ async function loadPrices(): Promise<number> {
         const tcgplayerId = productDoc.tcgplayerId;
 
         // get price data
-        const priceData = prices.get(tcgplayerId)
+        const priceData = scrapedPrices.get(tcgplayerId)
 
         // handle products without price data
         if (priceData === undefined) {
@@ -45,20 +44,24 @@ async function loadPrices(): Promise<number> {
         // construct IPrice object
         } else {
 
-            let price: IPrice = {
-                priceDate: priceDate,
-                product: productDoc,
-                granularity: TimeseriesGranularity.Hours,
+            let prices: IPriceData = {
                 marketPrice: priceData.marketPrice
-            }; 
+            }
 
             if (priceData.buylistMarketPrice !== null) {
-                price.buylistMarketPrice = priceData.buylistMarketPrice;
+                prices.buylistMarketPrice = priceData.buylistMarketPrice;
             }
 
             if (priceData.listedMedianPrice !== null) {
-                price.listedMedianPrice = priceData.listedMedianPrice;
+                prices.listedMedianPrice = priceData.listedMedianPrice;
             }
+
+            const price: IPrice = {
+                priceDate: priceDate,
+                tcgplayerId: tcgplayerId,
+                granularity: TimeseriesGranularity.Hours,
+                prices: prices
+            }; 
 
             priceDocs.push(price);
         }        

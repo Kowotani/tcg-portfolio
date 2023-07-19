@@ -1,12 +1,13 @@
 // imports
-import { assert, IHolding, IPortfolio, IPortfolioMethods, IProduct } from 'common';
+import { assert, IHolding, IPortfolio, IPortfolioMethods, IPrice, 
+    IProduct } from 'common';
 import * as _ from 'lodash';
 import mongoose from 'mongoose';
 import { HydratedDocument} from 'mongoose';
 import { IMHolding, holdingSchema } from './models/holdingSchema';
 import { IMPortfolio, portfolioSchema } from './models/portfolioSchema';
-import { IPrice, priceSchema } from './models/priceSchema';
-import { productSchema } from './models/productSchema';
+import { IMPrice, priceSchema } from './models/priceSchema';
+import { IMProduct, productSchema } from './models/productSchema';
 import { transactionSchema } from './models/transactionSchema';
 import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
 
@@ -273,7 +274,7 @@ DESC
 RETURN
     Array of Product docs
 */
-export async function getProducts(): Promise<IProduct[]> {
+export async function getProducts(): Promise<HydratedDocument<IMProduct>[]> {
 
     // connect to db
     await mongoose.connect(url);
@@ -337,7 +338,22 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
 
     try {
 
-        const res = await Price.insertMany(docs);
+        // create map of Product tcgplayerId -> ObjectId
+        const productDocs = await getProducts()
+        let idMap = new Map<number, mongoose.Types.ObjectId>()
+        productDocs.forEach(doc => {
+            idMap.set(doc.tcgplayerId, doc._id)
+        })
+
+        // convert IPrice[] into IMPrice[]
+        const priceDocs = docs.map(doc => {
+            return {
+                product: idMap.get(doc.tcgplayerId),
+                ...doc
+            } as IMPrice
+        })
+
+        const res = await Price.insertMany(priceDocs);
         return res.length;
         
     } catch(err) {
