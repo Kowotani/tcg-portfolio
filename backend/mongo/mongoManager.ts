@@ -150,7 +150,7 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
 
         // check if portfolioName exists for this userId
         const doc = await getPortfolio(portfolio)
-        if (doc !== null) {
+        if (doc instanceof Portfolio) {
             console.log(`${portfolioName} already exists for userId: ${userId}`)
             return false
         } 
@@ -192,7 +192,7 @@ export async function deletePortfolio(portfolio: IPortfolio): Promise<boolean> {
 
         // check if portfolioName exists for this userId
         const doc = await getPortfolio(portfolio)
-        if (doc === null) {
+        if (doc instanceof Portfolio === false) {
             console.log(`${portfolioName} does not exist for userId: ${userId}`)
             return false
         }
@@ -235,12 +235,12 @@ export async function deletePortfolioHolding(
 
         // check if portfolio exists
         const portfolioDoc = await getPortfolio(portfolio)
-        if (portfolioDoc === null) {
+        if (portfolioDoc instanceof Portfolio === false) {
             console.log(`${portfolio.portfolioName} does not exist for userId: ${userId}`)
             return false
 
         }
-        assert(portfolioDoc !== null)
+        assert(portfolioDoc instanceof Portfolio)
         
         // check if holding exists
         if (!portfolioDoc.hasHolding(tcgplayerId)) {
@@ -307,8 +307,8 @@ RETURN
     The document if found, else null
 */
 interface IGetProductParameters {
-    tcgplayerId?: Number;
-    hexStringId?: String;    // 24 char hex string
+    tcgplayerId?: number;
+    hexStringId?: string;    // 24 char hex string
 }
 export async function getProduct(
     { tcgplayerId, hexStringId }: IGetProductParameters = {}
@@ -325,7 +325,7 @@ export async function getProduct(
 
     try {
 
-        const doc = tcgplayerId !== undefined 
+        const doc = Number.isInteger(tcgplayerId)
             ? await Product.findOne({ 'tcgplayerId': tcgplayerId })
             : await Product.findById(hexStringId);
         return doc
