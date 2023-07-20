@@ -10,7 +10,6 @@ import { IMPrice, priceSchema } from './models/priceSchema';
 import { IMProduct, productSchema } from './models/productSchema';
 import { transactionSchema } from './models/transactionSchema';
 import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
-import { isAssertEntry } from 'typescript';
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
@@ -33,58 +32,92 @@ const Transaction = mongoose.model('Transaction', transactionSchema);
 
 /*
 DESC
-    Adds a Holding to a Portfolio
+    Adds a Holding (or array of Holdings) to a Portfolio. Will only add all
+    Holdings or none (ie. if one Holding already exists)
 INPUT
     portfolio: The Portfolio to contain the holding
     holding: The Holding to add
 RETURN
-    TRUE if the Holding was successfully added to the Portfolio, FALSE otherwise
+    TRUE if all Holdings were successfully added to the Portfolio, FALSE otherwise
 */
-export async function addPortfolioHolding(
+export async function addPortfolioHoldings(
     portfolio: IPortfolio, 
-    holding: IHolding,
+    holdingInput: IHolding | IHolding[],
 ): Promise<boolean> {
 
     // connect to db
     await mongoose.connect(url)
 
+    const holdingsToAdd = Array.isArray(holdingInput)
+        ? holdingInput
+        : [holdingInput]
+
     const userId = portfolio.userId
     const portfolioName = portfolio.portfolioName
-    const tcgplayerId = holding.tcgplayerId
-    const transactions = holding.transactions
 
     try {
 
+        // check if empty holdings array was passed
+        if (holdingsToAdd.length === 0) {
+            console.log(`No holdings found to add`)
+            return false
+        }
+
+        // check if all holdings have unique tcgplayerId
+        const holdingTcgplayerIds = holdingsToAdd.map((holding: IHolding) => {
+            return holding.tcgplayerId
+        })
+        if (holdingTcgplayerIds.length > _.uniq(holdingTcgplayerIds).length) {
+            console.log(`Duplicate tcgplayerIds detected in: ${holdingsToAdd}`)
+            return false
+        }
+
         // check if portfolio exists
         const portfolioDoc = await getPortfolio(portfolio)
-        if (portfolioDoc === null) {
+        if (portfolioDoc instanceof Portfolio === false) {
             console.log(`${portfolioName} does not exist for userId: ${userId}`)
             return false
         }
-        assert(portfolioDoc !== null)
+        assert(portfolioDoc instanceof Portfolio)
  
-        // check if product exists
-        const productDoc = await getProduct({tcgplayerId: tcgplayerId})
-        if (productDoc === null) {
-            console.log(`Product not found for tcgplayerId: ${tcgplayerId}`)
+        // check if all products exist
+        const productDocs = await getProducts()
+        const productTcgplayerIds = productDocs.map((doc: IMProduct) => {
+            return doc.tcgplayerId
+        })
+        const unknownTcgplayerIds = _.difference(
+            holdingTcgplayerIds, productTcgplayerIds)
+
+        if (unknownTcgplayerIds.length > 0) {
+            console.log(`Product not found for tcgplayerIds: ${unknownTcgplayerIds}`)
             return false
         }
-        assert(productDoc !== null)
 
-        // check if holding already exists
-        const holdingExists = portfolioDoc.hasHolding(tcgplayerId)
-        if (holdingExists) {
-            console.log(`tcgplayerId: ${tcgplayerId} already exists in portfolio: (${userId}, ${portfolioName})`)
+        // check if any holding already exists
+        const portfolioTcgplayerIds = portfolioDoc.getHoldings().map(
+            (holding: IHolding) =>{ return holding.tcgplayerId })
+        const existingHoldings = _.intersection(
+            portfolioTcgplayerIds, holdingTcgplayerIds)
+
+        if (existingHoldings.length > 0) {
+            console.log(`Portoflio holdings exist for tcgplayerIds: ${existingHoldings}`)
             return false
-        } 
+        }
 
-        // add holding
-        portfolioDoc.addHolding({
-            product: productDoc._id,
-            tcgplayerId: tcgplayerId,
-            transactions: transactions
-        } as IMHolding)
+        // add holdings
+        holdingsToAdd.forEach((holding: IHolding) => {
+            const productDoc = productDocs.find((doc: IMProduct) => {
+                    return doc.tcgplayerId === holding.tcgplayerId
+                })
+                assert(productDoc instanceof Product)
 
+                portfolioDoc.addHolding({
+                    product: productDoc._id,
+                    tcgplayerId: holding.tcgplayerId,
+                    transactions: holding.transactions
+                } as IMHolding)
+        })
+        
         return true
         
     } catch(err) {
@@ -414,8 +447,8 @@ async function main(): Promise<number> {
 
     // const userId = 1234
     // const portfolioName = 'Cardboard'
-    // const holdings = [] as IMHolding[]
-    // const tcgplayerId = 233232
+    // let holdings = [] as IHolding[]
+    // let tcgplayerId = 233232
     // let res
 
     // // -- Add portfolio
@@ -448,13 +481,26 @@ async function main(): Promise<number> {
     //     }]
     // }
 
-    // res = await addPortfolioHolding(
+    // holdings = [
+    //     holding,
+    //     {
+    //         tcgplayerId: 233232,
+    //         transactions: [{
+    //             type: TransactionType.Purchase,
+    //             date: new Date(),
+    //             price: 4.99,
+    //             quantity: 100
+    //         }]
+    //     }        
+    // ]
+
+    // res = await addPortfolioHoldings(
     //     {
     //         userId: userId,
     //         portfolioName: portfolioName,
-    //         holdings: [],
+    //         holdings: holdings,
     //     },
-    //     holding
+    //     holdings
     // )
     // if (res) {
     //     console.log('Holding successfully added')
