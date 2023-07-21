@@ -121,7 +121,9 @@ export interface IPortfolio {
 }
 export interface IPortfolioMethods {
     addHolding(holding: IHolding): void;
+    addHoldings(holdingInput: IHolding | IHolding[]): void;
     deleteHolding(tcgplayerId: number): void;
+    deleteHoldings(): void;
     getHoldings(): IHolding[];
     getTotalCost(): number | undefined;
     getMarketValue(prices: Map<number, number>): number | undefined;

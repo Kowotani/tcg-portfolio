@@ -47,12 +47,28 @@ portfolioSchema.method('addHolding',
         this.save()
 });
 
+// add holdings
+portfolioSchema.method('addHoldings', 
+    function addHoldings(holdingInput: IMHolding | IMHolding[]): void {
+        Array.isArray(holdingInput)
+            ? this.holdings.concat(holdingInput)
+            : this.holdings.push(holdingInput)
+        this.save()
+});
+
 // delete holding
 portfolioSchema.method('deleteHolding',
     function deleteHolding(tcgplayerId: number): void {
         this.holdings = this.holdings.filter((holding: IMHolding) => {
             return holding.tcgplayerId !== tcgplayerId
         })
+        this.save()
+});
+
+// delete holding
+portfolioSchema.method('deleteHoldings',
+    function deleteHoldings(): void {
+        this.holdings = []
         this.save()
 });
 

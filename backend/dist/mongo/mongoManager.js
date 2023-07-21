@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -524,8 +520,8 @@ function main() {
         // } else {
         //     console.log('Product not updated')
         // }
-        const userId = 1234;
-        const portfolioName = 'Alpha Investments';
+        // const userId = 1234
+        // const portfolioName = 'Alpha Investments'
         // let holdings = [
         //     {
         //       tcgplayerId: 233232,
@@ -539,20 +535,19 @@ function main() {
         //       ]
         //     }
         //   ]
-        const portfolio = {
-            userId: userId,
-            portfolioName: portfolioName,
-            holdings: []
-        };
+        // const portfolio: IPortfolio = {
+        //     userId: userId, 
+        //     portfolioName: portfolioName,
+        //     holdings: []
+        // }
         // let tcgplayerId = 233232
         // // // -- Set portfolio holdings
-        res = yield setPortfolioHoldings(portfolio, []);
-        if (res) {
-            console.log('Portfolio holdings successfully updated');
-        }
-        else {
-            console.log('Portfolio holdings not updated');
-        }
+        // res = await setPortfolioHoldings(portfolio, [])
+        // if (res) {
+        //     console.log('Portfolio holdings successfully updated')
+        // } else {
+        //     console.log('Portfolio holdings not updated')
+        // }
         // // -- Add portfolio
         // res = await addPortfolio(userId, portfolioName, holdings)
         // if (res) {

@@ -288,7 +288,9 @@ export interface IPortfolioMethods {
 
     // CRUD transaction
     addHolding(holding: IHolding): void,
+    addHoldings(holdingInput: IHolding | IHolding[]): void,
     deleteHolding(tcgplayerId: number): void, 
+    deleteHoldings(): void,
 
     // getters
     getHoldings(): IHolding[],
