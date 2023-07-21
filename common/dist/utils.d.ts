@@ -100,7 +100,7 @@ export interface IHolding {
     transactions: ITransaction[];
 }
 export interface IHoldingMethods {
-    addTransaction(txn: ITransaction): void;
+    addTransactions(txnInput: ITransaction | ITransaction[]): void;
     deleteTransaction(id: string): void;
     getProduct(): IProduct;
     getTransactions(): ITransaction[];

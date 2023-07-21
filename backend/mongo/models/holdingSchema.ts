@@ -44,10 +44,12 @@ export const holdingSchema = new Schema<IMHolding, THoldingModel, IHoldingMethod
 
 // -- transactions
 
-// add transaction
-holdingSchema.method('addTransaction', 
-    function addTransaction(txn: ITransaction): void {
-        this.transactions.push(txn)
+// add transactions
+holdingSchema.method('addTransactions', 
+    function addTransactions(txnInput: ITransaction | ITransaction[]): void {
+        Array.isArray(txnInput)
+            ? this.transactions = this.transactions.concat(txnInput)
+            : this.transactions.push(txnInput)
         this.parent.save()
 });
 
