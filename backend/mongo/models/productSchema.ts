@@ -46,6 +46,7 @@ export const productSchema = new Schema<IMProduct>({
     },
     msrp: {
         type: Number,
+        min: 1,
         // required: true
     },
     subtype: {
