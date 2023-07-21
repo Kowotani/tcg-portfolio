@@ -323,6 +323,11 @@ export async function setPortfolioHoldings(
         portfolioDoc.holdings = []
         await portfolioDoc.save()
 
+        // check if there are any holdings to add
+        if (Array.isArray(holdingInput) && holdingInput.length === 0) {
+            return true
+        }
+
         // add all holdings
         const res = await addPortfolioHoldings(portfolio, holdingInput)
 
@@ -624,7 +629,7 @@ async function main(): Promise<number> {
     
     // let tcgplayerId = 233232
     
-    // // // -- Set portfolio
+    // // // -- Set portfolio holdings
 
     // res = await setPortfolioHoldings(portfolio, [])
     // if (res) {

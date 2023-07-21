@@ -45,7 +45,6 @@ const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
 const transactionSchema_1 = require("./models/transactionSchema");
-const common_2 = require("common");
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
@@ -304,6 +303,10 @@ function setPortfolioHoldings(portfolio, holdingInput) {
             // remove any existing holdings
             portfolioDoc.holdings = [];
             yield portfolioDoc.save();
+            // check if there are any holdings to add
+            if (Array.isArray(holdingInput) && holdingInput.length === 0) {
+                return true;
+            }
             // add all holdings
             const res = yield addPortfolioHoldings(portfolio, holdingInput);
             if (!res) {
@@ -523,32 +526,32 @@ function main() {
         // }
         const userId = 1234;
         const portfolioName = 'Alpha Investments';
-        let holdings = [
-            {
-                tcgplayerId: 233232,
-                transactions: [
-                    {
-                        type: common_2.TransactionType.Sale,
-                        date: new Date(),
-                        price: 4.56,
-                        quantity: 999,
-                    }
-                ]
-            }
-        ];
+        // let holdings = [
+        //     {
+        //       tcgplayerId: 233232,
+        //       transactions: [
+        //         {
+        //           type: TransactionType.Sale,
+        //           date: new Date(),
+        //           price: 4.56,
+        //           quantity: 999,
+        //         }
+        //       ]
+        //     }
+        //   ]
         const portfolio = {
             userId: userId,
             portfolioName: portfolioName,
             holdings: []
         };
         // let tcgplayerId = 233232
-        // // // -- Set portfolio
+        // // // -- Set portfolio holdings
         res = yield setPortfolioHoldings(portfolio, []);
         if (res) {
             console.log('Portfolio holdings successfully updated');
         }
         else {
-            console.log('Portfolio holdingsnot updated');
+            console.log('Portfolio holdings not updated');
         }
         // // -- Add portfolio
         // res = await addPortfolio(userId, portfolioName, holdings)
