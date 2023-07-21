@@ -41,6 +41,7 @@ const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
 const transactionSchema_1 = require("./models/transactionSchema");
+const common_2 = require("common");
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
@@ -113,17 +114,20 @@ function addPortfolioHoldings(portfolio, holdingInput) {
                 return false;
             }
             // add holdings
-            holdingsToAdd.forEach((holding) => {
+            const holdings = holdingsToAdd.map((holding) => {
+                // get product doc
                 const productDoc = productDocs.find((doc) => {
                     return doc.tcgplayerId === holding.tcgplayerId;
                 });
                 (0, common_1.assert)(productDoc instanceof Product);
-                portfolioDoc.addHolding({
+                return {
                     product: productDoc._id,
                     tcgplayerId: holding.tcgplayerId,
                     transactions: holding.transactions
-                });
+                };
             });
+            console.log(holdings);
+            portfolioDoc.addHoldings(holdings);
             return true;
         }
         catch (err) {
@@ -520,34 +524,46 @@ function main() {
         // } else {
         //     console.log('Product not updated')
         // }
-        // const userId = 1234
-        // const portfolioName = 'Alpha Investments'
-        // let holdings = [
-        //     {
-        //       tcgplayerId: 233232,
-        //       transactions: [
-        //         {
-        //           type: TransactionType.Sale,
-        //           date: new Date(),
-        //           price: 4.56,
-        //           quantity: 999,
-        //         }
-        //       ]
-        //     }
-        //   ]
-        // const portfolio: IPortfolio = {
-        //     userId: userId, 
-        //     portfolioName: portfolioName,
-        //     holdings: []
-        // }
+        const userId = 1234;
+        const portfolioName = 'Alpha Investments';
+        let holdings = [
+            {
+                tcgplayerId: 233232,
+                transactions: [
+                    {
+                        type: common_2.TransactionType.Sale,
+                        date: new Date(),
+                        price: 4.56,
+                        quantity: 999,
+                    }
+                ]
+            },
+            {
+                tcgplayerId: 449558,
+                transactions: [
+                    {
+                        type: common_2.TransactionType.Purchase,
+                        date: new Date(),
+                        price: 789,
+                        quantity: 10,
+                    }
+                ]
+            }
+        ];
+        const portfolio = {
+            userId: userId,
+            portfolioName: portfolioName,
+            holdings: []
+        };
         // let tcgplayerId = 233232
         // // // -- Set portfolio holdings
-        // res = await setPortfolioHoldings(portfolio, [])
-        // if (res) {
-        //     console.log('Portfolio holdings successfully updated')
-        // } else {
-        //     console.log('Portfolio holdings not updated')
-        // }
+        res = yield addPortfolioHoldings(portfolio, holdings);
+        if (res) {
+            console.log('Portfolio holdings successfully added');
+        }
+        else {
+            console.log('Portfolio holdings not added');
+        }
         // // -- Add portfolio
         // res = await addPortfolio(userId, portfolioName, holdings)
         // if (res) {

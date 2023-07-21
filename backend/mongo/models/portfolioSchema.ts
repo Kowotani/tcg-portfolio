@@ -40,18 +40,11 @@ export const portfolioSchema = new Schema<IMPortfolio, TPortfolioModel, IPortfol
 
 // -- holdings
 
-// add holding
-portfolioSchema.method('addHolding', 
-    function addHolding(holding: IMHolding): void {
-        this.holdings.push(holding)
-        this.save()
-});
-
 // add holdings
 portfolioSchema.method('addHoldings', 
     function addHoldings(holdingInput: IMHolding | IMHolding[]): void {
         Array.isArray(holdingInput)
-            ? this.holdings.concat(holdingInput)
+            ? this.holdings = this.holdings.concat(holdingInput)
             : this.holdings.push(holdingInput)
         this.save()
 });

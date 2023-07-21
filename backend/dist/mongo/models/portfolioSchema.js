@@ -44,15 +44,10 @@ exports.portfolioSchema = new mongoose_1.Schema({
 // methods
 // =======
 // -- holdings
-// add holding
-exports.portfolioSchema.method('addHolding', function addHolding(holding) {
-    this.holdings.push(holding);
-    this.save();
-});
 // add holdings
 exports.portfolioSchema.method('addHoldings', function addHoldings(holdingInput) {
     Array.isArray(holdingInput)
-        ? this.holdings.concat(holdingInput)
+        ? this.holdings = this.holdings.concat(holdingInput)
         : this.holdings.push(holdingInput);
     this.save();
 });

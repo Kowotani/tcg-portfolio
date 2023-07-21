@@ -105,19 +105,23 @@ export async function addPortfolioHoldings(
         }
 
         // add holdings
-        holdingsToAdd.forEach((holding: IHolding) => {
-            const productDoc = productDocs.find((doc: IMProduct) => {
-                    return doc.tcgplayerId === holding.tcgplayerId
-                })
-                assert(productDoc instanceof Product)
+        const holdings = holdingsToAdd.map((holding: IHolding) => {
 
-                portfolioDoc.addHolding({
-                    product: productDoc._id,
-                    tcgplayerId: holding.tcgplayerId,
-                    transactions: holding.transactions
-                } as IMHolding)
+            // get product doc
+            const productDoc = productDocs.find((doc: IMProduct) => {
+                return doc.tcgplayerId === holding.tcgplayerId
+            })
+            assert(productDoc instanceof Product)            
+
+            return {
+                product: productDoc._id,
+                tcgplayerId: holding.tcgplayerId,
+                transactions: holding.transactions
+            } as IMHolding
         })
-        
+        console.log(holdings)
+
+        portfolioDoc.addHoldings(holdings)
         return true
         
     } catch(err) {
@@ -605,38 +609,49 @@ async function main(): Promise<number> {
     //     console.log('Product not updated')
     // }
 
-    // const userId = 1234
-    // const portfolioName = 'Alpha Investments'
-    // let holdings = [
-    //     {
-    //       tcgplayerId: 233232,
-    //       transactions: [
-    //         {
-    //           type: TransactionType.Sale,
-    //           date: new Date(),
-    //           price: 4.56,
-    //           quantity: 999,
-    //         }
-    //       ]
-    //     }
-    //   ]
+    const userId = 1234
+    const portfolioName = 'Alpha Investments'
+    let holdings = [
+        {
+          tcgplayerId: 233232,
+          transactions: [
+            {
+              type: TransactionType.Sale,
+              date: new Date(),
+              price: 4.56,
+              quantity: 999,
+            }
+          ]
+        },
+        {
+            tcgplayerId: 449558,
+            transactions: [
+              {
+                type: TransactionType.Purchase,
+                date: new Date(),
+                price: 789,
+                quantity: 10,
+              }
+            ]
+          }
+      ]
   
-    // const portfolio: IPortfolio = {
-    //     userId: userId, 
-    //     portfolioName: portfolioName,
-    //     holdings: []
-    // }
+    const portfolio: IPortfolio = {
+        userId: userId, 
+        portfolioName: portfolioName,
+        holdings: []
+    }
     
     // let tcgplayerId = 233232
     
     // // // -- Set portfolio holdings
 
-    // res = await setPortfolioHoldings(portfolio, [])
-    // if (res) {
-    //     console.log('Portfolio holdings successfully updated')
-    // } else {
-    //     console.log('Portfolio holdings not updated')
-    // }
+    res = await addPortfolioHoldings(portfolio, holdings)
+    if (res) {
+        console.log('Portfolio holdings successfully added')
+    } else {
+        console.log('Portfolio holdings not added')
+    }
 
     // // -- Add portfolio
 

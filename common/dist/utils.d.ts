@@ -120,7 +120,6 @@ export interface IPortfolio {
     holdings: IHolding[];
 }
 export interface IPortfolioMethods {
-    addHolding(holding: IHolding): void;
     addHoldings(holdingInput: IHolding | IHolding[]): void;
     deleteHolding(tcgplayerId: number): void;
     deleteHoldings(): void;
