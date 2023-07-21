@@ -31,7 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertPrices = exports.setProductProperty = exports.insertProducts = exports.getProducts = exports.getProduct = exports.getPortfolio = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHoldings = void 0;
+exports.insertPrices = exports.setProductProperty = exports.insertProducts = exports.getProducts = exports.getProduct = exports.setPortfolioProperty = exports.getPortfolio = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHoldings = void 0;
 // imports
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
@@ -272,10 +272,48 @@ function getPortfolio(portfolio) {
             console.log(`An error occurred in getPortfolio(): ${err}`);
             return null;
         }
-        return null;
     });
 }
 exports.getPortfolio = getPortfolio;
+/*
+DESC
+    Sets a property on the specified Portfolio document to the input value.
+    NOTE: This _cannot_ set the holdings property, use setPortfolioHoldings()
+INPUT
+    portfolio: The Portfolio to update
+    key: The property name to set
+    value: The property value to set
+RETURN
+    TRUE if the property was successfully set, FALSE otherwise
+*/
+function setPortfolioProperty(portfolio, key, value) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        // check if holdings is trying to be set
+        if (key === 'holdings') {
+            console.log('setPortfolioProperty() cannot set the holdings property, use setPortfolioHoldings() instead');
+            return false;
+        }
+        try {
+            // check if Portfolio exists
+            const portfolioDoc = yield getPortfolio(portfolio);
+            if (portfolioDoc instanceof Portfolio === false) {
+                console.log(`Portfolio not found (${portfolio.userId}, ${portfolio.portfolioName})`);
+            }
+            (0, common_1.assert)(portfolioDoc instanceof Portfolio);
+            // update Portfolio
+            portfolioDoc.set(key, value);
+            yield portfolioDoc.save();
+            return true;
+        }
+        catch (err) {
+            console.log(`An error occurred in setPortfolioProperty(): ${err}`);
+            return false;
+        }
+    });
+}
+exports.setPortfolioProperty = setPortfolioProperty;
 function getProduct({ tcgplayerId, hexStringId } = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         // check that tcgplayer_id or id is provided
@@ -351,23 +389,22 @@ INPUT
     key: The property name to set
     value: The property value to set
 RETURN
-    The number of documents inserted
+    TRUE if the property was successfully set, FALSE otherwise
 */
 function setProductProperty(tcgplayerId, key, value) {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            // get Product
-            const product = yield getProduct({ tcgplayerId: tcgplayerId });
             // check if Product exists
-            if (product instanceof Product === false) {
+            const productDoc = yield getProduct({ tcgplayerId: tcgplayerId });
+            if (productDoc instanceof Product === false) {
                 console.log(`Product not found for tcgplayerId: ${tcgplayerId}`);
             }
-            (0, common_1.assert)(product instanceof Product);
+            (0, common_1.assert)(productDoc instanceof Product);
             // update Product
-            product.set(key, value);
-            yield product.save();
+            productDoc.set(key, value);
+            yield productDoc.save();
             return true;
         }
         catch (err) {
@@ -415,6 +452,7 @@ function insertPrices(docs) {
 exports.insertPrices = insertPrices;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
+        let res;
         // const product: IProduct = {
         //     tcgplayerId: 123,
         //     tcg: TCG.MagicTheGathering,
@@ -425,11 +463,6 @@ function main() {
         // }
         // const res = await insertProducts([product])
         // console.log(res)
-        // const userId = 1234
-        // const portfolioName = 'Cardboard'
-        // let holdings = [] as IHolding[]
-        // let tcgplayerId = 233232
-        // let res
         // // // -- Set Product
         // const key = 'msrp'
         // const value = 225
@@ -438,6 +471,37 @@ function main() {
         //     console.log(`Product (${tcgplayerId}) updated {${key}: ${value}}`)
         // } else {
         //     console.log('Product not updated')
+        // }
+        // const userId = 1234
+        // const portfolioName = 'Cardboard'
+        // let holdings = [
+        //     {
+        //       tcgplayerId: 194891,
+        //       product: ObjectId("64b0460410138e6973996b61"),
+        //       transactions: [
+        //         {
+        //           type: 'Purchase',
+        //           date: ISODate("2023-07-19T19:53:50.840Z"),
+        //           price: 1.23,
+        //           quantity: 1,
+        //           _id: ObjectId("64b83f4e3bcc9a8f660cb304")
+        //         }
+        //       ],
+        //       _id: ObjectId("64b83f4e3bcc9a8f660cb303")
+        //     }
+        //   ]
+        // const portfolio: IPortfolio = {
+        //     userId: userId, 
+        //     portfolioName: portfolioName,
+        //     holdings: []
+        // }
+        // let tcgplayerId = 233232
+        // // // -- Set portfolio
+        // res = await setPortfolioProperty(portfolio, 'holdings', [])
+        // if (res) {
+        //     console.log('Portfolio successfully updated')
+        // } else {
+        //     console.log('Portfolio not updated')
         // }
         // // -- Add portfolio
         // res = await addPortfolio(userId, portfolioName, holdings)

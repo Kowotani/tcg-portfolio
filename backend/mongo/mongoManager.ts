@@ -288,8 +288,54 @@ export async function getPortfolio(
         console.log(`An error occurred in getPortfolio(): ${err}`)
         return null
     } 
-    
-    return null;
+}
+
+/*
+DESC
+    Sets a property on the specified Portfolio document to the input value. 
+    NOTE: This _cannot_ set the holdings property, use setPortfolioHoldings()
+INPUT 
+    portfolio: The Portfolio to update
+    key: The property name to set
+    value: The property value to set
+RETURN
+    TRUE if the property was successfully set, FALSE otherwise
+*/
+export async function setPortfolioProperty(
+    portfolio: IPortfolio,
+    key: string,
+    value: any
+): Promise<boolean> {
+
+    // connect to db
+    await mongoose.connect(url)
+
+    // check if holdings is trying to be set
+    if (key === 'holdings') {
+        console.log('setPortfolioProperty() cannot set the holdings property, use setPortfolioHoldings() instead')
+        return false
+    }
+
+    try {
+
+        // check if Portfolio exists
+        const portfolioDoc = await getPortfolio(portfolio)
+        if (portfolioDoc instanceof Portfolio === false) {
+            console.log(`Portfolio not found (${portfolio.userId}, ${portfolio.portfolioName})`)
+        }
+        assert(portfolioDoc instanceof Portfolio)
+
+        // update Portfolio
+        portfolioDoc.set(key, value)
+        await portfolioDoc.save()
+
+        return true
+
+    } catch(err) {
+
+        console.log(`An error occurred in setPortfolioProperty(): ${err}`);
+        return false
+    }
 }
 
 
@@ -395,7 +441,7 @@ INPUT
     key: The property name to set
     value: The property value to set
 RETURN
-    The number of documents inserted
+    TRUE if the property was successfully set, FALSE otherwise
 */
 export async function setProductProperty(
     tcgplayerId: number,
@@ -408,18 +454,16 @@ export async function setProductProperty(
 
     try {
 
-        // get Product
-        const product = await getProduct({tcgplayerId: tcgplayerId})
-
         // check if Product exists
-        if (product instanceof Product === false) {
+        const productDoc = await getProduct({tcgplayerId: tcgplayerId})
+        if (productDoc instanceof Product === false) {
             console.log(`Product not found for tcgplayerId: ${tcgplayerId}`)
         }
-        assert(product instanceof Product)
+        assert(productDoc instanceof Product)
 
         // update Product
-        product.set(key, value)
-        await product.save()
+        productDoc.set(key, value)
+        await productDoc.save()
 
         return true
 
@@ -477,6 +521,8 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
 
 async function main(): Promise<number> {
 
+    let res
+
     // const product: IProduct = {
     //     tcgplayerId: 123,
     //     tcg: TCG.MagicTheGathering,
@@ -489,12 +535,6 @@ async function main(): Promise<number> {
     // const res = await insertProducts([product])
     // console.log(res)
 
-    // const userId = 1234
-    // const portfolioName = 'Cardboard'
-    // let holdings = [] as IHolding[]
-    // let tcgplayerId = 233232
-    // let res
-
     // // // -- Set Product
     // const key = 'msrp'
     // const value = 225
@@ -504,6 +544,42 @@ async function main(): Promise<number> {
     //     console.log(`Product (${tcgplayerId}) updated {${key}: ${value}}`)
     // } else {
     //     console.log('Product not updated')
+    // }
+
+    // const userId = 1234
+    // const portfolioName = 'Cardboard'
+    // let holdings = [
+    //     {
+    //       tcgplayerId: 194891,
+    //       product: ObjectId("64b0460410138e6973996b61"),
+    //       transactions: [
+    //         {
+    //           type: 'Purchase',
+    //           date: ISODate("2023-07-19T19:53:50.840Z"),
+    //           price: 1.23,
+    //           quantity: 1,
+    //           _id: ObjectId("64b83f4e3bcc9a8f660cb304")
+    //         }
+    //       ],
+    //       _id: ObjectId("64b83f4e3bcc9a8f660cb303")
+    //     }
+    //   ]
+  
+    // const portfolio: IPortfolio = {
+    //     userId: userId, 
+    //     portfolioName: portfolioName,
+    //     holdings: []
+    // }
+    
+    // let tcgplayerId = 233232
+    
+    // // // -- Set portfolio
+
+    // res = await setPortfolioProperty(portfolio, 'holdings', [])
+    // if (res) {
+    //     console.log('Portfolio successfully updated')
+    // } else {
+    //     console.log('Portfolio not updated')
     // }
 
     // // -- Add portfolio
