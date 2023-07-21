@@ -9,7 +9,7 @@ import { IMPortfolio, portfolioSchema } from './models/portfolioSchema';
 import { IMPrice, priceSchema } from './models/priceSchema';
 import { IMProduct, productSchema } from './models/productSchema';
 import { transactionSchema } from './models/transactionSchema';
-// import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
+import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
@@ -292,6 +292,60 @@ export async function getPortfolio(
 
 /*
 DESC
+    Sets a Portfolio's holdings to the provided input
+INPUT 
+    portfolio: The Portfolio to update
+    holdings: An array of IHolding
+RETURN
+    TRUE if the holdings were successfully set, FALSE otherwise
+*/
+export async function setPortfolioHoldings(
+    portfolio: IPortfolio,
+    holdingInput: IHolding | IHolding[]
+): Promise<boolean> {
+
+    // connect to db
+    await mongoose.connect(url)
+
+    try {
+
+        // check if Portfolio exists
+        const portfolioDoc = await getPortfolio(portfolio)
+        if (portfolioDoc instanceof Portfolio === false) {
+            console.log(`Portfolio not found (${portfolio.userId}, ${portfolio.portfolioName})`)
+        }
+        assert(portfolioDoc instanceof Portfolio)
+
+        // back up existing holdings
+        const existingHoldings = portfolioDoc.holdings
+
+        // remove any existing holdings
+        portfolioDoc.holdings = []
+        await portfolioDoc.save()
+
+        // add all holdings
+        const res = await addPortfolioHoldings(portfolio, holdingInput)
+
+        if (!res) {
+            console.log('addPortfolioHoldings() failed in setPortfolioHoldings()')
+            portfolioDoc.holdings = existingHoldings
+            await portfolioDoc.save()
+            return false
+
+        } else {
+            await portfolioDoc.save()
+            return true
+        }
+
+    } catch(err) {
+
+        console.log(`An error occurred in setPortfolioHoldings(): ${err}`);
+        return false
+    }    
+}
+
+/*
+DESC
     Sets a property on the specified Portfolio document to the input value. 
     NOTE: This _cannot_ set the holdings property, use setPortfolioHoldings()
 INPUT 
@@ -547,21 +601,18 @@ async function main(): Promise<number> {
     // }
 
     // const userId = 1234
-    // const portfolioName = 'Cardboard'
+    // const portfolioName = 'Alpha Investments'
     // let holdings = [
     //     {
-    //       tcgplayerId: 194891,
-    //       product: ObjectId("64b0460410138e6973996b61"),
+    //       tcgplayerId: 233232,
     //       transactions: [
     //         {
-    //           type: 'Purchase',
-    //           date: ISODate("2023-07-19T19:53:50.840Z"),
-    //           price: 1.23,
-    //           quantity: 1,
-    //           _id: ObjectId("64b83f4e3bcc9a8f660cb304")
+    //           type: TransactionType.Sale,
+    //           date: new Date(),
+    //           price: 4.56,
+    //           quantity: 999,
     //         }
-    //       ],
-    //       _id: ObjectId("64b83f4e3bcc9a8f660cb303")
+    //       ]
     //     }
     //   ]
   
@@ -575,11 +626,11 @@ async function main(): Promise<number> {
     
     // // // -- Set portfolio
 
-    // res = await setPortfolioProperty(portfolio, 'holdings', [])
+    // res = await setPortfolioHoldings(portfolio, [])
     // if (res) {
-    //     console.log('Portfolio successfully updated')
+    //     console.log('Portfolio holdings successfully updated')
     // } else {
-    //     console.log('Portfolio not updated')
+    //     console.log('Portfolio holdings not updated')
     // }
 
     // // -- Add portfolio

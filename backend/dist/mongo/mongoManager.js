@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -31,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertPrices = exports.setProductProperty = exports.insertProducts = exports.getProducts = exports.getProduct = exports.setPortfolioProperty = exports.getPortfolio = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHoldings = void 0;
+exports.insertPrices = exports.setProductProperty = exports.insertProducts = exports.getProducts = exports.getProduct = exports.setPortfolioProperty = exports.setPortfolioHoldings = exports.getPortfolio = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHoldings = void 0;
 // imports
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
@@ -41,7 +45,7 @@ const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
 const transactionSchema_1 = require("./models/transactionSchema");
-// import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
+const common_2 = require("common");
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
@@ -277,6 +281,51 @@ function getPortfolio(portfolio) {
 exports.getPortfolio = getPortfolio;
 /*
 DESC
+    Sets a Portfolio's holdings to the provided input
+INPUT
+    portfolio: The Portfolio to update
+    holdings: An array of IHolding
+RETURN
+    TRUE if the holdings were successfully set, FALSE otherwise
+*/
+function setPortfolioHoldings(portfolio, holdingInput) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            // check if Portfolio exists
+            const portfolioDoc = yield getPortfolio(portfolio);
+            if (portfolioDoc instanceof Portfolio === false) {
+                console.log(`Portfolio not found (${portfolio.userId}, ${portfolio.portfolioName})`);
+            }
+            (0, common_1.assert)(portfolioDoc instanceof Portfolio);
+            // back up existing holdings
+            const existingHoldings = portfolioDoc.holdings;
+            // remove any existing holdings
+            portfolioDoc.holdings = [];
+            yield portfolioDoc.save();
+            // add all holdings
+            const res = yield addPortfolioHoldings(portfolio, holdingInput);
+            if (!res) {
+                console.log('addPortfolioHoldings() failed in setPortfolioHoldings()');
+                portfolioDoc.holdings = existingHoldings;
+                yield portfolioDoc.save();
+                return false;
+            }
+            else {
+                yield portfolioDoc.save();
+                return true;
+            }
+        }
+        catch (err) {
+            console.log(`An error occurred in setPortfolioHoldings(): ${err}`);
+            return false;
+        }
+    });
+}
+exports.setPortfolioHoldings = setPortfolioHoldings;
+/*
+DESC
     Sets a property on the specified Portfolio document to the input value.
     NOTE: This _cannot_ set the holdings property, use setPortfolioHoldings()
 INPUT
@@ -472,37 +521,35 @@ function main() {
         // } else {
         //     console.log('Product not updated')
         // }
-        // const userId = 1234
-        // const portfolioName = 'Cardboard'
-        // let holdings = [
-        //     {
-        //       tcgplayerId: 194891,
-        //       product: ObjectId("64b0460410138e6973996b61"),
-        //       transactions: [
-        //         {
-        //           type: 'Purchase',
-        //           date: ISODate("2023-07-19T19:53:50.840Z"),
-        //           price: 1.23,
-        //           quantity: 1,
-        //           _id: ObjectId("64b83f4e3bcc9a8f660cb304")
-        //         }
-        //       ],
-        //       _id: ObjectId("64b83f4e3bcc9a8f660cb303")
-        //     }
-        //   ]
-        // const portfolio: IPortfolio = {
-        //     userId: userId, 
-        //     portfolioName: portfolioName,
-        //     holdings: []
-        // }
+        const userId = 1234;
+        const portfolioName = 'Alpha Investments';
+        let holdings = [
+            {
+                tcgplayerId: 233232,
+                transactions: [
+                    {
+                        type: common_2.TransactionType.Sale,
+                        date: new Date(),
+                        price: 4.56,
+                        quantity: 999,
+                    }
+                ]
+            }
+        ];
+        const portfolio = {
+            userId: userId,
+            portfolioName: portfolioName,
+            holdings: []
+        };
         // let tcgplayerId = 233232
         // // // -- Set portfolio
-        // res = await setPortfolioProperty(portfolio, 'holdings', [])
-        // if (res) {
-        //     console.log('Portfolio successfully updated')
-        // } else {
-        //     console.log('Portfolio not updated')
-        // }
+        res = yield setPortfolioHoldings(portfolio, []);
+        if (res) {
+            console.log('Portfolio holdings successfully updated');
+        }
+        else {
+            console.log('Portfolio holdingsnot updated');
+        }
         // // -- Add portfolio
         // res = await addPortfolio(userId, portfolioName, holdings)
         // if (res) {
