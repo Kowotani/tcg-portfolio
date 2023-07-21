@@ -9,7 +9,7 @@ import { IMPortfolio, portfolioSchema } from './models/portfolioSchema';
 import { IMPrice, priceSchema } from './models/priceSchema';
 import { IMProduct, productSchema } from './models/productSchema';
 import { transactionSchema } from './models/transactionSchema';
-import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
+// import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
@@ -386,6 +386,50 @@ export async function insertProducts(docs: IProduct[]): Promise<number> {
     }
 }
 
+/*
+DESC
+    Sets a property on a Product document to the input value using the
+    tcgplayerId to find the Product
+INPUT 
+    tcgplayerId: TCGPlayerId identifying the product
+    key: The property name to set
+    value: The property value to set
+RETURN
+    The number of documents inserted
+*/
+export async function setProductProperty(
+    tcgplayerId: number,
+    key: string,
+    value: any
+): Promise<boolean> {
+    
+    // connect to db
+    await mongoose.connect(url)
+
+    try {
+
+        // get Product
+        const product = await getProduct({tcgplayerId: tcgplayerId})
+
+        // check if Product exists
+        if (product instanceof Product === false) {
+            console.log(`Product not found for tcgplayerId: ${tcgplayerId}`)
+        }
+        assert(product instanceof Product)
+
+        // update Product
+        product.set(key, value)
+        await product.save()
+
+        return true
+
+    } catch(err) {
+
+        console.log(`An error occurred in setProductProperty(): ${err}`);
+        return false
+    }
+}
+
 
 // -----
 // Price
@@ -450,6 +494,17 @@ async function main(): Promise<number> {
     // let holdings = [] as IHolding[]
     // let tcgplayerId = 233232
     // let res
+
+    // // // -- Set Product
+    // const key = 'msrp'
+    // const value = 225
+
+    // res = await setProductProperty(tcgplayerId, key, value)
+    // if (res) {
+    //     console.log(`Product (${tcgplayerId}) updated {${key}: ${value}}`)
+    // } else {
+    //     console.log('Product not updated')
+    // }
 
     // // -- Add portfolio
 

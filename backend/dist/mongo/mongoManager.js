@@ -31,7 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertPrices = exports.insertProducts = exports.getProducts = exports.getProduct = exports.getPortfolio = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHoldings = void 0;
+exports.insertPrices = exports.setProductProperty = exports.insertProducts = exports.getProducts = exports.getProduct = exports.getPortfolio = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHoldings = void 0;
 // imports
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
@@ -41,6 +41,7 @@ const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
 const transactionSchema_1 = require("./models/transactionSchema");
+// import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
@@ -341,6 +342,41 @@ function insertProducts(docs) {
     });
 }
 exports.insertProducts = insertProducts;
+/*
+DESC
+    Sets a property on a Product document to the input value using the
+    tcgplayerId to find the Product
+INPUT
+    tcgplayerId: TCGPlayerId identifying the product
+    key: The property name to set
+    value: The property value to set
+RETURN
+    The number of documents inserted
+*/
+function setProductProperty(tcgplayerId, key, value) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            // get Product
+            const product = yield getProduct({ tcgplayerId: tcgplayerId });
+            // check if Product exists
+            if (product instanceof Product === false) {
+                console.log(`Product not found for tcgplayerId: ${tcgplayerId}`);
+            }
+            (0, common_1.assert)(product instanceof Product);
+            // update Product
+            product.set(key, value);
+            yield product.save();
+            return true;
+        }
+        catch (err) {
+            console.log(`An error occurred in setProductProperty(): ${err}`);
+            return false;
+        }
+    });
+}
+exports.setProductProperty = setProductProperty;
 // -----
 // Price
 // -----
@@ -394,6 +430,15 @@ function main() {
         // let holdings = [] as IHolding[]
         // let tcgplayerId = 233232
         // let res
+        // // // -- Set Product
+        // const key = 'msrp'
+        // const value = 225
+        // res = await setProductProperty(tcgplayerId, key, value)
+        // if (res) {
+        //     console.log(`Product (${tcgplayerId}) updated {${key}: ${value}}`)
+        // } else {
+        //     console.log('Product not updated')
+        // }
         // // -- Add portfolio
         // res = await addPortfolio(userId, portfolioName, holdings)
         // if (res) {
