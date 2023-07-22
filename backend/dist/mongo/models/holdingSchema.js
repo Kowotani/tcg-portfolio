@@ -46,9 +46,11 @@ exports.holdingSchema = new mongoose_1.Schema({
 // methods
 // =======
 // -- transactions
-// add transaction
-exports.holdingSchema.method('addTransaction', function addTransaction(txn) {
-    this.transactions.push(txn);
+// add transactions
+exports.holdingSchema.method('addTransactions', function addTransactions(txnInput) {
+    Array.isArray(txnInput)
+        ? this.transactions = this.transactions.concat(txnInput)
+        : this.transactions.push(txnInput);
     this.parent.save();
 });
 // delete transaction

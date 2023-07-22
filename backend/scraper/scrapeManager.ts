@@ -10,72 +10,74 @@ import { IPrice, IPriceData, TimeseriesGranularity } from 'common';
 
 /*
 DESC
-    Loads price data for all known products
+  Loads price data for all known products
+RETURN
+  The number of Price documents inserted
 */
 async function loadPrices(): Promise<number> {
 
-    // get all Products
-    const productDocs = await getProducts();
-    console.log(`Retrieved prods: ${JSON.stringify(productDocs, null, 4)}`);
+  // get all Products
+  const productDocs = await getProducts();
+  console.log(`Retrieved prods: ${JSON.stringify(productDocs, null, 4)}`);
 
-    // scrape price data
-    const tcgplayerIds = productDocs.map( doc => doc.tcgplayerId );
-    const scrapedPrices = await scrape(tcgplayerIds);
+  // scrape price data
+  const tcgplayerIds = productDocs.map( doc => doc.tcgplayerId );
+  const scrapedPrices = await scrape(tcgplayerIds);
 
-    // insert price data
-    let priceDate = new Date();
-    priceDate.setMinutes(0,0,0);
+  // insert price data
+  let priceDate = new Date();
+  priceDate.setMinutes(0,0,0);
 
-    let priceDocs: IPrice[] = [];
+  let priceDocs: IPrice[] = [];
 
-    // iterate through each Product
-    for (const productDoc of productDocs) {
+  // iterate through each Product
+  for (const productDoc of productDocs) {
 
-        const tcgplayerId = productDoc.tcgplayerId;
+    const tcgplayerId = productDoc.tcgplayerId;
 
-        // get price data
-        const priceData = scrapedPrices.get(tcgplayerId)
+    // get price data
+    const priceData = scrapedPrices.get(tcgplayerId)
 
-        // handle products without price data
-        if (priceData === undefined) {
+    // handle products without price data
+    if (priceData === undefined) {
 
-            console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
+      console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
 
-        // construct IPrice object
-        } else {
+    // construct IPrice object
+    } else {
 
-            let prices: IPriceData = {
-                marketPrice: priceData.marketPrice
-            }
+      let prices: IPriceData = {
+        marketPrice: priceData.marketPrice
+      }
 
-            if (priceData.buylistMarketPrice !== null) {
-                prices.buylistMarketPrice = priceData.buylistMarketPrice;
-            }
+      if (priceData.buylistMarketPrice !== null) {
+        prices.buylistMarketPrice = priceData.buylistMarketPrice;
+      }
 
-            if (priceData.listedMedianPrice !== null) {
-                prices.listedMedianPrice = priceData.listedMedianPrice;
-            }
+      if (priceData.listedMedianPrice !== null) {
+        prices.listedMedianPrice = priceData.listedMedianPrice;
+      }
 
-            const price: IPrice = {
-                priceDate: priceDate,
-                tcgplayerId: tcgplayerId,
-                granularity: TimeseriesGranularity.Hours,
-                prices: prices
-            }; 
+      const price: IPrice = {
+        priceDate: priceDate,
+        tcgplayerId: tcgplayerId,
+        granularity: TimeseriesGranularity.Hours,
+        prices: prices
+      }; 
 
-            priceDocs.push(price);
-        }        
-    }
-    // console.log(JSON.stringify(priceDocs, null, 4));
-    const numInserted = await insertPrices(priceDocs);
-    return numInserted;
+      priceDocs.push(price);
+    }    
+  }
+  // console.log(JSON.stringify(priceDocs, null, 4));
+  const numInserted = await insertPrices(priceDocs);
+  return numInserted;
 }
 
 async function main() {
-    const numInserted = await loadPrices();
-    console.log(`Inserted ${numInserted} docs`);
+  const numInserted = await loadPrices();
+  console.log(`Inserted ${numInserted} docs`);
 }
 
 main()
-    .then(console.log)
-    .catch(console.error);
+  .then(console.log)
+  .catch(console.error);

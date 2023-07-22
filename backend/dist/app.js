@@ -30,14 +30,14 @@ app.get('/', (req, res) => {
 /*
 DESC: handle request to add a product
 INPUT: request body in multipart/form-data containing
-    tcgplayerId - the TCGplayer product id
-    releaseDate - product release date in YYYY-MM-DD format
-    name - product name
-    type - ProductType enum
-    language - ProductLanguage enum
-    subtype [OPTIONAL] - ProductSubType enum
-    setCode [OPTIONAL] - product set code
-    
+  tcgplayerId - the TCGplayer product id
+  releaseDate - product release date in YYYY-MM-DD format
+  name - product name
+  type - ProductType enum
+  language - ProductLanguage enum
+  subtype [OPTIONAL] - ProductSubType enum
+  setCode [OPTIONAL] - product set code
+  
 */
 app.post('/product', upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // variables

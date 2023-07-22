@@ -18,7 +18,9 @@ const common_1 = require("common");
 // ==============
 /*
 DESC
-    Loads price data for all known products
+  Loads price data for all known products
+RETURN
+  The number of Price documents inserted
 */
 function loadPrices() {
     return __awaiter(this, void 0, void 0, function* () {

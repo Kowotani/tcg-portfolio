@@ -15,11 +15,11 @@ const browser_1 = require("./browser");
 const common_1 = require("common");
 /*
 DESC
-    Scrapes price data for the input tcgplayerIds
+  Scrapes price data for the input tcgplayerIds
 INPUT
-    Array of tcgplayerIds
+  Array of tcgplayerIds
 RETURN
-    Array of IProductPriceData objects
+  Array of IProductPriceData objects
 */
 function scrape(ids) {
     return __awaiter(this, void 0, void 0, function* () {

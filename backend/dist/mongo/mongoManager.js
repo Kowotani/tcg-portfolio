@@ -36,20 +36,16 @@ exports.insertPrices = exports.setProductProperty = exports.insertProducts = exp
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const holdingSchema_1 = require("./models/holdingSchema");
 const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
-const transactionSchema_1 = require("./models/transactionSchema");
-const common_2 = require("common");
+// import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
-const Holding = mongoose_1.default.model('Holding', holdingSchema_1.holdingSchema);
 const Portfolio = mongoose_1.default.model('Portfolio', portfolioSchema_1.portfolioSchema);
 const Product = mongoose_1.default.model('Product', productSchema_1.productSchema);
 const Price = mongoose_1.default.model('Price', priceSchema_1.priceSchema);
-const Transaction = mongoose_1.default.model('Transaction', transactionSchema_1.transactionSchema);
 // =========
 // functions
 // =========
@@ -58,13 +54,13 @@ const Transaction = mongoose_1.default.model('Transaction', transactionSchema_1.
 // ---------
 /*
 DESC
-    Adds a Holding (or array of Holdings) to a Portfolio. Will only add all
-    Holdings or none (ie. if one Holding already exists)
+  Adds a Holding (or array of Holdings) to a Portfolio. Will only add all
+  Holdings or none (ie. if one Holding already exists)
 INPUT
-    portfolio: The Portfolio to contain the holding
-    holding: The Holding to add
+  portfolio: The Portfolio to contain the holding
+  holding: The Holding to add
 RETURN
-    TRUE if all Holdings were successfully added to the Portfolio, FALSE otherwise
+  TRUE if all Holdings were successfully added to the Portfolio, FALSE otherwise
 */
 function addPortfolioHoldings(portfolio, holdingInput) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -139,13 +135,13 @@ function addPortfolioHoldings(portfolio, holdingInput) {
 exports.addPortfolioHoldings = addPortfolioHoldings;
 /*
 DESC
-    Adds a Portfolio based on the given inputs
+  Adds a Portfolio based on the given inputs
 INPUT
-    userId: The associated userId
-    portfolioName: The portfolio's name
-    holdings: An array of Holdings
+  userId: The associated userId
+  portfolioName: The portfolio's name
+  holdings: An array of Holdings
 RETURN
-    TRUE if the Portfolio was successfully created, FALSE otherwise
+  TRUE if the Portfolio was successfully created, FALSE otherwise
 */
 function addPortfolio(portfolio) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -161,7 +157,7 @@ function addPortfolio(portfolio) {
                 console.log(`${portfolioName} already exists for userId: ${userId}`);
                 return false;
             }
-            // create the portfolio    
+            // create the portfolio  
             yield Portfolio.create({
                 userId,
                 portfolioName,
@@ -178,12 +174,12 @@ function addPortfolio(portfolio) {
 exports.addPortfolio = addPortfolio;
 /*
 DESC
-    Deletes the Portfolio document by userId and portfolioName
+  Deletes the Portfolio document by userId and portfolioName
 INPUT
-    userId: The associated userId
-    portfolioName: The portfolio's name
+  userId: The associated userId
+  portfolioName: The portfolio's name
 RETURN
-    TRUE if the Portfolio was successfully created, FALSE otherwise
+  TRUE if the Portfolio was successfully created, FALSE otherwise
 */
 function deletePortfolio(portfolio) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -198,7 +194,7 @@ function deletePortfolio(portfolio) {
                 console.log(`${portfolioName} does not exist for userId: ${userId}`);
                 return false;
             }
-            // delete the portfolio    
+            // delete the portfolio  
             const res = yield Portfolio.deleteOne({
                 'userId': userId,
                 'portfolioName': portfolioName,
@@ -214,12 +210,12 @@ function deletePortfolio(portfolio) {
 exports.deletePortfolio = deletePortfolio;
 /*
 DESC
-    Deletes the Holding for the input tcgplayerId from the input Portfolio
+  Deletes the Holding for the input tcgplayerId from the input Portfolio
 INPUT
-    portfolio: The Portfolio to contain the holding
-    tcgplayerId: The tcgplayerId of the Holding to delete
+  portfolio: The Portfolio to contain the holding
+  tcgplayerId: The tcgplayerId of the Holding to delete
 RETURN
-    TRUE if the Holding was successfully deleted from the Portfolio, FALSE otherwise
+  TRUE if the Holding was successfully deleted from the Portfolio, FALSE otherwise
 */
 function deletePortfolioHolding(portfolio, tcgplayerId) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -253,12 +249,12 @@ function deletePortfolioHolding(portfolio, tcgplayerId) {
 exports.deletePortfolioHolding = deletePortfolioHolding;
 /*
 DESC
-    Retrieves the Portfolio document by userId and portfolioName
+  Retrieves the Portfolio document by userId and portfolioName
 INPUT
-    userId: The associated userId
-    portfolioName: The portfolio's name
+  userId: The associated userId
+  portfolioName: The portfolio's name
 RETURN
-    The document if found, else null
+  The document if found, else null
 */
 function getPortfolio(portfolio) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -280,12 +276,12 @@ function getPortfolio(portfolio) {
 exports.getPortfolio = getPortfolio;
 /*
 DESC
-    Sets a Portfolio's holdings to the provided input
+  Sets a Portfolio's holdings to the provided input
 INPUT
-    portfolio: The Portfolio to update
-    holdings: An array of IHolding
+  portfolio: The Portfolio to update
+  holdings: An array of IHolding
 RETURN
-    TRUE if the holdings were successfully set, FALSE otherwise
+  TRUE if the holdings were successfully set, FALSE otherwise
 */
 function setPortfolioHoldings(portfolio, holdingInput) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -329,14 +325,14 @@ function setPortfolioHoldings(portfolio, holdingInput) {
 exports.setPortfolioHoldings = setPortfolioHoldings;
 /*
 DESC
-    Sets a property on the specified Portfolio document to the input value.
-    NOTE: This _cannot_ set the holdings property, use setPortfolioHoldings()
+  Sets a property on the specified Portfolio document to the input value.
+  NOTE: This _cannot_ set the holdings property, use setPortfolioHoldings()
 INPUT
-    portfolio: The Portfolio to update
-    key: The property name to set
-    value: The property value to set
+  portfolio: The Portfolio to update
+  key: The property name to set
+  value: The property value to set
 RETURN
-    TRUE if the property was successfully set, FALSE otherwise
+  TRUE if the property was successfully set, FALSE otherwise
 */
 function setPortfolioProperty(portfolio, key, value) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -390,9 +386,9 @@ function getProduct({ tcgplayerId, hexStringId } = {}) {
 exports.getProduct = getProduct;
 /*
 DESC
-    Returns all Products
+  Returns all Products
 RETURN
-    Array of Product docs
+  Array of Product docs
 */
 function getProducts() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -411,11 +407,11 @@ function getProducts() {
 exports.getProducts = getProducts;
 /*
 DESC
-    Constructs Price documents from the input data and inserts them
+  Constructs Price documents from the input data and inserts them
 INPUT
-    An array of IProducts
+  An array of IProducts
 RETURN
-    The number of documents inserted
+  The number of documents inserted
 */
 function insertProducts(docs) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -434,14 +430,14 @@ function insertProducts(docs) {
 exports.insertProducts = insertProducts;
 /*
 DESC
-    Sets a property on a Product document to the input value using the
-    tcgplayerId to find the Product
+  Sets a property on a Product document to the input value using the
+  tcgplayerId to find the Product
 INPUT
-    tcgplayerId: TCGPlayerId identifying the product
-    key: The property name to set
-    value: The property value to set
+  tcgplayerId: TCGPlayerId identifying the product
+  key: The property name to set
+  value: The property value to set
 RETURN
-    TRUE if the property was successfully set, FALSE otherwise
+  TRUE if the property was successfully set, FALSE otherwise
 */
 function setProductProperty(tcgplayerId, key, value) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -471,11 +467,11 @@ exports.setProductProperty = setProductProperty;
 // -----
 /*
 DESC
-    Constructs Price documents from the input data and inserts them
+  Constructs Price documents from the input data and inserts them
 INPUT
-    An array of IPrices
+  An array of IPrices
 RETURN
-    The number of documents inserted
+  The number of documents inserted
 */
 function insertPrices(docs) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -506,12 +502,12 @@ function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let res;
         // const product: IProduct = {
-        //     tcgplayerId: 123,
-        //     tcg: TCG.MagicTheGathering,
-        //     releaseDate: new Date(),
-        //     name: 'Foo',
-        //     type: ProductType.BoosterBox,
-        //     language: ProductLanguage.Japanese,
+        //   tcgplayerId: 123,
+        //   tcg: TCG.MagicTheGathering,
+        //   releaseDate: new Date(),
+        //   name: 'Foo',
+        //   type: ProductType.BoosterBox,
+        //   language: ProductLanguage.Japanese,
         // }
         // const res = await insertProducts([product])
         // console.log(res)
@@ -520,112 +516,111 @@ function main() {
         // const value = 225
         // res = await setProductProperty(tcgplayerId, key, value)
         // if (res) {
-        //     console.log(`Product (${tcgplayerId}) updated {${key}: ${value}}`)
+        //   console.log(`Product (${tcgplayerId}) updated {${key}: ${value}}`)
         // } else {
-        //     console.log('Product not updated')
+        //   console.log('Product not updated')
         // }
-        const userId = 1234;
-        const portfolioName = 'Alpha Investments';
-        let holdings = [
-            {
-                tcgplayerId: 233232,
-                transactions: [
-                    {
-                        type: common_2.TransactionType.Sale,
-                        date: new Date(),
-                        price: 4.56,
-                        quantity: 999,
-                    }
-                ]
-            },
-            {
-                tcgplayerId: 449558,
-                transactions: [
-                    {
-                        type: common_2.TransactionType.Purchase,
-                        date: new Date(),
-                        price: 789,
-                        quantity: 10,
-                    }
-                ]
-            }
-        ];
-        const portfolio = {
-            userId: userId,
-            portfolioName: portfolioName,
-            holdings: []
-        };
+        // const userId = 1234
+        // const portfolioName = 'Alpha Investments'
+        // let holdings = [
+        //   {
+        //     tcgplayerId: 233232,
+        //     transactions: [
+        //     {
+        //       type: TransactionType.Sale,
+        //       date: new Date(),
+        //       price: 4.56,
+        //       quantity: 999,
+        //     }
+        //     ]
+        //   },
+        //   {
+        //     tcgplayerId: 449558,
+        //     transactions: [
+        //       {
+        //       type: TransactionType.Purchase,
+        //       date: new Date(),
+        //       price: 789,
+        //       quantity: 10,
+        //       }
+        //     ]
+        //     }
+        //   ]
+        // const portfolio: IPortfolio = {
+        //   userId: userId, 
+        //   portfolioName: portfolioName,
+        //   holdings: []
+        // }
         // let tcgplayerId = 233232
         // // // -- Set portfolio holdings
-        res = yield addPortfolioHoldings(portfolio, holdings);
-        if (res) {
-            console.log('Portfolio holdings successfully added');
-        }
-        else {
-            console.log('Portfolio holdings not added');
-        }
+        // res = await addPortfolioHoldings(portfolio, holdings)
+        // if (res) {
+        //   console.log('Portfolio holdings successfully added')
+        // } else {
+        //   console.log('Portfolio holdings not added')
+        // }
         // // -- Add portfolio
         // res = await addPortfolio(userId, portfolioName, holdings)
         // if (res) {
-        //     console.log('Portfolio successfully created')
+        //   console.log('Portfolio successfully created')
         // } else {
-        //     console.log('Portfolio not created')
+        //   console.log('Portfolio not created')
         // }
         // // -- Delete portfolio
         // res = await deletePortfolio(userId, portfolioName)
         // if (res) {
-        //     console.log('Portfolio successfully deleted')
+        //   console.log('Portfolio successfully deleted')
         // } else {
-        //     console.log('Portfolio not deleted')
+        //   console.log('Portfolio not deleted')
         // }
         // // -- Add portfolio holding
         // const holding: IHolding = {
-        //     tcgplayerId: 233232,
-        //     transactions: [{
-        //         type: TransactionType.Purchase,
-        //         date: new Date(),
-        //         price: 1.23,
-        //         quantity: 1
-        //     }]
+        //   tcgplayerId: 233232,
+        //   transactions: [{
+        //     type: TransactionType.Purchase,
+        //     date: new Date(),
+        //     price: 1.23,
+        //     quantity: 1
+        //   }]
         // }
         // holdings = [
-        //     holding,
-        //     {
-        //         tcgplayerId: 233232,
-        //         transactions: [{
-        //             type: TransactionType.Purchase,
-        //             date: new Date(),
-        //             price: 4.99,
-        //             quantity: 100
-        //         }]
-        //     }        
+        //   holding,
+        //   {
+        //     tcgplayerId: 233232,
+        //     transactions: [{
+        //       type: TransactionType.Purchase,
+        //       date: new Date(),
+        //       price: 4.99,
+        //       quantity: 100
+        //     }]
+        //   }    
         // ]
         // res = await addPortfolioHoldings(
-        //     {
-        //         userId: userId,
-        //         portfolioName: portfolioName,
-        //         holdings: holdings,
-        //     },
-        //     holdings
+        //   {
+        //     userId: userId,
+        //     portfolioName: portfolioName,
+        //     holdings: holdings,
+        //   },
+        //   holdings
         // )
         // if (res) {
-        //     console.log('Holding successfully added')
+        //   console.log('Holding successfully added')
         // } else {
-        //     console.log('Holding not added')
+        //   console.log('Holding not added')
         // }
         // // -- Delete portfolio holding
         // res = await deletePortfolioHolding(
-        //     {
-        //         userId: userId,
-        //         portfolioName: portfolioName,
-        //         holdings: []
-        //     },
-        //     233232
+        //   {
+        //     userId: userId,
+        //     portfolioName: portfolioName,
+        //     holdings: []
+        //   },
+        //   233232
         // )
         // if (res) {
-        //     console.log('Holding successfully deleted')
+        //   console.log('Holding successfully deleted')
         // } else {
-        //     console.log('Holding not deleted')
+        //   console.log('Holding not deleted')
         // }
         return 0;
     });
