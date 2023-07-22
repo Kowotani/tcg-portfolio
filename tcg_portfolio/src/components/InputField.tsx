@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactElement } from 'react';
+import { PropsWithChildren } from 'react';
 import { 
   Box,
   InputGroup, 
@@ -9,78 +9,66 @@ import {
 } from '@chakra-ui/react';
 
 
-// ============
-// Shared Types
-// ============
-
-type TInputErrorWrapperProps = {
-  children: JSX.Element | JSX.Element[],
-  errorMessage?: string,
-  leftLabel?: string,
-  rightLabel?: string,
-  width?: string,
-}
-
-
 // ==========
 // Components
 // ==========
 
 // Error message tooltip
-type ErrorTooltipProps = {
+type TErrorTooltipProps = {
   label: string,
-  children: JSX.Element | JSX.Element[],
   isOpen?: boolean,
 }
-const ErrorTooltip: FunctionComponent<ErrorTooltipProps> = ({
-  label,
-  children,
-  isOpen = false,
-}): ReactElement => {
+const ErrorTooltip = (props: PropsWithChildren<TErrorTooltipProps>) => {
 
   return (
     <Tooltip 
-      label={label} 
+      label={props.label} 
       bg='red'
       color='white'
       placement='bottom-start'
       gutter={3} 
-      isOpen={isOpen}
+      isOpen={props.isOpen}
     >
-      {children}
+      {props.children}
     </Tooltip>
   )
 }
 
 // Input error wrapper
-export const InputErrorWrapper: FunctionComponent<TInputErrorWrapperProps> = ({
-  children,
-  errorMessage = undefined,
-  leftLabel = undefined,
-  rightLabel = undefined,
-  width = '100%',
-}): ReactElement => {
+type TInputErrorWrapperProps = {
+  errorMessage?: string,
+  leftLabel?: string,
+  rightLabel?: string,
+  width?: string,
+}
+export const InputErrorWrapper = (props: PropsWithChildren<TInputErrorWrapperProps>) => {
 
   return (
     <InputGroup>
-      {leftLabel ? <InputLeftAddon children={leftLabel} /> : undefined}
+      {props.leftLabel 
+        ? <InputLeftAddon children={props.leftLabel} /> 
+        : undefined
+      }
       <VStack 
         display='flex'
         direction='column'
         align='flex-start'
         spacing={0}
-        width={width}
+        width={props.width ?? '100%'}
       >
-      {children}
-      {errorMessage 
+      {props.children}
+      {props.errorMessage 
         ? (
-          <ErrorTooltip label={errorMessage} isOpen={true}>
+          <ErrorTooltip label={props.errorMessage} isOpen={true}>
             <Box />
           </ErrorTooltip>
         ) : undefined
       }    
       </VStack>        
-      {rightLabel ? <InputRightAddon children={rightLabel} /> : undefined}
+      {props.rightLabel 
+        ? <InputRightAddon children={props.rightLabel} /> 
+        : undefined
+      }
     </InputGroup>
   )
 }

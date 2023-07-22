@@ -1,4 +1,4 @@
-import { FunctionComponent, PropsWithChildren, useContext } from 'react';
+import { PropsWithChildren, useContext } from 'react';
 import { 
   Tab,
   TabList,
@@ -37,7 +37,7 @@ const NavTab = (props: PropsWithChildren<TNavTabProps>) => {
 // main component
 // ==============
 
-export const SideBar: FunctionComponent<{}> = () => {
+export const SideBar = () => {
 
   return (
     <>

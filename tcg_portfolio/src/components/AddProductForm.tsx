@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useState, } from 'react';
+import { useEffect, useState, } from 'react';
 import axios from 'axios';
 import { 
   Button,
@@ -22,7 +22,7 @@ import { InputErrorWrapper } from './InputField';
 // main component
 // ==============
 
-export const AddProductForm: FunctionComponent<{}> = () => {
+export const AddProductForm = () => {
 
 
   // =========
