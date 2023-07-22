@@ -1,19 +1,26 @@
-import { useState, createContext, ReactNode } from 'react'
-import { SideBarNav } from '../utils'
+import { createContext, PropsWithChildren, useState } from 'react'
+import { ISideBarNavContext, SideBarNav } from '../utils'
 
 // create context
-export const SideBarNavContext = createContext({});
+export const SideBarNavContext = createContext<ISideBarNavContext>({
+    sideBarNav: {
+        order: SideBarNav.HOME.order,
+        name: SideBarNav.HOME.name,
+        authorizedRoles: SideBarNav.HOME.authorizedRoles,
+    },
+    setSideBarNav: () => {}     // dummy placeholder
+});
 
 // create Provider
-export const SideBarNavProvider = (children: ReactNode) => {
+export const SideBarNavProvider = (props: PropsWithChildren) => {
 
-    const [nav, setSideBarNav] = useState(SideBarNav.HOME)
+    const [sideBarNav, setSideBarNav] = useState(SideBarNav.HOME)
 
-    const value = {nav, setSideBarNav}
+    const value = {sideBarNav, setSideBarNav}
 
     return (
         <SideBarNavContext.Provider value={value}>
-            {children}
+            {props.children}
         </SideBarNavContext.Provider>
     )
 }
