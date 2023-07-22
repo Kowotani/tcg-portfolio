@@ -178,10 +178,10 @@ exports.TCGToProductSubtype = (_c = {},
 // =========
 /*
 DESC
-    Basic assertion function
+  Basic assertion function
 INPUT
-    condition: A condition to assert is true
-    msg: An optional message to display
+  condition: A condition to assert is true
+  msg: An optional message to display
 */
 function assert(condition, msg) {
     if (!condition) {
@@ -191,12 +191,12 @@ function assert(condition, msg) {
 exports.assert = assert;
 /*
 DESC
-    Converts a price string (determined by isPriceString()) to a number
+  Converts a price string (determined by isPriceString()) to a number
 INPUT
-    A string to convert
+  A string to convert
 RETURN
-    The extracted price as a number from the string (eg. '$123.45' => 123.45)
-    Will return NaN if the input is not a price string
+  The extracted price as a number from the string (eg. '$123.45' => 123.45)
+  Will return NaN if the input is not a price string
 */
 function getPriceFromString(value) {
     return isPriceString(value)
@@ -206,12 +206,12 @@ function getPriceFromString(value) {
 exports.getPriceFromString = getPriceFromString;
 /*
 DESC
-    Returns an array of valid ProductSubtypes for the given TCG and ProductType
+  Returns an array of valid ProductSubtypes for the given TCG and ProductType
 INPUT
-    tcg: A TCG enum
-    productType: A ProductType enum
+  tcg: A TCG enum
+  productType: A ProductType enum
 RETURN
-    An array of ProductSubtypes for the given TCG and ProductType
+  An array of ProductSubtypes for the given TCG and ProductType
 */
 function getProductSubtypes(tcg, productType) {
     var tcgArray = exports.TCGToProductSubtype[tcg];
@@ -221,11 +221,11 @@ function getProductSubtypes(tcg, productType) {
 exports.getProductSubtypes = getProductSubtypes;
 /*
 DESC
-    Returns whether the input string contains only ASCII characters
+  Returns whether the input string contains only ASCII characters
 INPUT
-    A string to check
+  A string to check
 RETURN
-    TRUE if the input contains only ASCII characters, FALSE otherwise
+  TRUE if the input contains only ASCII characters, FALSE otherwise
 */
 function isASCII(value) {
     return /^[\x00-\x7F]*$/.test(value);
@@ -234,11 +234,11 @@ function isASCII(value) {
 exports.isASCII = isASCII;
 /*
 DESC
-    Returns whether the input is a number
+  Returns whether the input is a number
 INPUT
-    A value to check
+  A value to check
 RETURN
-    TRUE if the input is a number, FALSE otherwise
+  TRUE if the input is a number, FALSE otherwise
 */
 function isNumeric(value) {
     return !isNaN(value);
@@ -246,13 +246,13 @@ function isNumeric(value) {
 exports.isNumeric = isNumeric;
 /*
 DESC
-    Returns whether the input is a valid price string
+  Returns whether the input is a valid price string
 INPUT
-    A string to check
+  A string to check
 RETURN
-    TRUE if the input follows the following regex (which roughtly corresponds
-        to numbers like $123.45), FALSE otherwise
-    regex = ^\$\d+\.\d{2}$
+  TRUE if the input follows the following regex (which roughtly corresponds
+    to numbers like $123.45), FALSE otherwise
+  regex = ^\$\d+\.\d{2}$
 */
 function isPriceString(value) {
     var regexp = new RegExp('^\\$\\d+\\.\\d{2}$');
@@ -261,11 +261,11 @@ function isPriceString(value) {
 exports.isPriceString = isPriceString;
 /*
 DESC
-    Returns whether the input string matches a TCGPriceType value
+  Returns whether the input string matches a TCGPriceType value
 INPUT
-    A string to check
+  A string to check
 RETURN
-    TRUE if the input matches a TCGPriceType value
+  TRUE if the input matches a TCGPriceType value
 */
 function isTCGPriceTypeValue(value) {
     var arr = Object.values(TCGPriceType).map(function (v) { return v.toString(); });
@@ -274,12 +274,12 @@ function isTCGPriceTypeValue(value) {
 exports.isTCGPriceTypeValue = isTCGPriceTypeValue;
 /*
 DESC
-    Function used for sorting dates in ascending order
+  Function used for sorting dates in ascending order
 INPUT
-    a: The first Date
-    b: The second Date
+  a: The first Date
+  b: The second Date
 RETURN
-    A negative number if a < b, otherwise a positive number if a > b
+  A negative number if a < b, otherwise a positive number if a > b
 */
 function sortFnDateAsc(a, b) {
     return a.getTime() - b.getTime();
@@ -287,12 +287,12 @@ function sortFnDateAsc(a, b) {
 exports.sortFnDateAsc = sortFnDateAsc;
 /*
 DESC
-    Function used for sorting dates in descending order
+  Function used for sorting dates in descending order
 INPUT
-    a: The first Date
-    b: The second Date
+  a: The first Date
+  b: The second Date
 RETURN
-    A negative number if a > b, otherwise a positive number if a < b
+  A negative number if a > b, otherwise a positive number if a < b
 */
 function sortFnDateDesc(a, b) {
     return b.getTime() - a.getTime();

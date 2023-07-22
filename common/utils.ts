@@ -8,62 +8,62 @@ import * as _ from 'lodash'
 
 // POST to /product status
 export enum ProductPostStatus {
-    Added = 'tcgplayerId added',
-    AddedWithoutImage = 'tcgplayerId added (without image)',
-    AlreadyExists = 'tcgplayerId already exists',
+  Added = 'tcgplayerId added',
+  AddedWithoutImage = 'tcgplayerId added (without image)',
+  AlreadyExists = 'tcgplayerId already exists',
 }
 
 // -- mongodb
 
 // timeseries granularity
 export enum TimeseriesGranularity {
-    Seconds = 'seconds',
-    Minutes = 'minutes',
-    Hours = 'hours',
+  Seconds = 'seconds',
+  Minutes = 'minutes',
+  Hours = 'hours',
 };
 
 // -- product features
 
 // product language
 export enum ProductLanguage {
-    English = 'ENG',
-    Japanese = 'JPN',
+  English = 'ENG',
+  Japanese = 'JPN',
 };
 
 // product subtype
 export enum ProductSubtype {
-    Collector = 'Collector',
-    CommanderDeck = 'Commander Deck',
-    Draft = 'Draft',
-    EliteTrainerBox = 'Elite Trainer Box',
-    FABVersionTwo = '2.0',
-    FirstEdition = '1st Edition',
-    Foil = 'Foil',
-    FoilEteched = 'Foil Etched',
-    NonFoil = 'Non-Foil',
-    SecondEdition = '2nd Edition',
-    Set = 'Set',
-    TexturedFoil = 'Textured Foil',
-    UltraPremiumCollection = 'Ultra Premium Collection',
-    Unlimited = 'Unlimited',
+  Collector = 'Collector',
+  CommanderDeck = 'Commander Deck',
+  Draft = 'Draft',
+  EliteTrainerBox = 'Elite Trainer Box',
+  FABVersionTwo = '2.0',
+  FirstEdition = '1st Edition',
+  Foil = 'Foil',
+  FoilEteched = 'Foil Etched',
+  NonFoil = 'Non-Foil',
+  SecondEdition = '2nd Edition',
+  Set = 'Set',
+  TexturedFoil = 'Textured Foil',
+  UltraPremiumCollection = 'Ultra Premium Collection',
+  Unlimited = 'Unlimited',
 };
 
 // product type
 export enum ProductType {
-    BoosterBox = 'Booster Box',
-    Bundle = 'Bundle',
-    CommanderDeck = 'Commander Deck',
-    CommanderDeckSet = 'Commander Deck Set',
-    SecretLair = 'Secret Lair',
+  BoosterBox = 'Booster Box',
+  Bundle = 'Bundle',
+  CommanderDeck = 'Commander Deck',
+  CommanderDeckSet = 'Commander Deck Set',
+  SecretLair = 'Secret Lair',
 };
 
 // TCG
 export enum TCG {
-    FleshAndBlood = 'Flesh and Blood',
-    MagicTheGathering = 'Magic: The Gathering',
-    MetaZoo = 'MetaZoo',
-    Pokemon = 'Pokemon',
-    Sorcery = 'Sorcery',
+  FleshAndBlood = 'Flesh and Blood',
+  MagicTheGathering = 'Magic: The Gathering',
+  MetaZoo = 'MetaZoo',
+  Pokemon = 'Pokemon',
+  Sorcery = 'Sorcery',
 };
 
 
@@ -71,17 +71,17 @@ export enum TCG {
 
 // TCG price types
 export enum TCGPriceType {
-    MarketPrice = 'Market Price',
-    BuylistMarketPrice = 'Buylist Market Price',
-    ListedMedianPrice = 'Listed Median Price',
+  MarketPrice = 'Market Price',
+  BuylistMarketPrice = 'Buylist Market Price',
+  ListedMedianPrice = 'Listed Median Price',
 }
 
 // -- portfolio
 
 // transaction type
 export enum TransactionType {
-    Purchase = 'Purchase',
-    Sale = 'Sale',
+  Purchase = 'Purchase',
+  Sale = 'Sale',
 }
 
 
@@ -93,102 +93,102 @@ export enum TransactionType {
 // TCG -> product type
 export const TCGToProductType: { [key in TCG]: ProductType[] } = {
 
-    // FAB
-    [TCG.FleshAndBlood]: [
-        ProductType.BoosterBox,
-    ],
+  // FAB
+  [TCG.FleshAndBlood]: [
+    ProductType.BoosterBox,
+  ],
 
-    // MTG
-    [TCG.MagicTheGathering]: [
-        ProductType.BoosterBox,
-        ProductType.Bundle,
-        ProductType.CommanderDeck,
-        ProductType.CommanderDeckSet,
-        ProductType.SecretLair,
-    ],
+  // MTG
+  [TCG.MagicTheGathering]: [
+    ProductType.BoosterBox,
+    ProductType.Bundle,
+    ProductType.CommanderDeck,
+    ProductType.CommanderDeckSet,
+    ProductType.SecretLair,
+  ],
 
-    // Metazoo
-    [TCG.MetaZoo]: [
-        ProductType.BoosterBox,
-    ],
+  // Metazoo
+  [TCG.MetaZoo]: [
+    ProductType.BoosterBox,
+  ],
 
-    // Pokemon
-    [TCG.Pokemon]: [
-        ProductType.BoosterBox,
-        ProductType.Bundle,
-    ],
+  // Pokemon
+  [TCG.Pokemon]: [
+    ProductType.BoosterBox,
+    ProductType.Bundle,
+  ],
 
-    // Sorcery
-    [TCG.Sorcery]: [
-        ProductType.BoosterBox
-    ]
+  // Sorcery
+  [TCG.Sorcery]: [
+    ProductType.BoosterBox
+  ]
 }
 
 // product type -> product subtype
 export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubtype[] } = {
 
-    // Booster box
-    [ProductType.BoosterBox]: [
-        ProductSubtype.Collector,
-        ProductSubtype.Draft,
-        ProductSubtype.FABVersionTwo,
-        ProductSubtype.FirstEdition,
-        ProductSubtype.SecondEdition,
-        ProductSubtype.Set,
-        ProductSubtype.Unlimited,
-    ],
+  // Booster box
+  [ProductType.BoosterBox]: [
+    ProductSubtype.Collector,
+    ProductSubtype.Draft,
+    ProductSubtype.FABVersionTwo,
+    ProductSubtype.FirstEdition,
+    ProductSubtype.SecondEdition,
+    ProductSubtype.Set,
+    ProductSubtype.Unlimited,
+  ],
 
-    // Bundle 
-    [ProductType.Bundle]: [
-        ProductSubtype.EliteTrainerBox,
-        ProductSubtype.UltraPremiumCollection
-    ],
+  // Bundle 
+  [ProductType.Bundle]: [
+    ProductSubtype.EliteTrainerBox,
+    ProductSubtype.UltraPremiumCollection
+  ],
 
-    // Secret Lair
-    [ProductType.SecretLair]: [
-        ProductSubtype.CommanderDeck,
-        ProductSubtype.Foil,
-        ProductSubtype.FoilEteched,
-        ProductSubtype.NonFoil,
-        ProductSubtype.TexturedFoil,
-    ],
+  // Secret Lair
+  [ProductType.SecretLair]: [
+    ProductSubtype.CommanderDeck,
+    ProductSubtype.Foil,
+    ProductSubtype.FoilEteched,
+    ProductSubtype.NonFoil,
+    ProductSubtype.TexturedFoil,
+  ],
 }
 
 // TCG -> product subtype
 export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
 
-    // FAB
-    [TCG.FleshAndBlood]: [
-        ProductSubtype.FABVersionTwo,
-        ProductSubtype.FirstEdition,
-        ProductSubtype.Unlimited,
-    ],
+  // FAB
+  [TCG.FleshAndBlood]: [
+    ProductSubtype.FABVersionTwo,
+    ProductSubtype.FirstEdition,
+    ProductSubtype.Unlimited,
+  ],
 
-    // MTG
-    [TCG.MagicTheGathering]: [
-        ProductSubtype.Collector,
-        ProductSubtype.CommanderDeck,
-        ProductSubtype.Draft,
-        ProductSubtype.Foil,
-        ProductSubtype.FoilEteched,
-        ProductSubtype.NonFoil,
-        ProductSubtype.Set,
-        ProductSubtype.TexturedFoil,
-    ],
+  // MTG
+  [TCG.MagicTheGathering]: [
+    ProductSubtype.Collector,
+    ProductSubtype.CommanderDeck,
+    ProductSubtype.Draft,
+    ProductSubtype.Foil,
+    ProductSubtype.FoilEteched,
+    ProductSubtype.NonFoil,
+    ProductSubtype.Set,
+    ProductSubtype.TexturedFoil,
+  ],
 
-    // Metazoo
-    [TCG.MetaZoo]: [
-        ProductSubtype.FirstEdition,
-        ProductSubtype.SecondEdition,
-    ],
+  // Metazoo
+  [TCG.MetaZoo]: [
+    ProductSubtype.FirstEdition,
+    ProductSubtype.SecondEdition,
+  ],
 
-    // Pokemon
-    [TCG.Pokemon]: [
-        ProductSubtype.EliteTrainerBox,
-        ProductSubtype.UltraPremiumCollection,
-    ],    
+  // Pokemon
+  [TCG.Pokemon]: [
+    ProductSubtype.EliteTrainerBox,
+    ProductSubtype.UltraPremiumCollection,
+  ],  
 
-    // Sorcery
+  // Sorcery
 }
 
 
@@ -199,110 +199,110 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
 // -- User
 
 export interface IUser {
-    userId: number,
-    userName: string,
-    passwordHash: string,
-    passwordSalt: string,
-    email: string,
+  userId: number,
+  userName: string,
+  passwordHash: string,
+  passwordSalt: string,
+  email: string,
 }
 
 // -- Price
 
 // stores the price snapshot data
 export interface IPrice {
-    priceDate: Date;
-    tcgplayerId: number;
-    granularity: string;
-    prices: IPriceData;
+  priceDate: Date;
+  tcgplayerId: number;
+  granularity: string;
+  prices: IPriceData;
 }
 
 // stores the scraped price data
 export interface IPriceData {
-    marketPrice: number;
-    buylistMarketPrice?: number;
-    listedMedianPrice?: number;
+  marketPrice: number;
+  buylistMarketPrice?: number;
+  listedMedianPrice?: number;
 }
 
 // -- Product
 
 // defines the required data for a Product
 export interface IProduct {
-    tcgplayerId: number;
-    tcg: TCG;
-    releaseDate: Date;
-    name: string;
-    type: ProductType;
-    language: ProductLanguage;
-    msrp?: number;
-    subtype?: ProductSubtype;
-    setCode?: string;
+  tcgplayerId: number;
+  tcg: TCG;
+  releaseDate: Date;
+  name: string;
+  type: ProductType;
+  language: ProductLanguage;
+  msrp?: number;
+  subtype?: ProductSubtype;
+  setCode?: string;
 }
 
 // -- Portfolio, Holding, and Transaction schemas
 
 // transaction
 export interface ITransaction {
-    type: TransactionType,
-    date: Date,
-    price: number,
-    quantity: number,
+  type: TransactionType,
+  date: Date,
+  price: number,
+  quantity: number,
 }
 
 // holding
 export interface IHolding {
-    tcgplayerId: number,
-    transactions: ITransaction[],
+  tcgplayerId: number,
+  transactions: ITransaction[],
 }
 
 export interface IHoldingMethods {
 
-    // CRUD transaction
-    addTransactions(txnInput: ITransaction | ITransaction[]): void,
-    deleteTransaction(id: string): void,
+  // CRUD transaction
+  addTransactions(txnInput: ITransaction | ITransaction[]): void,
+  deleteTransaction(id: string): void,
 
-    // getters
-    getProduct(): IProduct,
-    getTransactions(): ITransaction[],
-    getPurchases(): ITransaction[],
-    getFirstPurchaseDate(): Date | undefined,
-    getLastPurchaseDate(): Date | undefined,
-    getTotalCost(): number | undefined,
-    getAvgCost(): number | undefined,
-    getMarketValue(price: number): number | undefined,
+  // getters
+  getProduct(): IProduct,
+  getTransactions(): ITransaction[],
+  getPurchases(): ITransaction[],
+  getFirstPurchaseDate(): Date | undefined,
+  getLastPurchaseDate(): Date | undefined,
+  getTotalCost(): number | undefined,
+  getAvgCost(): number | undefined,
+  getMarketValue(price: number): number | undefined,
 
-    // return calculation
-    getDollarReturn(price: number): number | undefined,
-    getPercentageReturn(price: number): number | undefined,
-    getAnnualizedReturn(price: number): number | undefined,
+  // return calculation
+  getDollarReturn(price: number): number | undefined,
+  getPercentageReturn(price: number): number | undefined,
+  getAnnualizedReturn(price: number): number | undefined,
 }
 
 // portfolio
 
 export interface IPortfolio {
-    userId: number,
-    portfolioName: string,
-    holdings: IHolding[],
+  userId: number,
+  portfolioName: string,
+  holdings: IHolding[],
 }
 
 export interface IPortfolioMethods {
 
-    // CRUD transaction
-    addHoldings(holdingInput: IHolding | IHolding[]): void,
-    deleteHolding(tcgplayerId: number): void, 
-    deleteHoldings(): void,
+  // CRUD transaction
+  addHoldings(holdingInput: IHolding | IHolding[]): void,
+  deleteHolding(tcgplayerId: number): void, 
+  deleteHoldings(): void,
 
-    // getters
-    getHoldings(): IHolding[],
-    getTotalCost(): number | undefined,
-    getMarketValue(prices: Map<number, number>): number | undefined,
+  // getters
+  getHoldings(): IHolding[],
+  getTotalCost(): number | undefined,
+  getMarketValue(prices: Map<number, number>): number | undefined,
 
-    // checkers
-    hasHolding(tcgplayerId: number): boolean,
+  // checkers
+  hasHolding(tcgplayerId: number): boolean,
 
-    // return calculation
-    getDollarReturn(prices: Map<number, number>): number | undefined,
-    getPercentageReturn(prices: Map<number, number>): number | undefined,
-    getAnnualizedReturn(prices: Map<number, number>): number | undefined,
+  // return calculation
+  getDollarReturn(prices: Map<number, number>): number | undefined,
+  getPercentageReturn(prices: Map<number, number>): number | undefined,
+  getAnnualizedReturn(prices: Map<number, number>): number | undefined,
 }
 
 
@@ -314,8 +314,8 @@ export interface IPortfolioMethods {
 
 // body for POST request to /product
 export type TProductPostBody = {
-    formData: IProduct,
-    imageUrl?: string, 
+  formData: IProduct,
+  imageUrl?: string, 
 }
 
 
@@ -325,128 +325,128 @@ export type TProductPostBody = {
 
 /*
 DESC
-    Basic assertion function
+  Basic assertion function
 INPUT
-    condition: A condition to assert is true
-    msg: An optional message to display
+  condition: A condition to assert is true
+  msg: An optional message to display
 */
 export function assert(condition: any, msg?: string): asserts condition {
-    if (!condition) {
-      throw new Error('Assertion Error: ' + msg);
-    }
+  if (!condition) {
+    throw new Error('Assertion Error: ' + msg);
+  }
   }
 
 /*
 DESC
-    Converts a price string (determined by isPriceString()) to a number
+  Converts a price string (determined by isPriceString()) to a number
 INPUT
-    A string to convert
+  A string to convert
 RETURN
-    The extracted price as a number from the string (eg. '$123.45' => 123.45)
-    Will return NaN if the input is not a price string
+  The extracted price as a number from the string (eg. '$123.45' => 123.45)
+  Will return NaN if the input is not a price string
 */
 export function getPriceFromString(value: string): number {
-    return isPriceString(value)
-        ? parseFloat(value.substring(1))
-        : NaN
+  return isPriceString(value)
+    ? parseFloat(value.substring(1))
+    : NaN
 }
 
 
 /*
 DESC
-    Returns an array of valid ProductSubtypes for the given TCG and ProductType
+  Returns an array of valid ProductSubtypes for the given TCG and ProductType
 INPUT
-    tcg: A TCG enum
-    productType: A ProductType enum
+  tcg: A TCG enum
+  productType: A ProductType enum
 RETURN
-    An array of ProductSubtypes for the given TCG and ProductType
+  An array of ProductSubtypes for the given TCG and ProductType
 */
 export function getProductSubtypes(tcg: TCG, productType: ProductType): ProductSubtype[] {
-    const tcgArray = TCGToProductSubtype[tcg];
-    const productTypeArray = ProductTypeToProductSubtype[productType];
-    return _.intersection(tcgArray, productTypeArray);
+  const tcgArray = TCGToProductSubtype[tcg];
+  const productTypeArray = ProductTypeToProductSubtype[productType];
+  return _.intersection(tcgArray, productTypeArray);
 }
 
 
 /*
 DESC
-    Returns whether the input string contains only ASCII characters
+  Returns whether the input string contains only ASCII characters
 INPUT
-    A string to check
+  A string to check
 RETURN
-    TRUE if the input contains only ASCII characters, FALSE otherwise
+  TRUE if the input contains only ASCII characters, FALSE otherwise
 */
 export function isASCII(value: string): boolean {
-    return /^[\x00-\x7F]*$/.test(value);;
+  return /^[\x00-\x7F]*$/.test(value);;
 }
 
 
 /*
 DESC
-    Returns whether the input is a number
+  Returns whether the input is a number
 INPUT
-    A value to check
+  A value to check
 RETURN
-    TRUE if the input is a number, FALSE otherwise
+  TRUE if the input is a number, FALSE otherwise
 */
 export function isNumeric(value: any): boolean {
-    return !isNaN(value);
+  return !isNaN(value);
 }
 
 
 /*
 DESC
-    Returns whether the input is a valid price string
+  Returns whether the input is a valid price string
 INPUT
-    A string to check
+  A string to check
 RETURN
-    TRUE if the input follows the following regex (which roughtly corresponds
-        to numbers like $123.45), FALSE otherwise
-    regex = ^\$\d+\.\d{2}$
+  TRUE if the input follows the following regex (which roughtly corresponds
+    to numbers like $123.45), FALSE otherwise
+  regex = ^\$\d+\.\d{2}$
 */
 export function isPriceString(value: string): boolean {
-    const regexp = new RegExp('^\\$\\d+\\.\\d{2}$');
-    return regexp.test(value);
+  const regexp = new RegExp('^\\$\\d+\\.\\d{2}$');
+  return regexp.test(value);
 }
 
 
 /*
 DESC
-    Returns whether the input string matches a TCGPriceType value
+  Returns whether the input string matches a TCGPriceType value
 INPUT
-    A string to check
+  A string to check
 RETURN
-    TRUE if the input matches a TCGPriceType value
+  TRUE if the input matches a TCGPriceType value
 */
 export function isTCGPriceTypeValue(value: string): boolean {
-    const arr = Object.values(TCGPriceType).map(v => v.toString());
-    return arr.includes(value);
+  const arr = Object.values(TCGPriceType).map(v => v.toString());
+  return arr.includes(value);
 }
 
 
 /*
 DESC
-    Function used for sorting dates in ascending order
+  Function used for sorting dates in ascending order
 INPUT
-    a: The first Date
-    b: The second Date
+  a: The first Date
+  b: The second Date
 RETURN
-    A negative number if a < b, otherwise a positive number if a > b
+  A negative number if a < b, otherwise a positive number if a > b
 */
 export function sortFnDateAsc(a: Date, b: Date): number {
-    return a.getTime() - b.getTime()
+  return a.getTime() - b.getTime()
 }
 
 
 /*
 DESC
-    Function used for sorting dates in descending order
+  Function used for sorting dates in descending order
 INPUT
-    a: The first Date
-    b: The second Date
+  a: The first Date
+  b: The second Date
 RETURN
-    A negative number if a > b, otherwise a positive number if a < b
+  A negative number if a > b, otherwise a positive number if a < b
 */
 export function sortFnDateDesc(a: Date, b: Date): number {
-    return b.getTime() - a.getTime()
+  return b.getTime() - a.getTime()
 }
