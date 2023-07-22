@@ -9,7 +9,7 @@ export enum UserType {
 }
 
 // navigation SideBar links
-export const Nav = {
+export const SideBarNav = {
     HOME: {
         order: 1,
         name: 'Home',
