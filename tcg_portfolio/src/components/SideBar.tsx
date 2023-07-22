@@ -1,10 +1,10 @@
 import { FunctionComponent, PropsWithChildren, useContext } from 'react';
 import { 
-    Tab,
-    TabList,
-    TabPanel,
-    TabPanels,
-    Tabs,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
 } from '@chakra-ui/react';
 import { AddProductForm } from './AddProductForm';
 import { SideBarNavContext } from '../state/SideBarNavContext';
@@ -16,20 +16,20 @@ import { ISideBarNav, SideBarNav } from '../utils';
 // ==============
 
 type TNavTabProps = {
-    sideBarNav: ISideBarNav
+  sideBarNav: ISideBarNav
 }
 
 const NavTab = (props: PropsWithChildren<TNavTabProps>) => {
 
-    const { setSideBarNav } = useContext(SideBarNavContext)
+  const { setSideBarNav } = useContext(SideBarNavContext)
 
-    return (
-        <Tab
-            onClick={() => {setSideBarNav(props.sideBarNav)}}
-        >
-            {props.sideBarNav.name}
-        </Tab>
-    )
+  return (
+    <Tab
+      onClick={() => {setSideBarNav(props.sideBarNav)}}
+    >
+      {props.sideBarNav.name}
+    </Tab>
+  )
 }
 
 
@@ -39,31 +39,27 @@ const NavTab = (props: PropsWithChildren<TNavTabProps>) => {
 
 export const SideBar: FunctionComponent<{}> = () => {
 
-    return (
-        <>
-            <Tabs 
-                orientation='vertical'
-                variant='soft-rounded'
-                colorScheme='blue'
-            >
-                <TabList>
-                    <NavTab sideBarNav={SideBarNav.HOME}/>
-                    <NavTab sideBarNav={SideBarNav.PORTFOLIO} />
-                    <NavTab sideBarNav={SideBarNav.ADD_PRODUCT} />
-                </TabList>
+  return (
+    <>
+      <Tabs 
+        orientation='vertical'
+        variant='soft-rounded'
+        colorScheme='blue'
+      >
+        <TabList>
+          <NavTab sideBarNav={SideBarNav.HOME}/>
+          <NavTab sideBarNav={SideBarNav.PORTFOLIO} />
+          <NavTab sideBarNav={SideBarNav.ADD_PRODUCT} />
+        </TabList>
 
-                <TabPanels>
-                    <TabPanel>
-                        <h1>Home</h1>
-                    </TabPanel>
-                    <TabPanel>
-                        <h1>Portfolio</h1>
-                    </TabPanel>
-                    <TabPanel>
-                        <AddProductForm />
-                    </TabPanel>
-                </TabPanels>
-            </Tabs>
-        </>
+        <TabPanels>
+          <TabPanel>Home</TabPanel>
+          <TabPanel>Portfolio</TabPanel>          
+          <TabPanel>
+            <AddProductForm />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </>
     )
 }
