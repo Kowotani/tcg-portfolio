@@ -37,11 +37,14 @@ const ErrorTooltip = (props: PropsWithChildren<TErrorTooltipProps>) => {
 // Input error wrapper
 type TInputErrorWrapperProps = {
   errorMessage?: string,
+  isErrorDisplayed?: boolean,
   leftLabel?: string,
   rightLabel?: string,
   width?: string,
 }
-export const InputErrorWrapper = (props: PropsWithChildren<TInputErrorWrapperProps>) => {
+export const InputErrorWrapper = (
+  props: PropsWithChildren<TInputErrorWrapperProps>
+) => {
 
   return (
     <InputGroup>
@@ -57,9 +60,12 @@ export const InputErrorWrapper = (props: PropsWithChildren<TInputErrorWrapperPro
         width={props.width ?? '100%'}
       >
       {props.children}
-      {props.errorMessage 
+      {props.isErrorDisplayed && props.errorMessage
         ? (
-          <ErrorTooltip label={props.errorMessage} isOpen={true}>
+          <ErrorTooltip 
+            label={props.errorMessage} 
+            isOpen={true}
+          >
             <Box />
           </ErrorTooltip>
         ) : undefined

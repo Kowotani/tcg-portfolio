@@ -1,4 +1,4 @@
-import { useEffect, useState, } from 'react';
+import { useContext, useEffect, useState, } from 'react';
 import axios from 'axios';
 import { 
   Button,
@@ -16,6 +16,8 @@ import { getProductSubtypes, IProduct, isASCII, ProductLanguage,
 } from 'common';
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField';
+import { SideBarNavContext } from '../state/SideBarNavContext';
+import { SideBarNav } from '../utils';
 
 
 // ==============
@@ -414,6 +416,9 @@ export const AddProductForm = () => {
     return data
   }
 
+  // SideBar context
+  const { sideBarNav } = useContext(SideBarNavContext)
+  const isAddProductForm = sideBarNav === SideBarNav.ADD_PRODUCT
 
   // handle TCG changes
   useEffect(() => {
@@ -425,7 +430,6 @@ export const AddProductForm = () => {
     updateProductSubypeInput(TCGState.tcg, productTypeState.productType)
 
   }, [TCGState.tcg])
-
 
   // handle Product Type changes
   useEffect(() => {
@@ -526,6 +530,7 @@ export const AddProductForm = () => {
           <InputErrorWrapper 
             leftLabel='TCGPlayer ID'
             errorMessage={TCGPlayerIdState.errorMessage}
+            isErrorDisplayed={TCGPlayerIdState.isInvalid && isAddProductForm}
           >
             <NumberInput
               isInvalid={TCGPlayerIdState.isInvalid || false}
@@ -543,6 +548,7 @@ export const AddProductForm = () => {
           <InputErrorWrapper 
             leftLabel='Name'
             errorMessage={nameState.errorMessage}
+            isErrorDisplayed={nameState.isInvalid && isAddProductForm}          
           >
             <Input 
               isInvalid={nameState.isInvalid || false}
@@ -556,6 +562,7 @@ export const AddProductForm = () => {
           <InputErrorWrapper 
             leftLabel='TCG'
             errorMessage={TCGState.errorMessage}
+            isErrorDisplayed={TCGState.isInvalid && isAddProductForm}
           >
             <Select
               value={TCGState.tcg.length === 0
@@ -638,6 +645,7 @@ export const AddProductForm = () => {
           <InputErrorWrapper 
             leftLabel='Release Date'
             errorMessage={releaseDateState.errorMessage}
+            isErrorDisplayed={releaseDateState.isInvalid && isAddProductForm}
           >
             <Input
               type='date'
@@ -651,6 +659,7 @@ export const AddProductForm = () => {
           <InputErrorWrapper 
             leftLabel='Set Code'
             errorMessage={setCodeState.errorMessage}
+            isErrorDisplayed={setCodeState.isInvalid && isAddProductForm}
           >
             <Input 
               isInvalid={setCodeState.isInvalid}
@@ -694,6 +703,7 @@ export const AddProductForm = () => {
           <InputErrorWrapper 
             leftLabel='Image URL'
             errorMessage={imageUrlState.errorMessage}
+            isErrorDisplayed={imageUrlState.isInvalid && isAddProductForm}
           >
             <Input
               placeholder={IMAGE_URL_PLACEHOLDER}
