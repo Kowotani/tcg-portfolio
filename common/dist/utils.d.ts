@@ -114,6 +114,16 @@ export interface IHoldingMethods {
     getPercentageReturn(price: number): number | undefined;
     getAnnualizedReturn(price: number): number | undefined;
 }
+export interface IHydratedHolding extends IHolding {
+    quantity: number;
+    price: number;
+    totalCost: number;
+    averageCost: number;
+    marketValue: number;
+    dollarReturn: number;
+    percentageReturn: number;
+    annualizedReturn: number;
+}
 export interface IPortfolio {
     userId: number;
     portfolioName: string;
@@ -130,6 +140,14 @@ export interface IPortfolioMethods {
     getDollarReturn(prices: Map<number, number>): number | undefined;
     getPercentageReturn(prices: Map<number, number>): number | undefined;
     getAnnualizedReturn(prices: Map<number, number>): number | undefined;
+}
+export interface IHydratedPortfolio extends IPortfolio {
+    hydratedHoldings: IHydratedHolding[];
+    totalCost: number;
+    marketValue: number;
+    dollarReturn: number;
+    percentageReturn: number;
+    annualizedReturn: number;
 }
 export declare type TProductPostBody = {
     formData: IProduct;
