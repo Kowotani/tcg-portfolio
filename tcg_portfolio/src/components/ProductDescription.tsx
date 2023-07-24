@@ -8,19 +8,25 @@ import { IProduct } from 'common'
 // ==============
 
 type TProductDescriptionProps = {
-  product: IProduct
+  product: IProduct,
+  hideHeader?: boolean
 }
 export const ProductDescription = (
   props: PropsWithChildren<TProductDescriptionProps>
 ) => {
 
   // TOOD: use CSS for this
-
+  
   return (
     <Box>
-      <Text align='left' fontWeight='bold'>
-        {props.product.name}
-      </Text>
+      {props.hideHeader
+        ? undefined
+        : (
+          <Text align='left' fontWeight='bold'>
+            {props.product.name}
+          </Text>
+        ) 
+      }
       <Text align='left'>{props.product.tcg}</Text>
       <Text align='left'>{props.product.type}</Text>
       <Text align='left'>{props.product.subtype}</Text>   
