@@ -347,6 +347,8 @@ export type TProductPostBody = {
 // functions
 // =========
 
+// -- generic
+
 /*
 DESC
   Basic assertion function
@@ -375,7 +377,6 @@ export function getPriceFromString(value: string): number {
     : NaN
 }
 
-
 /*
 DESC
   Returns an array of valid ProductSubtypes for the given TCG and ProductType
@@ -391,7 +392,6 @@ export function getProductSubtypes(tcg: TCG, productType: ProductType): ProductS
   return _.intersection(tcgArray, productTypeArray);
 }
 
-
 /*
 DESC
   Returns whether the input string contains only ASCII characters
@@ -404,7 +404,6 @@ export function isASCII(value: string): boolean {
   return /^[\x00-\x7F]*$/.test(value);;
 }
 
-
 /*
 DESC
   Returns whether the input is a number
@@ -416,7 +415,6 @@ RETURN
 export function isNumeric(value: any): boolean {
   return !isNaN(value);
 }
-
 
 /*
 DESC
@@ -433,7 +431,6 @@ export function isPriceString(value: string): boolean {
   return regexp.test(value);
 }
 
-
 /*
 DESC
   Returns whether the input string matches a TCGPriceType value
@@ -446,7 +443,6 @@ export function isTCGPriceTypeValue(value: string): boolean {
   const arr = Object.values(TCGPriceType).map(v => v.toString());
   return arr.includes(value);
 }
-
 
 /*
 DESC
@@ -461,7 +457,6 @@ export function sortFnDateAsc(a: Date, b: Date): number {
   return a.getTime() - b.getTime()
 }
 
-
 /*
 DESC
   Function used for sorting dates in descending order
@@ -473,4 +468,84 @@ RETURN
 */
 export function sortFnDateDesc(a: Date, b: Date): number {
   return b.getTime() - a.getTime()
+}
+
+// -- transaction
+
+/*
+DESC
+  Returns the average purchase cost from the input ITransaction. This value
+  should never be negative
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The average purchase cost quantity from the input ITransaction
+*/
+export function getAverageCost(transactions: ITransaction[]): number {
+  const value =  getTotalCost(transactions) / getPurchaseQuantity(transactions)
+  assert(value >= 0)
+  return value
+}
+
+/*
+DESC
+  Returns the purchasess from the input ITransaction array
+INPUT
+  transactions: An ITransaction array
+RETURN
+  An array of purchases from the ITransaction array
+*/
+export function getPurchases(transactions: ITransaction[]): ITransaction[] {
+  return transactions.filter((txn: ITransaction) => {
+    return txn.type === TransactionType.Purchase
+})}
+
+/*
+DESC
+  Returns the purchase quantity from the input ITransaction. This value
+  should never be negative
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The purchase quantity from the input ITransaction
+*/
+export function getPurchaseQuantity(transactions: ITransaction[]): number {
+  const value =  _.sumBy(getPurchases(transactions), (txn: ITransaction) => {
+    return txn.quantity
+  })
+  assert(value >= 0)
+  return value
+}
+
+/*
+DESC
+  Returns the total cost of items 
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The item quantity available from the input ITransaction
+*/
+export function getQuantity(transactions: ITransaction[]): number {
+  const value =  _.sumBy(transactions, (txn: ITransaction) => {
+    return txn.quantity
+  })
+  assert(value >= 0)
+  return value
+}
+
+/*
+DESC
+  Returns the total purchase cost from the input ITransaction. This value
+  should never be negative
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The total purchase cost quantity from the input ITransaction
+*/
+export function getTotalCost(transactions: ITransaction[]): number {
+  const value =  _.sumBy(getPurchases(transactions), (txn: ITransaction) => {
+    return txn.quantity * txn.price
+  })
+  assert(value >= 0)
+  return value
 }

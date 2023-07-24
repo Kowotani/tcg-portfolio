@@ -1,7 +1,7 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
+exports.getTotalCost = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
 var _ = require("lodash");
 // =====
 // enums
@@ -176,6 +176,7 @@ exports.TCGToProductSubtype = (_c = {},
 // =========
 // functions
 // =========
+// -- generic
 /*
 DESC
   Basic assertion function
@@ -298,3 +299,83 @@ function sortFnDateDesc(a, b) {
     return b.getTime() - a.getTime();
 }
 exports.sortFnDateDesc = sortFnDateDesc;
+// -- transaction
+/*
+DESC
+  Returns the average purchase cost from the input ITransaction. This value
+  should never be negative
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The average purchase cost quantity from the input ITransaction
+*/
+function getAverageCost(transactions) {
+    var value = getTotalCost(transactions) / getPurchaseQuantity(transactions);
+    assert(value >= 0);
+    return value;
+}
+exports.getAverageCost = getAverageCost;
+/*
+DESC
+  Returns the purchasess from the input ITransaction array
+INPUT
+  transactions: An ITransaction array
+RETURN
+  An array of purchases from the ITransaction array
+*/
+function getPurchases(transactions) {
+    return transactions.filter(function (txn) {
+        return txn.type === TransactionType.Purchase;
+    });
+}
+exports.getPurchases = getPurchases;
+/*
+DESC
+  Returns the purchase quantity from the input ITransaction. This value
+  should never be negative
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The purchase quantity from the input ITransaction
+*/
+function getPurchaseQuantity(transactions) {
+    var value = _.sumBy(getPurchases(transactions), function (txn) {
+        return txn.quantity;
+    });
+    assert(value >= 0);
+    return value;
+}
+exports.getPurchaseQuantity = getPurchaseQuantity;
+/*
+DESC
+  Returns the total cost of items
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The item quantity available from the input ITransaction
+*/
+function getQuantity(transactions) {
+    var value = _.sumBy(transactions, function (txn) {
+        return txn.quantity;
+    });
+    assert(value >= 0);
+    return value;
+}
+exports.getQuantity = getQuantity;
+/*
+DESC
+  Returns the total purchase cost from the input ITransaction. This value
+  should never be negative
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The total purchase cost quantity from the input ITransaction
+*/
+function getTotalCost(transactions) {
+    var value = _.sumBy(getPurchases(transactions), function (txn) {
+        return txn.quantity * txn.price;
+    });
+    assert(value >= 0);
+    return value;
+}
+exports.getTotalCost = getTotalCost;
