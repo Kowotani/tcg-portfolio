@@ -1,16 +1,14 @@
 import { PropsWithChildren } from 'react';
 import { 
-  Box,
   Card,
   CardBody,
-  CardFooter,
-  CardHeader,
   HStack,
-  Image,
   StackDivider,
-  Text,
 } from '@chakra-ui/react';
 import { IProduct } from 'common'
+import { ProductDescription } from './ProductDescription';
+import { ProductImage } from './ProductImage';
+
 
 
 // ==============
@@ -22,10 +20,6 @@ type TProductCardProps = {
 }
 export const ProductCard = (props: PropsWithChildren<TProductCardProps>) => {
 
-  // TODO: Get image filename with extension
-  // const imageUrl = `${props.product.tcgplayerId}.webp`
-  const imageUrl = '/foo.webp'
-
   return (
     <Card 
       direction='row'
@@ -36,18 +30,11 @@ export const ProductCard = (props: PropsWithChildren<TProductCardProps>) => {
           divider={<StackDivider borderColor='gray.200'/>}
           spacing={4}
         >
-          <Image 
+          <ProductImage 
             boxSize='100px'
-            src={imageUrl}
+            product={props.product}
           />
-          <Box>
-            <Text align='left' fontWeight='bold'>
-              {props.product.name}
-            </Text>
-            <Text align='left'>{props.product.tcg}</Text>
-            <Text align='left'>{props.product.type}</Text>
-            <Text align='left'>{props.product.subtype}</Text>   
-          </Box>
+          <ProductDescription product={props.product}/>
         </HStack>
       </CardBody>
     </Card>
