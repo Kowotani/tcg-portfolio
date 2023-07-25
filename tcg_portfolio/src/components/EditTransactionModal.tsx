@@ -19,14 +19,14 @@ import {
   ModalOverlay,
   NumberInput,
   NumberInputField,
-  SimpleGrid,
   StackDivider,
   Text,
   VStack
 } from '@chakra-ui/react';
 import { getPurchaseQuantity, getAverageCost, getTotalCost, IProduct, 
   ITransaction } from 'common';
-import { Field, FieldInputProps, Form, Formik, FormikProps } from 'formik';
+import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
+  FormikProps } from 'formik';
 import { ProductDescription } from './ProductDescription';
 import { ProductImage } from './ProductImage';
 import { getBrowserLocale } from '../utils';
@@ -47,133 +47,197 @@ interface IInputValues {
 }
 const AddTransactionForm = () => {
 
+  // functions
+
   // -- validation functions
 
   function validateDate(value: Date): string | undefined {
-    return !value ? 'Required' : undefined
+    let error
+    if (!value) { error = 'Required' }
+    return error
   }
 
   function validatePrice(value: number): string | undefined {
-    return value === 0 ? 'Required' : undefined
+    let error
+    if (!value) {
+      error = 'Price is required'
+    } else if (value <= 0) {
+      error = 'Must be positive'
+    }
+    return error
   }
 
   function validateQuantity(value: number): string | undefined {
-    return value === 0 ? 'Required' : undefined
+    let error
+    if (!value) {
+      error = 'Quantity is required'
+    } else if (value <= 0) {
+      error = 'Must be positive'
+    }
+    return error
   }
 
-  // -- component
+  // -- hanlder functions
 
-  const defaultDate = (new Date()).toISOString().substring(0,10)
+  function handlePriceOnBlur(
+    e: React.FocusEvent<HTMLInputElement, Element>,
+    form: FormikProps<IInputValues>
+  ): void {
+    if (e.target.value) {
+      form.setFieldValue('price', Math.max(Number(e.target.value), 1))
+    } else {
+      form.setErrors({'price': 'Price is required'})
+      form.setFieldTouched('price')
+    }
+  }
+
+  function handleQuantityOnBlur(
+    e: React.FocusEvent<HTMLInputElement, Element>,
+    form: FormikProps<IInputValues>
+  ): void {
+    form.setFieldValue('quantity', Math.max(Number(e.target.value), 1))
+  }
+  
+
+  // component
+
+  // defaults
+  const DEFAULT_DATE = new Date()
+  const DEFAULT_QUANTITY = 1
 
   return (
     <Card>
       <CardBody>
         <Formik
           initialValues={{
-            date: new Date(),
+            date: DEFAULT_DATE,
             price: 0,
-            quantity: 0,
+            quantity: DEFAULT_QUANTITY,
           }}
-          onSubmit={(values: IInputValues, actions) => {
-            console.log(values)
+          onSubmit={(values: IInputValues, actions: FormikHelpers<IInputValues>) => {
+            console.log('Values: ' + JSON.stringify(values))
           }}
         >
-          <Form>
-            <VStack spacing={4}>
+          {(form: FormikProps<IInputValues>) => (
 
-              {/* Date */}
-              <Field name='date' validate={validateDate}>
-                {(form: FormikProps<IInputValues>) => (
-                  <FormControl 
-                    isInvalid={form.errors?.date !== undefined
-                      && form.touched?.date as boolean}
-                    isRequired={true}
-                  >
-                    <HStack display='flex' justifyContent='space-between'>
-                      <FormLabel>Date</FormLabel>
-                      <Box>
-                        <Input
-                          type='date' 
-                          defaultValue={defaultDate}
-                        />
-                        {form.errors?.date 
-                          ? (
-                            <FormErrorMessage>
-                              {form.errors.date as string}
-                            </FormErrorMessage>
-                          ) : undefined
-                        }    
-                      </Box>    
-                    </HStack>          
-                  </FormControl>
-                )}
-              </Field>
+            <Form>
+              <VStack spacing={4}>
 
-              {/* Quantity */}
-              <Field name='quantity' validate={validateQuantity}>
-                {(form: FormikProps<IInputValues>) => (
-                  <FormControl 
-                    isInvalid={form.errors?.quantity !== undefined
-                      && form.touched?.quantity as boolean}
-                    isRequired={true}
-                  >
-                    <HStack display='flex' justifyContent='space-between'>
-                      <FormLabel>Quantity</FormLabel>
-                      <Box>
-                        <NumberInput min={1} precision={0} width='165px'>
-                          <NumberInputField />
-                        </NumberInput>
-                        {form.errors?.quantity 
-                          ? (
-                            <FormErrorMessage>
-                              {form.errors.quantity as string}
-                            </FormErrorMessage>
-                          ) : undefined
-                        }    
-                      </Box>   
-                    </HStack>           
-                  </FormControl>
-                )}
-              </Field>
+                {/* Date */}
+                <Field name='date' validate={validateDate}>
+                  {(field: FieldInputProps<string>) => (
+                    <FormControl 
+                      isInvalid={form.errors?.date !== undefined
+                        && form.touched?.date as boolean}
+                      isRequired={true}
+                    >
+                      <HStack display='flex' justifyContent='space-between'>
+                        <FormLabel>Date</FormLabel>
+                        <Box>
+                          <Input
+                            {...field}
+                            type='date'
+                            defaultValue={
+                              DEFAULT_DATE.toISOString().substring(0,10)}
+                            onBlur={(e) => {form.setFieldValue(
+                              'date', 
+                              e.target.value, 
+                              true
+                            )}}
+                          />
+                          {form.errors?.date 
+                            ? (
+                              <FormErrorMessage>
+                                {form.errors.date as string}
+                              </FormErrorMessage>
+                            ) : undefined
+                          }    
+                        </Box>    
+                      </HStack>          
+                    </FormControl>
+                  )}
+                </Field>
 
-              {/* Price */}
-              <Field name='price' validate={validatePrice}>
-                {(form: FormikProps<IInputValues>) => (
-                  <FormControl 
-                    isInvalid={form.errors?.price !== undefined
-                      && form.touched?.price as boolean}
-                    isRequired={true}
-                  >
-                    <HStack display='flex' justifyContent='space-between'>
-                    <FormLabel>Price</FormLabel>
-                      <Box>
-                        <InputGroup>
-                          <InputLeftAddon children='$' />
-                          <NumberInput min={1} precision={2} width='123px'>                        
-                            <NumberInputField />
+                {/* Quantity */}
+                <Field name='quantity' validate={validateQuantity}>
+                  {(field: FieldInputProps<number>) => (
+                    <FormControl 
+                      isInvalid={form.errors?.quantity !== undefined
+                        && form.touched?.quantity as boolean}
+                      isRequired={true}
+                    >
+                      <HStack display='flex' justifyContent='space-between'>
+                        <FormLabel>Quantity</FormLabel>
+                        <Box>
+                          <NumberInput 
+                            defaultValue={DEFAULT_QUANTITY}
+                            min={1}
+                            precision={0} 
+                            width='165px'
+                          >
+                            <NumberInputField 
+                              {...field}
+                              onBlur={(e) => handleQuantityOnBlur(e, form)}
+                              textAlign='right'
+                            />
                           </NumberInput>
-                        </InputGroup>
-                        {form.errors?.price 
-                          ? (
-                            <FormErrorMessage>
-                              {form.errors.price as string}
-                            </FormErrorMessage>
-                          ) : undefined
-                        }    
-                      </Box>   
-                    </HStack>           
-                  </FormControl>
-                )}
-              </Field>
+                          {form.errors?.quantity 
+                            ? (
+                              <FormErrorMessage>
+                                {form.errors.quantity as string}
+                              </FormErrorMessage>
+                            ) : undefined
+                          }    
+                        </Box>   
+                      </HStack>           
+                    </FormControl>
+                  )}
+                </Field>
 
-              <Button 
-                colorScheme='green' 
-                type='submit'
-              >
-                Add Transaction
-              </Button>
-            </VStack>
-          </Form>
+                {/* Price */}
+                <Field name='price' validate={validatePrice}>
+                  {(field: FieldInputProps<number>) => (
+                    <FormControl 
+                      isInvalid={form.errors?.price !== undefined
+                        && form.touched?.price as boolean}
+                      isRequired={true}
+                    >
+                      <HStack display='flex' justifyContent='space-between'>
+                      <FormLabel>Price</FormLabel>
+                        <Box>
+                          <InputGroup>
+                            <InputLeftAddon children='$' />
+                            <NumberInput min={1} precision={2} width='123px'>                        
+                              <NumberInputField 
+                                {...field} 
+                                onBlur={(e) => handlePriceOnBlur(e, form)}
+                                textAlign='right'
+                              />
+                            </NumberInput>
+                          </InputGroup>
+                          {form.errors?.price 
+                            ? (
+                              <FormErrorMessage justifyContent='flex-end'>
+                                {form.errors.price as string}
+                              </FormErrorMessage>
+                            ) : undefined
+                          }    
+                        </Box>   
+                      </HStack>           
+                    </FormControl>
+                  )}
+                </Field>
+
+                <Button 
+                  colorScheme='green' 
+                  type='submit'
+                >
+                  Add Transaction
+                </Button>
+              </VStack>
+            </Form>
+
+          )}
         </Formik>
       </CardBody>
     </Card>
@@ -238,33 +302,8 @@ export const EditTransactionModal = (
   props: PropsWithChildren<TEditTransactionalModalProps>
 ) => {
 
-  const [ transactions, setTransactions ] = useState()
-
-  // --------------------
-  // Add Transaction Form
-  // --------------------
-
-  // -- validation functions
-
-  function validateDate(value: Date): string | undefined {
-    return !value ? 'Required' : undefined
-  }
-
-  function validateQuantity(value: number): string | undefined {
-    let error
-    if (value === 0) {
-      error = 'Required'
-    }
-    if (value < 0) {
-      error = 'Must be positive'
-    }
-    return error
-  }
-
-  // -- component
-
+  // const [ transactions, setTransactions ] = useState()
   
-
   // --------------
   // Main Component
   // --------------
