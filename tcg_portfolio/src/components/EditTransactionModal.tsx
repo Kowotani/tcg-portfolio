@@ -19,12 +19,14 @@ import {
   ModalOverlay,
   NumberInput,
   NumberInputField,
+  Radio,
+  RadioGroup,
   StackDivider,
   Text,
   VStack
 } from '@chakra-ui/react';
 import { getPurchaseQuantity, getAverageCost, getTotalCost, IProduct, 
-  ITransaction } from 'common';
+  ITransaction, TransactionType } from 'common';
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik';
 import { ProductDescription } from './ProductDescription';
@@ -43,7 +45,8 @@ import { getBrowserLocale } from '../utils';
 interface IInputValues {
   date: Date,
   price: number,
-  quantity: number
+  quantity: number,
+  type: TransactionType.Purchase | TransactionType.Sale
 }
 const AddTransactionForm = () => {
 
@@ -79,6 +82,13 @@ const AddTransactionForm = () => {
 
   // -- hanlder functions
 
+  function handleDateOnBlur(
+    e: React.FocusEvent<HTMLInputElement, Element>,
+    form: FormikProps<IInputValues>
+  ): void {
+    form.setFieldValue('date', e.target.value)
+  }
+
   function handlePriceOnBlur(
     e: React.FocusEvent<HTMLInputElement, Element>,
     form: FormikProps<IInputValues>
@@ -98,12 +108,20 @@ const AddTransactionForm = () => {
     form.setFieldValue('quantity', Math.max(Number(e.target.value), 1))
   }
   
+  function handleTypeOnChange(
+    e: string,
+    form: FormikProps<IInputValues>
+  ): void {
+    form.setFieldValue('type', e)
+  }
+
 
   // component
 
   // defaults
   const DEFAULT_DATE = new Date()
   const DEFAULT_QUANTITY = 1
+  const DEFAULT_TYPE = TransactionType.Purchase
 
   return (
     <Card>
@@ -113,15 +131,31 @@ const AddTransactionForm = () => {
             date: DEFAULT_DATE,
             price: 0,
             quantity: DEFAULT_QUANTITY,
+            type: DEFAULT_TYPE
           }}
           onSubmit={(values: IInputValues, actions: FormikHelpers<IInputValues>) => {
             console.log('Values: ' + JSON.stringify(values))
+            actions.setSubmitting(false)
           }}
         >
           {(form: FormikProps<IInputValues>) => (
 
             <Form>
               <VStack spacing={4}>
+
+                {/* Type */}
+                <Field name='type' >
+                  {(field: FieldInputProps<string>) => (
+                    <RadioGroup
+                      onChange={(e) => handleTypeOnChange(e, form)}
+                    >
+                      <HStack spacing={8}>
+                        <Radio value={TransactionType.Purchase}>Purchase</Radio>
+                        <Radio value={TransactionType.Sale}>Sale</Radio>
+                      </HStack>
+                    </RadioGroup>
+                  )}
+                </Field>
 
                 {/* Date */}
                 <Field name='date' validate={validateDate}>
@@ -139,11 +173,7 @@ const AddTransactionForm = () => {
                             type='date'
                             defaultValue={
                               DEFAULT_DATE.toISOString().substring(0,10)}
-                            onBlur={(e) => {form.setFieldValue(
-                              'date', 
-                              e.target.value, 
-                              true
-                            )}}
+                            onBlur={(e) => handleDateOnBlur(e, form)}
                           />
                           {form.errors?.date 
                             ? (
@@ -158,8 +188,8 @@ const AddTransactionForm = () => {
                   )}
                 </Field>
 
-                {/* Quantity */}
-                <Field name='quantity' validate={validateQuantity}>
+               {/* Quantity */}
+               <Field name='quantity' validate={validateQuantity}>
                   {(field: FieldInputProps<number>) => (
                     <FormControl 
                       isInvalid={form.errors?.quantity !== undefined
@@ -230,6 +260,7 @@ const AddTransactionForm = () => {
 
                 <Button 
                   colorScheme='green' 
+                  isLoading={form.isSubmitting}
                   type='submit'
                 >
                   Add Transaction
