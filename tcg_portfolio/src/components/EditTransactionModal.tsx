@@ -25,7 +25,7 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react';
-import { getPurchaseQuantity, getAverageCost, getTotalCost, IProduct, 
+import { getAverageCost, getPurchaseQuantity, getTotalCost, IProduct, 
   ITransaction, TransactionType } from 'common';
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik';
@@ -327,22 +327,73 @@ const TransactionSummaryCardProps = (
 // TransactionTable
 // -----------------
 
+/*
+DESC
+  Returns the input price formatted according to the locale and the number
+  of decimal places
+INPUT
+  price: The price to format
+  locale: The locale to format against
+  decimal?: The number of decimals to format to, defaults to 0
+  prefix?: Any prefix to pre-pend to the price
+RETURN
+  The price formatted to the locale with the prfeix and number of decimal places
+*/
+function getFormattedPrice(
+  price: number, 
+  locale: string,
+  prefix?: string,
+  decimals?: number,
+): string {
+
+  let formattedPrice = price.toLocaleString(locale)
+  const decimalIx = formattedPrice.indexOf('.')
+  const precision = decimalIx >= 0 ? price.toString().length - decimalIx : 0
+
+  // precision required
+  if (decimals !== undefined && decimals > 0) {
+    
+    // no existing precision
+    if (precision === 0) {
+      formattedPrice = formattedPrice + '.' + '0'.repeat(decimals)
+
+    // existing precision too high
+    } else if (precision > decimals) {
+      formattedPrice = formattedPrice.substring(0, 
+        formattedPrice.length - (precision - decimals))
+
+    // existing precision too low
+    } else if (precision < decimals) {
+      formattedPrice = formattedPrice + '0'.repeat(decimals - precision)
+    }
+  
+  // precision not required
+  } else if (decimalIx >= 0) {
+    formattedPrice = formattedPrice.substring(0, decimalIx)
+  }
+
+  return prefix ? prefix + formattedPrice : formattedPrice
+}
+
+const locale = getBrowserLocale()
+
 const data: ITransaction[] = [
   {
     type: TransactionType.Purchase,
     date: new Date(),
-    price: 4.56,
+    price: 1234.56,
     quantity: 123
   },
   {
     type: TransactionType.Purchase,
     date: new Date(2023, 7, 1),
-    price: 6.54,
-    quantity: 987
+    price: 9,
+    quantity: 9876
   },
 ]
 
 const columnHelper = createColumnHelper<ITransaction>()
+
 const columns = [
   columnHelper.accessor('date', {
     cell: (info) => info.getValue().toISOString().substring(0,10),
@@ -353,14 +404,14 @@ const columns = [
     header: 'Type'
   }),
   columnHelper.accessor('quantity', {
-    cell: (info) => info.getValue(),
+    cell: (info) => info.getValue().toLocaleString(locale),
     header: 'Quantity',
     meta: {
       isNumeric: true
     }
   }),
   columnHelper.accessor('price', {
-    cell: (info) => info.getValue(),
+    cell: (info) => getFormattedPrice(info.getValue(), locale, '$', 2),
     header: 'Price',
     meta: {
       isNumeric: true
