@@ -50,3 +50,32 @@ export interface ISideBarNavContext {
   sideBarNav: ISideBarNav,
   setSideBarNav: React.Dispatch<React.SetStateAction<ISideBarNav>>
 }
+
+
+// =========
+// functions
+// =========
+
+/*
+DESC
+  Returns the first locale detected from the browser (ie. navigator.languages). 
+  Defaults to 'en-US' if none are found
+RETURN
+  The first locale detected from the browser
+REF
+  https://phrase.com/blog/posts/detecting-a-users-locale/
+*/
+export function getBrowserLocale(): string {
+  
+  const DEFAULT_LOCALE = 'en-US'
+
+  const browserLocales = navigator.languages === undefined
+    ? [navigator.language]
+    : navigator.languages
+
+  if (!browserLocales || browserLocales.length === 0) {
+    return DEFAULT_LOCALE
+  }
+
+  return browserLocales[0].trim()
+}
