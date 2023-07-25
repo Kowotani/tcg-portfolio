@@ -147,7 +147,9 @@ const AddTransactionForm = () => {
                 <Field name='type' >
                   {(field: FieldInputProps<string>) => (
                     <RadioGroup
+                      {...field}
                       onChange={(e) => handleTypeOnChange(e, form)}
+                      defaultValue={TransactionType.Purchase}
                     >
                       <HStack spacing={8}>
                         <Radio value={TransactionType.Purchase}>Purchase</Radio>
