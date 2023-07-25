@@ -32,6 +32,8 @@ import { Field, FieldInputProps, Form, Formik, FormikHelpers,
 import { ProductDescription } from './ProductDescription';
 import { ProductImage } from './ProductImage';
 import { getBrowserLocale } from '../utils';
+import { createColumnHelper } from '@tanstack/react-table';
+import { TransactionTable } from './TransactionTable';
 
 
 // ==============
@@ -80,7 +82,7 @@ const AddTransactionForm = () => {
     return error
   }
 
-  // -- hanlder functions
+  // -- handler functions
 
   function handleDateOnBlur(
     e: React.FocusEvent<HTMLInputElement, Element>,
@@ -321,6 +323,52 @@ const TransactionSummaryCardProps = (
 }
 
 
+// -----------------
+// TransactionTable
+// -----------------
+
+const data: ITransaction[] = [
+  {
+    type: TransactionType.Purchase,
+    date: new Date(),
+    price: 4.56,
+    quantity: 123
+  },
+  {
+    type: TransactionType.Purchase,
+    date: new Date(2023, 7, 1),
+    price: 6.54,
+    quantity: 987
+  },
+]
+
+const columnHelper = createColumnHelper<ITransaction>()
+const columns = [
+  columnHelper.accessor('date', {
+    cell: (info) => info.getValue().toISOString().substring(0,10),
+    header: 'Date'
+  }),
+  columnHelper.accessor('type', {
+    cell: (info) => info.getValue() === 'Purchase' ? 'Buy' : 'Sell',
+    header: 'Type'
+  }),
+  columnHelper.accessor('quantity', {
+    cell: (info) => info.getValue(),
+    header: 'Quantity',
+    meta: {
+      isNumeric: true
+    }
+  }),
+  columnHelper.accessor('price', {
+    cell: (info) => info.getValue(),
+    header: 'Price',
+    meta: {
+      isNumeric: true
+    }
+  }),  
+]
+
+
 // ==============
 // Main Component
 // ==============
@@ -360,6 +408,11 @@ export const EditTransactionModal = (
             />
             <TransactionSummaryCardProps transactions={props.transactions}/>
             <AddTransactionForm />
+            <Card>
+              <CardBody>
+                <TransactionTable columns={columns} data={data}/>
+              </CardBody>
+            </Card>
           </VStack>
         </ModalBody>
         <ModalFooter display='flex' justifyContent='space-evenly'>
