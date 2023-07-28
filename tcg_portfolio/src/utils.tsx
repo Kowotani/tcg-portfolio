@@ -86,3 +86,51 @@ export function getBrowserLocale(): string {
 
   return browserLocales[0].trim()
 }
+
+/*
+DESC
+  Returns the input price formatted according to the locale and the number
+  of decimal places
+INPUT
+  price: The price to format
+  locale: The locale to format against
+  decimal?: The number of decimals to format to, defaults to 0
+  prefix?: Any prefix to pre-pend to the price
+RETURN
+  The price formatted to the locale with the prfeix and number of decimal places
+*/
+export function getFormattedPrice(
+  price: number, 
+  locale: string,
+  prefix?: string,
+  decimals?: number,
+): string {
+
+  let formattedPrice = price.toLocaleString(locale)
+  const decimalIx = formattedPrice.indexOf('.')
+  const precision = decimalIx >= 0 ? price.toString().length - decimalIx : 0
+
+  // precision required
+  if (decimals !== undefined && decimals > 0) {
+    
+    // no existing precision
+    if (precision === 0) {
+      formattedPrice = formattedPrice + '.' + '0'.repeat(decimals)
+
+    // existing precision too high
+    } else if (precision > decimals) {
+      formattedPrice = formattedPrice.substring(0, 
+        formattedPrice.length - (precision - decimals))
+
+    // existing precision too low
+    } else if (precision < decimals) {
+      formattedPrice = formattedPrice + '0'.repeat(decimals - precision)
+    }
+  
+  // precision not required
+  } else if (decimalIx >= 0) {
+    formattedPrice = formattedPrice.substring(0, decimalIx)
+  }
+
+  return prefix ? prefix + formattedPrice : formattedPrice
+}
