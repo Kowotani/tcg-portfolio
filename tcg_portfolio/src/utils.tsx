@@ -106,9 +106,16 @@ export function getFormattedPrice(
   decimals?: number,
 ): string {
 
-  let formattedPrice = price.toLocaleString(locale)
+  // round trao;omg decimals to handle potential rounding from toLocaleString()
+  const roundedPrice = decimals 
+    ? Math.round(price * Math.pow(10, decimals)) / Math.pow(10, decimals)
+    : Math.round(price)
+
+  let formattedPrice = roundedPrice.toLocaleString(locale)
   const decimalIx = formattedPrice.indexOf('.')
-  const precision = decimalIx >= 0 ? price.toString().length - decimalIx : 0
+  const precision = decimalIx >= 0 
+    ? roundedPrice.toString().length - decimalIx - 1 
+    : 0
 
   // precision required
   if (decimals !== undefined && decimals > 0) {
