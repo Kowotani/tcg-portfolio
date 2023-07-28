@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useContext } from 'react';
 import { 
   Box,
   Button,
@@ -12,11 +12,12 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { IHydratedHolding, IProduct } from 'common';
-import { EditTransactionModal } from './EditTransactionModal';
+import { EditTransactionsModal } from './EditTransactionsModal';
 import { ProductDescription } from './ProductDescription';
 import { ProductImage } from './ProductImage';
-import { getBrowserLocale } from '../utils';
+import { getBrowserLocale, IEditTransactionsContext } from '../utils';
 
+import { EditTransactionsContext } from '../state/EditTransactionsContext';
 
 // ==============
 // Sub Components
@@ -61,6 +62,14 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+  const { setTransactions } 
+    = useContext(EditTransactionsContext) as IEditTransactionsContext
+
+  function handleModalOnClick(): void {
+    setTransactions(props.holding.transactions)
+    onOpen()
+  }
+
   return (
     <>
       <Card>
@@ -82,17 +91,21 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
               >
                 <ProductDescription product={props.product} showHeader={false} />
                 <HoldingSummary holding={props.holding} />
-                <Button colorScheme='blue' onClick={onOpen}>Transactions</Button>
+                <Button 
+                  colorScheme='blue' 
+                  onClick={handleModalOnClick}
+                >
+                  Transactions
+                </Button>
               </HStack>
             </VStack>
           </HStack>
         </CardBody>
       </Card>
-      <EditTransactionModal 
+      <EditTransactionsModal 
         isOpen={isOpen} 
         onClose={onClose} 
         product={props.product}
-        transactions={props.holding.transactions}
       />
     </>
   )
