@@ -162,7 +162,7 @@ export declare function isPriceString(value: string): boolean;
 export declare function isTCGPriceTypeValue(value: string): boolean;
 export declare function sortFnDateAsc(a: Date, b: Date): number;
 export declare function sortFnDateDesc(a: Date, b: Date): number;
-export declare function getAverageCost(transactions: ITransaction[]): number;
+export declare function getAverageCost(transactions: ITransaction[]): number | undefined;
 export declare function getPurchases(transactions: ITransaction[]): ITransaction[];
 export declare function getPurchaseQuantity(transactions: ITransaction[]): number;
 export declare function getQuantity(transactions: ITransaction[]): number;

@@ -479,12 +479,17 @@ DESC
 INPUT
   transactions: An ITransaction array
 RETURN
-  The average purchase cost quantity from the input ITransaction
+  The average purchase cost quantity from the input ITransaction, or undefined
+  if purchaseQuantity === 0
 */
-export function getAverageCost(transactions: ITransaction[]): number {
-  const value =  getTotalCost(transactions) / getPurchaseQuantity(transactions)
-  assert(value >= 0)
-  return value
+export function getAverageCost(
+  transactions: ITransaction[]
+): number | undefined {
+  const quantity = getPurchaseQuantity(transactions)
+  return quantity === 0 
+    ? undefined
+    : getTotalCost(transactions) / quantity
+  
 }
 
 /*
@@ -513,7 +518,7 @@ export function getPurchaseQuantity(transactions: ITransaction[]): number {
   const value =  _.sumBy(getPurchases(transactions), (txn: ITransaction) => {
     return txn.quantity
   })
-  assert(value >= 0)
+  assert(value >= 0, 'getPurchaseQuantity() is not at least 0')
   return value
 }
 
@@ -529,7 +534,7 @@ export function getQuantity(transactions: ITransaction[]): number {
   const value =  _.sumBy(transactions, (txn: ITransaction) => {
     return txn.quantity
   })
-  assert(value >= 0)
+  assert(value >= 0, 'getQuantity() is not at least 0')
   return value
 }
 
@@ -546,6 +551,6 @@ export function getTotalCost(transactions: ITransaction[]): number {
   const value =  _.sumBy(getPurchases(transactions), (txn: ITransaction) => {
     return txn.quantity * txn.price
   })
-  assert(value >= 0)
+  assert(value >= 0, 'getTotalCost() is not at least 0')
   return value
 }

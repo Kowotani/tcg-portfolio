@@ -307,12 +307,14 @@ DESC
 INPUT
   transactions: An ITransaction array
 RETURN
-  The average purchase cost quantity from the input ITransaction
+  The average purchase cost quantity from the input ITransaction, or undefined
+  if purchaseQuantity === 0
 */
 function getAverageCost(transactions) {
-    var value = getTotalCost(transactions) / getPurchaseQuantity(transactions);
-    assert(value >= 0);
-    return value;
+    var quantity = getPurchaseQuantity(transactions);
+    return quantity === 0
+        ? undefined
+        : getTotalCost(transactions) / quantity;
 }
 exports.getAverageCost = getAverageCost;
 /*
@@ -342,7 +344,7 @@ function getPurchaseQuantity(transactions) {
     var value = _.sumBy(getPurchases(transactions), function (txn) {
         return txn.quantity;
     });
-    assert(value >= 0);
+    assert(value >= 0, 'getPurchaseQuantity() is not at least 0');
     return value;
 }
 exports.getPurchaseQuantity = getPurchaseQuantity;
@@ -358,7 +360,7 @@ function getQuantity(transactions) {
     var value = _.sumBy(transactions, function (txn) {
         return txn.quantity;
     });
-    assert(value >= 0);
+    assert(value >= 0, 'getQuantity() is not at least 0');
     return value;
 }
 exports.getQuantity = getQuantity;
@@ -375,7 +377,7 @@ function getTotalCost(transactions) {
     var value = _.sumBy(getPurchases(transactions), function (txn) {
         return txn.quantity * txn.price;
     });
-    assert(value >= 0);
+    assert(value >= 0, 'getTotalCost() is not at least 0');
     return value;
 }
 exports.getTotalCost = getTotalCost;
