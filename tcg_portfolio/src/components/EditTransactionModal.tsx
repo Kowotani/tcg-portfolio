@@ -1,4 +1,4 @@
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useContext, useEffect } from 'react';
 import { 
   Box,
   Button,
@@ -31,10 +31,12 @@ import { Field, FieldInputProps, Form, Formik, FormikHelpers,
   FormikProps } from 'formik';
 import { ProductDescription } from './ProductDescription';
 import { ProductImage } from './ProductImage';
-import { getBrowserLocale } from '../utils';
+import { getBrowserLocale, getFormattedPrice, IEditTransactionsContext
+  } from '../utils';
 import { createColumnHelper } from '@tanstack/react-table';
 import { TransactionTable } from './TransactionTable';
 
+import { EditTransactionsContext } from '../state/EditTransactionsContext';
 
 // ==============
 // Sub Components
@@ -51,6 +53,10 @@ interface IInputValues {
   type: TransactionType.Purchase | TransactionType.Sale
 }
 const AddTransactionForm = () => {
+
+  // contexts
+  const { transactions, setTransactions } 
+    = useContext(EditTransactionsContext) as IEditTransactionsContext
 
   // functions
 
@@ -117,6 +123,10 @@ const AddTransactionForm = () => {
     form.setFieldValue('type', e)
   }
 
+  function handleAddTransaction(txn: ITransaction): void {
+    setTransactions([...transactions, txn])
+  }
+
 
   // component
 
@@ -138,6 +148,13 @@ const AddTransactionForm = () => {
           onSubmit={(values: IInputValues, actions: FormikHelpers<IInputValues>) => {
             console.log('Values: ' + JSON.stringify(values))
             actions.setSubmitting(false)
+            handleAddTransaction({
+              ...values,
+              // TODO: figure out how to fix this
+              date: typeof values.date === 'string'
+                ? new Date(Date.parse(values.date))
+                : values.date
+            } as ITransaction)
           }}
         >
           {(form: FormikProps<IInputValues>) => (
@@ -327,70 +344,7 @@ const TransactionSummaryCardProps = (
 // TransactionTable
 // -----------------
 
-/*
-DESC
-  Returns the input price formatted according to the locale and the number
-  of decimal places
-INPUT
-  price: The price to format
-  locale: The locale to format against
-  decimal?: The number of decimals to format to, defaults to 0
-  prefix?: Any prefix to pre-pend to the price
-RETURN
-  The price formatted to the locale with the prfeix and number of decimal places
-*/
-function getFormattedPrice(
-  price: number, 
-  locale: string,
-  prefix?: string,
-  decimals?: number,
-): string {
-
-  let formattedPrice = price.toLocaleString(locale)
-  const decimalIx = formattedPrice.indexOf('.')
-  const precision = decimalIx >= 0 ? price.toString().length - decimalIx : 0
-
-  // precision required
-  if (decimals !== undefined && decimals > 0) {
-    
-    // no existing precision
-    if (precision === 0) {
-      formattedPrice = formattedPrice + '.' + '0'.repeat(decimals)
-
-    // existing precision too high
-    } else if (precision > decimals) {
-      formattedPrice = formattedPrice.substring(0, 
-        formattedPrice.length - (precision - decimals))
-
-    // existing precision too low
-    } else if (precision < decimals) {
-      formattedPrice = formattedPrice + '0'.repeat(decimals - precision)
-    }
-  
-  // precision not required
-  } else if (decimalIx >= 0) {
-    formattedPrice = formattedPrice.substring(0, decimalIx)
-  }
-
-  return prefix ? prefix + formattedPrice : formattedPrice
-}
-
 const locale = getBrowserLocale()
-
-const data: ITransaction[] = [
-  {
-    type: TransactionType.Purchase,
-    date: new Date(),
-    price: 1234.56,
-    quantity: 123
-  },
-  {
-    type: TransactionType.Purchase,
-    date: new Date(2023, 7, 1),
-    price: 9,
-    quantity: 9876
-  },
-]
 
 const columnHelper = createColumnHelper<ITransaction>()
 
@@ -400,11 +354,15 @@ const columns = [
     header: 'Date'
   }),
   columnHelper.accessor('type', {
-    cell: (info) => info.getValue() === 'Purchase' ? 'Buy' : 'Sell',
+    cell: (info) => info.getValue() === TransactionType.Purchase ? 'P' : 'S',
     header: 'Type'
   }),
   columnHelper.accessor('quantity', {
-    cell: (info) => info.getValue().toLocaleString(locale),
+    cell: (info) => {
+      const sign = info.row.getValue('type') === TransactionType.Sale ? '-' : ''
+      const strQuantity = sign.concat(info.getValue().toLocaleString(locale))
+      return strQuantity
+    },
     header: 'Quantity',
     meta: {
       isNumeric: true
@@ -434,8 +392,11 @@ export const EditTransactionModal = (
   props: PropsWithChildren<TEditTransactionalModalProps>
 ) => {
 
-  // const [ transactions, setTransactions ] = useState()
-  
+  // contexts
+  const { transactions } 
+    = useContext(EditTransactionsContext) as IEditTransactionsContext
+
+
   // --------------
   // Main Component
   // --------------
@@ -461,7 +422,10 @@ export const EditTransactionModal = (
             <AddTransactionForm />
             <Card>
               <CardBody>
-                <TransactionTable columns={columns} data={data}/>
+                <TransactionTable 
+                  columns={columns} 
+                  data={transactions}
+                />
               </CardBody>
             </Card>
           </VStack>
