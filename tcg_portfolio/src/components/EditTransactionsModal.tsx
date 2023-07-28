@@ -146,7 +146,7 @@ const AddTransactionForm = () => {
             type: DEFAULT_TYPE
           }}
           onSubmit={(values: IInputValues, actions: FormikHelpers<IInputValues>) => {
-            console.log('Values: ' + JSON.stringify(values))
+            // console.log('Values: ' + JSON.stringify(values))
             actions.setSubmitting(false)
             handleAddTransaction({
               ...values,
@@ -323,15 +323,22 @@ const TransactionSummaryCardProps = (
         >
           <Box>
             <Text align='center' fontWeight='bold'>Quantity</Text>
-            <Text align='center'>{quantity.toLocaleString(locale)}</Text>
+            <Text align='center'>
+              {getFormattedPrice(quantity, locale, '', 0)}
+            </Text>
           </Box>
           <Box>
             <Text align='center' fontWeight='bold'>Total Cost</Text>
-            <Text align='center'>${totalCost.toLocaleString(locale)}</Text>
+            <Text align='center'>
+              {getFormattedPrice(totalCost, locale, '$', 2)}
+            </Text>
           </Box>
           <Box>
             <Text align='center' fontWeight='bold'>Average Cost</Text>
-            <Text align='center'>${averageCost.toLocaleString(locale)}</Text>
+            <Text align='center'>{averageCost 
+              ? getFormattedPrice(averageCost, locale, '$', 2)
+              : ' -'}
+            </Text>
           </Box>                    
         </HStack>
       </CardBody>
@@ -382,14 +389,13 @@ const columns = [
 // Main Component
 // ==============
 
-type TEditTransactionalModalProps = {
+type TEditTransactionsModalProps = {
   isOpen: boolean,
   onClose: () => void,
   product: IProduct,
-  transactions: ITransaction[]
 }
-export const EditTransactionModal = (
-  props: PropsWithChildren<TEditTransactionalModalProps>
+export const EditTransactionsModal = (
+  props: PropsWithChildren<TEditTransactionsModalProps>
 ) => {
 
   // contexts
@@ -418,7 +424,7 @@ export const EditTransactionModal = (
               product={props.product} 
               showHeader={false} 
             />
-            <TransactionSummaryCardProps transactions={props.transactions}/>
+            <TransactionSummaryCardProps transactions={transactions}/>
             <AddTransactionForm />
             <Card>
               <CardBody>
