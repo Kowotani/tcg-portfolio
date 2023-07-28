@@ -3,15 +3,13 @@ import { ITransaction } from 'common';
 import { IEditTransactionsContext } from '../utils';
 
 // create context
-export const EditTransactionsContext = createContext<IEditTransactionsContext>({
-  transactions: [] as ITransaction[],
-  setTransactions: () => {}     // dummy placeholder
-});
+export const EditTransactionsContext = 
+  createContext<IEditTransactionsContext | null>(null);
 
 // create Provider
 export const EditTransactionsProvider = (props: PropsWithChildren) => {
 
-  const [transactions, setTransactions] = useState([] as ITransaction[])
+  const [transactions, setTransactions] = useState<ITransaction[]>([])
 
   const value = {transactions, setTransactions}
 
