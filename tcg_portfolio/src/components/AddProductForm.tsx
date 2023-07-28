@@ -17,7 +17,7 @@ import { getProductSubtypes, IProduct, isASCII, ProductLanguage,
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField';
 import { SideBarNavContext } from '../state/SideBarNavContext';
-import { SideBarNav } from '../utils';
+import { ISideBarNavContext, SideBarNav } from '../utils';
 
 
 // ==============
@@ -417,7 +417,7 @@ export const AddProductForm = () => {
   }
 
   // SideBar context
-  const { sideBarNav } = useContext(SideBarNavContext)
+  const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
   const isAddProductForm = sideBarNav === SideBarNav.ADD_PRODUCT
 
   // handle TCG changes
