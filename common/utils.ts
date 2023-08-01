@@ -501,13 +501,13 @@ RETURN
   The average sale revenue from the input ITransaction, or undefined
   if saleQuantity === 0
 */
-export function getAverageRev(
+export function getAverageRevenue(
   transactions: ITransaction[]
 ): number | undefined {
   const quantity = getSaleQuantity(transactions)
   return quantity === 0 
     ? undefined
-    : getTotalRev(transactions) / quantity
+    : getTotalRevenue(transactions) / quantity
 }
 
 /*
@@ -612,7 +612,7 @@ INPUT
 RETURN
   The total sale revenue from the input ITransaction
 */
-export function getTotalRev(transactions: ITransaction[]): number {
+export function getTotalRevenue(transactions: ITransaction[]): number {
   const value =  _.sumBy(getSales(transactions), (txn: ITransaction) => {
     return txn.quantity * txn.price
   })

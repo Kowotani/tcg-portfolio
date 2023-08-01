@@ -1,7 +1,7 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.getTotalRev = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getAverageRev = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
+exports.getTotalRevenue = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getAverageRevenue = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
 var _ = require("lodash");
 // =====
 // enums
@@ -327,13 +327,13 @@ RETURN
   The average sale revenue from the input ITransaction, or undefined
   if saleQuantity === 0
 */
-function getAverageRev(transactions) {
+function getAverageRevenue(transactions) {
     var quantity = getSaleQuantity(transactions);
     return quantity === 0
         ? undefined
-        : getTotalRev(transactions) / quantity;
+        : getTotalRevenue(transactions) / quantity;
 }
-exports.getAverageRev = getAverageRev;
+exports.getAverageRevenue = getAverageRevenue;
 /*
 DESC
   Returns the purchases from the input ITransaction array
@@ -438,11 +438,11 @@ INPUT
 RETURN
   The total sale revenue from the input ITransaction
 */
-function getTotalRev(transactions) {
+function getTotalRevenue(transactions) {
     var value = _.sumBy(getSales(transactions), function (txn) {
         return txn.quantity * txn.price;
     });
     assert(value >= 0, 'getTotalRev() is not at least 0');
     return value;
 }
-exports.getTotalRev = getTotalRev;
+exports.getTotalRevenue = getTotalRevenue;
