@@ -95,6 +95,9 @@ export interface ITransaction {
     price: number;
     quantity: number;
 }
+export interface IDeletableTransaction extends ITransaction {
+    delete?: boolean;
+}
 export interface IHolding {
     tcgplayerId: number;
     transactions: ITransaction[];

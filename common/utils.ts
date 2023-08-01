@@ -248,6 +248,11 @@ export interface ITransaction {
   quantity: number,
 }
 
+// dummy interface to support a delete button column in React table
+export interface IDeletableTransaction extends ITransaction {
+  delete?: boolean,
+}
+
 // holding
 export interface IHolding {
   tcgplayerId: number,
