@@ -1,7 +1,7 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.getTotalCost = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
+exports.getTotalRev = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getAverageRev = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
 var _ = require("lodash");
 // =====
 // enums
@@ -307,7 +307,7 @@ DESC
 INPUT
   transactions: An ITransaction array
 RETURN
-  The average purchase cost quantity from the input ITransaction, or undefined
+  The average purchase cost from the input ITransaction, or undefined
   if purchaseQuantity === 0
 */
 function getAverageCost(transactions) {
@@ -319,7 +319,24 @@ function getAverageCost(transactions) {
 exports.getAverageCost = getAverageCost;
 /*
 DESC
-  Returns the purchasess from the input ITransaction array
+  Returns the average sale revemue from the input ITransaction. This value
+  should never be negative
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The average sale revenue from the input ITransaction, or undefined
+  if saleQuantity === 0
+*/
+function getAverageRev(transactions) {
+    var quantity = getSaleQuantity(transactions);
+    return quantity === 0
+        ? undefined
+        : getTotalRev(transactions) / quantity;
+}
+exports.getAverageRev = getAverageRev;
+/*
+DESC
+  Returns the purchases from the input ITransaction array
 INPUT
   transactions: An ITransaction array
 RETURN
@@ -366,12 +383,43 @@ function getQuantity(transactions) {
 exports.getQuantity = getQuantity;
 /*
 DESC
+  Returns the sales from the input ITransaction array
+INPUT
+  transactions: An ITransaction array
+RETURN
+  An array of sales from the ITransaction array
+*/
+function getSales(transactions) {
+    return transactions.filter(function (txn) {
+        return txn.type === TransactionType.Sale;
+    });
+}
+exports.getSales = getSales;
+/*
+DESC
+  Returns the sale quantity from the input ITransaction. This value
+  should never be negative
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The sale quantity from the input ITransaction
+*/
+function getSaleQuantity(transactions) {
+    var value = _.sumBy(getSales(transactions), function (txn) {
+        return txn.quantity;
+    });
+    assert(value >= 0, 'getSaleQuantity() is not at least 0');
+    return value;
+}
+exports.getSaleQuantity = getSaleQuantity;
+/*
+DESC
   Returns the total purchase cost from the input ITransaction. This value
   should never be negative
 INPUT
   transactions: An ITransaction array
 RETURN
-  The total purchase cost quantity from the input ITransaction
+  The total purchase cost from the input ITransaction
 */
 function getTotalCost(transactions) {
     var value = _.sumBy(getPurchases(transactions), function (txn) {
@@ -381,3 +429,20 @@ function getTotalCost(transactions) {
     return value;
 }
 exports.getTotalCost = getTotalCost;
+/*
+DESC
+  Returns the total sale revenue from the input ITransaction. This value
+  should never be negative
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The total sale revenue from the input ITransaction
+*/
+function getTotalRev(transactions) {
+    var value = _.sumBy(getSales(transactions), function (txn) {
+        return txn.quantity * txn.price;
+    });
+    assert(value >= 0, 'getTotalRev() is not at least 0');
+    return value;
+}
+exports.getTotalRev = getTotalRev;

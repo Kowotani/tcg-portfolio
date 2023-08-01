@@ -479,7 +479,7 @@ DESC
 INPUT
   transactions: An ITransaction array
 RETURN
-  The average purchase cost quantity from the input ITransaction, or undefined
+  The average purchase cost from the input ITransaction, or undefined
   if purchaseQuantity === 0
 */
 export function getAverageCost(
@@ -489,12 +489,30 @@ export function getAverageCost(
   return quantity === 0 
     ? undefined
     : getTotalCost(transactions) / quantity
-  
 }
 
 /*
 DESC
-  Returns the purchasess from the input ITransaction array
+  Returns the average sale revemue from the input ITransaction. This value
+  should never be negative
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The average sale revenue from the input ITransaction, or undefined
+  if saleQuantity === 0
+*/
+export function getAverageRev(
+  transactions: ITransaction[]
+): number | undefined {
+  const quantity = getSaleQuantity(transactions)
+  return quantity === 0 
+    ? undefined
+    : getTotalRev(transactions) / quantity
+}
+
+/*
+DESC
+  Returns the purchases from the input ITransaction array
 INPUT
   transactions: An ITransaction array
 RETURN
@@ -540,17 +558,64 @@ export function getQuantity(transactions: ITransaction[]): number {
 
 /*
 DESC
+  Returns the sales from the input ITransaction array
+INPUT
+  transactions: An ITransaction array
+RETURN
+  An array of sales from the ITransaction array
+*/
+export function getSales(transactions: ITransaction[]): ITransaction[] {
+  return transactions.filter((txn: ITransaction) => {
+    return txn.type === TransactionType.Sale
+})}
+
+/*
+DESC
+  Returns the sale quantity from the input ITransaction. This value
+  should never be negative
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The sale quantity from the input ITransaction
+*/
+export function getSaleQuantity(transactions: ITransaction[]): number {
+  const value =  _.sumBy(getSales(transactions), (txn: ITransaction) => {
+    return txn.quantity
+  })
+  assert(value >= 0, 'getSaleQuantity() is not at least 0')
+  return value
+}
+
+/*
+DESC
   Returns the total purchase cost from the input ITransaction. This value
   should never be negative
 INPUT
   transactions: An ITransaction array
 RETURN
-  The total purchase cost quantity from the input ITransaction
+  The total purchase cost from the input ITransaction
 */
 export function getTotalCost(transactions: ITransaction[]): number {
   const value =  _.sumBy(getPurchases(transactions), (txn: ITransaction) => {
     return txn.quantity * txn.price
   })
   assert(value >= 0, 'getTotalCost() is not at least 0')
+  return value
+}
+
+/*
+DESC
+  Returns the total sale revenue from the input ITransaction. This value
+  should never be negative
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The total sale revenue from the input ITransaction
+*/
+export function getTotalRev(transactions: ITransaction[]): number {
+  const value =  _.sumBy(getSales(transactions), (txn: ITransaction) => {
+    return txn.quantity * txn.price
+  })
+  assert(value >= 0, 'getTotalRev() is not at least 0')
   return value
 }
