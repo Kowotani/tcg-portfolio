@@ -114,7 +114,7 @@ export function getFormattedPrice(
   let formattedPrice = roundedPrice.toLocaleString(locale)
   const decimalIx = formattedPrice.indexOf('.')
   const precision = decimalIx >= 0 
-    ? roundedPrice.toString().length - decimalIx - 1 
+    ? formattedPrice.toString().length - decimalIx - 1 
     : 0
 
   // precision required
