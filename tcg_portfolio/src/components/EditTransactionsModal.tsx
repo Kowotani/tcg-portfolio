@@ -25,8 +25,9 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react';
-import { getAverageCost, getPurchaseQuantity, getTotalCost, IProduct, 
-  ITransaction, TransactionType } from 'common';
+import { getAverageCost, getAverageRevenue, getPurchaseQuantity, 
+  getSaleQuantity, getTotalCost, getTotalRevenue, IProduct, ITransaction, 
+  TransactionType } from 'common';
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik';
 import { ProductDescription } from './ProductDescription';
@@ -301,19 +302,23 @@ const AddTransactionForm = () => {
 // TransactionSummaryCard
 // ----------------------
 
-type TTransactionSummaryCardProps = {
-  transactions: ITransaction[]
+type TTransactionSummaryItem = {
+  title: string,
+  fn: (transactions: ITransaction[]) => number | undefined,
+  formattedPrefix?: string,
+  formattedPrecision?: number,
+  placeholder?: string,
 }
-const TransactionSummaryCardProps = (
+type TTransactionSummaryCardProps = {
+  transactions: ITransaction[],
+  summaryItems: TTransactionSummaryItem[]
+}
+const TransactionSummaryCard = (
   props: PropsWithChildren<TTransactionSummaryCardProps>
 ) => {
  
-  const quantity = getPurchaseQuantity(props.transactions)
-  const totalCost = getTotalCost(props.transactions)
-  const averageCost = getAverageCost(props.transactions)
-
   const locale = getBrowserLocale()
-
+  
   return (
     <Card>
       <CardBody>
@@ -321,25 +326,25 @@ const TransactionSummaryCardProps = (
           divider={<StackDivider color='gray.200'/>}
           spacing={4}
         >
-          <Box>
-            <Text align='center' fontWeight='bold'>Quantity</Text>
-            <Text align='center'>
-              {getFormattedPrice(quantity, locale, '', 0)}
-            </Text>
-          </Box>
-          <Box>
-            <Text align='center' fontWeight='bold'>Total Cost</Text>
-            <Text align='center'>
-              {getFormattedPrice(totalCost, locale, '$', 2)}
-            </Text>
-          </Box>
-          <Box>
-            <Text align='center' fontWeight='bold'>Average Cost</Text>
-            <Text align='center'>{averageCost 
-              ? getFormattedPrice(averageCost, locale, '$', 2)
-              : ' -'}
-            </Text>
-          </Box>                    
+          {
+            props.summaryItems.map((item: TTransactionSummaryItem) => {
+
+              const value = item.fn(props.transactions) ?? 0
+              const prefix = item.formattedPrefix ?? ''
+              const decimals = item.formattedPrecision ?? 0
+
+              return (
+                <Box>
+                  <Text align='center' fontWeight='bold'>{item.title}</Text>
+                  <Text align='center'>{value 
+                      ? getFormattedPrice(value, locale, prefix, decimals)
+                      : item.placeholder
+                    }
+                  </Text>
+                </Box>
+              )
+            })
+          }
         </HStack>
       </CardBody>
     </Card>
@@ -402,6 +407,50 @@ export const EditTransactionsModal = (
   const { transactions } 
     = useContext(EditTransactionsContext) as IEditTransactionsContext
 
+  // transaction summary items
+  const purchaseSummaryItems: TTransactionSummaryItem[] = [
+    {
+      title: 'Purchases',
+      fn: getPurchaseQuantity,
+      placeholder: '-',
+    },
+    {
+      title: 'Total Cost',
+      fn: getTotalCost,
+      formattedPrefix: '$',
+      formattedPrecision: 2,
+      placeholder: '$ -',
+    },
+    {
+      title: 'Avg Cost',
+      fn: getAverageCost,
+      formattedPrefix: '$',
+      formattedPrecision: 2,
+      placeholder: '$ -',
+    },
+  ]
+
+  const saleSummaryItems: TTransactionSummaryItem[] = [
+    {
+      title: 'Sales',
+      fn: getSaleQuantity,
+      placeholder: '-',
+    },
+    {
+      title: 'Total Rev',
+      fn: getTotalRevenue,
+      formattedPrefix: '$',
+      formattedPrecision: 2,
+      placeholder: '$ -',
+    },
+    {
+      title: 'Avg Rev',
+      fn: getAverageRevenue,
+      formattedPrefix: '$',
+      formattedPrecision: 2,
+      placeholder: '$ -',
+    },
+  ]
 
   // --------------
   // Main Component
@@ -424,7 +473,21 @@ export const EditTransactionsModal = (
               product={props.product} 
               showHeader={false} 
             />
-            <TransactionSummaryCardProps transactions={transactions}/>
+            {/* Purchases */}
+            <TransactionSummaryCard 
+              transactions={transactions}
+              summaryItems={purchaseSummaryItems}
+            />
+            {/* Sales */}
+            {
+              getSaleQuantity(transactions) > 0 
+                ? (
+                  <TransactionSummaryCard 
+                    transactions={transactions}
+                    summaryItems={saleSummaryItems}
+                  />
+                ) : undefined
+            }
             <AddTransactionForm />
             <Card>
               <CardBody>
