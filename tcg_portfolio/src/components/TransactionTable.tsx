@@ -1,7 +1,6 @@
 import { PropsWithChildren, useState } from "react"
 import { 
   Box,
-  chakra,
   Icon,
   Table, 
   Thead, 
@@ -10,28 +9,18 @@ import {
   Th, 
   Td, 
 } from "@chakra-ui/react"
-import { ITransaction } from "common";
+import { IDeletableTransaction } from "common";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  RowData,
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import { TiArrowSortedDown, TiArrowSortedUp } from 'react-icons/ti'
 
 // https://chakra-ui.com/getting-started/with-react-table
-
-
-// ==========
-// interfaces
-// ==========
-
-interface IColumnMeta<TData extends RowData, TValue> {
-
-}
 
 
 // =====
@@ -44,7 +33,7 @@ export type TTransactionTableProps<Data extends object> = {
 };
 
 export const TransactionTable = (
-  props: PropsWithChildren<TTransactionTableProps<ITransaction>>
+  props: PropsWithChildren<TTransactionTableProps<IDeletableTransaction>>
 ) => {
 
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -59,8 +48,6 @@ export const TransactionTable = (
       sorting
     }
   })
-
-
 
   return (
     <Table>
@@ -79,16 +66,20 @@ export const TransactionTable = (
                   backgroundColor='gray.600'
                   color='white'
                   isNumeric={meta?.isNumeric}
-                  p='16px'
+                  p='14px'
                 >
-                  <Box display='flex' alignItems='center' justifyContent={meta?.isNumeric ? 'flex-end': 'flex-begin'}>
+                  <Box 
+                    display='flex' 
+                    alignItems='center' 
+                    justifyContent={meta?.isNumeric ? 'flex-end': 'flex-begin'}
+                  >
 
                     {/* LHS icon */}
-                    <Box height='16px'>
+                    <Box height='14px'>
                       {header.column.getIsSorted() && meta?.isNumeric ? (
                         header.column.getIsSorted() === "asc" 
-                          ? <Icon as={TiArrowSortedUp} boxSize='16px' color='white'/> 
-                          : <Icon as={TiArrowSortedDown} boxSize='16px' color='white'/> 
+                          ? <Icon as={TiArrowSortedUp} boxSize='14px' color='white'/> 
+                          : <Icon as={TiArrowSortedDown} boxSize='14px' color='white'/> 
                       ) : null
                       }
                     </Box>          
@@ -99,11 +90,11 @@ export const TransactionTable = (
                     </Box>
 
                     {/* RHS icon */}              
-                    <Box height='16px'>
+                    <Box height='14px'>
                       {header.column.getIsSorted() && !meta?.isNumeric ? (
                         header.column.getIsSorted() === "asc" 
-                          ? <Icon as={TiArrowSortedUp} boxSize='16px' color='white'/> 
-                          : <Icon as={TiArrowSortedDown} boxSize='16px' color='white'/> 
+                          ? <Icon as={TiArrowSortedUp} boxSize='14px' color='white'/> 
+                          : <Icon as={TiArrowSortedDown} boxSize='14px' color='white'/> 
                       ) : null
                       }
                     </Box>                
@@ -123,7 +114,7 @@ export const TransactionTable = (
                  // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                 const meta: any = cell.column.columnDef.meta
                 return (
-                  <Td key={cell.id} isNumeric={meta?.isNumeric}>
+                  <Td key={cell.id} isNumeric={meta?.isNumeric} p='14px'>
                     {flexRender(
                       cell.column.columnDef.cell,
                       cell.getContext()

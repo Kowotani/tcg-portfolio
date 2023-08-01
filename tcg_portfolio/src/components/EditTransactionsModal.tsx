@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext, useEffect } from 'react';
+import { PropsWithChildren, useContext } from 'react';
 import { 
   Box,
   Button,
@@ -8,6 +8,7 @@ import {
   FormErrorMessage,
   FormLabel,
   HStack,
+  IconButton,
   Input,
   InputGroup,
   InputLeftAddon,
@@ -26,18 +27,19 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { getAverageCost, getAverageRevenue, getPurchaseQuantity, 
-  getSaleQuantity, getTotalCost, getTotalRevenue, IProduct, ITransaction, 
-  TransactionType } from 'common';
+  getSaleQuantity, getTotalCost, getTotalRevenue, IDeletableTransaction, 
+  IProduct, ITransaction, TransactionType } from 'common';
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik';
 import { ProductDescription } from './ProductDescription';
 import { ProductImage } from './ProductImage';
-import { getBrowserLocale, getFormattedPrice, IEditTransactionsContext
-  } from '../utils';
+import { FiMinusCircle } from 'react-icons/fi'
+import { EditTransactionsContext } from '../state/EditTransactionsContext';
 import { createColumnHelper } from '@tanstack/react-table';
 import { TransactionTable } from './TransactionTable';
+import { getBrowserLocale, getFormattedPrice, IEditTransactionsContext
+} from '../utils';
 
-import { EditTransactionsContext } from '../state/EditTransactionsContext';
 
 // ==============
 // Sub Components
@@ -127,7 +129,6 @@ const AddTransactionForm = () => {
   function handleAddTransaction(txn: ITransaction): void {
     setTransactions([...transactions, txn])
   }
-
 
   // component
 
@@ -352,44 +353,6 @@ const TransactionSummaryCard = (
 }
 
 
-// -----------------
-// TransactionTable
-// -----------------
-
-const locale = getBrowserLocale()
-
-const columnHelper = createColumnHelper<ITransaction>()
-
-const columns = [
-  columnHelper.accessor('date', {
-    cell: (info) => info.getValue().toISOString().substring(0,10),
-    header: 'Date'
-  }),
-  columnHelper.accessor('type', {
-    cell: (info) => info.getValue() === TransactionType.Purchase ? 'P' : 'S',
-    header: 'Type'
-  }),
-  columnHelper.accessor('quantity', {
-    cell: (info) => {
-      const sign = info.row.getValue('type') === TransactionType.Sale ? '-' : ''
-      const strQuantity = sign.concat(info.getValue().toLocaleString(locale))
-      return strQuantity
-    },
-    header: 'Quantity',
-    meta: {
-      isNumeric: true
-    }
-  }),
-  columnHelper.accessor('price', {
-    cell: (info) => getFormattedPrice(info.getValue(), locale, '$', 2),
-    header: 'Price',
-    meta: {
-      isNumeric: true
-    }
-  }),  
-]
-
-
 // ==============
 // Main Component
 // ==============
@@ -404,7 +367,7 @@ export const EditTransactionsModal = (
 ) => {
 
   // contexts
-  const { transactions } 
+  const { transactions, setTransactions } 
     = useContext(EditTransactionsContext) as IEditTransactionsContext
 
   // transaction summary items
@@ -450,6 +413,79 @@ export const EditTransactionsModal = (
       formattedPrecision: 2,
       placeholder: '$ -',
     },
+  ]
+
+  // -----------------
+  // TransactionTable
+  // -----------------
+
+  function handleDeleteTransaction(txn: ITransaction): void {
+    const ix = transactions.findIndex((t: ITransaction) => (
+        t.date === txn.date 
+        && t.price === txn.price 
+        && t.quantity === txn.quantity
+        && t.type === txn.type
+    ))
+    if (ix >= 0) {
+      const newTransactions = [...transactions]
+      newTransactions.splice(ix, 1)
+      setTransactions(newTransactions)
+    }
+  }
+
+  const locale = getBrowserLocale()
+
+  const columnHelper = createColumnHelper<IDeletableTransaction>()
+
+  const columns = [
+    columnHelper.accessor('date', {
+      cell: (info) => info.getValue().toISOString().substring(0,10),
+      header: 'Date'
+    }),
+    columnHelper.accessor('type', {
+      cell: (info) => info.getValue() === TransactionType.Purchase ? 'P' : 'S',
+      header: 'Type'
+    }),
+    columnHelper.accessor('quantity', {
+      cell: (info) => {
+        const sign = info.row.getValue('type') === TransactionType.Sale ? '-' : ''
+        const strQuantity = sign.concat(info.getValue().toLocaleString(locale))
+        return strQuantity
+      },
+      header: 'Quantity',
+      meta: {
+        isNumeric: true
+      }
+    }),
+    columnHelper.accessor('price', {
+      cell: (info) => getFormattedPrice(info.getValue(), locale, '$', 2),
+      header: 'Price',
+      meta: {
+        isNumeric: true
+      }
+    }),  
+    columnHelper.accessor('delete', {
+      cell: (info) => {
+        return (
+          <IconButton 
+            aria-label='Delete transaction'
+            colorScheme='red'
+            fontSize='24px'
+            icon={<FiMinusCircle />}
+            isRound={true}
+            onClick={() => handleDeleteTransaction({
+              date: info.row.getValue('date'),
+              price: info.row.getValue('price'),
+              quantity: info.row.getValue('quantity'),              
+              type: info.row.getValue('type')
+            })}
+            variant='ghost'
+          />
+        )
+      },
+      header: '',
+      enableSorting: false,
+    }),  
   ]
 
   // --------------
