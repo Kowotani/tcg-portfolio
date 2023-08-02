@@ -440,7 +440,8 @@ export const EditTransactionsModal = (
   const columns = [
     columnHelper.accessor('date', {
       cell: (info) => info.getValue().toISOString().substring(0,10),
-      header: 'Date'
+      header: 'Date',
+      sortingFn: 'datetime'
     }),
     columnHelper.accessor('type', {
       cell: (info) => info.getValue() === TransactionType.Purchase ? 'P' : 'S',
@@ -455,7 +456,14 @@ export const EditTransactionsModal = (
       header: 'Quantity',
       meta: {
         isNumeric: true
-      }
+      },
+      sortingFn: (rowA, rowB, columnId) => {
+        const valueA = Number(rowA.getValue(columnId))
+          * (rowA.getValue('type') === TransactionType.Purchase ? 1 : -1)
+        const valueB = Number(rowB.getValue(columnId))
+        * (rowB.getValue('type') === TransactionType.Purchase ? 1 : -1)
+        return valueA < valueB ? -1 : valueA > valueB ? 1 : 0
+      }      
     }),
     columnHelper.accessor('price', {
       cell: (info) => getFormattedPrice(info.getValue(), locale, '$', 2),
@@ -503,17 +511,21 @@ export const EditTransactionsModal = (
         <ModalHeader textAlign='center'>{props.product.name}</ModalHeader>
         <ModalBody>
           <VStack>
-            <ProductImage boxSize='200px' product={props.product} />
+
+            {/* Description */}
             <ProductDescription 
               align='center'
               product={props.product} 
               showHeader={false} 
             />
+            <ProductImage boxSize='200px' product={props.product} />
+
             {/* Purchases */}
             <TransactionSummaryCard 
               transactions={transactions}
               summaryItems={purchaseSummaryItems}
             />
+            
             {/* Sales */}
             {
               getSaleQuantity(transactions) > 0 
@@ -524,6 +536,8 @@ export const EditTransactionsModal = (
                   />
                 ) : undefined
             }
+
+            {/* Add Transaction Form */}
             <AddTransactionForm />
             <Card>
               <CardBody>
