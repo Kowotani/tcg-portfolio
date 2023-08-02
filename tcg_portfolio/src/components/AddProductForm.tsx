@@ -10,10 +10,9 @@ import {
   useToast,
   VStack, 
 } from '@chakra-ui/react';
-import { getProductSubtypes, IProduct, isASCII, ProductLanguage, 
+import { ADD_PRODUCT_URL, getProductSubtypes, IProduct, isASCII, ProductLanguage, 
   ProductPostStatus, ProductType, ProductSubtype, TCG, TCGToProductType, 
-  TProductPostBody,
-} from 'common';
+  TProductPostBody } from 'common';
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField';
 import { SideBarNavContext } from '../state/SideBarNavContext';
@@ -37,8 +36,6 @@ export const AddProductForm = () => {
   const PRODUCT_SUBTYPE_EMPTY_PLACEHOLDER = 'No Subtypes'
   const PRODUCT_TYPE_PLACEHOLDER = 'Select TCG first'
   const TCG_SELECT_DEFAULT = 'Select TCG'
-  
-  const ADD_PRODUCT_URL = '/product'  
 
 
   // ======

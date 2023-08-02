@@ -1,7 +1,7 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.getTotalRevenue = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getAverageRevenue = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductsGetStatus = exports.ProductPostStatus = void 0;
+exports.getTotalRevenue = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getAverageRevenue = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductsGetStatus = exports.ProductPostStatus = void 0;
 var _ = require("lodash");
 // =====
 // enums
@@ -179,6 +179,11 @@ exports.TCGToProductSubtype = (_c = {},
         ProductSubtype.UltraPremiumCollection,
     ],
     _c);
+// ======
+// routes
+// ======
+exports.ADD_PRODUCT_URL = '/product';
+exports.GET_PRODUCTS_URL = '/products';
 // =========
 // functions
 // =========

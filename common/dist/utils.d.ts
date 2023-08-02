@@ -157,6 +157,8 @@ export interface IHydratedPortfolio extends IPortfolio {
     percentageReturn: number;
     annualizedReturn: number;
 }
+export declare const ADD_PRODUCT_URL = "/product";
+export declare const GET_PRODUCTS_URL = "/products";
 export declare type TProductPostBody = {
     formData: IProduct;
     imageUrl?: string;

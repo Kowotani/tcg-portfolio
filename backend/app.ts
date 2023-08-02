@@ -1,5 +1,6 @@
 // imports
-import { ProductPostStatus, ProductsGetStatus, TProductPostBody } from 'common';
+import { ADD_PRODUCT_URL, GET_PRODUCTS_URL, ProductPostStatus, 
+  ProductsGetStatus, TProductPostBody } from 'common';
 import express from 'express';
 import { getProduct, getProducts, insertProducts } from './mongo/mongoManager';
 import multer from 'multer';
@@ -29,7 +30,7 @@ RETURN
     200: The Product documents were returned successfully
     500: An error occurred
 */
-app.get('/products', async (req: any, res: any) => {
+app.get(GET_PRODUCTS_URL, async (req: any, res: any) => {
 
   try {
 
@@ -74,7 +75,7 @@ RETURN
     202: The Product already exists
     500: An error occurred
 */
-app.post('/product', upload.none(), async (req: any, res: any) => {
+app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
 
   // variables
   const body: TProductPostBody = req.body
@@ -135,6 +136,7 @@ app.post('/product', upload.none(), async (req: any, res: any) => {
       res.send(body)
     }
   }
+  
 })
 
 

@@ -37,7 +37,7 @@ RETURN
     200: The Product documents were returned successfully
     500: An error occurred
 */
-app.get('/products', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get(common_1.GET_PRODUCTS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // query Products
         const data = yield (0, mongoManager_1.getProducts)();
@@ -78,7 +78,7 @@ RETURN
     202: The Product already exists
     500: An error occurred
 */
-app.post('/product', upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // variables
     const body = req.body;
     const data = body.formData;

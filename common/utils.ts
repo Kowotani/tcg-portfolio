@@ -341,6 +341,14 @@ export interface IHydratedPortfolio extends IPortfolio {
 }
 
 
+// ======
+// routes
+// ======
+
+export const ADD_PRODUCT_URL = '/product'
+export const GET_PRODUCTS_URL = '/products'
+
+
 // =====
 // types
 // =====
