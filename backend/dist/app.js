@@ -28,16 +28,55 @@ app.get('/', (req, res) => {
 // product
 // =======
 /*
-DESC: handle request to add a product
-INPUT: request body in multipart/form-data containing
-  tcgplayerId - the TCGplayer product id
-  releaseDate - product release date in YYYY-MM-DD format
-  name - product name
-  type - ProductType enum
-  language - ProductLanguage enum
-  subtype [OPTIONAL] - ProductSubType enum
-  setCode [OPTIONAL] - product set code
-  
+DESC
+  Handle request for documents of all Products
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The Product documents were returned successfully
+    500: An error occurred
+*/
+app.get('/products', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // query Products
+        const data = yield (0, mongoManager_1.getProducts)();
+        // return Products
+        res.status(200);
+        const body = {
+            data: data,
+            message: common_1.ProductsGetStatus.Success
+        };
+        res.send(body);
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: common_1.ProductPostStatus.Error + ': ' + err
+        };
+        res.send(body);
+    }
+}));
+/*
+DESC
+  Handle request to add a Product
+INPUT
+  Request body in multipart/form-data containing
+    tcgplayerId: The TCGplayer product id
+    releaseDate: Product release date in YYYY-MM-DD format
+    name: Product name
+    type: ProductType enum
+    language: ProductLanguage enum
+    subtype [OPTIONAL]: ProductSubType enum
+    setCode [OPTIONAL]: Product set code
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    201: The Product was successfully added
+    202: The Product already exists
+    500: An error occurred
 */
 app.post('/product', upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // variables
@@ -55,30 +94,41 @@ app.post('/product', upload.none(), (req, res) => __awaiter(void 0, void 0, void
         res.send(body);
     }
     else {
-        // add product
-        const numInserted = yield (0, mongoManager_1.insertProducts)([data]);
-        // load image to S3
-        const isImageLoaded = body.imageUrl
-            ? yield (0, s3Manager_1.loadImageToS3)(tcgPlayerId, body.imageUrl)
-            : false;
-        // success
-        if (numInserted > 0) {
-            res.status(201);
-            const body = {
-                tcgplayerId: data.tcgplayerId,
-                message: isImageLoaded
-                    ? common_1.ProductPostStatus.Added
-                    : common_1.ProductPostStatus.AddedWithoutImage,
-                data: data,
-            };
-            res.send(body);
+        try {
+            // add product
+            const numInserted = yield (0, mongoManager_1.insertProducts)([data]);
+            // load image to S3
+            const isImageLoaded = body.imageUrl
+                ? yield (0, s3Manager_1.loadImageToS3)(tcgPlayerId, body.imageUrl)
+                : false;
+            // success
+            if (numInserted > 0) {
+                res.status(201);
+                const body = {
+                    tcgplayerId: data.tcgplayerId,
+                    message: isImageLoaded
+                        ? common_1.ProductPostStatus.Added
+                        : common_1.ProductPostStatus.AddedWithoutImage,
+                    data: data,
+                };
+                res.send(body);
+                // error
+            }
+            else {
+                res.status(500);
+                const body = {
+                    tcgplayerId: data.tcgplayerId,
+                    message: common_1.ProductPostStatus.Error,
+                };
+                res.send(body);
+            }
             // error
         }
-        else {
+        catch (err) {
             res.status(500);
             const body = {
                 tcgplayerId: data.tcgplayerId,
-                message: 'Error creating Product doc',
+                message: common_1.ProductPostStatus.Error + ': ' + err,
             };
             res.send(body);
         }
