@@ -1,7 +1,7 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.getTotalRevenue = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getAverageRevenue = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductPostStatus = void 0;
+exports.getTotalRevenue = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getAverageRevenue = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductsGetStatus = exports.ProductPostStatus = void 0;
 var _ = require("lodash");
 // =====
 // enums
@@ -13,7 +13,13 @@ var ProductPostStatus;
     ProductPostStatus["Added"] = "tcgplayerId added";
     ProductPostStatus["AddedWithoutImage"] = "tcgplayerId added (without image)";
     ProductPostStatus["AlreadyExists"] = "tcgplayerId already exists";
+    ProductPostStatus["Error"] = "Error creating the Product doc";
 })(ProductPostStatus = exports.ProductPostStatus || (exports.ProductPostStatus = {}));
+var ProductsGetStatus;
+(function (ProductsGetStatus) {
+    ProductsGetStatus["Success"] = "Successfully retried Product docs";
+    ProductsGetStatus["Error"] = "Error retreiving Product docs";
+})(ProductsGetStatus = exports.ProductsGetStatus || (exports.ProductsGetStatus = {}));
 // -- mongodb
 // timeseries granularity
 var TimeseriesGranularity;
