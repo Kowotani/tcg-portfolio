@@ -1,4 +1,4 @@
-import { ITransaction } from "common"
+import { IPortfolio, ITransaction } from "common"
 
 // =====
 // enums
@@ -39,6 +39,11 @@ export const SideBarNav = {
 // ==========
 // interfaces
 // ==========
+
+export interface IEditPortfolioContext {
+  portfolio: IPortfolio,
+  setPortfolio: React.Dispatch<React.SetStateAction<IPortfolio>>
+}
 
 export interface IEditTransactionsContext {
   transactions: ITransaction[],
