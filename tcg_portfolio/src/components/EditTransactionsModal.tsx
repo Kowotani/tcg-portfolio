@@ -439,13 +439,14 @@ export const EditTransactionsModal = (
 
   const columns = [
     columnHelper.accessor('date', {
-      cell: (info) => info.getValue().toISOString().substring(0,10),
+      cell: (info) => info.getValue().toISOString().substring(0, 10),
       header: 'Date',
       sortingFn: 'datetime'
     }),
     columnHelper.accessor('type', {
       cell: (info) => info.getValue() === TransactionType.Purchase ? 'P' : 'S',
-      header: 'Type'
+      header: 'Type',
+      enableHiding: true,
     }),
     columnHelper.accessor('quantity', {
       cell: (info) => {
@@ -495,6 +496,10 @@ export const EditTransactionsModal = (
       enableSorting: false,
     }),  
   ]
+
+  // hidden columns
+  const hiddenColumns = ['type']
+
 
   // --------------
   // Main Component
@@ -546,6 +551,7 @@ export const EditTransactionsModal = (
                   <TransactionTable 
                     columns={columns} 
                     data={transactions}
+                    hiddenColumns={hiddenColumns}
                   />
                 </CardBody>
               </Card>
