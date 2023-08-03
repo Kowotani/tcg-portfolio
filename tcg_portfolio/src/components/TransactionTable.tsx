@@ -72,7 +72,7 @@ export const TransactionTable = (
   // ==============
 
   return (
-    <Box h='200px' overflow='auto'>
+    <Box maxH='220px' overflow='auto'>
       <Table>
 
         {/* Table Head */}
