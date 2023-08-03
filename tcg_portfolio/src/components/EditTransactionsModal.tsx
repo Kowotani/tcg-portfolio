@@ -504,61 +504,64 @@ export const EditTransactionsModal = (
     <Modal 
       closeOnOverlayClick={false}
       isOpen={props.isOpen} 
-      onClose={props.onClose} 
+      onClose={props.onClose}
     >
       <ModalOverlay />
-      <ModalContent >
-        <ModalHeader textAlign='center'>{props.product.name}</ModalHeader>
-        <ModalBody>
-          <VStack>
+      {/* Set modal z-index to be higher than the error tooltip (1800)*/}
+      <Box zIndex={1850}>
+        <ModalContent>
+          <ModalHeader textAlign='center'>{props.product.name}</ModalHeader>
+          <ModalBody>
+            <VStack>
 
-            {/* Description */}
-            <ProductDescription 
-              align='center'
-              product={props.product} 
-              showHeader={false} 
-            />
-            <ProductImage boxSize='200px' product={props.product} />
+              {/* Description */}
+              <ProductDescription 
+                align='center'
+                product={props.product} 
+                showHeader={false} 
+              />
+              <ProductImage boxSize='200px' product={props.product} />
 
-            {/* Purchases */}
-            <TransactionSummaryCard 
-              transactions={transactions}
-              summaryItems={purchaseSummaryItems}
-            />
-            
-            {/* Sales */}
-            {
-              getSaleQuantity(transactions) > 0 
-                ? (
-                  <TransactionSummaryCard 
-                    transactions={transactions}
-                    summaryItems={saleSummaryItems}
+              {/* Purchases */}
+              <TransactionSummaryCard 
+                transactions={transactions}
+                summaryItems={purchaseSummaryItems}
+              />
+              
+              {/* Sales */}
+              {
+                getSaleQuantity(transactions) > 0 
+                  ? (
+                    <TransactionSummaryCard 
+                      transactions={transactions}
+                      summaryItems={saleSummaryItems}
+                    />
+                  ) : undefined
+              }
+
+              {/* Add Transaction Form */}
+              <AddTransactionForm />
+              <Card>
+                <CardBody>
+                  <TransactionTable 
+                    columns={columns} 
+                    data={transactions}
                   />
-                ) : undefined
-            }
-
-            {/* Add Transaction Form */}
-            <AddTransactionForm />
-            <Card>
-              <CardBody>
-                <TransactionTable 
-                  columns={columns} 
-                  data={transactions}
-                />
-              </CardBody>
-            </Card>
-          </VStack>
-        </ModalBody>
-        <ModalFooter display='flex' justifyContent='space-evenly'>
-          <Button 
-            variant='ghost' 
-            onClick={props.onClose}
-          >
-              Exit Without Saving
-          </Button>
-          <Button colorScheme='blue'>Save</Button>
-        </ModalFooter>
-      </ModalContent>
+                </CardBody>
+              </Card>
+            </VStack>
+          </ModalBody>
+          <ModalFooter display='flex' justifyContent='space-evenly'>
+            <Button 
+              variant='ghost' 
+              onClick={props.onClose}
+            >
+                Exit Without Saving
+            </Button>
+            <Button colorScheme='blue'>Save</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Box>
     </Modal>
   )
 }
