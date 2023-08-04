@@ -1,4 +1,16 @@
-import { IPortfolio, ITransaction } from "common"
+import { IPortfolio, ITransaction, ProductSubtype } from 'common'
+
+
+// ======
+// arrays
+// ======
+
+// these ProductSubtypes should be excluded from display to the user
+export const NonVisibileProductSubtypes = [
+  ProductSubtype.FABVersionTwo,
+  ProductSubtype.NonFoil
+]
+
 
 // =====
 // enums
