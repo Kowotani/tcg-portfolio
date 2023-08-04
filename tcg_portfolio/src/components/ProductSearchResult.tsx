@@ -1,19 +1,24 @@
 import { PropsWithChildren } from 'react'
-import { Box, Text, VStack } from '@chakra-ui/react'
-import { IProduct, ProductSubtype } from 'common'
+import { 
+  Box, 
+  Highlight, 
+  Text, 
+  VStack 
+} from '@chakra-ui/react'
+import { IProduct } from 'common'
+import { NonVisibileProductSubtypes } from '../utils'
 
 type TProductSearchResult = {
-  product: IProduct
+  product: IProduct,
+  searchInput: string,
 }
 export const ProductSearchResult = (
   props: PropsWithChildren<TProductSearchResult>
 ) => {
+
   const product = props.product
-  const invalidSubtypes = [
-    ProductSubtype.FABVersionTwo,
-    ProductSubtype.NonFoil
-  ]
-  const subtype = product.subtype && !invalidSubtypes.includes(product.subtype) 
+  const subtype = product.subtype 
+    && !NonVisibileProductSubtypes.includes(product.subtype) 
       ? ` (${product.subtype})` : ''
   const header = `${product.name} - ${product.type}${subtype}`  
 
@@ -31,7 +36,12 @@ export const ProductSearchResult = (
             noOfLines={1} 
             textAlign='left'
           >
-            {header}
+            <Highlight 
+              query={props.searchInput}
+              styles={{py: 1, bg: 'yellow.200'}}
+            >
+              {header}
+            </Highlight>
           </Text>
         </Box>
         <Box>
@@ -42,7 +52,12 @@ export const ProductSearchResult = (
             noOfLines={1} 
             textAlign='left'
           >
-            {product.tcg}
+            <Highlight 
+              query={props.searchInput}
+              styles={{py: 1, bg: 'yellow.200'}}
+            >
+              {product.tcg}
+            </Highlight>
           </Text>
         </Box>
       </VStack>
