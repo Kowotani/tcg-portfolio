@@ -6,12 +6,12 @@ import { FaSearch } from 'react-icons/fa'
 
 type TSearchInput = BoxProps & {
   value: string;
-	onSearchChange: ( event: React.ChangeEvent<HTMLInputElement> ) => void;
-	searchResultRenderer: ( result: any ) => JSX.Element;
+	onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+	searchResultRenderer: (result: any) => JSX.Element;
   searchResultKey: string;
-	onSearchResultSelect: ( result: any ) => void;
+	onSearchResultSelect: (result: any) => void;
   maxSearchResults?: number;
-	noSearchResultsText?: string;
+	noSearchResultsComponent?: JSX.Element;
   placeholder?: string;
   searchResultsMaxHeight?: string;
   searchResults?: any[];
@@ -25,13 +25,11 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 		searchResultRenderer,
 		onSearchResultSelect,
     maxSearchResults,
-    noSearchResultsText = 'No results found',
+    noSearchResultsComponent,
 		placeholder = '',
     searchResultKey,
     searchResultsMaxHeight,
 		searchResults = [],
-		
-		...rest
 	} = props
 
   const [ showResults, setShowResults ] = useState(false)
@@ -80,7 +78,7 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
             zIndex={1300}
             width='100%'
 					>
-						{searchResults.length > 0
+						{value.length > 0 && searchResults.length > 0
               ? searchResults
                 .slice(0, maxSearchResults ?? searchResults.length)
                 .map(result => {
@@ -103,11 +101,11 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 									<Box
 										borderBottom='1px solid rgba(34,36,38,.1)'
 									>
-										<Flex alignItems='center' >
-											<Box p='0.8em' margin='0' color='black'>
-												<Text>{noSearchResultsText}</Text>
-											</Box>
-										</Flex>
+									{noSearchResultsComponent ??
+                    (
+                      <Text>No Search Results</Text>
+                    )
+                  }
 									</Box>
 								)
 						}
