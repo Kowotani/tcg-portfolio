@@ -10,14 +10,16 @@ import {
   Text,
   useDisclosure,
   VStack
-} from '@chakra-ui/react';
-import { IHydratedHolding, IProduct } from 'common';
-import { EditTransactionsModal } from './EditTransactionsModal';
-import { ProductDescription } from './ProductDescription';
-import { ProductImage } from './ProductImage';
-import { getBrowserLocale, IEditTransactionsContext } from '../utils';
+} from '@chakra-ui/react'
+import { getAverageCost, getQuantity, getTotalCost, IHolding, IProduct 
+} from 'common'
+import { EditTransactionsModal } from './EditTransactionsModal'
+import { ProductDescription } from './ProductDescription'
+import { ProductImage } from './ProductImage'
+import { getBrowserLocale, getFormattedPrice, IEditTransactionsContext 
+} from '../utils'
 
-import { EditTransactionsContext } from '../state/EditTransactionsContext';
+import { EditTransactionsContext } from '../state/EditTransactionsContext'
 
 // ==============
 // Sub Components
@@ -25,25 +27,35 @@ import { EditTransactionsContext } from '../state/EditTransactionsContext';
 
 // summary metrics for the holding
 type THoldingSummaryProps = {
-  holding: IHydratedHolding
+  holding: IHolding
 }
 const HoldingSummary = (props: PropsWithChildren<THoldingSummaryProps>) => {
 
   const locale = getBrowserLocale()
 
+  const quantity = getQuantity(props.holding.transactions)
+  const totalCost = getTotalCost(props.holding.transactions)
+  const averageCost = getAverageCost(props.holding.transactions)
+
   return (
     <SimpleGrid columns={2}>
       <Text align='left'>Quantity:</Text>
       <Text align='right'>
-        {`${props.holding.quantity.toLocaleString(locale)}`}
+        {getFormattedPrice(quantity, locale, '', 0)}
       </Text>
       <Text align='left'>Total Cost:</Text>
       <Text align='right'>
-        {`$${props.holding.totalCost.toLocaleString(locale)}`}
+        {totalCost 
+          ? getFormattedPrice(totalCost, locale, '$', 2)
+          : '$ -'
+        }
       </Text>
       <Text align='left'>Avg Cost:</Text>
       <Text align='right'>
-        {`$${props.holding.averageCost.toLocaleString(locale)}`}
+      {averageCost 
+          ? getFormattedPrice(averageCost, locale, '$', 2)
+          : '$ -'
+        }
       </Text>
     </SimpleGrid>
   )
@@ -55,7 +67,7 @@ const HoldingSummary = (props: PropsWithChildren<THoldingSummaryProps>) => {
 // ==============
 
 type THoldingCardProps = {
-  holding: IHydratedHolding,
+  holding: IHolding,
   product: IProduct
 }
 export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
