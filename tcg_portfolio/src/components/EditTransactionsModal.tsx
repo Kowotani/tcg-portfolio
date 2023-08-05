@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext } from 'react';
+import { PropsWithChildren, useState } from 'react';
 import { 
   Box,
   Button,
@@ -34,11 +34,9 @@ import { Field, FieldInputProps, Form, Formik, FormikHelpers,
 import { ProductDescription } from './ProductDescription';
 import { ProductImage } from './ProductImage';
 import { FiMinusCircle } from 'react-icons/fi'
-import { EditTransactionsContext } from '../state/EditTransactionsContext';
 import { createColumnHelper } from '@tanstack/react-table';
 import { TransactionTable } from './TransactionTable';
-import { getBrowserLocale, getFormattedPrice, IEditTransactionsContext
-} from '../utils';
+import { getBrowserLocale, getFormattedPrice } from '../utils';
 
 
 // ==============
@@ -55,11 +53,12 @@ interface IInputValues {
   quantity: number,
   type: TransactionType.Purchase | TransactionType.Sale
 }
-const AddTransactionForm = () => {
-
-  // contexts
-  const { transactions, setTransactions } 
-    = useContext(EditTransactionsContext) as IEditTransactionsContext
+type TAddTransactionFormProps = {
+  handleAddTransaction: (txn: ITransaction) => void;
+}
+const AddTransactionForm = (
+  props: PropsWithChildren<TAddTransactionFormProps>
+) => {
 
   // functions
 
@@ -127,7 +126,7 @@ const AddTransactionForm = () => {
   }
 
   function handleAddTransaction(txn: ITransaction): void {
-    setTransactions([...transactions, txn])
+    props.handleAddTransaction(txn)
   }
 
   // component
@@ -361,14 +360,15 @@ type TEditTransactionsModalProps = {
   isOpen: boolean,
   onClose: () => void,
   product: IProduct,
+  setTransactions: (txns: ITransaction[]) => void,
+  transactions: ITransaction[],
 }
 export const EditTransactionsModal = (
   props: PropsWithChildren<TEditTransactionsModalProps>
 ) => {
 
-  // contexts
-  const { transactions, setTransactions } 
-    = useContext(EditTransactionsContext) as IEditTransactionsContext
+  // state
+  const [ transactions, setTransactions ] = useState(props.transactions)
 
   // transaction summary items
   const purchaseSummaryItems: TTransactionSummaryItem[] = [
@@ -414,6 +414,27 @@ export const EditTransactionsModal = (
       placeholder: '$ -',
     },
   ]
+
+  // -- functions
+
+  // add transaction to local state only
+  function handleAddTransaction(txn: ITransaction): void {
+    setTransactions([...transactions, txn])
+  }
+
+  // exit without save
+  function handleOnExit(): void {
+    // reset local transactions
+    setTransactions(props.transactions)
+    props.onClose()
+  }
+
+  // exit and save 
+  function handleOnSave(): void {
+    // update parent transactions
+    props.setTransactions(transactions)
+    props.onClose()
+  }
 
   // -----------------
   // TransactionTable
@@ -497,13 +518,13 @@ export const EditTransactionsModal = (
     }),  
   ]
 
-  // hidden columns
+  // -- hidden columns
   const hiddenColumns = ['type']
 
 
-  // --------------
+  // ==============
   // Main Component
-  // --------------
+  // ==============
 
   return (
     <Modal 
@@ -545,7 +566,9 @@ export const EditTransactionsModal = (
               }
 
               {/* Add Transaction Form */}
-              <AddTransactionForm />
+              <AddTransactionForm 
+                handleAddTransaction={handleAddTransaction}
+              />
               <Card>
                 <CardBody>
                   <TransactionTable 
@@ -560,11 +583,16 @@ export const EditTransactionsModal = (
           <ModalFooter display='flex' justifyContent='space-evenly'>
             <Button 
               variant='ghost' 
-              onClick={props.onClose}
+              onClick={handleOnExit}
             >
                 Exit Without Saving
             </Button>
-            <Button colorScheme='blue'>Save</Button>
+            <Button 
+              colorScheme='blue'
+              onClick={handleOnSave}
+            >
+              Save
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Box>

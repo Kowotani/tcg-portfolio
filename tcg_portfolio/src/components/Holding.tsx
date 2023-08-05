@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext } from 'react';
+import { PropsWithChildren, useState } from 'react';
 import { 
   Box,
   Button,
@@ -11,15 +11,12 @@ import {
   useDisclosure,
   VStack
 } from '@chakra-ui/react'
-import { getAverageCost, getQuantity, getTotalCost, IHolding, IProduct 
-} from 'common'
+import { getAverageCost, getQuantity, getTotalCost, IHolding, IProduct,  
+  ITransaction } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
-import { getBrowserLocale, getFormattedPrice, IEditTransactionsContext 
-} from '../utils'
-
-import { EditTransactionsContext } from '../state/EditTransactionsContext'
+import { getBrowserLocale, getFormattedPrice } from '../utils'
 
 // ==============
 // Sub Components
@@ -72,15 +69,24 @@ type THoldingCardProps = {
 }
 export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
 
+  // modal
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { setTransactions } 
-    = useContext(EditTransactionsContext) as IEditTransactionsContext
+  // state
+  const [ holding, setHolding ] = useState(props.holding)
+  const [ transactions, setTransactions ] = useState(holding.transactions)
 
-  function handleModalOnClick(): void {
-    setTransactions(props.holding.transactions)
-    onOpen()
+  // functions
+  
+  function handleSetTransactions(txns: ITransaction[]): void {
+    setHolding({...holding, transactions: txns})
+    setTransactions(txns)
   }
+
+
+  // ==============
+  // Main Component
+  // ==============
 
   return (
     <>
@@ -102,10 +108,10 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
                 spacing={4}
               >
                 <ProductDescription product={props.product} showHeader={false} />
-                <HoldingSummary holding={props.holding} />
+                <HoldingSummary holding={holding} />
                 <Button 
                   colorScheme='blue' 
-                  onClick={handleModalOnClick}
+                  onClick={onOpen}
                 >
                   Transactions
                 </Button>
@@ -118,6 +124,8 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
         isOpen={isOpen} 
         onClose={onClose} 
         product={props.product}
+        setTransactions={handleSetTransactions}
+        transactions={transactions}
       />
     </>
   )
