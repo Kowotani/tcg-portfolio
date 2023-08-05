@@ -22,8 +22,6 @@ import {
   NumberInputField,
   Radio,
   RadioGroup,
-  StackDivider,
-  Text,
   useToast,
   VStack
 } from '@chakra-ui/react'
@@ -533,6 +531,8 @@ export const EditTransactionsModal = (
                   <TransactionSummary 
                     transactions={transactions}
                     summaryItems={purchaseSummaryItems}
+                    orientation='horizontal'
+                    style='card'
                   />
                 </CardBody>
               </Card>
@@ -546,6 +546,8 @@ export const EditTransactionsModal = (
                         <TransactionSummary 
                           transactions={transactions}
                           summaryItems={saleSummaryItems}
+                          orientation='horizontal'
+                          style='card'
                         />
                       </CardBody>
                     </Card>
