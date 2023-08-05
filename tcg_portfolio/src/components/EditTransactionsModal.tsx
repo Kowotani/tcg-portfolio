@@ -26,18 +26,19 @@ import {
   Text,
   useToast,
   VStack
-} from '@chakra-ui/react';
+} from '@chakra-ui/react'
 import { getAverageCost, getAverageRevenue, getPurchaseQuantity, 
   getSaleQuantity, getTotalCost, getTotalRevenue, IDeletableTransaction, 
-  IProduct, ITransaction, TransactionType } from 'common';
+  IProduct, ITransaction, TransactionType } from 'common'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
-  FormikProps } from 'formik';
-import { ProductDescription } from './ProductDescription';
-import { ProductImage } from './ProductImage';
+  FormikProps } from 'formik'
+import * as _ from 'lodash'
+import { ProductDescription } from './ProductDescription'
+import { ProductImage } from './ProductImage'
 import { FiMinusCircle } from 'react-icons/fi'
-import { createColumnHelper } from '@tanstack/react-table';
-import { TransactionTable } from './TransactionTable';
-import { getBrowserLocale, getFormattedPrice } from '../utils';
+import { createColumnHelper } from '@tanstack/react-table'
+import { TransactionTable } from './TransactionTable'
+import { getBrowserLocale, getFormattedPrice } from '../utils'
 
 
 // ==============
@@ -312,7 +313,8 @@ type TTransactionSummaryItem = {
 }
 type TTransactionSummaryCardProps = {
   transactions: ITransaction[],
-  summaryItems: TTransactionSummaryItem[]
+  summaryItems?: TTransactionSummaryItem[]
+  twoDimSummaryItems?: TTransactionSummaryItem[][]
 }
 const TransactionSummaryCard = (
   props: PropsWithChildren<TTransactionSummaryCardProps>
@@ -320,33 +322,108 @@ const TransactionSummaryCard = (
  
   const locale = getBrowserLocale()
   
+  // -------------
+  // sub component
+  // -------------
+  type TSummaryItemProps = {
+    title: string,
+    value: number,
+    prefix: string,
+    decimals: number,
+    placeholder?: string,
+  }
+  const SummaryItem = (props: PropsWithChildren<TSummaryItemProps>) => {
+    return (
+      <Box>
+        <Text align='center' fontWeight='bold'>{props.title}</Text>
+        <Text align='center'>{props.value 
+          ? getFormattedPrice(props.value, locale, props.prefix, props.decimals)
+          : props.placeholder}
+        </Text>
+      </Box>
+    )
+  }
+
+  const isTwoDimensional = !_.isEmpty(props.twoDimSummaryItems)
+
+    
+  // ==============
+  // Main Component
+  // ==============
+
   return (
     <Card>
       <CardBody>
-        <HStack 
-          divider={<StackDivider color='gray.200'/>}
-          spacing={4}
-        >
-          {
-            props.summaryItems.map((item: TTransactionSummaryItem) => {
+        {isTwoDimensional
+          ? (
+            <VStack
+              divider={<StackDivider color='gray.200'/>}
+              spacing={4}
+            >
+              {props.twoDimSummaryItems && props.twoDimSummaryItems.map(
+                (itemRow: TTransactionSummaryItem[]) => {
 
-              const value = item.fn(props.transactions) ?? 0
-              const prefix = item.formattedPrefix ?? ''
-              const decimals = item.formattedPrecision ?? 0
+                  return (
+                    <HStack 
+                      divider={<StackDivider color='gray.200'/>}
+                      spacing={4}
+                      display='flex'
+                      justifyContent='space-evenly'
+                      width='100%'
+                    >
+                      {itemRow.map(
+                        (item: TTransactionSummaryItem) => {
 
-              return (
-                <Box>
-                  <Text align='center' fontWeight='bold'>{item.title}</Text>
-                  <Text align='center'>{value 
-                      ? getFormattedPrice(value, locale, prefix, decimals)
-                      : item.placeholder
-                    }
-                  </Text>
-                </Box>
-              )
-            })
-          }
-        </HStack>
+                          const value = item.fn(props.transactions) ?? 0
+                          const prefix = item.formattedPrefix ?? ''
+                          const decimals = item.formattedPrecision ?? 0
+
+                          return (
+                            <SummaryItem 
+                              title={item.title}
+                              value={value}
+                              prefix={prefix}
+                              decimals={decimals}
+                              placeholder={item.placeholder}
+                            />
+                          )
+                        }
+                      )}
+                    </HStack>
+                  )
+                }
+              )}
+            </VStack>
+          ) : (
+            <HStack 
+              divider={<StackDivider color='gray.200'/>}
+              spacing={4}
+              display='flex'
+              justifyContent='space-evenly'
+              width='100%'              
+            >
+              {props.summaryItems && props.summaryItems.map(
+                (item: TTransactionSummaryItem) => {
+    
+                  const value = item.fn(props.transactions) ?? 0
+                  const prefix = item.formattedPrefix ?? ''
+                  const decimals = item.formattedPrecision ?? 0
+    
+                  return (
+                    <SummaryItem 
+                      title={item.title}
+                      value={value}
+                      prefix={prefix}
+                      decimals={decimals}
+                      placeholder={item.placeholder}
+                    />
+                  )
+                }
+              )}
+            </HStack>
+          )
+        }
+
       </CardBody>
     </Card>
   )
