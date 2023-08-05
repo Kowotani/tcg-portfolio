@@ -10,6 +10,93 @@ import { ITransaction } from 'common'
 import * as _ from 'lodash'
 import { getBrowserLocale, getFormattedPrice } from '../utils'
 
+
+// --------------
+// Sub Components
+// --------------
+
+// -- TransactionSummaryItem
+
+type TTransactionSummaryItemProps = {
+  title: string,
+  value: number,
+  prefix?: string,
+  decimals?: number,
+  placeholder?: string,
+  style?: string,
+}
+const TransactionSummaryItem = (
+  props: PropsWithChildren<TTransactionSummaryItemProps>
+) => {
+
+  const {
+    title,
+    value,
+    prefix = '',
+    decimals = 0,
+    placeholder,
+    style = 'card'
+  } = props
+
+  const locale = getBrowserLocale()
+
+  return (
+    <>
+      {style === 'card'
+        ? (
+          <Box>
+            <Text as='b' align='center'>{title}</Text>
+            <Text align='center'>
+              {value 
+                ? getFormattedPrice(value, locale, prefix, decimals)
+                : placeholder}
+            </Text>
+          </Box>
+
+        ) : style === 'list' ? (
+          <Box display='flex' justifyContent='space-between'>
+            <Text as='b'>{title}</Text>
+            <Text>
+              {value 
+                ? getFormattedPrice(value, locale, prefix, decimals)
+                : placeholder}
+            </Text>
+          </Box>
+
+        ) : undefined
+      }
+    </>
+  )
+}
+
+// -- TransactionSummaryWrapper
+
+type TTransactionSummaryItemWrapper = {
+  item: TTransactionSummaryItem
+  transactions: ITransaction[],
+  style?: string
+}
+const TransactionSummaryItemWrapper = (
+  props: PropsWithChildren<TTransactionSummaryItemWrapper>
+) => {
+
+  return (
+    <TransactionSummaryItem 
+      title={props.item.title}
+      value={props.item.fn(props.transactions) ?? 0}
+      prefix={props.item.formattedPrefix}
+      decimals={props.item.formattedPrecision}
+      placeholder={props.item.placeholder}
+      style={props.style}
+    />
+  )
+}
+
+
+// ==============
+// Main Component
+// ==============
+
 export type TTransactionSummaryItem = {
   title: string,
   fn: (transactions: ITransaction[]) => number | undefined,
@@ -19,54 +106,33 @@ export type TTransactionSummaryItem = {
 }
 export type TTransactionSummaryProps = {
   transactions: ITransaction[],
-  summaryItems?: TTransactionSummaryItem[]
-  twoDimSummaryItems?: TTransactionSummaryItem[][]
+  orientation?: 'horizontal' | 'vertical',
+  style?: 'card' | 'list',
+  summaryItems?: TTransactionSummaryItem[],
+  twoDimSummaryItems?: TTransactionSummaryItem[][],
 }
 export const TransactionSummary = (
   props: PropsWithChildren<TTransactionSummaryProps>
 ) => {
  
-  const locale = getBrowserLocale()
-  
-  // -------------
-  // Sub Component
-  // -------------
-
-  type TSummaryItemProps = {
-    title: string,
-    value: number,
-    prefix: string,
-    decimals: number,
-    placeholder?: string,
-  }
-  const SummaryItem = (props: PropsWithChildren<TSummaryItemProps>) => {
-    return (
-      <Box>
-        <Text align='center' fontWeight='bold'>{props.title}</Text>
-        <Text align='center'>{props.value 
-          ? getFormattedPrice(props.value, locale, props.prefix, props.decimals)
-          : props.placeholder}
-        </Text>
-      </Box>
-    )
-  }
-
-  const isTwoDimensional = !_.isEmpty(props.twoDimSummaryItems)
-
-    
-  // ==============
-  // Main Component
-  // ==============
+  const {
+    orientation = 'horizontal',
+    style,
+    transactions,
+    summaryItems = [],
+    twoDimSummaryItems = [[]]
+  } = props
 
   return (
     <>
-      {isTwoDimensional
+      {!_.isEmpty(twoDimSummaryItems[0])
+      
         ? (
           <VStack
             divider={<StackDivider color='gray.200'/>}
             spacing={4}
           >
-            {props.twoDimSummaryItems && props.twoDimSummaryItems.map(
+            {twoDimSummaryItems.map(
               (itemRow: TTransactionSummaryItem[]) => {
 
                 return (
@@ -79,18 +145,11 @@ export const TransactionSummary = (
                   >
                     {itemRow.map(
                       (item: TTransactionSummaryItem) => {
-
-                        const value = item.fn(props.transactions) ?? 0
-                        const prefix = item.formattedPrefix ?? ''
-                        const decimals = item.formattedPrecision ?? 0
-
                         return (
-                          <SummaryItem 
-                            title={item.title}
-                            value={value}
-                            prefix={prefix}
-                            decimals={decimals}
-                            placeholder={item.placeholder}
+                          <TransactionSummaryItemWrapper 
+                            item={item} 
+                            transactions={transactions}
+                            style={style}
                           />
                         )
                       }
@@ -100,7 +159,9 @@ export const TransactionSummary = (
               }
             )}
           </VStack>
-        ) : (
+
+        ) : orientation === 'horizontal' ? (
+
           <HStack 
             divider={<StackDivider color='gray.200'/>}
             spacing={4}
@@ -108,26 +169,41 @@ export const TransactionSummary = (
             justifyContent='space-evenly'
             width='100%'              
           >
-            {props.summaryItems && props.summaryItems.map(
+            {summaryItems.map(
               (item: TTransactionSummaryItem) => {
-
-                const value = item.fn(props.transactions) ?? 0
-                const prefix = item.formattedPrefix ?? ''
-                const decimals = item.formattedPrecision ?? 0
-
                 return (
-                  <SummaryItem 
-                    title={item.title}
-                    value={value}
-                    prefix={prefix}
-                    decimals={decimals}
-                    placeholder={item.placeholder}
+                  <TransactionSummaryItemWrapper 
+                    item={item} 
+                    transactions={transactions}
+                    style={style}
                   />
                 )
               }
             )}
           </HStack>
-        )
+
+        ) : orientation === 'vertical' ? (
+
+          <VStack 
+            divider={<StackDivider color='gray.200'/>}
+            spacing={4}
+            display='flex'
+            alignItems='center'
+          >
+            {summaryItems.map(
+              (item: TTransactionSummaryItem) => {
+                return (
+                  <TransactionSummaryItemWrapper 
+                    item={item} 
+                    transactions={transactions}
+                    style={style}
+                  />
+                )
+              }
+            )}
+          </VStack>
+
+        ) : undefined
       }
     </>
   )
