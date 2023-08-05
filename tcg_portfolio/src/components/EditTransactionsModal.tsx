@@ -37,6 +37,8 @@ import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
 import { FiMinusCircle } from 'react-icons/fi'
 import { createColumnHelper } from '@tanstack/react-table'
+import { TransactionSummary, TTransactionSummaryItem 
+  } from './TransactionSummary'
 import { TransactionTable } from './TransactionTable'
 import { getBrowserLocale, getFormattedPrice } from '../utils'
 
@@ -300,136 +302,6 @@ const AddTransactionForm = (
 }
 
 
-// ----------------------
-// TransactionSummaryCard
-// ----------------------
-
-type TTransactionSummaryItem = {
-  title: string,
-  fn: (transactions: ITransaction[]) => number | undefined,
-  formattedPrefix?: string,
-  formattedPrecision?: number,
-  placeholder?: string,
-}
-type TTransactionSummaryCardProps = {
-  transactions: ITransaction[],
-  summaryItems?: TTransactionSummaryItem[]
-  twoDimSummaryItems?: TTransactionSummaryItem[][]
-}
-const TransactionSummaryCard = (
-  props: PropsWithChildren<TTransactionSummaryCardProps>
-) => {
- 
-  const locale = getBrowserLocale()
-  
-  // -------------
-  // sub component
-  // -------------
-  type TSummaryItemProps = {
-    title: string,
-    value: number,
-    prefix: string,
-    decimals: number,
-    placeholder?: string,
-  }
-  const SummaryItem = (props: PropsWithChildren<TSummaryItemProps>) => {
-    return (
-      <Box>
-        <Text align='center' fontWeight='bold'>{props.title}</Text>
-        <Text align='center'>{props.value 
-          ? getFormattedPrice(props.value, locale, props.prefix, props.decimals)
-          : props.placeholder}
-        </Text>
-      </Box>
-    )
-  }
-
-  const isTwoDimensional = !_.isEmpty(props.twoDimSummaryItems)
-
-    
-  // ==============
-  // Main Component
-  // ==============
-
-  return (
-    <Card>
-      <CardBody>
-        {isTwoDimensional
-          ? (
-            <VStack
-              divider={<StackDivider color='gray.200'/>}
-              spacing={4}
-            >
-              {props.twoDimSummaryItems && props.twoDimSummaryItems.map(
-                (itemRow: TTransactionSummaryItem[]) => {
-
-                  return (
-                    <HStack 
-                      divider={<StackDivider color='gray.200'/>}
-                      spacing={4}
-                      display='flex'
-                      justifyContent='space-evenly'
-                      width='100%'
-                    >
-                      {itemRow.map(
-                        (item: TTransactionSummaryItem) => {
-
-                          const value = item.fn(props.transactions) ?? 0
-                          const prefix = item.formattedPrefix ?? ''
-                          const decimals = item.formattedPrecision ?? 0
-
-                          return (
-                            <SummaryItem 
-                              title={item.title}
-                              value={value}
-                              prefix={prefix}
-                              decimals={decimals}
-                              placeholder={item.placeholder}
-                            />
-                          )
-                        }
-                      )}
-                    </HStack>
-                  )
-                }
-              )}
-            </VStack>
-          ) : (
-            <HStack 
-              divider={<StackDivider color='gray.200'/>}
-              spacing={4}
-              display='flex'
-              justifyContent='space-evenly'
-              width='100%'              
-            >
-              {props.summaryItems && props.summaryItems.map(
-                (item: TTransactionSummaryItem) => {
-    
-                  const value = item.fn(props.transactions) ?? 0
-                  const prefix = item.formattedPrefix ?? ''
-                  const decimals = item.formattedPrecision ?? 0
-    
-                  return (
-                    <SummaryItem 
-                      title={item.title}
-                      value={value}
-                      prefix={prefix}
-                      decimals={decimals}
-                      placeholder={item.placeholder}
-                    />
-                  )
-                }
-              )}
-            </HStack>
-          )
-        }
-
-      </CardBody>
-    </Card>
-  )
-}
-
-
 // ==============
 // Main Component
 // ==============
@@ -448,7 +320,10 @@ export const EditTransactionsModal = (
   // state
   const [ transactions, setTransactions ] = useState(props.transactions)
 
+  // -------------------------
   // transaction summary items
+  // -------------------------
+
   const purchaseSummaryItems: TTransactionSummaryItem[] = [
     {
       title: 'Purchases',
@@ -493,7 +368,9 @@ export const EditTransactionsModal = (
     },
   ]
 
-  // -- functions
+  // ---------
+  // functions
+  // ---------
 
   // add transaction to local state only
   function handleAddTransaction(txn: ITransaction): void {
@@ -535,9 +412,9 @@ export const EditTransactionsModal = (
     return getPurchaseQuantity(transactions) >= getSaleQuantity(transactions)
   }
 
-  // -----------------
+  // ----------------
   // TransactionTable
-  // -----------------
+  // ----------------
 
   function handleDeleteTransaction(txn: ITransaction): void {
     const ix = transactions.findIndex((t: ITransaction) => (
@@ -620,7 +497,7 @@ export const EditTransactionsModal = (
   // -- hidden columns
   const hiddenColumns = ['type']
 
-  // alert if Purchases < Sales
+  // toast for validation alerts
   const toast = useToast()
 
 
@@ -651,19 +528,27 @@ export const EditTransactionsModal = (
               <ProductImage boxSize='200px' product={props.product} />
 
               {/* Purchases */}
-              <TransactionSummaryCard 
-                transactions={transactions}
-                summaryItems={purchaseSummaryItems}
-              />
+              <Card>
+                <CardBody>
+                  <TransactionSummary 
+                    transactions={transactions}
+                    summaryItems={purchaseSummaryItems}
+                  />
+                </CardBody>
+              </Card>
               
               {/* Sales */}
               {
                 getSaleQuantity(transactions) > 0 
                   ? (
-                    <TransactionSummaryCard 
-                      transactions={transactions}
-                      summaryItems={saleSummaryItems}
-                    />
+                    <Card>
+                      <CardBody>
+                        <TransactionSummary 
+                          transactions={transactions}
+                          summaryItems={saleSummaryItems}
+                        />
+                      </CardBody>
+                    </Card>
                   ) : undefined
               }
 
