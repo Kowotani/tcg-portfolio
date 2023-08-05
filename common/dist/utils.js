@@ -386,7 +386,7 @@ RETURN
 */
 function getQuantity(transactions) {
     var value = _.sumBy(transactions, function (txn) {
-        return txn.quantity;
+        return txn.quantity * (txn.type === TransactionType.Purchase ? 1 : -1);
     });
     assert(value >= 0, 'getQuantity() is not at least 0');
     return value;

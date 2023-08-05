@@ -569,7 +569,7 @@ RETURN
 */
 export function getQuantity(transactions: ITransaction[]): number {
   const value =  _.sumBy(transactions, (txn: ITransaction) => {
-    return txn.quantity
+    return txn.quantity * (txn.type === TransactionType.Purchase ? 1 : -1)
   })
   assert(value >= 0, 'getQuantity() is not at least 0')
   return value
