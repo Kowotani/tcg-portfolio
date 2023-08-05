@@ -14,10 +14,8 @@ import { HoldingCard } from './Holding'
 import { InputErrorWrapper } from './InputField'
 import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
-
-import { EditPortfolioContext } from '../state/EditPortfolioContext'
 import { SideBarNavContext } from '../state/SideBarNavContext'
-import { IEditPortfolioContext, ISideBarNavContext, NonVisibileProductSubtypes, 
+import { ISideBarNavContext, NonVisibileProductSubtypes, 
   SideBarNav } from '../utils'
 
 
@@ -27,8 +25,6 @@ export const EditPortfolioForm = (
 ) => {
 
   // contexts
-  const { portfolio, setPortfolio} = 
-    useContext(EditPortfolioContext) as IEditPortfolioContext
   const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
   const isEditPortfolioForm = sideBarNav === SideBarNav.PORTFOLIO
 
@@ -37,9 +33,47 @@ export const EditPortfolioForm = (
   // states
   // ======
 
-  // -----------------
-  // Portfolio Details
-  // -----------------
+  // ---------
+  // Portfolio
+  // ---------
+
+  // ====================================
+  // dummy data start
+
+  const fooTransactions: ITransaction[] = [
+    {
+      type: TransactionType.Purchase,
+      date: new Date(),
+      quantity: 123,
+      price: 5.67
+    }
+  ]
+
+  const fooHolding: IHolding = {
+    tcgplayerId: 121527,
+    transactions: fooTransactions
+  }
+  const fooPortfolio: IPortfolio = {
+    userId: 1234,
+    portfolioName: 'Alpha Investments',
+    holdings: [fooHolding]
+  }
+
+  const fooProduct: IProduct = {
+    tcgplayerId: 121527,
+    tcg: TCG.MagicTheGathering,
+    releaseDate: new Date(),
+    name: 'Kaladesh',
+    type: ProductType.BoosterBox,
+    language: ProductLanguage.English,
+    subtype: ProductSubtype.Draft,
+    setCode: 'KLD',
+  }
+
+  // dummy data end
+  // ====================================
+
+  const [ portfolio, setPortfolio ] = useState(fooPortfolio)
 
   // PortfolioName state
   const [ portfolioNameState, setPortfolioNameState ] = useState<{
@@ -108,47 +142,6 @@ export const EditPortfolioForm = (
   function handleSearchChange(value: string): void {
     _.debounce(() => setSearchInput(value), 300)
   }
-  
-  // ====================================
-  // dummy data start
-
-  const fooTransactions: ITransaction[] = [
-    {
-      type: TransactionType.Purchase,
-      date: new Date(),
-      quantity: 123,
-      price: 5.67
-    }
-  ]
-
-  const fooHolding: IHolding = {
-    tcgplayerId: 121527,
-    transactions: fooTransactions
-  }
-  const fooPortfolio: IPortfolio = {
-    userId: 1234,
-    portfolioName: 'Alpha Investments',
-    holdings: [fooHolding]
-  }
-
-  const fooProduct: IProduct = {
-    tcgplayerId: 121527,
-    tcg: TCG.MagicTheGathering,
-    releaseDate: new Date(),
-    name: 'Kaladesh',
-    type: ProductType.BoosterBox,
-    language: ProductLanguage.English,
-    subtype: ProductSubtype.Draft,
-    setCode: 'KLD',
-  }
-
-  useEffect(() => {
-    setPortfolio(fooPortfolio)
-  }, [])
-
-  // dummy data end
-  // ====================================
-
 
   // get initial products 
   useEffect(() => {
