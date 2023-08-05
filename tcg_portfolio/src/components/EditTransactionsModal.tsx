@@ -24,6 +24,7 @@ import {
   RadioGroup,
   StackDivider,
   Text,
+  useToast,
   VStack
 } from '@chakra-ui/react';
 import { getAverageCost, getAverageRevenue, getPurchaseQuantity, 
@@ -431,9 +432,30 @@ export const EditTransactionsModal = (
 
   // exit and save 
   function handleOnSave(): void {
-    // update parent transactions
-    props.setTransactions(transactions)
-    props.onClose()
+
+    // check that purchaes >= sales
+    if (hasNonNegativeQuantity()) {
+
+      // update parent transactions
+      props.setTransactions(transactions)
+      props.onClose()
+
+    // alert via toast
+    } else {
+      
+      toast({
+        title: 'Error',
+        description: 'Sales cannot be greater than Purchases',
+        status: 'error',
+        variant: 'subtle',
+        isClosable: true,
+      })          
+    }
+  }
+
+  // validate that purchases >= sales
+  function hasNonNegativeQuantity(): boolean {
+    return getPurchaseQuantity(transactions) >= getSaleQuantity(transactions)
   }
 
   // -----------------
@@ -520,6 +542,9 @@ export const EditTransactionsModal = (
 
   // -- hidden columns
   const hiddenColumns = ['type']
+
+  // alert if Purchases < Sales
+  const toast = useToast()
 
 
   // ==============
