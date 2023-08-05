@@ -385,9 +385,7 @@ RETURN
   The item quantity available from the input ITransaction
 */
 function getQuantity(transactions) {
-    var value = _.sumBy(transactions, function (txn) {
-        return txn.quantity * (txn.type === TransactionType.Purchase ? 1 : -1);
-    });
+    var value = getPurchaseQuantity(transactions) - getSaleQuantity(transactions);
     assert(value >= 0, 'getQuantity() is not at least 0');
     return value;
 }
