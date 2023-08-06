@@ -531,8 +531,7 @@ export const EditTransactionsModal = (
                   <TransactionSummary 
                     transactions={transactions}
                     summaryItems={purchaseSummaryItems}
-                    orientation='horizontal'
-                    style='card'
+                    variant='hcard'
                   />
                 </CardBody>
               </Card>
@@ -546,8 +545,7 @@ export const EditTransactionsModal = (
                         <TransactionSummary 
                           transactions={transactions}
                           summaryItems={saleSummaryItems}
-                          orientation='horizontal'
-                          style='card'
+                          variant='hcard'
                         />
                       </CardBody>
                     </Card>

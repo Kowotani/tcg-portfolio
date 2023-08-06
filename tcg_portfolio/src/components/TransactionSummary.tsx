@@ -2,6 +2,7 @@ import { PropsWithChildren } from 'react';
 import { 
   Box,
   HStack,
+  Spacer,
   StackDivider,
   Text,
   VStack
@@ -18,45 +19,49 @@ import { getBrowserLocale, getFormattedPrice } from '../utils'
 // -- TransactionSummaryItem
 
 type TTransactionSummaryItemProps = {
+  variant: string,
   title: string,
   value: number,
   prefix?: string,
   decimals?: number,
   placeholder?: string,
-  style?: string,
+  
 }
 const TransactionSummaryItem = (
   props: PropsWithChildren<TTransactionSummaryItemProps>
 ) => {
 
   const {
+    variant,
     title,
     value,
     prefix = '',
     decimals = 0,
     placeholder,
-    style = 'card'
   } = props
 
   const locale = getBrowserLocale()
 
   return (
     <>
-      {style === 'card'
+      {variant === 'list' 
+
         ? (
-          <Box>
-            <Text as='b' align='center'>{title}</Text>
-            <Text align='center'>
+          <Box display='flex' justifyContent='space-between' width='100%'>
+            <Text as='b'>{title}</Text>
+            <Spacer minWidth={4} />
+            <Text>
               {value 
                 ? getFormattedPrice(value, locale, prefix, decimals)
                 : placeholder}
             </Text>
           </Box>
 
-        ) : style === 'list' ? (
-          <Box display='flex' justifyContent='space-between'>
-            <Text as='b'>{title}</Text>
-            <Text>
+        ) : ['hcard', 'vcard'].includes(variant) ? (
+
+          <Box>
+            <Text as='b' align='center'>{title}</Text>
+            <Text align='center'>
               {value 
                 ? getFormattedPrice(value, locale, prefix, decimals)
                 : placeholder}
@@ -74,7 +79,7 @@ const TransactionSummaryItem = (
 type TTransactionSummaryItemWrapper = {
   item: TTransactionSummaryItem
   transactions: ITransaction[],
-  style?: string
+  variant: string,
 }
 const TransactionSummaryItemWrapper = (
   props: PropsWithChildren<TTransactionSummaryItemWrapper>
@@ -87,7 +92,7 @@ const TransactionSummaryItemWrapper = (
       prefix={props.item.formattedPrefix}
       decimals={props.item.formattedPrecision}
       placeholder={props.item.placeholder}
-      style={props.style}
+      variant={props.variant}
     />
   )
 }
@@ -106,27 +111,25 @@ export type TTransactionSummaryItem = {
 }
 export type TTransactionSummaryProps = {
   transactions: ITransaction[],
-  orientation?: 'horizontal' | 'vertical',
-  style?: 'card' | 'list',
   summaryItems?: TTransactionSummaryItem[],
   twoDimSummaryItems?: TTransactionSummaryItem[][],
+  variant?: 'hcard' | 'vcard' | 'list'
 }
 export const TransactionSummary = (
   props: PropsWithChildren<TTransactionSummaryProps>
 ) => {
  
   const {
-    orientation = 'horizontal',
-    style,
     transactions,
     summaryItems = [],
-    twoDimSummaryItems = [[]]
+    twoDimSummaryItems = [[]],
+    variant = 'list',
   } = props
 
   return (
     <>
       {!_.isEmpty(twoDimSummaryItems[0])
-      
+
         ? (
           <VStack
             divider={<StackDivider color='gray.200'/>}
@@ -149,7 +152,7 @@ export const TransactionSummary = (
                           <TransactionSummaryItemWrapper 
                             item={item} 
                             transactions={transactions}
-                            style={style}
+                            variant={variant}
                           />
                         )
                       }
@@ -160,7 +163,26 @@ export const TransactionSummary = (
             )}
           </VStack>
 
-        ) : orientation === 'horizontal' ? (
+      ) : variant === 'list' ? (
+
+        <VStack           
+          spacing={0}
+          width='100%'      
+        >
+          {summaryItems.map(
+            (item: TTransactionSummaryItem) => {
+              return (
+                <TransactionSummaryItemWrapper 
+                  item={item} 
+                  transactions={transactions}
+                  variant={variant}
+                />
+              )
+            }
+          )}
+        </VStack>
+
+        ) : variant === 'hcard' ? (
 
           <HStack 
             divider={<StackDivider color='gray.200'/>}
@@ -175,14 +197,14 @@ export const TransactionSummary = (
                   <TransactionSummaryItemWrapper 
                     item={item} 
                     transactions={transactions}
-                    style={style}
+                    variant={variant}
                   />
                 )
               }
             )}
           </HStack>
 
-        ) : orientation === 'vertical' ? (
+        ) : variant === 'vcard' ? (
 
           <VStack 
             divider={<StackDivider color='gray.200'/>}
@@ -196,7 +218,7 @@ export const TransactionSummary = (
                   <TransactionSummaryItemWrapper 
                     item={item} 
                     transactions={transactions}
-                    style={style}
+                    variant={variant}
                   />
                 )
               }
