@@ -1,67 +1,22 @@
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useState } from 'react'
 import { 
   Box,
   Button,
   Card,
   CardBody,
   HStack,
-  SimpleGrid,
   StackDivider,
   Text,
   useDisclosure,
   VStack
 } from '@chakra-ui/react'
-import { getAverageCost, getQuantity, getTotalCost, IHolding, IProduct,  
-  ITransaction } from 'common'
+import { getAverageCost, getAverageRevenue, getPurchaseQuantity, getQuantity, 
+  getSaleQuantity, IHolding, IProduct, ITransaction } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
-import { getBrowserLocale, getFormattedPrice } from '../utils'
+import { TransactionSummary, TTransactionSummaryItem } from './TransactionSummary'
 
-// ==============
-// Sub Components
-// ==============
-
-// summary metrics for the holding
-type THoldingSummaryProps = {
-  holding: IHolding
-}
-const HoldingSummary = (props: PropsWithChildren<THoldingSummaryProps>) => {
-
-  const locale = getBrowserLocale()
-
-  const quantity = getQuantity(props.holding.transactions)
-  const totalCost = getTotalCost(props.holding.transactions)
-  const averageCost = getAverageCost(props.holding.transactions)
-
-  return (
-    <SimpleGrid columns={2}>
-      <Text align='left'>Quantity:</Text>
-      <Text align='right'>
-        {getFormattedPrice(quantity, locale, '', 0)}
-      </Text>
-      <Text align='left'>Total Cost:</Text>
-      <Text align='right'>
-        {totalCost 
-          ? getFormattedPrice(totalCost, locale, '$', 2)
-          : '$ -'
-        }
-      </Text>
-      <Text align='left'>Avg Cost:</Text>
-      <Text align='right'>
-      {averageCost 
-          ? getFormattedPrice(averageCost, locale, '$', 2)
-          : '$ -'
-        }
-      </Text>
-    </SimpleGrid>
-  )
-}
-
-
-// ==============
-// Main Component
-// ==============
 
 type THoldingCardProps = {
   holding: IHolding,
@@ -83,6 +38,61 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     setTransactions(txns)
   }
 
+  // TransactionSummary
+
+  const quantitySummary: TTransactionSummaryItem[] = [
+    {
+      title: 'Purchases',
+      fn: getPurchaseQuantity,
+      placeholder: '-',
+      titleStyle: {},
+    },
+    {
+      title: 'Sales',
+      fn: getSaleQuantity,
+      placeholder: '-',
+      titleStyle: {},
+    },
+    {
+      title: 'Quantity',
+      fn: getQuantity,
+      placeholder: '-',
+      titleStyle: {},
+    },
+  ]
+
+  const profitSummary: TTransactionSummaryItem[] = [
+    {
+      title: 'Avg Cost',
+      fn: getAverageCost,
+      formattedPrefix: '$',
+      formattedPrecision: 2,
+      placeholder: '$ -',
+      titleStyle: {},
+    },
+    {
+      title: 'Avg Rev',
+      fn: getAverageRevenue,
+      formattedPrefix: '$',
+      formattedPrecision: 2,
+      placeholder: '$ -',
+      titleStyle: {},
+    },
+    {
+      title: 'Profit',
+      fn: (txns: ITransaction[]) => {
+        return getSaleQuantity(txns) > 0
+          ? getSaleQuantity(txns) 
+            * (Number(getAverageRevenue(txns)) - Number(getAverageCost(txns)))
+          : undefined
+      },
+      formattedPrefix: '$',
+      formattedPrecision: 2,
+      placeholder: '$ -',
+      titleStyle: {},
+    },
+  ]
+
 
   // ==============
   // Main Component
@@ -96,6 +106,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
             divider={<StackDivider color='gray.200'/>}
             spacing={4}
           >
+            {/* Product Image */}
             <ProductImage product={props.product} boxSize='100px'/>
             <VStack spacing={0}>
               <Box display='flex' justifyContent='flex-start' width='100%'>
@@ -103,12 +114,34 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
                   {props.product.name}
                 </Text>
               </Box>
+
               <HStack
                 divider={<StackDivider color='gray.200'/>}
                 spacing={4}
               >
-                <ProductDescription product={props.product} showHeader={false} />
-                <HoldingSummary holding={holding} />
+                {/* Product Desc */}
+                <Box minWidth='200px'>
+                  <ProductDescription 
+                    product={props.product} 
+                    showHeader={false} 
+                  />
+                </Box>
+
+                {/* Quantity */}
+                <TransactionSummary 
+                  transactions={transactions}
+                  summaryItems={quantitySummary}
+                  variant='list'
+                />
+
+                {/* Profit */}
+                <TransactionSummary 
+                  transactions={transactions}
+                  summaryItems={profitSummary}
+                  variant='list'
+                />
+
+                {/* Edit Transactions */}
                 <Button 
                   colorScheme='blue' 
                   onClick={onOpen}
