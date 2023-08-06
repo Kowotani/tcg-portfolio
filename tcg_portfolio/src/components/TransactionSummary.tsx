@@ -25,7 +25,7 @@ type TTransactionSummaryItemProps = {
   prefix?: string,
   decimals?: number,
   placeholder?: string,
-  
+  titleStyle?: {[key: string]: string}
 }
 const TransactionSummaryItem = (
   props: PropsWithChildren<TTransactionSummaryItemProps>
@@ -38,6 +38,7 @@ const TransactionSummaryItem = (
     prefix = '',
     decimals = 0,
     placeholder,
+    titleStyle,
   } = props
 
   const locale = getBrowserLocale()
@@ -48,8 +49,10 @@ const TransactionSummaryItem = (
 
         ? (
           <Box display='flex' justifyContent='space-between' width='100%'>
-            <Text as='b'>{title}</Text>
-            <Spacer minWidth={4} />
+            {titleStyle
+              ? <Text style={titleStyle}>{title}</Text>
+              : <Text as='b'>{title}</Text>
+            }
             <Text>
               {value 
                 ? getFormattedPrice(value, locale, prefix, decimals)
@@ -60,7 +63,10 @@ const TransactionSummaryItem = (
         ) : ['hcard', 'vcard'].includes(variant) ? (
 
           <Box>
-            <Text as='b' align='center'>{title}</Text>
+            {titleStyle
+              ? <Text style={titleStyle}>{title}</Text>
+              : <Text as='b' align='center'>{title}</Text>
+            }
             <Text align='center'>
               {value 
                 ? getFormattedPrice(value, locale, prefix, decimals)
@@ -93,6 +99,7 @@ const TransactionSummaryItemWrapper = (
       decimals={props.item.formattedPrecision}
       placeholder={props.item.placeholder}
       variant={props.variant}
+      titleStyle={props.item.titleStyle}
     />
   )
 }
@@ -108,6 +115,7 @@ export type TTransactionSummaryItem = {
   formattedPrefix?: string,
   formattedPrecision?: number,
   placeholder?: string,
+  titleStyle?: {[key: string]: string},
 }
 export type TTransactionSummaryProps = {
   transactions: ITransaction[],
