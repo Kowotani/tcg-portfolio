@@ -1,7 +1,7 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.getTotalRevenue = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getAverageRevenue = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductsGetStatus = exports.ProductPostStatus = void 0;
+exports.getTotalRevenue = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getProfit = exports.getAverageRevenue = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductsGetStatus = exports.ProductPostStatus = void 0;
 var _ = require("lodash");
 // =====
 // enums
@@ -345,6 +345,23 @@ function getAverageRevenue(transactions) {
         : getTotalRevenue(transactions) / quantity;
 }
 exports.getAverageRevenue = getAverageRevenue;
+/*
+DESC
+  Returns the realized profit (or loss) determined as
+    profit = salesQuantity * (avgRev - avgCost)
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The realized profit based on sales and avg cost vs avg revenue from the
+  ITransaction array, or undefined if saleQuantity === 0
+*/
+function getProfit(transactions) {
+    var quantity = getSaleQuantity(transactions);
+    return quantity === 0
+        ? undefined
+        : quantity * getAverageRevenue(transactions) - getAverageCost(transactions);
+}
+exports.getProfit = getProfit;
 /*
 DESC
   Returns the purchases from the input ITransaction array

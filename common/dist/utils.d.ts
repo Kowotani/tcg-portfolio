@@ -174,6 +174,7 @@ export declare function sortFnDateAsc(a: Date, b: Date): number;
 export declare function sortFnDateDesc(a: Date, b: Date): number;
 export declare function getAverageCost(transactions: ITransaction[]): number | undefined;
 export declare function getAverageRevenue(transactions: ITransaction[]): number | undefined;
+export declare function getProfit(transactions: ITransaction[]): number | undefined;
 export declare function getPurchases(transactions: ITransaction[]): ITransaction[];
 export declare function getPurchaseQuantity(transactions: ITransaction[]): number;
 export declare function getQuantity(transactions: ITransaction[]): number;

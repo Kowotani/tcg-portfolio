@@ -531,6 +531,23 @@ export function getAverageRevenue(
 
 /*
 DESC
+  Returns the realized profit (or loss) determined as
+    profit = salesQuantity * (avgRev - avgCost)
+INPUT
+  transactions: An ITransaction array
+RETURN
+  The realized profit based on sales and avg cost vs avg revenue from the 
+  ITransaction array, or undefined if saleQuantity === 0
+*/
+export function getProfit(transactions: ITransaction[]): number | undefined {
+  const quantity = getSaleQuantity(transactions)
+  return quantity === 0 
+    ? undefined
+    : quantity * getAverageRevenue(transactions) - getAverageCost(transactions)
+}
+
+/*
+DESC
   Returns the purchases from the input ITransaction array
 INPUT
   transactions: An ITransaction array
