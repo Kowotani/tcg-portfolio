@@ -42,6 +42,9 @@ const TransactionSummaryItem = (
   } = props
 
   const locale = getBrowserLocale()
+  const isNegative = value < 0 ? '-' : ''
+  const absValue = Math.abs(value)
+  const formattedPrice = getFormattedPrice(absValue, locale, prefix, decimals)
 
   return (
     <>
@@ -60,7 +63,7 @@ const TransactionSummaryItem = (
             <Spacer minWidth={4}/>
             <Text>
               {value 
-                ? getFormattedPrice(value, locale, prefix, decimals)
+                ? (isNegative ? '-' : '') + formattedPrice
                 : placeholder}
             </Text>
           </Box>
@@ -74,7 +77,7 @@ const TransactionSummaryItem = (
             }
             <Text align='center'>
               {value 
-                ? getFormattedPrice(value, locale, prefix, decimals)
+                ? (isNegative ? '-' : '') + formattedPrice
                 : placeholder}
             </Text>
           </Box>
