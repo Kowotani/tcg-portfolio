@@ -10,8 +10,8 @@ import {
   useDisclosure,
   VStack
 } from '@chakra-ui/react'
-import { getAverageCost, getAverageRevenue, getPurchaseQuantity, getQuantity, 
-  getSaleQuantity, IHolding, IProduct, ITransaction } from 'common'
+import { getAverageCost, getAverageRevenue, getProfit, getPurchaseQuantity, 
+  getQuantity, getSaleQuantity, IHolding, IProduct, ITransaction } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
@@ -80,12 +80,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     },
     {
       title: 'Profit:',
-      fn: (txns: ITransaction[]) => {
-        return getSaleQuantity(txns) > 0
-          ? getSaleQuantity(txns) 
-            * (Number(getAverageRevenue(txns)) - Number(getAverageCost(txns)))
-          : undefined
-      },
+      fn: getProfit,
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
