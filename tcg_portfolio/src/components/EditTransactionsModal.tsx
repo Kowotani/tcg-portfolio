@@ -519,9 +519,10 @@ export const EditTransactionsModal = (
 
               {/* Description */}
               <ProductDescription 
-                align='center'
                 product={props.product} 
-                showHeader={false} 
+                showHeader={false}
+                fontSize='large' 
+                textAlign='center'
               />
               <ProductImage boxSize='200px' product={props.product} />
 

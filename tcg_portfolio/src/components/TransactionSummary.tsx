@@ -48,11 +48,16 @@ const TransactionSummaryItem = (
       {variant === 'list' 
 
         ? (
-          <Box display='flex' justifyContent='space-between' width='100%'>
+          <Box 
+            display='flex' 
+            justifyContent='space-between' 
+            width='100%'
+          >
             {titleStyle
               ? <Text style={titleStyle}>{title}</Text>
               : <Text as='b'>{title}</Text>
             }
+            <Spacer minWidth={4}/>
             <Text>
               {value 
                 ? getFormattedPrice(value, locale, prefix, decimals)
@@ -175,7 +180,7 @@ export const TransactionSummary = (
 
         <VStack           
           spacing={0}
-          width='100%'      
+          width='fit-content'      
         >
           {summaryItems.map(
             (item: TTransactionSummaryItem) => {
@@ -219,6 +224,7 @@ export const TransactionSummary = (
             spacing={4}
             display='flex'
             alignItems='center'
+            width='fit-content'
           >
             {summaryItems.map(
               (item: TTransactionSummaryItem) => {

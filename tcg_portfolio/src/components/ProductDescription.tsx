@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, BoxProps, Text } from '@chakra-ui/react';
 import { IProduct } from 'common'
 
 
@@ -7,31 +7,45 @@ import { IProduct } from 'common'
 // Main Component
 // ==============
 
-type TProductDescriptionProps = {
+type TProductDescriptionProps = BoxProps & {
   product: IProduct,
-  align?: 'left' | 'center' | 'right'
   showHeader?: boolean
 }
 export const ProductDescription = (
   props: PropsWithChildren<TProductDescriptionProps>
 ) => {
 
-  // TOOD: use CSS for this
-  const alignment = props.align ?? 'left'
-
   return (
     <Box>
       {props.showHeader ?? true 
         ? (
-          <Text align={alignment} fontWeight='bold'>
+          <Text 
+            textAlign={props.textAlign} 
+            fontWeight='bold'
+          >
             {props.product.name}
           </Text>
         )
         : undefined 
       }
-      <Text align={alignment}>{props.product.tcg}</Text>
-      <Text align={alignment}>{props.product.type}</Text>
-      <Text align={alignment}>{props.product.subtype}</Text>   
+      <Text 
+        textAlign={props.textAlign} 
+        fontSize={props.fontSize}
+      >
+        {props.product.tcg}
+      </Text>
+      <Text 
+        textAlign={props.textAlign} 
+        fontSize={props.fontSize}
+      >
+        {props.product.type}
+      </Text>
+      <Text 
+        textAlign={props.textAlign} 
+        fontSize={props.fontSize}
+      >
+        {props.product.subtype}
+      </Text>   
     </Box>
   )
 }

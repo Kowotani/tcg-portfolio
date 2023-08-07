@@ -42,19 +42,19 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
 
   const quantitySummary: TTransactionSummaryItem[] = [
     {
-      title: 'Purchases',
+      title: 'Purchases:',
       fn: getPurchaseQuantity,
       placeholder: '-',
       titleStyle: {},
     },
     {
-      title: 'Sales',
+      title: 'Sales:',
       fn: getSaleQuantity,
       placeholder: '-',
       titleStyle: {},
     },
     {
-      title: 'Quantity',
+      title: 'Quantity:',
       fn: getQuantity,
       placeholder: '-',
       titleStyle: {},
@@ -63,7 +63,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
 
   const profitSummary: TTransactionSummaryItem[] = [
     {
-      title: 'Avg Cost',
+      title: 'Avg Cost:',
       fn: getAverageCost,
       formattedPrefix: '$',
       formattedPrecision: 2,
@@ -71,7 +71,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
       titleStyle: {},
     },
     {
-      title: 'Avg Rev',
+      title: 'Avg Rev:',
       fn: getAverageRevenue,
       formattedPrefix: '$',
       formattedPrecision: 2,
@@ -79,7 +79,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
       titleStyle: {},
     },
     {
-      title: 'Profit',
+      title: 'Profit:',
       fn: (txns: ITransaction[]) => {
         return getSaleQuantity(txns) > 0
           ? getSaleQuantity(txns) 
@@ -120,33 +120,38 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
                 spacing={4}
               >
                 {/* Product Desc */}
-                <Box minWidth='200px'>
-                  <ProductDescription 
-                    product={props.product} 
-                    showHeader={false} 
+                <ProductDescription 
+                  product={props.product} 
+                  showHeader={false} 
+                  fontSize='large'
+                  textAlign='left'
+                  width='fit-content'
+                />
+
+                {/* Quantity */}
+                <Box fontSize='large'>
+                  <TransactionSummary 
+                    transactions={transactions}
+                    summaryItems={quantitySummary}
+                    variant='list'
                   />
                 </Box>
 
-                {/* Quantity */}
-                <TransactionSummary 
-                  transactions={transactions}
-                  summaryItems={quantitySummary}
-                  variant='list'
-                />
-
                 {/* Profit */}
-                <TransactionSummary 
-                  transactions={transactions}
-                  summaryItems={profitSummary}
-                  variant='list'
-                />
+                <Box fontSize='large'>
+                  <TransactionSummary 
+                    transactions={transactions}
+                    summaryItems={profitSummary}
+                    variant='list'
+                  />
+                </Box>
 
                 {/* Edit Transactions */}
                 <Button 
                   colorScheme='blue' 
                   onClick={onOpen}
                 >
-                  Transactions
+                  Edit
                 </Button>
               </HStack>
             </VStack>
