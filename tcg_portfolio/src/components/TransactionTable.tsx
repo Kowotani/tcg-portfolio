@@ -9,7 +9,7 @@ import {
   Th, 
   Td, 
 } from "@chakra-ui/react"
-import { IDeletableTransaction } from "common";
+import { IReactTableTransaction } from "common";
 import { TiArrowSortedDown, TiArrowSortedUp } from 'react-icons/ti'
 import {
   ColumnDef,
@@ -34,7 +34,7 @@ export type TTransactionTableProps<Data extends object> = {
 };
 
 export const TransactionTable = (
-  props: PropsWithChildren<TTransactionTableProps<IDeletableTransaction>>
+  props: PropsWithChildren<TTransactionTableProps<IReactTableTransaction>>
 ) => {
 
   const [sorting, setSorting] = useState<SortingState>([]);

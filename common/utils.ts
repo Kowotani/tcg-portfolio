@@ -254,8 +254,8 @@ export interface ITransaction {
   quantity: number,
 }
 
-// dummy interface to support a delete button column in React table
-export interface IDeletableTransaction extends ITransaction {
+// dummy interface to support additional columns in React Table
+export interface IReactTableTransaction extends ITransaction {
   delete?: boolean,
 }
 

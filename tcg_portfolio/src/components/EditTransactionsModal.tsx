@@ -26,7 +26,7 @@ import {
   VStack
 } from '@chakra-ui/react'
 import { getAverageCost, getAverageRevenue, getPurchaseQuantity, 
-  getSaleQuantity, getTotalCost, getTotalRevenue, IDeletableTransaction, 
+  getSaleQuantity, getTotalCost, getTotalRevenue, IReactTableTransaction, 
   IProduct, ITransaction, TransactionType } from 'common'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
@@ -430,7 +430,7 @@ export const EditTransactionsModal = (
 
   const locale = getBrowserLocale()
 
-  const columnHelper = createColumnHelper<IDeletableTransaction>()
+  const columnHelper = createColumnHelper<IReactTableTransaction>()
 
   const columns = [
     columnHelper.accessor('date', {

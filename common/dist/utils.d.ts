@@ -100,7 +100,7 @@ export interface ITransaction {
     price: number;
     quantity: number;
 }
-export interface IDeletableTransaction extends ITransaction {
+export interface IReactTableTransaction extends ITransaction {
     delete?: boolean;
 }
 export interface IHolding {
