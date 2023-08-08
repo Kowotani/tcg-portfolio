@@ -1,8 +1,14 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.getTotalRevenue = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getProfit = exports.getAverageRevenue = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductsGetStatus = exports.ProductPostStatus = void 0;
+exports.getTotalRevenue = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getProfit = exports.getAverageRevenue = exports.getAverageCost = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductsGetStatus = exports.ProductPostStatus = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var _ = require("lodash");
+// =========
+// constants
+// =========
+exports.DAYS_PER_YEAR = 365;
+exports.MILLISECONDS_PER_SECOND = 1000;
+exports.SECONDS_PER_DAY = 86400;
 // =====
 // enums
 // =====
@@ -187,7 +193,9 @@ exports.GET_PRODUCTS_URL = '/products';
 // =========
 // functions
 // =========
-// -- generic
+// -------
+// generic
+// -------
 /*
 DESC
   Basic assertion function
@@ -310,7 +318,9 @@ function sortFnDateDesc(a, b) {
     return b.getTime() - a.getTime();
 }
 exports.sortFnDateDesc = sortFnDateDesc;
-// -- transaction
+// -----------
+// transaction
+// -----------
 /*
 DESC
   Returns the average purchase cost from the input ITransaction. This value

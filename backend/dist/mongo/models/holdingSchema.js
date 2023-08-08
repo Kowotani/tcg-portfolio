@@ -131,6 +131,7 @@ exports.holdingSchema.method('getAnnualizedReturn', function getAnnualizedReturn
         return undefined;
     }
     const elapsedDays = (new Date().getTime()
-        - this.getFirstPurchaseDate().getTime()) / 86400 / 1000;
-    return Math.pow(1 + this.getPercentageReturn(price), 365 / elapsedDays) - 1;
+        - this.getFirstPurchaseDate().getTime())
+        / common_1.SECONDS_PER_DAY / common_1.MILLISECONDS_PER_SECOND;
+    return Math.pow(1 + this.getPercentageReturn(price), common_1.DAYS_PER_YEAR / elapsedDays) - 1;
 });

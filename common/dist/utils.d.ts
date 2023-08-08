@@ -1,3 +1,6 @@
+export declare const DAYS_PER_YEAR = 365;
+export declare const MILLISECONDS_PER_SECOND = 1000;
+export declare const SECONDS_PER_DAY = 86400;
 export declare enum ProductPostStatus {
     Added = "tcgplayerId added",
     AddedWithoutImage = "tcgplayerId added (without image)",

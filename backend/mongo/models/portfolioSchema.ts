@@ -1,7 +1,8 @@
 import { Document, Model, Schema } from 'mongoose';
 import { IMHolding, holdingSchema } from './holdingSchema';
 import * as _ from 'lodash';
-import { IHolding, IPortfolio, IPortfolioMethods } from 'common';
+import { DAYS_PER_YEAR, IPortfolio, IPortfolioMethods, MILLISECONDS_PER_SECOND,
+  SECONDS_PER_DAY } from 'common';
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html
 
 
@@ -159,7 +160,9 @@ portfolioSchema.method('getAnnualizedReturn',
     }
 
     const elapsedDays = (new Date().getTime() 
-      - this.getFirstPurchaseDate().getTime()) / 86400 / 1000
+      - this.getFirstPurchaseDate().getTime()) 
+      / SECONDS_PER_DAY / MILLISECONDS_PER_SECOND
 
-    return Math.pow(1 + this.getPercentageReturn(prices), 365 / elapsedDays) - 1
+    return Math.pow(1 + this.getPercentageReturn(prices), 
+      DAYS_PER_YEAR / elapsedDays) - 1
 });

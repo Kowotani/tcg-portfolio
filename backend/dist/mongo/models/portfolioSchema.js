@@ -23,6 +23,7 @@ exports.portfolioSchema = void 0;
 const mongoose_1 = require("mongoose");
 const holdingSchema_1 = require("./holdingSchema");
 const _ = __importStar(require("lodash"));
+const common_1 = require("common");
 // ==========
 // properties
 // ==========
@@ -129,6 +130,7 @@ exports.portfolioSchema.method('getAnnualizedReturn', function getAnnualizedRetu
         return undefined;
     }
     const elapsedDays = (new Date().getTime()
-        - this.getFirstPurchaseDate().getTime()) / 86400 / 1000;
-    return Math.pow(1 + this.getPercentageReturn(prices), 365 / elapsedDays) - 1;
+        - this.getFirstPurchaseDate().getTime())
+        / common_1.SECONDS_PER_DAY / common_1.MILLISECONDS_PER_SECOND;
+    return Math.pow(1 + this.getPercentageReturn(prices), common_1.DAYS_PER_YEAR / elapsedDays) - 1;
 });
