@@ -23,7 +23,6 @@ exports.portfolioSchema = void 0;
 const mongoose_1 = require("mongoose");
 const holdingSchema_1 = require("./holdingSchema");
 const _ = __importStar(require("lodash"));
-const common_1 = require("common");
 // ==========
 // properties
 // ==========
@@ -59,31 +58,30 @@ exports.portfolioSchema.method('deleteHolding', function deleteHolding(tcgplayer
     });
     this.save();
 });
-// delete holding
+// delete holdings
 exports.portfolioSchema.method('deleteHoldings', function deleteHoldings() {
     this.holdings = [];
     this.save();
 });
 // -- getters
+/*
+  TODO:
+  getTotalRevenue
+  getProfit
+
+  account for profit in returns
+*/
+// get user ID
+exports.portfolioSchema.method('getUserId', function getUserId() {
+    return this.userId;
+});
+// get portfolio name
+exports.portfolioSchema.method('getPortfolioName', function getPortfolioName() {
+    return this.portfolioName;
+});
 // get holdings
 exports.portfolioSchema.method('getHoldings', function getHoldings() {
     return this.holdings;
-});
-// get first purchase date
-exports.portfolioSchema.method('getFirstPurchaseDate', function getFirstPurchaseDate() {
-    return this.getHoldings().length > 0
-        ? _.min(this.getHoldings().map((holding) => {
-            return holding.methods.getFirstPurchaseDate();
-        }))
-        : undefined;
-});
-// get last purchase date
-exports.portfolioSchema.method('getLastPurchaseDate', function getLastPurchaseDate() {
-    return this.getHoldings().length > 0
-        ? _.max(this.getHoldings().map((holding) => {
-            return holding.methods.getLastPurchaseDate();
-        }))
-        : undefined;
 });
 // -- checkers
 // holding exists
@@ -123,14 +121,4 @@ exports.portfolioSchema.method('getPercentageReturn', function getPercentageRetu
     return this.getPurchases().length > 0
         ? this.getMarketValue(prices) / this.getTotalCost() - 1
         : undefined;
-});
-// get annualized return
-exports.portfolioSchema.method('getAnnualizedReturn', function getAnnualizedReturn(prices) {
-    if (this.getPurchases().length === 0) {
-        return undefined;
-    }
-    const elapsedDays = (new Date().getTime()
-        - this.getFirstPurchaseDate().getTime())
-        / common_1.SECONDS_PER_DAY / common_1.MILLISECONDS_PER_SECOND;
-    return Math.pow(1 + this.getPercentageReturn(prices), common_1.DAYS_PER_YEAR / elapsedDays) - 1;
 });

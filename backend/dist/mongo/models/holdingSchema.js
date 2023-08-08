@@ -54,19 +54,43 @@ exports.holdingSchema.method('addTransactions', function addTransactions(txnInpu
     this.parent.save();
 });
 // delete transaction
-exports.holdingSchema.method('deleteTransaction', function deleteTransaction(type, date, price, quantity) {
-    const ix = this.transactions.findIndex((txn) => {
-        return txn.type === type
-            && txn.date === date
-            && txn.price === price
-            && txn.quantity === quantity;
+exports.holdingSchema.method('deleteTransaction', function deleteTransaction(txn) {
+    const ix = this.transactions.findIndex((t) => {
+        return txn.type === t.type
+            && txn.date === t.date
+            && txn.price === t.price
+            && txn.quantity === t.quantity;
     });
     if (ix >= 0) {
-        this.transactions = this.transactions.splice(ix, 1);
+        this.transactions.splice(ix, 1);
         this.parent.save();
     }
 });
+// delete transactions
+exports.holdingSchema.method('deleteTransactions', function deleteTransactions() {
+    this.transactions = [];
+    this.parent.save();
+});
 // -- getters
+/*
+  TODO:
+  getPurchaseQuantity
+  getSales
+  getSaleQuantity
+  getAverageRevenue
+  getTotalRevenue
+  getProfit
+
+  account for profit in returns
+*/
+// get TCGPlayerId
+exports.holdingSchema.method('getTcgplayerId', function getTcgplayerId() {
+    return this.tcgplayerId;
+});
+// get transactions
+exports.holdingSchema.method('getTransactions', function getPurchases() {
+    return this.transactions;
+});
 // get purchases
 exports.holdingSchema.method('getPurchases', function getPurchases() {
     return this.transactions.filter({ 'type': common_1.TransactionType.Purchase });
@@ -99,7 +123,7 @@ exports.holdingSchema.method('getTotalCost', function getTotalCost() {
         : undefined;
 });
 // get average cost
-exports.holdingSchema.method('getAvgCost', function getAvgCost() {
+exports.holdingSchema.method('getAverageCost', function getAverageCost() {
     return this.getPurchases().length > 0
         ? this.getTotalCost() / this.getPurchases().length
         : undefined;

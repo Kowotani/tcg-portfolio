@@ -1,10 +1,10 @@
-import { IHolding, IHoldingMethods, IPortfolio, IPortfolioMethods, ITransaction, TransactionType } from './utils';
+import { IHolding, IHoldingMethods, IPortfolio, IPortfolioMethods, ITransaction } from './utils';
 export declare class Holding implements IHolding, IHoldingMethods {
     tcgplayerId: number;
     transactions: ITransaction[];
     constructor(tcgplayerId: number, transactions: ITransaction[]);
     addTransactions(txnInput: ITransaction | ITransaction[]): void;
-    deleteTransaction(type: TransactionType, date: Date, price: number, quantity: number): void;
+    deleteTransaction(txn: ITransaction): void;
     deleteTransactions(): void;
     getAnnualizedReturn(price: number): number | undefined;
     getAverageCost(): number | undefined;

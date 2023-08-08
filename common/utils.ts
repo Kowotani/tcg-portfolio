@@ -279,12 +279,7 @@ export interface IHoldingMethods {
 
   // CRUD transaction
   addTransactions(txnInput: ITransaction | ITransaction[]): void,
-  deleteTransaction(    
-    type: TransactionType,
-    date: Date,
-    price: number,
-    quantity: number
-  ): void,
+  deleteTransaction(txn: ITransaction): void,
   deleteTransactions(): void,
 
   // getters

@@ -22,12 +22,12 @@ var Holding = /** @class */ (function () {
             : this.transactions.push(txnInput);
     };
     // delete transaction
-    Holding.prototype.deleteTransaction = function (type, date, price, quantity) {
-        var ix = this.transactions.findIndex(function (txn) {
-            return txn.type === type
-                && txn.date === date
-                && txn.price === price
-                && txn.quantity === quantity;
+    Holding.prototype.deleteTransaction = function (txn) {
+        var ix = this.transactions.findIndex(function (t) {
+            return txn.type === t.type
+                && txn.date === t.date
+                && txn.price === t.price
+                && txn.quantity === t.quantity;
         });
         if (ix >= 0) {
             this.transactions.splice(ix, 1);

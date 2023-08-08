@@ -112,7 +112,7 @@ export interface IHolding {
 }
 export interface IHoldingMethods {
     addTransactions(txnInput: ITransaction | ITransaction[]): void;
-    deleteTransaction(type: TransactionType, date: Date, price: number, quantity: number): void;
+    deleteTransaction(txn: ITransaction): void;
     deleteTransactions(): void;
     getTcgplayerId(): number;
     getTransactions(): ITransaction[];

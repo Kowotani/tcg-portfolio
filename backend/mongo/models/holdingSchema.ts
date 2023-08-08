@@ -56,17 +56,12 @@ holdingSchema.method('addTransactions',
 
 // delete transaction
 holdingSchema.method('deleteTransaction',
-  function deleteTransaction(
-    type: TransactionType,
-    date: Date,
-    price: number,
-    quantity: number
-  ): void {
-    const ix = this.transactions.findIndex((txn: ITransaction) => {
-      return txn.type === type 
-        && txn.date === date
-        && txn.price === price
-        && txn.quantity === quantity
+  function deleteTransaction(txn: ITransaction): void {
+    const ix = this.transactions.findIndex((t: ITransaction) => {
+      return txn.type === t.type 
+        && txn.date === t.date
+        && txn.price === t.price
+        && txn.quantity === t.quantity
     })
     if (ix >= 0) {
       this.transactions.splice(ix, 1)
