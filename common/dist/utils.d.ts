@@ -112,14 +112,24 @@ export interface IHolding {
 }
 export interface IHoldingMethods {
     addTransactions(txnInput: ITransaction | ITransaction[]): void;
-    deleteTransaction(id: string): void;
-    getProduct(): IProduct;
+    deleteTransaction(type: TransactionType, date: Date, price: number, quantity: number): void;
+    deleteTransactions(): void;
+    getTcgplayerId(): number;
     getTransactions(): ITransaction[];
     getPurchases(): ITransaction[];
     getFirstPurchaseDate(): Date | undefined;
     getLastPurchaseDate(): Date | undefined;
+    getSales(): ITransaction[];
+    getPurchaseQuantity(): number;
+    getSaleQuantity(): number;
+    getQuantity(): number;
+    hasPurchases(): boolean;
+    hasSales(): boolean;
     getTotalCost(): number | undefined;
-    getAvgCost(): number | undefined;
+    getTotalRevenue(): number | undefined;
+    getAverageCost(): number | undefined;
+    getAverageRevenue(): number | undefined;
+    getProfit(): number | undefined;
     getMarketValue(price: number): number | undefined;
     getDollarReturn(price: number): number | undefined;
     getPercentageReturn(price: number): number | undefined;
@@ -144,13 +154,19 @@ export interface IPortfolioMethods {
     addHoldings(holdingInput: IHolding | IHolding[]): void;
     deleteHolding(tcgplayerId: number): void;
     deleteHoldings(): void;
+    getUserId(): number;
+    getPortfolioName(): string;
     getHoldings(): IHolding[];
     getTotalCost(): number | undefined;
+    getTotalRevenue(): number | undefined;
+    getProfit(): number | undefined;
     getMarketValue(prices: Map<number, number>): number | undefined;
     hasHolding(tcgplayerId: number): boolean;
+    hasHoldings(): boolean;
+    hasPurchases(): boolean;
+    hasSales(): boolean;
     getDollarReturn(prices: Map<number, number>): number | undefined;
     getPercentageReturn(prices: Map<number, number>): number | undefined;
-    getAnnualizedReturn(prices: Map<number, number>): number | undefined;
 }
 export interface IHydratedPortfolio extends IPortfolio {
     hydratedHoldings: IHydratedHolding[];

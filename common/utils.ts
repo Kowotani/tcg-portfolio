@@ -279,19 +279,39 @@ export interface IHoldingMethods {
 
   // CRUD transaction
   addTransactions(txnInput: ITransaction | ITransaction[]): void,
-  deleteTransaction(id: string): void,
+  deleteTransaction(    
+    type: TransactionType,
+    date: Date,
+    price: number,
+    quantity: number
+  ): void,
+  deleteTransactions(): void,
 
   // getters
-  getProduct(): IProduct,
+  getTcgplayerId(): number,
   getTransactions(): ITransaction[],
+
   getPurchases(): ITransaction[],
   getFirstPurchaseDate(): Date | undefined,
   getLastPurchaseDate(): Date | undefined,
-  getTotalCost(): number | undefined,
-  getAvgCost(): number | undefined,
-  getMarketValue(price: number): number | undefined,
+  getSales(): ITransaction[],
+
+  getPurchaseQuantity(): number,
+  getSaleQuantity(): number,
+  getQuantity(): number
+
+  // checkers
+  hasPurchases(): boolean,
+  hasSales(): boolean,
 
   // return calculation
+  getTotalCost(): number | undefined,
+  getTotalRevenue(): number | undefined,
+  getAverageCost(): number | undefined,
+  getAverageRevenue(): number | undefined,
+  getProfit(): number | undefined,
+  getMarketValue(price: number): number | undefined,
+
   getDollarReturn(price: number): number | undefined,
   getPercentageReturn(price: number): number | undefined,
   getAnnualizedReturn(price: number): number | undefined,
@@ -326,17 +346,23 @@ export interface IPortfolioMethods {
   deleteHoldings(): void,
 
   // getters
+  getUserId(): number,
+  getPortfolioName(): string,
   getHoldings(): IHolding[],
   getTotalCost(): number | undefined,
+  getTotalRevenue(): number | undefined,
+  getProfit(): number | undefined,
   getMarketValue(prices: Map<number, number>): number | undefined,
 
   // checkers
   hasHolding(tcgplayerId: number): boolean,
+  hasHoldings(): boolean,
+  hasPurchases(): boolean,
+  hasSales(): boolean,
 
   // return calculation
   getDollarReturn(prices: Map<number, number>): number | undefined,
   getPercentageReturn(prices: Map<number, number>): number | undefined,
-  getAnnualizedReturn(prices: Map<number, number>): number | undefined,
 }
 
 export interface IHydratedPortfolio extends IPortfolio {
