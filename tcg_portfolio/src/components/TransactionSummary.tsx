@@ -165,7 +165,8 @@ export const TransactionSummary = (
                     {itemRow.map(
                       (item: TTransactionSummaryItem) => {
                         return (
-                          <TransactionSummaryItemWrapper 
+                          <TransactionSummaryItemWrapper
+                            key={item.title} 
                             item={item} 
                             transactions={transactions}
                             variant={variant}
@@ -188,7 +189,8 @@ export const TransactionSummary = (
           {summaryItems.map(
             (item: TTransactionSummaryItem) => {
               return (
-                <TransactionSummaryItemWrapper 
+                <TransactionSummaryItemWrapper
+                  key={item.title}  
                   item={item} 
                   transactions={transactions}
                   variant={variant}
@@ -211,6 +213,7 @@ export const TransactionSummary = (
               (item: TTransactionSummaryItem) => {
                 return (
                   <TransactionSummaryItemWrapper 
+                    key={item.title} 
                     item={item} 
                     transactions={transactions}
                     variant={variant}
@@ -233,6 +236,7 @@ export const TransactionSummary = (
               (item: TTransactionSummaryItem) => {
                 return (
                   <TransactionSummaryItemWrapper 
+                    key={item.title} 
                     item={item} 
                     transactions={transactions}
                     variant={variant}
