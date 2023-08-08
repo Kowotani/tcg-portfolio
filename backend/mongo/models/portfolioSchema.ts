@@ -154,7 +154,7 @@ portfolioSchema.method('getPercentageReturn',
 portfolioSchema.method('getAnnualizedReturn', 
   function getAnnualizedReturn(prices: Map<number, number>): number | undefined {
 
-    if (this.getPurchases().legnth === 0) {
+    if (this.getPurchases().length === 0) {
       return undefined
     }
 

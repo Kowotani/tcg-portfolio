@@ -153,7 +153,7 @@ holdingSchema.method('getPercentageReturn',
 holdingSchema.method('getAnnualizedReturn', 
   function getAnnualizedReturn(price: number): number | undefined {
 
-    if (this.getPurchases().legnth === 0) {
+    if (this.getPurchases().length === 0) {
       return undefined
     }
 
