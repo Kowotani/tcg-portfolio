@@ -50,7 +50,7 @@ var Holding = /** @class */ (function () {
     // get average cost
     Holding.prototype.getAverageCost = function () {
         return this.hasPurchases()
-            ? this.getTotalCost() / this.getPurchases().length
+            ? this.getTotalCost() / this.getPurchaseQuantity()
             : undefined;
     };
     // get average cost
@@ -102,7 +102,7 @@ var Holding = /** @class */ (function () {
     // get profit
     Holding.prototype.getProfit = function () {
         return this.hasSales()
-            ? this.getQuantity() * this.getAverageRevenue() - this.getAverageCost()
+            ? this.getSaleQuantity() * this.getAverageRevenue() - this.getAverageCost()
             : undefined;
     };
     // get purchases

@@ -69,7 +69,7 @@ export class Holding implements IHolding, IHoldingMethods {
   // get average cost
   getAverageCost(): number | undefined {
   return this.hasPurchases()
-    ? this.getTotalCost() / this.getPurchases().length
+    ? this.getTotalCost() / this.getPurchaseQuantity()
     : undefined
   } 
 
@@ -126,7 +126,7 @@ export class Holding implements IHolding, IHoldingMethods {
   // get profit
   getProfit(): number | undefined {
     return this.hasSales()
-      ? this.getQuantity() * this.getAverageRevenue() - this.getAverageCost()
+      ? this.getSaleQuantity() * this.getAverageRevenue() - this.getAverageCost()
       : undefined
   }
 
