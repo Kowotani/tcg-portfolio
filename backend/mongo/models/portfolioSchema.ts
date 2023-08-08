@@ -109,7 +109,7 @@ portfolioSchema.method('hasHolding',
 // -- return inputs
 
 // get total cost
-holdingSchema.method('getTotalCost', 
+portfolioSchema.method('getTotalCost', 
   function getTotalCost(): number | undefined {
     return this.getHoldings().length > 0
       ? _.sum(this.getHoldings().map(
@@ -120,7 +120,7 @@ holdingSchema.method('getTotalCost',
 });
 
 // get market value
-holdingSchema.method('getMarketValue', 
+portfolioSchema.method('getMarketValue', 
   function getMarketValue(prices: Map<number, number>): number | undefined {
     return this.getHoldings().length > 0
       ? _.sum(this.getHoldings().map(
@@ -135,7 +135,7 @@ holdingSchema.method('getMarketValue',
 // -- returns
 
 // get dollar return
-holdingSchema.method('getDollarReturn', 
+portfolioSchema.method('getDollarReturn', 
   function getDollarReturn(prices: Map<number, number>): number | undefined {
     return this.getPurchases().length > 0
       ? this.getMarketValue(prices) - this.getTotalCost()
@@ -143,7 +143,7 @@ holdingSchema.method('getDollarReturn',
 });
 
 // get percentage return
-holdingSchema.method('getPercentageReturn', 
+portfolioSchema.method('getPercentageReturn', 
   function getPercentageReturn(prices: Map<number, number>): number | undefined {
     return this.getPurchases().length > 0
       ? this.getMarketValue(prices) / this.getTotalCost() - 1
@@ -151,7 +151,7 @@ holdingSchema.method('getPercentageReturn',
 });
 
 // get annualized return
-holdingSchema.method('getAnnualizedReturn', 
+portfolioSchema.method('getAnnualizedReturn', 
   function getAnnualizedReturn(prices: Map<number, number>): number | undefined {
 
     if (this.getPurchases().legnth === 0) {

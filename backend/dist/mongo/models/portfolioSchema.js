@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -93,7 +97,7 @@ exports.portfolioSchema.method('hasHolding', function hasHolding(tcgplayerId) {
 });
 // -- return inputs
 // get total cost
-holdingSchema_1.holdingSchema.method('getTotalCost', function getTotalCost() {
+exports.portfolioSchema.method('getTotalCost', function getTotalCost() {
     return this.getHoldings().length > 0
         ? _.sum(this.getHoldings().map((holding) => {
             return holding.methods.getTotalCost();
@@ -101,7 +105,7 @@ holdingSchema_1.holdingSchema.method('getTotalCost', function getTotalCost() {
         : undefined;
 });
 // get market value
-holdingSchema_1.holdingSchema.method('getMarketValue', function getMarketValue(prices) {
+exports.portfolioSchema.method('getMarketValue', function getMarketValue(prices) {
     return this.getHoldings().length > 0
         ? _.sum(this.getHoldings().map((holding) => {
             var _a;
@@ -112,19 +116,19 @@ holdingSchema_1.holdingSchema.method('getMarketValue', function getMarketValue(p
 });
 // -- returns
 // get dollar return
-holdingSchema_1.holdingSchema.method('getDollarReturn', function getDollarReturn(prices) {
+exports.portfolioSchema.method('getDollarReturn', function getDollarReturn(prices) {
     return this.getPurchases().length > 0
         ? this.getMarketValue(prices) - this.getTotalCost()
         : undefined;
 });
 // get percentage return
-holdingSchema_1.holdingSchema.method('getPercentageReturn', function getPercentageReturn(prices) {
+exports.portfolioSchema.method('getPercentageReturn', function getPercentageReturn(prices) {
     return this.getPurchases().length > 0
         ? this.getMarketValue(prices) / this.getTotalCost() - 1
         : undefined;
 });
 // get annualized return
-holdingSchema_1.holdingSchema.method('getAnnualizedReturn', function getAnnualizedReturn(prices) {
+exports.portfolioSchema.method('getAnnualizedReturn', function getAnnualizedReturn(prices) {
     if (this.getPurchases().legnth === 0) {
         return undefined;
     }
