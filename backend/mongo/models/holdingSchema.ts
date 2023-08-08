@@ -69,12 +69,43 @@ holdingSchema.method('deleteTransaction',
         && txn.quantity === quantity
     })
     if (ix >= 0) {
-      this.transactions = this.transactions.splice(ix, 1)
+      this.transactions.splice(ix, 1)
       this.parent.save()    
     }
 });
 
+// delete transactions
+holdingSchema.method('deleteTransactions',
+  function deleteTransactions(): void {
+    this.transactions = []
+    this.parent.save()
+});
+
 // -- getters
+
+/* 
+  TODO:
+  getPurchaseQuantity
+  getSales
+  getSaleQuantity
+  getAverageRevenue
+  getTotalRevenue
+  getProfit
+
+  account for profit in returns
+*/ 
+
+// get TCGPlayerId
+holdingSchema.method('getTcgplayerId', 
+  function getTcgplayerId(): ITransaction[] {
+    return this.tcgplayerId
+});
+
+// get transactions
+holdingSchema.method('getTransactions', 
+  function getPurchases(): ITransaction[] {
+    return this.transactions
+});
 
 // get purchases
 holdingSchema.method('getPurchases', 
@@ -115,8 +146,8 @@ holdingSchema.method('getTotalCost',
 });
 
 // get average cost
-holdingSchema.method('getAvgCost', 
-  function getAvgCost(): number | undefined {
+holdingSchema.method('getAverageCost', 
+  function getAverageCost(): number | undefined {
     return this.getPurchases().length > 0
       ? this.getTotalCost() / this.getPurchases().length
       : undefined

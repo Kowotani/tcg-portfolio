@@ -1,8 +1,7 @@
 import { Document, Model, Schema } from 'mongoose';
 import { IMHolding, holdingSchema } from './holdingSchema';
 import * as _ from 'lodash';
-import { DAYS_PER_YEAR, IPortfolio, IPortfolioMethods, MILLISECONDS_PER_SECOND,
-  SECONDS_PER_DAY } from 'common';
+import { IPortfolio, IPortfolioMethods } from 'common';
 // https://mongoosejs.com/docs/typescript/statics-and-methods.html
 
 
@@ -59,7 +58,7 @@ portfolioSchema.method('deleteHolding',
     this.save()
 });
 
-// delete holding
+// delete holdings
 portfolioSchema.method('deleteHoldings',
   function deleteHoldings(): void {
     this.holdings = []
@@ -68,32 +67,30 @@ portfolioSchema.method('deleteHoldings',
 
 // -- getters
 
+/* 
+  TODO:
+  getTotalRevenue
+  getProfit
+
+  account for profit in returns
+*/ 
+
+// get user ID
+portfolioSchema.method('getUserId', 
+  function getUserId(): number {
+    return this.userId
+});
+
+// get portfolio name
+portfolioSchema.method('getPortfolioName', 
+  function getPortfolioName(): string {
+    return this.portfolioName
+});
+
 // get holdings
 portfolioSchema.method('getHoldings', 
   function getHoldings(): IMHolding[] {
     return this.holdings
-});
-
-// get first purchase date
-portfolioSchema.method('getFirstPurchaseDate', 
-  function getFirstPurchaseDate(): Date | undefined {
-    return this.getHoldings().length > 0 
-      ? _.min(this.getHoldings().map(
-        (holding: typeof holdingSchema) => { 
-          return holding.methods.getFirstPurchaseDate()
-        }))
-      : undefined
-});
-
-// get last purchase date
-portfolioSchema.method('getLastPurchaseDate', 
-  function getLastPurchaseDate(): Date | undefined {
-    return this.getHoldings().length > 0 
-      ? _.max(this.getHoldings().map(
-        (holding: typeof holdingSchema) => { 
-          return holding.methods.getLastPurchaseDate()
-        }))
-      : undefined
 });
 
 // -- checkers
@@ -149,20 +146,4 @@ portfolioSchema.method('getPercentageReturn',
     return this.getPurchases().length > 0
       ? this.getMarketValue(prices) / this.getTotalCost() - 1
       : undefined
-});
-
-// get annualized return
-portfolioSchema.method('getAnnualizedReturn', 
-  function getAnnualizedReturn(prices: Map<number, number>): number | undefined {
-
-    if (this.getPurchases().length === 0) {
-      return undefined
-    }
-
-    const elapsedDays = (new Date().getTime() 
-      - this.getFirstPurchaseDate().getTime()) 
-      / SECONDS_PER_DAY / MILLISECONDS_PER_SECOND
-
-    return Math.pow(1 + this.getPercentageReturn(prices), 
-      DAYS_PER_YEAR / elapsedDays) - 1
 });
