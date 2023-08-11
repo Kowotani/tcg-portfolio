@@ -25,9 +25,9 @@ import {
   useToast,
   VStack
 } from '@chakra-ui/react'
+import { IReactTableTransaction, IProduct, ITransaction, TransactionType } from 'common'
 import { getAverageCost, getAverageRevenue, getPurchaseQuantity, 
-  getSaleQuantity, getTotalCost, getTotalRevenue, IReactTableTransaction, 
-  IProduct, ITransaction, TransactionType } from 'common'
+  getSaleQuantity, getTotalCost, getTotalRevenue } from 'common'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
 import * as _ from 'lodash'
@@ -325,19 +325,19 @@ export const EditTransactionsModal = (
   const purchaseSummaryItems: TTransactionSummaryItem[] = [
     {
       title: 'Purchases',
-      fn: getPurchaseQuantity,
+      value: getPurchaseQuantity(transactions),
       placeholder: '-',
     },
     {
       title: 'Total Cost',
-      fn: getTotalCost,
+      value: getTotalCost(transactions),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
     },
     {
       title: 'Avg Cost',
-      fn: getAverageCost,
+      value: getAverageCost(transactions),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
@@ -347,19 +347,19 @@ export const EditTransactionsModal = (
   const saleSummaryItems: TTransactionSummaryItem[] = [
     {
       title: 'Sales',
-      fn: getSaleQuantity,
+      value: getSaleQuantity(transactions),
       placeholder: '-',
     },
     {
       title: 'Total Rev',
-      fn: getTotalRevenue,
+      value: getTotalRevenue(transactions),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
     },
     {
       title: 'Avg Rev',
-      fn: getAverageRevenue,
+      value: getAverageRevenue(transactions),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
@@ -530,7 +530,6 @@ export const EditTransactionsModal = (
               <Card>
                 <CardBody>
                   <TransactionSummary 
-                    transactions={transactions}
                     summaryItems={purchaseSummaryItems}
                     variant='hcard'
                   />
@@ -544,7 +543,6 @@ export const EditTransactionsModal = (
                     <Card>
                       <CardBody>
                         <TransactionSummary 
-                          transactions={transactions}
                           summaryItems={saleSummaryItems}
                           variant='hcard'
                         />

@@ -7,7 +7,6 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react'
-import { ITransaction } from 'common'
 import * as _ from 'lodash'
 import { getBrowserLocale, getFormattedPrice } from '../utils'
 
@@ -18,33 +17,35 @@ import { getBrowserLocale, getFormattedPrice } from '../utils'
 
 // -- TransactionSummaryItem
 
-type TTransactionSummaryItemProps = {
-  variant: string,
-  title: string,
-  value: number,
-  prefix?: string,
-  decimals?: number,
-  placeholder?: string,
-  titleStyle?: {[key: string]: string}
+type TTransactionSummaryItemProps = TTransactionSummaryItem & {
+  variant: string
 }
 const TransactionSummaryItem = (
   props: PropsWithChildren<TTransactionSummaryItemProps>
 ) => {
 
   const {
-    variant,
     title,
     value,
-    prefix = '',
-    decimals = 0,
+    formattedPrefix = '',
+    formattedPrecision = 0,
     placeholder,
     titleStyle,
+    variant,
   } = props
 
   const locale = getBrowserLocale()
-  const isNegative = value < 0 ? '-' : ''
-  const absValue = Math.abs(value)
-  const formattedPrice = getFormattedPrice(absValue, locale, prefix, decimals)
+  const isNegative = value 
+    ? value < 0 
+      ? '-' 
+      : '' 
+    : undefined
+  const absValue = value 
+    ? Math.abs(value) 
+    : undefined
+  const formattedPrice = absValue 
+    ? getFormattedPrice(absValue, locale, formattedPrefix, formattedPrecision)
+    : undefined
 
   return (
     <>
@@ -88,29 +89,28 @@ const TransactionSummaryItem = (
   )
 }
 
-// -- TransactionSummaryWrapper
+// // -- TransactionSummaryWrapper
 
-type TTransactionSummaryItemWrapper = {
-  item: TTransactionSummaryItem
-  transactions: ITransaction[],
-  variant: string,
-}
-const TransactionSummaryItemWrapper = (
-  props: PropsWithChildren<TTransactionSummaryItemWrapper>
-) => {
+// type TTransactionSummaryItemWrapper = {
+//   item: TTransactionSummaryItem
+//   variant: string,
+// }
+// const TransactionSummaryItemWrapper = (
+//   props: PropsWithChildren<TTransactionSummaryItemWrapper>
+// ) => {
 
-  return (
-    <TransactionSummaryItem 
-      title={props.item.title}
-      value={props.item.fn(props.transactions) ?? 0}
-      prefix={props.item.formattedPrefix}
-      decimals={props.item.formattedPrecision}
-      placeholder={props.item.placeholder}
-      variant={props.variant}
-      titleStyle={props.item.titleStyle}
-    />
-  )
-}
+//   return (
+//     <TransactionSummaryItem 
+//       title={props.item.title}
+//       value={props.item.value}
+//       prefix={props.item.formattedPrefix}
+//       decimals={props.item.formattedPrecision}
+//       placeholder={props.item.placeholder}
+//       variant={props.variant}
+//       titleStyle={props.item.titleStyle}
+//     />
+//   )
+// }
 
 
 // ==============
@@ -119,14 +119,13 @@ const TransactionSummaryItemWrapper = (
 
 export type TTransactionSummaryItem = {
   title: string,
-  fn: (transactions: ITransaction[]) => number | undefined,
+  value?: number,
   formattedPrefix?: string,
   formattedPrecision?: number,
   placeholder?: string,
   titleStyle?: {[key: string]: string},
 }
 export type TTransactionSummaryProps = {
-  transactions: ITransaction[],
   summaryItems?: TTransactionSummaryItem[],
   twoDimSummaryItems?: TTransactionSummaryItem[][],
   variant?: 'hcard' | 'vcard' | 'list'
@@ -136,7 +135,6 @@ export const TransactionSummary = (
 ) => {
  
   const {
-    transactions,
     summaryItems = [],
     twoDimSummaryItems = [[]],
     variant = 'list',
@@ -165,10 +163,9 @@ export const TransactionSummary = (
                     {itemRow.map(
                       (item: TTransactionSummaryItem) => {
                         return (
-                          <TransactionSummaryItemWrapper
-                            key={item.title} 
-                            item={item} 
-                            transactions={transactions}
+                          <TransactionSummaryItem
+                            {...item}
+                            key={item.title}
                             variant={variant}
                           />
                         )
@@ -189,10 +186,9 @@ export const TransactionSummary = (
           {summaryItems.map(
             (item: TTransactionSummaryItem) => {
               return (
-                <TransactionSummaryItemWrapper
-                  key={item.title}  
-                  item={item} 
-                  transactions={transactions}
+                <TransactionSummaryItem
+                  {...item}
+                  key={item.title}
                   variant={variant}
                 />
               )
@@ -212,10 +208,9 @@ export const TransactionSummary = (
             {summaryItems.map(
               (item: TTransactionSummaryItem) => {
                 return (
-                  <TransactionSummaryItemWrapper 
-                    key={item.title} 
-                    item={item} 
-                    transactions={transactions}
+                  <TransactionSummaryItem
+                    {...item}
+                    key={item.title}
                     variant={variant}
                   />
                 )
@@ -235,10 +230,9 @@ export const TransactionSummary = (
             {summaryItems.map(
               (item: TTransactionSummaryItem) => {
                 return (
-                  <TransactionSummaryItemWrapper 
-                    key={item.title} 
-                    item={item} 
-                    transactions={transactions}
+                  <TransactionSummaryItem
+                    {...item}
+                    key={item.title}
                     variant={variant}
                   />
                 )

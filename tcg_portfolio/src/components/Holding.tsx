@@ -10,8 +10,9 @@ import {
   useDisclosure,
   VStack
 } from '@chakra-ui/react'
+import { IHolding, IProduct, ITransaction } from 'common'
 import { getAverageCost, getAverageRevenue, getProfit, getPurchaseQuantity, 
-  getQuantity, getSaleQuantity, IHolding, IProduct, ITransaction } from 'common'
+  getQuantity, getSaleQuantity } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
@@ -43,19 +44,19 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
   const quantitySummary: TTransactionSummaryItem[] = [
     {
       title: 'Purchases:',
-      fn: getPurchaseQuantity,
+      value: getPurchaseQuantity(transactions),
       placeholder: '-',
       titleStyle: {},
     },
     {
       title: 'Sales:',
-      fn: getSaleQuantity,
+      value: getSaleQuantity(transactions),
       placeholder: '-',
       titleStyle: {},
     },
     {
       title: 'Quantity:',
-      fn: getQuantity,
+      value: getQuantity(transactions),
       placeholder: '-',
       titleStyle: {},
     },
@@ -64,7 +65,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
   const profitSummary: TTransactionSummaryItem[] = [
     {
       title: 'Avg Cost:',
-      fn: getAverageCost,
+      value: getAverageCost(transactions),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
@@ -72,7 +73,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     },
     {
       title: 'Avg Rev:',
-      fn: getAverageRevenue,
+      value: getAverageRevenue(transactions),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
@@ -80,7 +81,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     },
     {
       title: 'Profit:',
-      fn: getProfit,
+      value: getProfit(transactions),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
@@ -126,7 +127,6 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
                 {/* Quantity */}
                 <Box fontSize='large'>
                   <TransactionSummary 
-                    transactions={transactions}
                     summaryItems={quantitySummary}
                     variant='list'
                   />
@@ -135,7 +135,6 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
                 {/* Profit */}
                 <Box fontSize='large'>
                   <TransactionSummary 
-                    transactions={transactions}
                     summaryItems={profitSummary}
                     variant='list'
                   />
