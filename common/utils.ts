@@ -312,8 +312,9 @@ export interface IHoldingMethods {
   getAnnualizedReturn(price: number): number | undefined,
 }
 
-export interface IHydratedHolding extends IHolding {
+export interface IHydratedHolding {
   product: IProduct,
+  transactions: ITransaction[],
 }
 
 // portfolio
@@ -351,7 +352,9 @@ export interface IPortfolioMethods {
   getPercentageReturn(prices: Map<number, number>): number | undefined,
 }
 
-export interface IHydratedPortfolio extends IPortfolio {
+export interface IHydratedPortfolio {
+  userId: number,
+  portfolioName: string,
   hydratedHoldings: IHydratedHolding[],
 }
 

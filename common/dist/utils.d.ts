@@ -135,8 +135,9 @@ export interface IHoldingMethods {
     getPercentageReturn(price: number): number | undefined;
     getAnnualizedReturn(price: number): number | undefined;
 }
-export interface IHydratedHolding extends IHolding {
+export interface IHydratedHolding {
     product: IProduct;
+    transactions: ITransaction[];
 }
 export interface IPortfolio {
     userId: number;
@@ -161,7 +162,9 @@ export interface IPortfolioMethods {
     getDollarReturn(prices: Map<number, number>): number | undefined;
     getPercentageReturn(prices: Map<number, number>): number | undefined;
 }
-export interface IHydratedPortfolio extends IPortfolio {
+export interface IHydratedPortfolio {
+    userId: number;
+    portfolioName: string;
     hydratedHoldings: IHydratedHolding[];
 }
 export declare const ADD_PRODUCT_URL = "/product";
