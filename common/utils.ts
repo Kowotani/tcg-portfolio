@@ -313,16 +313,7 @@ export interface IHoldingMethods {
 }
 
 export interface IHydratedHolding extends IHolding {
-  quantity: number,
-  price: number,
-
-  totalCost: number,
-  averageCost: number,
-  marketValue: number,
-
-  dollarReturn: number,
-  percentageReturn: number,
-  annualizedReturn: number
+  product: IProduct,
 }
 
 // portfolio
@@ -362,13 +353,6 @@ export interface IPortfolioMethods {
 
 export interface IHydratedPortfolio extends IPortfolio {
   hydratedHoldings: IHydratedHolding[],
-
-  totalCost: number,
-  marketValue: number,
-
-  dollarReturn: number,
-  percentageReturn: number,
-  annualizedReturn: number  
 }
 
 

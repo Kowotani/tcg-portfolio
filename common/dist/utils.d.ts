@@ -136,14 +136,7 @@ export interface IHoldingMethods {
     getAnnualizedReturn(price: number): number | undefined;
 }
 export interface IHydratedHolding extends IHolding {
-    quantity: number;
-    price: number;
-    totalCost: number;
-    averageCost: number;
-    marketValue: number;
-    dollarReturn: number;
-    percentageReturn: number;
-    annualizedReturn: number;
+    product: IProduct;
 }
 export interface IPortfolio {
     userId: number;
@@ -170,11 +163,6 @@ export interface IPortfolioMethods {
 }
 export interface IHydratedPortfolio extends IPortfolio {
     hydratedHoldings: IHydratedHolding[];
-    totalCost: number;
-    marketValue: number;
-    dollarReturn: number;
-    percentageReturn: number;
-    annualizedReturn: number;
 }
 export declare const ADD_PRODUCT_URL = "/product";
 export declare const GET_PRODUCTS_URL = "/products";
