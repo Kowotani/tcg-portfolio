@@ -53,7 +53,8 @@ export function getProfit(transactions: ITransaction[]): number | undefined {
   const quantity = getSaleQuantity(transactions)
   return quantity === 0 
     ? undefined
-    : quantity * getAverageRevenue(transactions) - getAverageCost(transactions)
+    : (getAverageRevenue(transactions) - getAverageCost(transactions))
+      * quantity
 }
 
 /*
