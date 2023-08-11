@@ -1,0 +1,11 @@
+import { ITransaction } from './utils';
+export declare function getAverageCost(transactions: ITransaction[]): number | undefined;
+export declare function getAverageRevenue(transactions: ITransaction[]): number | undefined;
+export declare function getProfit(transactions: ITransaction[]): number | undefined;
+export declare function getPurchases(transactions: ITransaction[]): ITransaction[];
+export declare function getPurchaseQuantity(transactions: ITransaction[]): number;
+export declare function getQuantity(transactions: ITransaction[]): number;
+export declare function getSales(transactions: ITransaction[]): ITransaction[];
+export declare function getSaleQuantity(transactions: ITransaction[]): number;
+export declare function getTotalCost(transactions: ITransaction[]): number;
+export declare function getTotalRevenue(transactions: ITransaction[]): number;
