@@ -10,9 +10,13 @@ import {
   useDisclosure,
   VStack
 } from '@chakra-ui/react'
-import { IHolding, IProduct, ITransaction } from 'common'
-import { getAverageCost, getAverageRevenue, getProfit, getPurchaseQuantity, 
-  getQuantity, getSaleQuantity } from 'common'
+import { 
+  IHydratedHolding, ITransaction,
+
+  getAverageCost, getAverageRevenue, getProfit, getPurchaseQuantity, 
+  getQuantity, getSaleQuantity,
+} from 'common'
+import {  } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
@@ -20,8 +24,7 @@ import { TransactionSummary, TTransactionSummaryItem } from './TransactionSummar
 
 
 type THoldingCardProps = {
-  holding: IHolding,
-  product: IProduct
+  hydratedHolding: IHydratedHolding,
 }
 export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
 
@@ -29,7 +32,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   // state
-  const [ holding, setHolding ] = useState(props.holding)
+  const [ holding, setHolding ] = useState(props.hydratedHolding)
   const [ transactions, setTransactions ] = useState(holding.transactions)
 
   // functions
@@ -103,11 +106,14 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
             spacing={4}
           >
             {/* Product Image */}
-            <ProductImage product={props.product} boxSize='100px'/>
+            <ProductImage 
+              product={props.hydratedHolding.product} 
+              boxSize='100px'
+            />
             <VStack spacing={0}>
               <Box display='flex' justifyContent='flex-start' width='100%'>
                 <Text align='left' fontWeight='bold'>
-                  {props.product.name}
+                  {props.hydratedHolding.product.name}
                 </Text>
               </Box>
 
@@ -117,7 +123,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
               >
                 {/* Product Desc */}
                 <ProductDescription 
-                  product={props.product} 
+                  product={props.hydratedHolding.product} 
                   showHeader={false} 
                   fontSize='large'
                   textAlign='left'
@@ -155,7 +161,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
       <EditTransactionsModal 
         isOpen={isOpen} 
         onClose={onClose} 
-        product={props.product}
+        product={props.hydratedHolding.product}
         setTransactions={handleSetTransactions}
         transactions={transactions}
       />

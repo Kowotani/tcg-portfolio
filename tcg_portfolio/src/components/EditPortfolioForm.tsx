@@ -4,9 +4,12 @@ import {
   Box,
   Input,
 } from '@chakra-ui/react'
-import { GET_PRODUCTS_URL, IHolding,  IPortfolio, IProduct, 
-  isASCII, ITransaction, ProductLanguage, ProductSubtype, ProductType, TCG, 
-  TransactionType } from 'common'
+import { IHydratedHolding, IHydratedPortfolio, IProduct, 
+  ITransaction, ProductLanguage, ProductSubtype, ProductType, TCG, 
+  TransactionType,
+
+  GET_PRODUCTS_URL, isASCII,
+} from 'common'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
     FormikProps } from 'formik';
 import * as _ from 'lodash'
@@ -49,16 +52,6 @@ export const EditPortfolioForm = (
     }
   ]
 
-  const fooHolding: IHolding = {
-    tcgplayerId: 121527,
-    transactions: fooTransactions
-  }
-  const fooPortfolio: IPortfolio = {
-    userId: 1234,
-    portfolioName: 'Alpha Investments',
-    holdings: [fooHolding]
-  }
-
   const fooProduct: IProduct = {
     tcgplayerId: 121527,
     tcg: TCG.MagicTheGathering,
@@ -69,6 +62,17 @@ export const EditPortfolioForm = (
     subtype: ProductSubtype.Draft,
     setCode: 'KLD',
   }
+
+  const fooHolding: IHydratedHolding = {
+    product: fooProduct,
+    transactions: fooTransactions
+  }
+  const fooPortfolio: IHydratedPortfolio = {
+    userId: 1234,
+    portfolioName: 'Alpha Investments',
+    hydratedHoldings: [fooHolding]
+  }
+
 
   // dummy data end
   // ====================================
@@ -139,9 +143,31 @@ export const EditPortfolioForm = (
   // Product search
   // --------------
 
-  function handleSearchChange(value: string): void {
-    _.debounce(() => setSearchInput(value), 300)
+  function onSearchResultClick(product: IProduct):void {
+    // clear search 
+    setSearchInput('')
+
+    // update searchable products
+    const newSearchableProducts = searchableProducts.filter((p: IProduct) => {
+        return p.tcgplayerId !== product.tcgplayerId
+    })
+    setSearchableProducts(newSearchableProducts)
+
+    // update portfolio
+    const holding: IHydratedHolding = {
+      product: product,
+      transactions: []
+    }
+    setPortfolio({
+      ...portfolio, 
+      hydratedHoldings: portfolio.hydratedHoldings.concat([holding])
+    })
   }
+
+  
+  // =====
+  // hooks
+  // =====
 
   // get initial products 
   useEffect(() => {
@@ -150,14 +176,15 @@ export const EditPortfolioForm = (
       url: GET_PRODUCTS_URL,
     })
     .then(res => {
-      const data: IProduct[] = res.data.data
-      const existingTCGPlayerIds = portfolio.holdings.map(
-        holding => holding.tcgplayerId
+      const products: IProduct[] = res.data.data
+      const existingTCGPlayerIds = portfolio.hydratedHoldings.map(
+        (holding: IHydratedHolding) => holding.product.tcgplayerId
       )
-      const unheldProducts = data.filter(product => {
+      const searchableProducts = products.filter((product: IProduct) => {
         return !existingTCGPlayerIds.includes(product.tcgplayerId)
       })
-      setSearchableProducts(unheldProducts)
+      setSearchableProducts(searchableProducts)
+      
     })
     .catch(err => {
       console.log('Error fetching products: ' + err)
@@ -200,7 +227,7 @@ export const EditPortfolioForm = (
 
   return (
     <>
-      {/* Portfolio */}
+      {/* Portfolio Header */}
       <Box bg='teal.500' color='white' fontWeight='medium' p='8px' m='16px 0px'>
         Portfolio Details
       </Box>
@@ -221,7 +248,7 @@ export const EditPortfolioForm = (
         </InputErrorWrapper>
       </Box>
 
-      {/* Holdings */}
+      {/* Holdings Header */}
       <Box bg='teal.500' color='white' fontWeight='medium' p='8px' m='16px 0px'>
         Holdings
       </Box>      
@@ -231,7 +258,7 @@ export const EditPortfolioForm = (
         placeholder='Product to Add'
         maxSearchResults={5}
         onSearchChange={e => setSearchInput(e.target.value)}
-        onSearchResultSelect={e => console.log(e)}
+        onSearchResultSelect={e => onSearchResultClick(e as IProduct)}
         searchResultRenderer={(res: IProduct) => (
           <ProductSearchResult 
             product={res} 
@@ -241,13 +268,19 @@ export const EditPortfolioForm = (
         searchResults={searchResults}
         searchResultKey='tcgplayerId'
         value={searchInput}
+        clearSearch={() => setSearchInput('')}
       />
 
-      <HoldingCard 
-        product={fooProduct}
-        holding={fooHolding}
-      />
-
+      {/* Holding Cards */}
+      {portfolio.hydratedHoldings.map((holding: IHydratedHolding) => {
+        return (
+          <HoldingCard 
+            key={holding.product.tcgplayerId}
+            hydratedHolding={holding}
+          />
+        )
+      })}
+      
       {/* Footer */}
     </>
   )

@@ -1,6 +1,17 @@
 import React, { PropsWithChildren, useState } from 'react'
-import { Input, InputGroup, InputLeftElement, Box, Icon, BoxProps, Flex, Text } from '@chakra-ui/react';
-import { FaSearch } from 'react-icons/fa'
+import { 
+  Box,
+  BoxProps, 
+  Flex,
+  Icon,
+  IconButton,
+  Input, 
+  InputGroup, 
+  InputLeftElement,
+  InputRightElement,   
+  Text
+} from '@chakra-ui/react';
+import { FaRegTimesCircle, FaSearch } from 'react-icons/fa'
 
 // https://github.com/GastonKhouri/chakra-ui-search/blob/main/src/components/Search.tsx
 
@@ -10,6 +21,7 @@ type TSearchInput = BoxProps & {
 	searchResultRenderer: (result: any) => JSX.Element;
   searchResultKey: string;
 	onSearchResultSelect: (result: any) => void;
+  clearSearch?: () => void;
   maxSearchResults?: number;
 	noSearchResultsComponent?: JSX.Element;
   placeholder?: string;
@@ -24,6 +36,7 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 		onSearchChange,
 		searchResultRenderer,
 		onSearchResultSelect,
+    clearSearch,
     maxSearchResults,
     noSearchResultsComponent,
 		placeholder = '',
@@ -48,20 +61,38 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 
       {/* Search input */}
 			<InputGroup mb='10px'>
-				{
-					<InputLeftElement
-						pointerEvents='none'
-						children={<Icon as={FaSearch} color='gray.500' />}
-					/>
-				}
+        <InputLeftElement
+          pointerEvents='none'
+          children={<Icon as={FaSearch} color='gray.500' />}
+        />
 
 				<Input
 					placeholder={placeholder}
-					value={ value }
+					value={value}
 					onChange={onSearchChange}
 					onFocus={() => setShowResults(true)}
 					onBlur={handleOnBlur}
 				/>
+
+        {value.length > 0 
+          ? (
+            <InputRightElement 
+              children={
+                <IconButton 
+                  aria-label='Clear search'
+                  color='gray.500'
+                  fontSize='20px'
+                  icon={<FaRegTimesCircle />}
+                  isRound={true}
+                  onClick={() => (clearSearch ? clearSearch() : undefined)}
+                  variant='ghost'
+                />
+              }
+            />
+          ) : undefined
+
+        }
+
 			</InputGroup>
 
       {/* Search results */}

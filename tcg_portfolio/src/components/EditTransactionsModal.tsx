@@ -25,12 +25,16 @@ import {
   useToast,
   VStack
 } from '@chakra-ui/react'
-import { IReactTableTransaction, IProduct, ITransaction, TransactionType } from 'common'
-import { getAverageCost, getAverageRevenue, getPurchaseQuantity, 
-  getSaleQuantity, getTotalCost, getTotalRevenue } from 'common'
+import { 
+  IReactTableTransaction, IProduct, ITransaction, TransactionType,
+
+  getAverageCost, getAverageRevenue, getPurchaseQuantity, getSaleQuantity, 
+  getTotalCost, getTotalRevenue,
+} from 'common'
+import { 
+   } from 'common'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
-import * as _ from 'lodash'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
 import { FiMinusCircle } from 'react-icons/fi'
