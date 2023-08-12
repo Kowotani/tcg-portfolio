@@ -42,7 +42,8 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { TransactionSummary, TTransactionSummaryItem 
   } from './TransactionSummary'
 import { TransactionTable } from './TransactionTable'
-import { getBrowserLocale, getFormattedPrice } from '../utils'
+import { getBrowserLocale, getFormattedPrice, getProductNameWithLanguage 
+} from '../utils'
 
 
 // ==============
@@ -517,7 +518,10 @@ export const EditTransactionsModal = (
       {/* Set modal z-index to be higher than the error tooltip (1800)*/}
       <Box zIndex={1850}>
         <ModalContent>
-          <ModalHeader textAlign='center'>{props.product.name}</ModalHeader>
+          <ModalHeader textAlign='center'
+          >
+            {getProductNameWithLanguage(props.product)}
+          </ModalHeader>
           <ModalBody>
             <VStack>
 

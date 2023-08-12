@@ -5,8 +5,9 @@ import {
   Text, 
   VStack 
 } from '@chakra-ui/react'
-import { IProduct } from 'common'
-import { NonVisibileProductSubtypes } from '../utils'
+import { IProduct, ProductLanguage } from 'common'
+import { NonVisibileProductSubtypes 
+} from '../utils'
 
 type TProductSearchResult = {
   product: IProduct,
@@ -19,8 +20,12 @@ export const ProductSearchResult = (
   const product = props.product
   const subtype = product.subtype 
     && !NonVisibileProductSubtypes.includes(product.subtype) 
-      ? ` (${product.subtype})` : ''
-  const header = `${product.name} - ${product.type}${subtype}`  
+      ? ` - (${product.subtype})` 
+      : ''
+  const language = product.language !== ProductLanguage.English
+    ? ' [' + product.language + ']'
+    : ''
+  const header = `${product.name} - ${product.type}${subtype}${language}`  
 
   return (
     <Box p={0}>

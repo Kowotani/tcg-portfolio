@@ -4,7 +4,8 @@ import {
   Box,
   Input,
 } from '@chakra-ui/react'
-import { IHydratedHolding, IHydratedPortfolio, IProduct, 
+import { 
+  IHydratedHolding, IHydratedPortfolio, IProduct, 
   ITransaction, ProductLanguage, ProductSubtype, ProductType, TCG, 
   TransactionType,
 
@@ -18,8 +19,8 @@ import { InputErrorWrapper } from './InputField'
 import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
 import { SideBarNavContext } from '../state/SideBarNavContext'
-import { ISideBarNavContext, NonVisibileProductSubtypes, 
-  SideBarNav } from '../utils'
+import { ISideBarNavContext, NonVisibileProductSubtypes, SideBarNav 
+} from '../utils'
 
 
 type TEditPortfolioProps = {}

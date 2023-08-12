@@ -1,4 +1,6 @@
-import { IPortfolio, ITransaction, ProductSubtype } from 'common'
+import { IPortfolio, IProduct, ITransaction, ProductLanguage, 
+  ProductSubtype 
+} from 'common'
 
 
 // ======
@@ -80,6 +82,8 @@ export interface ISideBarNavContext {
 // functions
 // =========
 
+// -- generic
+
 /*
 DESC
   Returns the first locale detected from the browser (ie. navigator.languages). 
@@ -157,4 +161,20 @@ export function getFormattedPrice(
   }
 
   return prefix ? prefix + formattedPrice : formattedPrice
+}
+
+/*
+DESC
+  Returns the Product's name with the added ProductLanguage if the language is
+  not English
+INPUT
+  product: The IProduct with name to format
+RETURN
+  The Product's name formatted with the ProductLanguage if it's not English
+*/
+export function getProductNameWithLanguage(product: IProduct): string {
+  return `${product.name} 
+    ${product.language !== ProductLanguage.English 
+      ? '[' + product.language + ']' 
+      : ''}`
 }

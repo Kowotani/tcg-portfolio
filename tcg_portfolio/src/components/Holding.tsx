@@ -21,6 +21,7 @@ import { EditTransactionsModal } from './EditTransactionsModal'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
 import { TransactionSummary, TTransactionSummaryItem } from './TransactionSummary'
+import { getProductNameWithLanguage } from '../utils'
 
 
 type THoldingCardProps = {
@@ -113,7 +114,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
             <VStack spacing={0}>
               <Box display='flex' justifyContent='flex-start' width='100%'>
                 <Text align='left' fontWeight='bold'>
-                  {props.hydratedHolding.product.name}
+                  {getProductNameWithLanguage(props.hydratedHolding.product)}
                 </Text>
               </Box>
 

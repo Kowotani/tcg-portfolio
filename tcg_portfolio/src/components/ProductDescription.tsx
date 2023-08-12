@@ -1,7 +1,8 @@
 import { PropsWithChildren } from 'react';
 import { Box, BoxProps, Text } from '@chakra-ui/react';
 import { IProduct } from 'common'
-import { NonVisibileProductSubtypes } from '../utils';
+import { getProductNameWithLanguage, NonVisibileProductSubtypes 
+} from '../utils';
 
 
 // ==============
@@ -18,13 +19,13 @@ export const ProductDescription = (
 
   return (
     <Box>
-      {props.showHeader ?? true 
+      {props.showHeader
         ? (
           <Text 
             textAlign={props.textAlign} 
             fontWeight='bold'
           >
-            {props.product.name}
+            {getProductNameWithLanguage(props.product)}
           </Text>
         )
         : undefined 
