@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { Box, BoxProps, Text } from '@chakra-ui/react';
 import { IProduct } from 'common'
+import { NonVisibileProductSubtypes } from '../utils';
 
 
 // ==============
@@ -40,12 +41,17 @@ export const ProductDescription = (
       >
         {props.product.type}
       </Text>
-      <Text 
-        textAlign={props.textAlign} 
-        fontSize={props.fontSize}
-      >
-        {props.product.subtype}
-      </Text>   
+      {props.product.subtype 
+        && !NonVisibileProductSubtypes.includes(props.product.subtype)
+        ? (
+          <Text 
+            textAlign={props.textAlign} 
+            fontSize={props.fontSize}
+          >
+            {props.product.subtype}
+          </Text>   
+        ) : undefined
+      }
     </Box>
   )
 }
