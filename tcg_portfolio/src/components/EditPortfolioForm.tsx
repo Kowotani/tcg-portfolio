@@ -9,10 +9,8 @@ import {
   ITransaction, ProductLanguage, ProductSubtype, ProductType, TCG, 
   TransactionType,
 
-  GET_PRODUCTS_URL, isASCII,
+  assert, GET_PRODUCTS_URL, isASCII,
 } from 'common'
-import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
-    FormikProps } from 'formik';
 import * as _ from 'lodash'
 import { HoldingCard } from './Holding'
 import { InputErrorWrapper } from './InputField'
@@ -165,6 +163,29 @@ export const EditPortfolioForm = (
     })
   }
 
+  function onHoldingDeleteClick(holding: IHydratedHolding): void {
+    // update searchable products
+    const matchingHolding = portfolio.hydratedHoldings.find(
+      (h: IHydratedHolding) => {
+        return h.product.tcgplayerId === holding.product.tcgplayerId
+    })
+    // TODO: implement this in a type guard
+    assert(matchingHolding !== undefined)
+    setSearchableProducts([...searchableProducts, matchingHolding.product])
+
+    // update portfolio
+    const newHoldings = portfolio.hydratedHoldings.filter(
+      (h: IHydratedHolding) => {
+        return h.product.tcgplayerId !== holding.product.tcgplayerId 
+    })
+    setPortfolio({
+      ...portfolio,
+      hydratedHoldings: newHoldings
+    })
+
+    // clear search 
+    setSearchInput('')
+  }
   
   // =====
   // hooks
@@ -278,6 +299,7 @@ export const EditPortfolioForm = (
           <HoldingCard 
             key={holding.product.tcgplayerId}
             hydratedHolding={holding}
+            onHoldingDeleteClick={onHoldingDeleteClick}
           />
         )
       })}

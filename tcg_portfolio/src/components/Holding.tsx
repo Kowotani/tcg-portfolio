@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardBody,
+  CloseButton,
   HStack,
   StackDivider,
   Text,
@@ -26,6 +27,7 @@ import { getProductNameWithLanguage } from '../utils'
 
 type THoldingCardProps = {
   hydratedHolding: IHydratedHolding,
+  onHoldingDeleteClick: (holding: IHydratedHolding) => void,
 }
 export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
 
@@ -112,10 +114,15 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
               boxSize='100px'
             />
             <VStack spacing={0}>
-              <Box display='flex' justifyContent='flex-start' width='100%'>
+              <Box display='flex' justifyContent='space-between' width='100%'>
                 <Text align='left' fontWeight='bold'>
                   {getProductNameWithLanguage(props.hydratedHolding.product)}
                 </Text>
+                <CloseButton 
+                  onClick={
+                    () => props.onHoldingDeleteClick(props.hydratedHolding)
+                  }
+                />
               </Box>
 
               <HStack
