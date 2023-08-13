@@ -3,6 +3,7 @@ import {
   
   assert, isIHydratedHolding, isIProduct
 } from 'common'
+import * as _ from 'lodash'
 
 
 // ======
@@ -73,6 +74,70 @@ export interface ISideBarNavContext {
 // =========
 // functions
 // =========
+
+// -- filtering
+
+/*
+DESC
+  Helper function used for filtering Product search results and Holdings in 
+  the Portfolio view
+RETURN
+  TRUE if the Product matches the searchInput, FALSE otherwise
+*/
+function isMatchingProduct(product: IProduct, searchInput: string): boolean {
+  return (
+    // name
+    _.toLower(product.name).match(_.toLower(searchInput)) !== null
+
+    // TCG
+    || _.toLower(product.tcg).match(_.toLower(searchInput)) !== null
+
+    // ProductType
+    || _.toLower(product.type).match(_.toLower(searchInput)) !== null
+
+    // ProductSubtype
+    || (_.toLower(product.subtype).match(_.toLower(searchInput)) !== null
+      && !NonVisibileProductSubtypes.includes(
+        product.subtype as ProductSubtype)
+      )
+  )
+}
+
+/*
+DESC
+  Function used for filtering wither an IProduct matches the input searchInput
+  NOTE: This function returns another function
+RETURN
+  A function that accepts an IProduct and returns TRUE if the searchInput
+  match the IProduct according to isMatchingProduct()
+REF
+  https://stackoverflow.com/questions/7759237/how-do-i-pass-an-extra-parameter-to-the-callback-function-in-javascript-filter
+*/
+export function filterFnHoldingCard(
+  searchInput: string
+): (element: IHydratedHolding) => boolean {
+  return function(holding: IHydratedHolding) {
+    return isMatchingProduct(holding.product, searchInput)
+  }
+}
+
+/*
+DESC
+  Function used for filtering wither an IProduct matches the input searchInput
+  NOTE: This function returns another function
+RETURN
+  A function that accepts an IProduct and returns TRUE if the searchInput
+  match the IProduct according to isMatchingProduct()
+REF
+  https://stackoverflow.com/questions/7759237/how-do-i-pass-an-extra-parameter-to-the-callback-function-in-javascript-filter
+*/
+export function filterFnProductSearchResult(
+  searchInput: string
+): (element: IProduct) => boolean {
+  return function(product: IProduct) {
+    return isMatchingProduct(product, searchInput)
+  }
+}
 
 // -- generic
 

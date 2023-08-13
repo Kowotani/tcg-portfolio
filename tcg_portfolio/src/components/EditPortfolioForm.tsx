@@ -21,10 +21,11 @@ import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
 import { SideBarNavContext } from '../state/SideBarNavContext'
 import { 
-  ISideBarNavContext, NonVisibileProductSubtypes, SideBarNav, 
+  ISideBarNavContext, SideBarNav, 
 
-  sortFnHydratedHoldingAsc, sortFnProductSearchResults
-} from '../utils'
+  filterFnProductSearchResult, sortFnHydratedHoldingAsc, 
+  sortFnProductSearchResults
+} from '../utils' 
 
 
 type TEditPortfolioProps = {}
@@ -223,24 +224,7 @@ export const EditPortfolioForm = (
   // update Product seach results
   useEffect(() => {
     const productResults = searchableProducts
-      .filter(product => {    
-        return (
-          // name
-          _.toLower(product.name).match(_.toLower(searchInput)) !== null
-
-          // TCG
-          || _.toLower(product.tcg).match(_.toLower(searchInput)) !== null
-
-          // ProductType
-          || _.toLower(product.type).match(_.toLower(searchInput)) !== null
-
-          // ProductSubtype
-          || (_.toLower(product.subtype).match(_.toLower(searchInput)) !== null
-            && !NonVisibileProductSubtypes.includes(
-              product.subtype as ProductSubtype)
-            )
-        )
-      })
+      .filter(filterFnProductSearchResult(searchInput))
       .sort(sortFnProductSearchResults)
     setSearchResults(productResults)
   }, [searchInput, searchableProducts])
@@ -280,7 +264,7 @@ export const EditPortfolioForm = (
 
       {/* Search Product to Add */}
       <SearchInput 
-        placeholder='Product to Add'
+        placeholder='Search Products to Add'
         maxSearchResults={5}
         onSearchChange={e => setSearchInput(e.target.value)}
         onSearchResultSelect={e => onSearchResultClick(e as IProduct)}
