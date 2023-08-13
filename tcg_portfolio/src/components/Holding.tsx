@@ -113,7 +113,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
               product={props.hydratedHolding.product} 
               boxSize='100px'
             />
-            <VStack spacing={0}>
+            <VStack spacing={0} width='100%'>
               <Box display='flex' justifyContent='space-between' width='100%'>
                 <Text align='left' fontWeight='bold'>
                   {getProductNameWithLanguage(props.hydratedHolding.product)}
@@ -126,6 +126,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
               </Box>
 
               <HStack
+                width='100%'
                 divider={<StackDivider color='gray.200'/>}
                 spacing={4}
               >
@@ -159,7 +160,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
                   colorScheme='blue' 
                   onClick={onOpen}
                 >
-                  Edit
+                  Transactions
                 </Button>
               </HStack>
             </VStack>
