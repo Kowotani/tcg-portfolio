@@ -9,6 +9,8 @@ import {
   ITransaction, ProductLanguage, ProductSubtype, ProductType, TCG, 
   TransactionType,
 
+  isIHydratedHolding,
+
   assert, GET_PRODUCTS_URL, isASCII,
 } from 'common'
 import * as _ from 'lodash'
@@ -169,8 +171,7 @@ export const EditPortfolioForm = (
       (h: IHydratedHolding) => {
         return h.product.tcgplayerId === holding.product.tcgplayerId
     })
-    // TODO: implement this in a type guard
-    assert(matchingHolding !== undefined)
+    assert(isIHydratedHolding(matchingHolding))
     setSearchableProducts([...searchableProducts, matchingHolding.product])
 
     // update portfolio
