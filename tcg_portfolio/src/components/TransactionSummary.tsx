@@ -89,29 +89,6 @@ const TransactionSummaryItem = (
   )
 }
 
-// // -- TransactionSummaryWrapper
-
-// type TTransactionSummaryItemWrapper = {
-//   item: TTransactionSummaryItem
-//   variant: string,
-// }
-// const TransactionSummaryItemWrapper = (
-//   props: PropsWithChildren<TTransactionSummaryItemWrapper>
-// ) => {
-
-//   return (
-//     <TransactionSummaryItem 
-//       title={props.item.title}
-//       value={props.item.value}
-//       prefix={props.item.formattedPrefix}
-//       decimals={props.item.formattedPrecision}
-//       placeholder={props.item.placeholder}
-//       variant={props.variant}
-//       titleStyle={props.item.titleStyle}
-//     />
-//   )
-// }
-
 
 // ==============
 // Main Component

@@ -1,6 +1,4 @@
-import { IPortfolio, IProduct, ITransaction, ProductLanguage, 
-  ProductSubtype 
-} from 'common'
+import { IProduct, ProductLanguage, ProductSubtype } from 'common'
 
 
 // ======
@@ -53,16 +51,6 @@ export const SideBarNav = {
 // ==========
 // interfaces
 // ==========
-
-export interface IEditPortfolioContext {
-  portfolio: IPortfolio,
-  setPortfolio: React.Dispatch<React.SetStateAction<IPortfolio>>
-}
-
-export interface IEditTransactionsContext {
-  transactions: ITransaction[],
-  setTransactions: React.Dispatch<React.SetStateAction<ITransaction[]>>
-}
 
 // SideBarNav
 export interface ISideBarNav {

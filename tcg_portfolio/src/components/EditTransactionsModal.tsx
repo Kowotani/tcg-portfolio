@@ -154,7 +154,6 @@ const AddTransactionForm = (
             type: DEFAULT_TYPE
           }}
           onSubmit={(values: IInputValues, actions: FormikHelpers<IInputValues>) => {
-            // console.log('Values: ' + JSON.stringify(values))
             actions.setSubmitting(false)
             handleAddTransaction({
               ...values,

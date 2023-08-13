@@ -212,7 +212,7 @@ export const EditPortfolioForm = (
     .catch(err => {
       console.log('Error fetching products: ' + err)
     })
-  }, [])
+  })
 
   // update Product seach results
   useEffect(() => {
@@ -241,7 +241,7 @@ export const EditPortfolioForm = (
         return valA > valB ? 1 : -1
       })
     setSearchResults(productResults)
-  }, [searchInput])
+  }, [searchInput, searchableProducts])
 
 
   // ==============
