@@ -1,4 +1,8 @@
-import { IProduct, ProductLanguage, ProductSubtype } from 'common'
+import { 
+  IHydratedHolding, IProduct, ProductLanguage, ProductSubtype, 
+  
+  assert, isIHydratedHolding 
+} from 'common'
 
 
 // ======
@@ -165,4 +169,57 @@ export function getProductNameWithLanguage(product: IProduct): string {
     ${product.language !== ProductLanguage.English 
       ? '[' + product.language + ']' 
       : ''}`
+}
+
+// -- sorting
+
+/*
+DESC
+  Helpder function used for generating sorting keys for IHydratedHolding
+  sorting functions
+INPUT
+  holding: The IHydratedHolding
+RETURN
+  The generated sorting key
+*/
+function genHydratedHoldingKey(holding: IHydratedHolding): string {
+  return holding.product.name
+    + holding.product.tcg
+    + holding.product.type
+    + holding.product.subtype ?? ''
+    + holding.product.language
+}
+
+/*
+DESC
+  Function used for sorting IHydratedHolding in ascending order
+INPUT
+  a: The first IHydratedHolding
+  b: The second IHydratedHolding
+RETURN
+  A negative number if a < b, otherwise a positive number if a > b
+*/
+export function sortFnHydratedHoldingAsc(a: any, b: any): number {
+  assert(isIHydratedHolding(a))
+  assert(isIHydratedHolding(b))
+  const keyA = genHydratedHoldingKey(a)
+  const keyB = genHydratedHoldingKey(b)
+  return keyA < keyB ? -1 : keyB > keyA ? 1 : 0
+}
+
+/*
+DESC
+  Function used for sorting IHydratedHolding in descending order
+INPUT
+  a: The first IHydratedHolding
+  b: The second IHydratedHolding
+RETURN
+  A negative number if a > b, otherwise a positive number if a <>> b
+*/
+export function sortFnHydratedHoldingDesc(a: any, b: any): number {
+  assert(isIHydratedHolding(a))
+  assert(isIHydratedHolding(b))
+  const keyA = genHydratedHoldingKey(a)
+  const keyB = genHydratedHoldingKey(b)
+  return keyA < keyB ? 1 : keyB > keyA ? -1 : 0
 }

@@ -3,6 +3,7 @@ import axios from 'axios'
 import { 
   Box,
   Input,
+  Spacer,
 } from '@chakra-ui/react'
 import { 
   IHydratedHolding, IHydratedPortfolio, IProduct, 
@@ -19,7 +20,9 @@ import { InputErrorWrapper } from './InputField'
 import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
 import { SideBarNavContext } from '../state/SideBarNavContext'
-import { ISideBarNavContext, NonVisibileProductSubtypes, SideBarNav 
+import { 
+  ISideBarNavContext, NonVisibileProductSubtypes, SideBarNav, 
+  sortFnHydratedHoldingAsc
 } from '../utils'
 
 
@@ -71,7 +74,7 @@ export const EditPortfolioForm = (
   const fooPortfolio: IHydratedPortfolio = {
     userId: 1234,
     portfolioName: 'Alpha Investments',
-    hydratedHoldings: [fooHolding]
+    hydratedHoldings: [fooHolding].sort(sortFnHydratedHoldingAsc)
   }
 
 
@@ -155,13 +158,15 @@ export const EditPortfolioForm = (
     setSearchableProducts(newSearchableProducts)
 
     // update portfolio
-    const holding: IHydratedHolding = {
-      product: product,
-      transactions: []
-    }
+    const newHoldings = portfolio.hydratedHoldings
+      .concat([{
+        product: product,
+        transactions: []
+      }])
+      .sort(sortFnHydratedHoldingAsc)
     setPortfolio({
       ...portfolio, 
-      hydratedHoldings: portfolio.hydratedHoldings.concat([holding])
+      hydratedHoldings: newHoldings
     })
   }
 
@@ -212,7 +217,7 @@ export const EditPortfolioForm = (
     .catch(err => {
       console.log('Error fetching products: ' + err)
     })
-  })
+  }, [])
 
   // update Product seach results
   useEffect(() => {
@@ -297,11 +302,14 @@ export const EditPortfolioForm = (
       {/* Holding Cards */}
       {portfolio.hydratedHoldings.map((holding: IHydratedHolding) => {
         return (
-          <HoldingCard 
-            key={holding.product.tcgplayerId}
-            hydratedHolding={holding}
-            onHoldingDeleteClick={onHoldingDeleteClick}
-          />
+          <>
+            <HoldingCard 
+              key={holding.product.tcgplayerId}
+              hydratedHolding={holding}
+              onHoldingDeleteClick={onHoldingDeleteClick}
+            />
+            <Spacer h='8px'/>
+          </>
         )
       })}
       
