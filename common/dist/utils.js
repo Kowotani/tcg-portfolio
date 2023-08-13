@@ -1,7 +1,7 @@
 "use strict";
 var _a, _b, _c;
 exports.__esModule = true;
-exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductsGetStatus = exports.ProductPostStatus = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isITransaction = exports.isIProduct = exports.isIPriceData = exports.isIPrice = exports.isIPortfolio = exports.isIHydratedPortfolio = exports.isIHydratedHolding = exports.isIHolding = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductsGetStatus = exports.ProductPostStatus = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var _ = require("lodash");
 // =========
 // constants
@@ -318,3 +318,152 @@ function sortFnDateDesc(a, b) {
     return b.getTime() - a.getTime();
 }
 exports.sortFnDateDesc = sortFnDateDesc;
+// ===========
+// type guards
+// ===========
+/*
+DESC
+  Returns whether or not the input is an IHolding
+INPUT
+  arg: An object that might be an IHolding
+RETURN
+  TRUE if the input is an IHolding, FALSE otherwise
+*/
+function isIHolding(arg) {
+    return arg
+        && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
+        && arg.transactions && Array.isArray(arg.transactions)
+        && _.every(arg.transactions.map(function (el) {
+            return isITransaction(el);
+        }));
+}
+exports.isIHolding = isIHolding;
+/*
+DESC
+  Returns whether or not the input is an IHydratedHolding
+INPUT
+  arg: An object that might be an IHydratedHolding
+RETURN
+  TRUE if the input is an IHydratedHolding, FALSE otherwise
+*/
+function isIHydratedHolding(arg) {
+    return arg
+        && arg.product && isIProduct(arg.product)
+        && arg.transactions && Array.isArray(arg.transactions)
+        && _.every(arg.transactions.map(function (el) {
+            return isITransaction(el);
+        }));
+}
+exports.isIHydratedHolding = isIHydratedHolding;
+/*
+DESC
+  Returns whether or not the input is an IHydratedPortfolio
+INPUT
+  arg: An object that might be an IHydratedPortfolio
+RETURN
+  TRUE if the input is an IHydratedPortfolio, FALSE otherwise
+*/
+function isIHydratedPortfolio(arg) {
+    return arg
+        && arg.userId && typeof (arg.userId) === 'number'
+        && arg.portfolioName && typeof (arg.portfolioName) === 'string'
+        && arg.holdings && Array.isArray(arg.holdings)
+        && _.every(arg.holdings.forEach(function (el) {
+            return isIHydratedHolding(el);
+        }));
+}
+exports.isIHydratedPortfolio = isIHydratedPortfolio;
+/*
+DESC
+  Returns whether or not the input is an IPortfolio
+INPUT
+  arg: An object that might be an IPortfolio
+RETURN
+  TRUE if the input is an IPortfolio, FALSE otherwise
+*/
+function isIPortfolio(arg) {
+    return arg
+        && arg.userId && typeof (arg.userId) === 'number'
+        && arg.portfolioName && typeof (arg.portfolioName) === 'string'
+        && arg.holdings && Array.isArray(arg.holdings)
+        && _.every(arg.holdings.forEach(function (el) {
+            return isIHolding(el);
+        }));
+}
+exports.isIPortfolio = isIPortfolio;
+/*
+DESC
+  Returns whether or not the input is an IPrice
+INPUT
+  arg: An object that might be an IPrice
+RETURN
+  TRUE if the input is an IPrice, FALSE otherwise
+*/
+function isIPrice(arg) {
+    return arg
+        && arg.priceDate && arg.priceData instanceof Date
+        && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
+        && arg.granularity && typeof (arg.granularity) === 'string'
+        && arg.prices && isIPriceData(arg.prices);
+}
+exports.isIPrice = isIPrice;
+/*
+DESC
+  Returns whether or not the input is an IPriceData
+INPUT
+  arg: An object that might be an IPriceData
+RETURN
+  TRUE if the input is an IPriceData, FALSE otherwise
+*/
+function isIPriceData(arg) {
+    return arg
+        // required
+        && arg.marketPrice && typeof (arg.marketPrice) === 'number'
+        // optional
+        && arg.buylistMarketPrice
+        ? typeof (arg.buylistMarketPrice) === 'number'
+        : true
+            && arg.listedMedianPrice
+            ? typeof (arg.listedMedianPrice) === 'number'
+            : true;
+}
+exports.isIPriceData = isIPriceData;
+/*
+DESC
+  Returns whether or not the input is an IProduct
+INPUT
+  arg: An object that might be an IProduct
+RETURN
+  TRUE if the input is an IProduct, FALSE otherwise
+*/
+function isIProduct(arg) {
+    return arg
+        // require
+        && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
+        && arg.tcg && _.values(TCG).includes(arg.tcg)
+        && arg.releaseDate && arg.releaseDate instanceof Date
+        && arg.name && typeof (arg.name) === 'string'
+        && arg.type && _.values(ProductType).includes(arg.type)
+        && arg.language && _.values(ProductLanguage).includes(arg.language)
+        // optional
+        && arg.msrp ? typeof (arg.msrp) === 'number' : true
+        && arg.subtype ? _.values(ProductSubtype).includes(arg.subtype) : true
+        && arg.setCode ? typeof (arg.setCode) === 'string' : true;
+}
+exports.isIProduct = isIProduct;
+/*
+DESC
+  Returns whether or not the input is an ITransaction
+INPUT
+  arg: An object that might be an ITransaction
+RETURN
+  TRUE if the input is an ITransaction, FALSE otherwise
+*/
+function isITransaction(arg) {
+    return arg
+        && arg.type && _.values(TransactionType).includes(arg.type)
+        && arg.date && arg.date instanceof Date
+        && arg.price && typeof (arg.price) === 'number'
+        && arg.quantity && typeof (arg.quantity) === 'number';
+}
+exports.isITransaction = isITransaction;

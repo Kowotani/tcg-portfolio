@@ -508,3 +508,156 @@ RETURN
 export function sortFnDateDesc(a: Date, b: Date): number {
   return b.getTime() - a.getTime()
 }
+
+
+// ===========
+// type guards
+// ===========
+
+/*
+DESC
+  Returns whether or not the input is an IHolding
+INPUT
+  arg: An object that might be an IHolding 
+RETURN
+  TRUE if the input is an IHolding, FALSE otherwise
+*/
+export function isIHolding(arg: any): arg is IHolding {
+  return arg
+    && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
+    && arg.transactions && Array.isArray(arg.transactions)
+      && _.every(arg.transactions.map((el: any) => {
+        return isITransaction(el)
+      }))
+}
+
+/*
+DESC
+  Returns whether or not the input is an IHydratedHolding
+INPUT
+  arg: An object that might be an IHydratedHolding 
+RETURN
+  TRUE if the input is an IHydratedHolding, FALSE otherwise
+*/
+export function isIHydratedHolding(arg: any): arg is IHydratedHolding {
+  return arg
+    && arg.product && isIProduct(arg.product)
+    && arg.transactions && Array.isArray(arg.transactions)
+      && _.every(arg.transactions.map((el: any) => {
+        return isITransaction(el)
+      }))
+}
+
+/*
+DESC
+  Returns whether or not the input is an IHydratedPortfolio
+INPUT
+  arg: An object that might be an IHydratedPortfolio 
+RETURN
+  TRUE if the input is an IHydratedPortfolio, FALSE otherwise
+*/
+export function isIHydratedPortfolio(arg: any): arg is IHydratedPortfolio {
+  return arg
+    && arg.userId && typeof(arg.userId) === 'number'
+    && arg.portfolioName && typeof(arg.portfolioName) === 'string'
+    && arg.holdings && Array.isArray(arg.holdings)
+      && _.every(arg.holdings.forEach((el: any) => {
+        return isIHydratedHolding(el)
+      }))
+}
+
+/*
+DESC
+  Returns whether or not the input is an IPortfolio
+INPUT
+  arg: An object that might be an IPortfolio 
+RETURN
+  TRUE if the input is an IPortfolio, FALSE otherwise
+*/
+export function isIPortfolio(arg: any): arg is IPortfolio {
+  return arg
+    && arg.userId && typeof(arg.userId) === 'number'
+    && arg.portfolioName && typeof(arg.portfolioName) === 'string'
+    && arg.holdings && Array.isArray(arg.holdings)
+      && _.every(arg.holdings.forEach((el: any) => {
+        return isIHolding(el)
+      }))
+}
+
+/*
+DESC
+  Returns whether or not the input is an IPrice
+INPUT
+  arg: An object that might be an IPrice 
+RETURN
+  TRUE if the input is an IPrice, FALSE otherwise
+*/
+export function isIPrice(arg: any): arg is IPrice {
+  return arg
+    && arg.priceDate && arg.priceData instanceof Date
+    && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
+    && arg.granularity && typeof(arg.granularity) === 'string'
+    && arg.prices && isIPriceData(arg.prices)
+}
+
+/*
+DESC
+  Returns whether or not the input is an IPriceData
+INPUT
+  arg: An object that might be an IPriceData 
+RETURN
+  TRUE if the input is an IPriceData, FALSE otherwise
+*/
+export function isIPriceData(arg: any): arg is IPriceData {
+  return arg
+    // required
+    && arg.marketPrice && typeof(arg.marketPrice) === 'number'
+
+    // optional
+    && arg.buylistMarketPrice 
+      ? typeof(arg.buylistMarketPrice) === 'number' 
+      : true
+    && arg.listedMedianPrice 
+      ? typeof(arg.listedMedianPrice) === 'number' 
+      : true
+}
+
+/*
+DESC
+  Returns whether or not the input is an IProduct
+INPUT
+  arg: An object that might be an IProduct 
+RETURN
+  TRUE if the input is an IProduct, FALSE otherwise
+*/
+export function isIProduct(arg: any): arg is IProduct {
+  return arg
+    // require
+    && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
+    && arg.tcg && _.values(TCG).includes(arg.tcg)
+    && arg.releaseDate && arg.releaseDate instanceof Date
+    && arg.name && typeof(arg.name) === 'string'
+    && arg.type && _.values(ProductType).includes(arg.type)
+    && arg.language && _.values(ProductLanguage).includes(arg.language)
+
+    // optional
+    && arg.msrp ? typeof(arg.msrp) === 'number' : true
+    && arg.subtype ? _.values(ProductSubtype).includes(arg.subtype) : true
+    && arg.setCode ? typeof(arg.setCode) === 'string' : true
+}
+
+/*
+DESC
+  Returns whether or not the input is an ITransaction
+INPUT
+  arg: An object that might be an ITransaction 
+RETURN
+  TRUE if the input is an ITransaction, FALSE otherwise
+*/
+export function isITransaction(arg: any): arg is ITransaction {
+  return arg
+    && arg.type && _.values(TransactionType).includes(arg.type)
+    && arg.date && arg.date instanceof Date
+    && arg.price && typeof(arg.price) === 'number'
+    && arg.quantity && typeof(arg.quantity) === 'number'
+}
