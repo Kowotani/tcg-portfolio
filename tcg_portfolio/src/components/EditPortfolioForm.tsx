@@ -12,7 +12,7 @@ import {
 
   isIHydratedHolding,
 
-  assert, GET_PRODUCTS_URL, isASCII,
+  assert, GET_PRODUCTS_URL, isASCII
 } from 'common'
 import * as _ from 'lodash'
 import { HoldingCard } from './Holding'
@@ -22,7 +22,8 @@ import { SearchInput } from './SearchInput'
 import { SideBarNavContext } from '../state/SideBarNavContext'
 import { 
   ISideBarNavContext, NonVisibileProductSubtypes, SideBarNav, 
-  sortFnHydratedHoldingAsc
+
+  sortFnHydratedHoldingAsc, sortFnProductSearchResults
 } from '../utils'
 
 
@@ -240,11 +241,7 @@ export const EditPortfolioForm = (
             )
         )
       })
-      .sort((pA: IProduct, pB: IProduct): number => {
-        const valA = `${pA.name} ${pA.type} ${pA.subtype} ${pA.language}`
-        const valB = `${pB.name} ${pB.type} ${pB.subtype} ${pB.language}`
-        return valA > valB ? 1 : -1
-      })
+      .sort(sortFnProductSearchResults)
     setSearchResults(productResults)
   }, [searchInput, searchableProducts])
 

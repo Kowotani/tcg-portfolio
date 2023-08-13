@@ -1,7 +1,7 @@
 import { 
   IHydratedHolding, IProduct, ProductLanguage, ProductSubtype, 
   
-  assert, isIHydratedHolding 
+  assert, isIHydratedHolding, isIProduct
 } from 'common'
 
 
@@ -175,7 +175,7 @@ export function getProductNameWithLanguage(product: IProduct): string {
 
 /*
 DESC
-  Helpder function used for generating sorting keys for IHydratedHolding
+  Helper function used for generating sorting keys for IHydratedHolding
   sorting functions
 INPUT
   holding: The IHydratedHolding
@@ -188,6 +188,21 @@ function genHydratedHoldingKey(holding: IHydratedHolding): string {
     + holding.product.type
     + holding.product.subtype ?? ''
     + holding.product.language
+}
+
+/*
+DESC
+  Helper function used for generating sorting keys for IProduct search results
+INPUT
+  product: The IProduct
+RETURN
+  The generated sorting key
+*/
+function genProductSearchResultKey(product: IProduct): string {
+  return product.name
+    + product.tcg
+    + product.type
+    + product.subtype ?? ''
 }
 
 /*
@@ -214,7 +229,7 @@ INPUT
   a: The first IHydratedHolding
   b: The second IHydratedHolding
 RETURN
-  A negative number if a > b, otherwise a positive number if a <>> b
+  A negative number if a > b, otherwise a positive number if a < b
 */
 export function sortFnHydratedHoldingDesc(a: any, b: any): number {
   assert(isIHydratedHolding(a))
@@ -222,4 +237,22 @@ export function sortFnHydratedHoldingDesc(a: any, b: any): number {
   const keyA = genHydratedHoldingKey(a)
   const keyB = genHydratedHoldingKey(b)
   return keyA < keyB ? 1 : keyB > keyA ? -1 : 0
+}
+
+/*
+DESC
+  Function used for sorting IProduct in ascending order for displaying
+  search results
+INPUT
+  a: The first IProduct
+  b: The second IProduct
+RETURN
+  A negative number if a < b, otherwise a positive number if a > b
+*/
+export function sortFnProductSearchResults(a: any, b: any): number {
+  assert(isIProduct(a))
+  assert(isIProduct(b))
+  const keyA = genProductSearchResultKey(a)
+  const keyB = genProductSearchResultKey(b)
+  return keyA < keyB ? -1 : keyB > keyA ? 1 : 0
 }
