@@ -15,7 +15,7 @@ import {
 
   assert, GET_PRODUCTS_URL, isASCII
 } from 'common'
-import { HoldingCard } from './Holding'
+import { HoldingCard } from './HoldingCard'
 import { InputErrorWrapper } from './InputField'
 import { FilterInput } from './FilterInput'
 import { ProductSearchResult } from './ProductSearchResult';
