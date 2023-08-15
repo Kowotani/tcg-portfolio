@@ -4,6 +4,7 @@ import {
   Box,
   Input,
   Spacer,
+  Text
 } from '@chakra-ui/react'
 import { 
   IHydratedHolding, IHydratedPortfolio, IProduct, 
@@ -14,16 +15,16 @@ import {
 
   assert, GET_PRODUCTS_URL, isASCII
 } from 'common'
-import * as _ from 'lodash'
 import { HoldingCard } from './Holding'
 import { InputErrorWrapper } from './InputField'
+import { FilterInput } from './FilterInput'
 import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
 import { SideBarNavContext } from '../state/SideBarNavContext'
 import { 
   ISideBarNavContext, SideBarNav, 
 
-  filterFnProductSearchResult, sortFnHydratedHoldingAsc, 
+  filterFnHoldingCard, filterFnProductSearchResult, sortFnHydratedHoldingAsc, 
   sortFnProductSearchResults
 } from '../utils' 
 
@@ -41,6 +42,12 @@ export const EditPortfolioForm = (
   // ======
   // states
   // ======
+
+  // -------
+  // Holding
+  // -------
+
+  const [ holdingFilter, setHoldingFilter ] = useState('')
 
   // ---------
   // Portfolio
@@ -264,7 +271,7 @@ export const EditPortfolioForm = (
 
       {/* Search Product to Add */}
       <SearchInput 
-        placeholder='Search Products to Add'
+        placeholder='Search a Product'
         maxSearchResults={5}
         onSearchChange={e => setSearchInput(e.target.value)}
         onSearchResultSelect={e => onSearchResultClick(e as IProduct)}
@@ -280,19 +287,43 @@ export const EditPortfolioForm = (
         clearSearch={() => setSearchInput('')}
       />
 
+      {/* Filter Holdings */}
+      <FilterInput 
+        placeholder='Filter a Holding'
+        onFilterChange={e => setHoldingFilter(e.target.value)}
+        value={holdingFilter}
+        clearFilter={() => setHoldingFilter('')}
+      />
+
+      {holdingFilter.length > 0 &&
+        <Box width='100%'>
+          <Text fontSize='lg' as='em'>
+          {portfolio.hydratedHoldings.filter(filterFnHoldingCard(holdingFilter)).length}
+          &nbsp;of&nbsp;
+          {portfolio.hydratedHoldings.length} 
+          &nbsp;holding
+          {portfolio.hydratedHoldings.length > 1 ? 's': ''}
+          &nbsp;displayed
+          </Text>
+        </Box>
+      }
+
       {/* Holding Cards */}
-      {portfolio.hydratedHoldings.map((holding: IHydratedHolding) => {
-        return (
-          <>
-            <HoldingCard 
-              key={holding.product.tcgplayerId}
-              hydratedHolding={holding}
-              onHoldingDeleteClick={onHoldingDeleteClick}
-            />
-            <Spacer h='8px'/>
-          </>
-        )
-      })}
+      {portfolio.hydratedHoldings
+        .filter(filterFnHoldingCard(holdingFilter))
+        .map((holding: IHydratedHolding) => {
+          return (
+            <>
+              <HoldingCard 
+                key={holding.product.tcgplayerId}
+                hydratedHolding={holding}
+                onHoldingDeleteClick={onHoldingDeleteClick}
+              />
+              <Spacer h='8px'/>
+            </>
+          )
+        })
+      }
       
       {/* Footer */}
     </>
