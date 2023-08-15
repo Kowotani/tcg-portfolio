@@ -314,7 +314,7 @@ export const EditPortfolioForm = (
 
       {/* Search Product to Add */}
       <SearchInput 
-        placeholder='Search a Product'
+        placeholder='Search for a Product'
         maxSearchResults={5}
         onSearchChange={e => setSearchInput(e.target.value)}
         onSearchResultSelect={e => onSearchResultClick(e as IProduct)}
@@ -332,7 +332,7 @@ export const EditPortfolioForm = (
 
       {/* Filter Holdings */}
       <FilterInput 
-        placeholder='Filter a Holding'
+        placeholder='Filter for a Holding'
         onFilterChange={e => setHoldingFilter(e.target.value)}
         value={holdingFilter}
         clearFilter={() => setHoldingFilter('')}
@@ -356,15 +356,15 @@ export const EditPortfolioForm = (
         .filter(filterFnHoldingCard(holdingFilter))
         .map((holding: IHydratedHolding) => {
           return (
-            <>
+            <Box key={holding.product.tcgplayerId}>
               <HoldingCard 
-                key={holding.product.tcgplayerId}
+                
                 hydratedHolding={holding}
                 onHoldingDelete={onHoldingDelete}
                 onHoldingUpdate={onHoldingUpdate}
               />
               <Spacer h='8px'/>
-            </>
+            </Box>
           )
         })
       }
