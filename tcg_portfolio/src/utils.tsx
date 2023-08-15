@@ -107,6 +107,8 @@ function isMatchingProduct(product: IProduct, searchInput: string): boolean {
 DESC
   Function used for filtering wither an IProduct matches the input searchInput
   NOTE: This function returns another function
+INPUT
+  filterInput: A string to search using isMatchingProduct()
 RETURN
   A function that accepts an IProduct and returns TRUE if the searchInput
   match the IProduct according to isMatchingProduct()
@@ -114,10 +116,10 @@ REF
   https://stackoverflow.com/questions/7759237/how-do-i-pass-an-extra-parameter-to-the-callback-function-in-javascript-filter
 */
 export function filterFnHoldingCard(
-  searchInput: string
+  searchinput: string
 ): (element: IHydratedHolding) => boolean {
   return function(holding: IHydratedHolding) {
-    return isMatchingProduct(holding.product, searchInput)
+    return isMatchingProduct(holding.product, searchinput)
   }
 }
 
@@ -125,6 +127,8 @@ export function filterFnHoldingCard(
 DESC
   Function used for filtering wither an IProduct matches the input searchInput
   NOTE: This function returns another function
+INPUT
+  searchInput: A string to search using isMatchingProduct()  
 RETURN
   A function that accepts an IProduct and returns TRUE if the searchInput
   match the IProduct according to isMatchingProduct()
