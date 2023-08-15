@@ -153,10 +153,45 @@ export const EditPortfolioForm = (
   }
 
   // --------------
+  // Holding change
+  // --------------
+
+  /*
+  DESC
+    Handler function to update the Portfolio when one of its Holdings is updated
+    but not deleted (see onHoldingDelete()), such as when the underlying 
+    Transactions change
+  INPUT
+    holding: The updated IHydratedHolding
+  */
+  function onHoldingUpdate(holding: IHydratedHolding): void {
+    // create new holdings
+    const ix = portfolio.hydratedHoldings.findIndex((h: IHydratedHolding) => {
+      return h.product.tcgplayerId === holding.product.tcgplayerId
+    })
+    assert(ix >= 0 && ix < portfolio.hydratedHoldings.length)
+    const newHoldings = portfolio.hydratedHoldings
+    newHoldings.splice(ix, 1, holding)
+
+    // set new holdings
+    setPortfolio({
+      ...portfolio,
+      hydratedHoldings: newHoldings
+    })
+  }
+
+  // --------------
   // Product search
   // --------------
 
-  function onSearchResultClick(product: IProduct):void {
+  /*
+  DESC
+    Handler function to update various states after the user selects a Product
+    from the search results to add to the Portfolio
+  INPUT
+    product: The IProduct that was clicked from the search results
+  */
+  function onSearchResultClick(product: IProduct): void {
     // clear search 
     setSearchInput('')
 
@@ -179,7 +214,14 @@ export const EditPortfolioForm = (
     })
   }
 
-  function onHoldingDeleteClick(holding: IHydratedHolding): void {
+  /*
+  DESC
+    Handler function to update various states after the user deletes a Holding
+    from the Portfolio
+  INPUT
+    holding: The IHydratedHolding to delete
+  */
+  function onHoldingDelete(holding: IHydratedHolding): void {
     // update searchable products
     const matchingHolding = portfolio.hydratedHoldings.find(
       (h: IHydratedHolding) => {
@@ -202,6 +244,7 @@ export const EditPortfolioForm = (
     setSearchInput('')
   }
   
+
   // =====
   // hooks
   // =====
@@ -317,7 +360,8 @@ export const EditPortfolioForm = (
               <HoldingCard 
                 key={holding.product.tcgplayerId}
                 hydratedHolding={holding}
-                onHoldingDeleteClick={onHoldingDeleteClick}
+                onHoldingDelete={onHoldingDelete}
+                onHoldingUpdate={onHoldingUpdate}
               />
               <Spacer h='8px'/>
             </>

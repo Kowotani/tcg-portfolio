@@ -1,4 +1,4 @@
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import { 
   Box,
   Button,
@@ -27,18 +27,26 @@ import { getProductNameWithLanguage } from '../utils'
 
 type THoldingCardProps = {
   hydratedHolding: IHydratedHolding,
-  onHoldingDeleteClick: (holding: IHydratedHolding) => void,
+  onHoldingDelete: (holding: IHydratedHolding) => void,
+  onHoldingUpdate: (holding: IHydratedHolding) => void,
 }
 export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
 
   // modal
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+
+  // =====
   // state
+  // =====
+
   const [ holding, setHolding ] = useState(props.hydratedHolding)
   const [ transactions, setTransactions ] = useState(holding.transactions)
 
+
+  // =========
   // functions
+  // =========
   
   function handleSetTransactions(txns: ITransaction[]): void {
     setHolding({...holding, transactions: txns})
@@ -95,6 +103,15 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     },
   ]
 
+  // =====
+  // hooks
+  // =====
+
+  // update the parent Portfolio when the Holding changes
+  useEffect(() => {
+    props.onHoldingUpdate(holding)
+  }, [holding])
+
 
   // ==============
   // Main Component
@@ -120,7 +137,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
                 </Text>
                 <CloseButton 
                   onClick={
-                    () => props.onHoldingDeleteClick(props.hydratedHolding)
+                    () => props.onHoldingDelete(props.hydratedHolding)
                   }
                 />
               </Box>
