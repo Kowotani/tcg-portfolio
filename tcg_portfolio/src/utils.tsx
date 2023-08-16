@@ -21,12 +21,19 @@ export const NonVisibileProductSubtypes = [
 // enums
 // =====
 
+// Portfolio panel subpages
+export enum PortfolioPanelNav {
+  Add = 'Add',
+  Edit = 'Edit',
+  Overview = 'Overview',
+  Performance = 'Performance',
+}
+
 // the types of user accounts
 export enum UserType {
   Admin = 'Admin',
   User = 'User'
 }
-
 
 // SideBarNav
 export const SideBarNav = {
