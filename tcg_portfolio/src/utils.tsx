@@ -70,6 +70,18 @@ export interface ISideBarNavContext {
   setSideBarNav: React.Dispatch<React.SetStateAction<ISideBarNav>>
 }
 
+// User
+export interface IUser {
+  userId: number,
+  userType: UserType,
+}
+
+// UserContext
+export interface IUserContext {
+  user: IUser,
+  setUser: React.Dispatch<React.SetStateAction<IUser>>
+}
+
 
 // =========
 // functions
