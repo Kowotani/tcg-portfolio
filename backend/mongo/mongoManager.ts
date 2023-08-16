@@ -146,6 +146,7 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
   const userId = portfolio.userId
   const portfolioName = portfolio.portfolioName
   const holdings = portfolio.holdings
+  const description = portfolio.description
 
   try {
 
@@ -161,6 +162,7 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
       userId,
       portfolioName,
       holdings,
+      description,
     })
 
     return true
@@ -606,11 +608,15 @@ async function main(): Promise<number> {
   //   console.log('Product not updated')
   // }
 
-  // const userId = 1234
-  // const portfolioName = 'Alpha Investments'
+  // const p233232 = await getProduct({'tcgplayerId': 233232})
+  // const p449558 = await getProduct({'tcgplayerId': 449558})
+
+  // const userId = 456
+  // const portfolioName = 'Beta Investments'
   // let holdings = [
   //   {
   //     tcgplayerId: 233232,
+  //     product: p233232?._id,
   //     transactions: [
   //     {
   //       type: TransactionType.Sale,
@@ -622,6 +628,7 @@ async function main(): Promise<number> {
   //   },
   //   {
   //     tcgplayerId: 449558,
+  //     product: p449558?._id,
   //     transactions: [
   //       {
   //       type: TransactionType.Purchase,
@@ -636,7 +643,8 @@ async function main(): Promise<number> {
   // const portfolio: IPortfolio = {
   //   userId: userId, 
   //   portfolioName: portfolioName,
-  //   holdings: []
+  //   holdings: [],
+  //   description: 'Foobar'
   // }
   
   // let tcgplayerId = 233232
@@ -652,7 +660,7 @@ async function main(): Promise<number> {
 
   // // -- Add portfolio
 
-  // res = await addPortfolio(userId, portfolioName, holdings)
+  // res = await addPortfolio(portfolio)
   // if (res) {
   //   console.log('Portfolio successfully created')
   // } else {

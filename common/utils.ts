@@ -323,6 +323,7 @@ export interface IPortfolio {
   userId: number,
   portfolioName: string,
   holdings: IHolding[],
+  description?: string,
 }
 
 export interface IPortfolioMethods {
@@ -335,6 +336,7 @@ export interface IPortfolioMethods {
   // getters
   getUserId(): number,
   getPortfolioName(): string,
+  getDescription(): string | undefined,
   getHoldings(): IHolding[],
   getTotalCost(): number | undefined,
   getTotalRevenue(): number | undefined,

@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -39,7 +43,6 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
-// import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
@@ -150,6 +153,7 @@ function addPortfolio(portfolio) {
         const userId = portfolio.userId;
         const portfolioName = portfolio.portfolioName;
         const holdings = portfolio.holdings;
+        const description = portfolio.description;
         try {
             // check if portfolioName exists for this userId
             const doc = yield getPortfolio(portfolio);
@@ -162,6 +166,7 @@ function addPortfolio(portfolio) {
                 userId,
                 portfolioName,
                 holdings,
+                description,
             });
             return true;
         }
@@ -520,11 +525,14 @@ function main() {
         // } else {
         //   console.log('Product not updated')
         // }
-        // const userId = 1234
-        // const portfolioName = 'Alpha Investments'
+        // const p233232 = await getProduct({'tcgplayerId': 233232})
+        // const p449558 = await getProduct({'tcgplayerId': 449558})
+        const userId = 456;
+        const portfolioName = 'Beta Investments';
         // let holdings = [
         //   {
         //     tcgplayerId: 233232,
+        //     product: p233232?._id,
         //     transactions: [
         //     {
         //       type: TransactionType.Sale,
@@ -536,6 +544,7 @@ function main() {
         //   },
         //   {
         //     tcgplayerId: 449558,
+        //     product: p449558?._id,
         //     transactions: [
         //       {
         //       type: TransactionType.Purchase,
@@ -546,11 +555,12 @@ function main() {
         //     ]
         //     }
         //   ]
-        // const portfolio: IPortfolio = {
-        //   userId: userId, 
-        //   portfolioName: portfolioName,
-        //   holdings: []
-        // }
+        const portfolio = {
+            userId: userId,
+            portfolioName: portfolioName,
+            holdings: [],
+            description: 'Foobar'
+        };
         // let tcgplayerId = 233232
         // // // -- Set portfolio holdings
         // res = await addPortfolioHoldings(portfolio, holdings)
@@ -560,12 +570,13 @@ function main() {
         //   console.log('Portfolio holdings not added')
         // }
         // // -- Add portfolio
-        // res = await addPortfolio(userId, portfolioName, holdings)
-        // if (res) {
-        //   console.log('Portfolio successfully created')
-        // } else {
-        //   console.log('Portfolio not created')
-        // }
+        res = yield addPortfolio(portfolio);
+        if (res) {
+            console.log('Portfolio successfully created');
+        }
+        else {
+            console.log('Portfolio not created');
+        }
         // // -- Delete portfolio
         // res = await deletePortfolio(userId, portfolioName)
         // if (res) {

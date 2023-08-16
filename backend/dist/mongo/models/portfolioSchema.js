@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -39,6 +43,9 @@ exports.portfolioSchema = new mongoose_1.Schema({
         type: [holdingSchema_1.holdingSchema],
         required: true
     },
+    description: {
+        type: String,
+    }
 });
 // =======
 // methods
@@ -78,6 +85,10 @@ exports.portfolioSchema.method('getUserId', function getUserId() {
 // get portfolio name
 exports.portfolioSchema.method('getPortfolioName', function getPortfolioName() {
     return this.portfolioName;
+});
+// get description
+exports.portfolioSchema.method('getDescription', function getDescription() {
+    return this.description;
 });
 // get holdings
 exports.portfolioSchema.method('getHoldings', function getHoldings() {

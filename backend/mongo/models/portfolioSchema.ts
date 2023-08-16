@@ -31,6 +31,9 @@ export const portfolioSchema = new Schema<IMPortfolio, TPortfolioModel, IPortfol
     type: [holdingSchema],
     required: true
   },
+  description: {
+    type: String,
+  }
 });
 
 
@@ -85,6 +88,12 @@ portfolioSchema.method('getUserId',
 portfolioSchema.method('getPortfolioName', 
   function getPortfolioName(): string {
     return this.portfolioName
+});
+
+// get description
+portfolioSchema.method('getDescription', 
+  function getDescription(): string | undefined {
+    return this.description
 });
 
 // get holdings

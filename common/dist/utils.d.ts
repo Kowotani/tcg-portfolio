@@ -143,6 +143,7 @@ export interface IPortfolio {
     userId: number;
     portfolioName: string;
     holdings: IHolding[];
+    description?: string;
 }
 export interface IPortfolioMethods {
     addHoldings(holdingInput: IHolding | IHolding[]): void;
