@@ -15,13 +15,13 @@ import { getBrowserLocale, getFormattedPrice } from '../utils'
 // Sub Components
 // --------------
 
-// -- TransactionSummaryItem
+// -- MetricSummaryItem
 
-type TTransactionSummaryItemProps = TTransactionSummaryItem & {
+type TMetricSummaryItemProps = TMetricSummaryItem & {
   variant: string
 }
-const TransactionSummaryItem = (
-  props: PropsWithChildren<TTransactionSummaryItemProps>
+const MetricSummaryItem = (
+  props: PropsWithChildren<TMetricSummaryItemProps>
 ) => {
 
   const {
@@ -94,7 +94,7 @@ const TransactionSummaryItem = (
 // Main Component
 // ==============
 
-export type TTransactionSummaryItem = {
+export type TMetricSummaryItem = {
   title: string,
   value?: number,
   formattedPrefix?: string,
@@ -102,13 +102,13 @@ export type TTransactionSummaryItem = {
   placeholder?: string,
   titleStyle?: {[key: string]: string},
 }
-export type TTransactionSummaryProps = {
-  summaryItems?: TTransactionSummaryItem[],
-  twoDimSummaryItems?: TTransactionSummaryItem[][],
+export type TMetricSummaryProps = {
+  summaryItems?: TMetricSummaryItem[],
+  twoDimSummaryItems?: TMetricSummaryItem[][],
   variant?: 'hcard' | 'vcard' | 'list'
 }
-export const TransactionSummary = (
-  props: PropsWithChildren<TTransactionSummaryProps>
+export const MetricSummary = (
+  props: PropsWithChildren<TMetricSummaryProps>
 ) => {
  
   const {
@@ -127,7 +127,7 @@ export const TransactionSummary = (
             spacing={4}
           >
             {twoDimSummaryItems.map(
-              (itemRow: TTransactionSummaryItem[]) => {
+              (itemRow: TMetricSummaryItem[]) => {
 
                 return (
                   <HStack 
@@ -138,9 +138,9 @@ export const TransactionSummary = (
                     width='100%'
                   >
                     {itemRow.map(
-                      (item: TTransactionSummaryItem) => {
+                      (item: TMetricSummaryItem) => {
                         return (
-                          <TransactionSummaryItem
+                          <MetricSummaryItem
                             {...item}
                             key={item.title}
                             variant={variant}
@@ -161,9 +161,9 @@ export const TransactionSummary = (
           width='fit-content'      
         >
           {summaryItems.map(
-            (item: TTransactionSummaryItem) => {
+            (item: TMetricSummaryItem) => {
               return (
-                <TransactionSummaryItem
+                <MetricSummaryItem
                   {...item}
                   key={item.title}
                   variant={variant}
@@ -183,9 +183,9 @@ export const TransactionSummary = (
             width='100%'              
           >
             {summaryItems.map(
-              (item: TTransactionSummaryItem) => {
+              (item: TMetricSummaryItem) => {
                 return (
-                  <TransactionSummaryItem
+                  <MetricSummaryItem
                     {...item}
                     key={item.title}
                     variant={variant}
@@ -205,9 +205,9 @@ export const TransactionSummary = (
             width='fit-content'
           >
             {summaryItems.map(
-              (item: TTransactionSummaryItem) => {
+              (item: TMetricSummaryItem) => {
                 return (
-                  <TransactionSummaryItem
+                  <MetricSummaryItem
                     {...item}
                     key={item.title}
                     variant={variant}

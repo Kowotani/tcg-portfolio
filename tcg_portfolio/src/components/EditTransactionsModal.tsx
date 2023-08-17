@@ -39,8 +39,8 @@ import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
 import { FiMinusCircle } from 'react-icons/fi'
 import { createColumnHelper } from '@tanstack/react-table'
-import { TransactionSummary, TTransactionSummaryItem 
-  } from './TransactionSummary'
+import { MetricSummary, TMetricSummaryItem 
+  } from './MetricSummary'
 import { TransactionTable } from './TransactionTable'
 import { getBrowserLocale, getFormattedPrice, getProductNameWithLanguage 
 } from '../utils'
@@ -326,7 +326,7 @@ export const EditTransactionsModal = (
   // transaction summary items
   // -------------------------
 
-  const purchaseSummaryItems: TTransactionSummaryItem[] = [
+  const purchaseSummaryItems: TMetricSummaryItem[] = [
     {
       title: 'Purchases',
       value: getPurchaseQuantity(transactions),
@@ -348,7 +348,7 @@ export const EditTransactionsModal = (
     },
   ]
 
-  const saleSummaryItems: TTransactionSummaryItem[] = [
+  const saleSummaryItems: TMetricSummaryItem[] = [
     {
       title: 'Sales',
       value: getSaleQuantity(transactions),
@@ -536,7 +536,7 @@ export const EditTransactionsModal = (
               {/* Purchases */}
               <Card>
                 <CardBody>
-                  <TransactionSummary 
+                  <MetricSummary 
                     summaryItems={purchaseSummaryItems}
                     variant='hcard'
                   />
@@ -549,7 +549,7 @@ export const EditTransactionsModal = (
                   ? (
                     <Card>
                       <CardBody>
-                        <TransactionSummary 
+                        <MetricSummary 
                           summaryItems={saleSummaryItems}
                           variant='hcard'
                         />

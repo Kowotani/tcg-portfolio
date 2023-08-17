@@ -21,7 +21,7 @@ import {  } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
-import { TransactionSummary, TTransactionSummaryItem } from './TransactionSummary'
+import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { getProductNameWithLanguage } from '../utils'
 
 
@@ -53,9 +53,9 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     setTransactions(txns)
   }
 
-  // TransactionSummary
+  // MetricSummary
 
-  const quantitySummary: TTransactionSummaryItem[] = [
+  const quantitySummary: TMetricSummaryItem[] = [
     {
       title: 'Purchases:',
       value: getPurchaseQuantity(transactions),
@@ -76,7 +76,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     },
   ]
 
-  const profitSummary: TTransactionSummaryItem[] = [
+  const profitSummary: TMetricSummaryItem[] = [
     {
       title: 'Avg Cost:',
       value: getAverageCost(transactions),
@@ -158,7 +158,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
 
                 {/* Quantity */}
                 <Box fontSize='large'>
-                  <TransactionSummary 
+                  <MetricSummary 
                     summaryItems={quantitySummary}
                     variant='list'
                   />
@@ -166,7 +166,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
 
                 {/* Profit */}
                 <Box fontSize='large'>
-                  <TransactionSummary 
+                  <MetricSummary 
                     summaryItems={profitSummary}
                     variant='list'
                   />
