@@ -17,7 +17,6 @@ import {
   getAverageCost, getAverageRevenue, getProfit, getPurchaseQuantity, 
   getQuantity, getSaleQuantity,
 } from 'common'
-import {  } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
