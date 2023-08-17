@@ -223,12 +223,19 @@ export class Portfolio implements IPortfolio, IPortfolioMethods {
   userId: number
   portfolioName: string
   holdings: Holding[]
+  description?: string
 
   // constructor
-  constructor(userId: number, portfolioName: string, holdings: Holding[]) {
+  constructor(
+    userId: number, 
+    portfolioName: string, 
+    holdings: Holding[],
+    description?: string
+  ) {
     this.userId = userId
     this.portfolioName = portfolioName
     this.holdings = holdings
+    this.description = description
   }
 
 
@@ -253,6 +260,11 @@ export class Portfolio implements IPortfolio, IPortfolioMethods {
   // delete holding
   deleteHoldings(): void {
     this.holdings = []
+  }
+
+  // get description
+  getDescription(): string | undefined {
+    return this.description
   }
 
   // get dollar return
