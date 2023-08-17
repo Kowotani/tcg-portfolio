@@ -205,6 +205,7 @@ export function getFormattedPrice(
   locale: string,
   prefix?: string,
   decimals?: number,
+  suffix?: string,
 ): string {
 
   // round trao;omg decimals to handle potential rounding from toLocaleString()
@@ -240,7 +241,8 @@ export function getFormattedPrice(
     formattedPrice = formattedPrice.substring(0, decimalIx)
   }
 
-  return prefix ? prefix + formattedPrice : formattedPrice
+  // prefix and suffixe
+  return (prefix ?? '') + formattedPrice + (suffix ?? '')
 }
 
 /*
