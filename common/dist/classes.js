@@ -180,10 +180,11 @@ exports.Holding = Holding;
 // =========
 var Portfolio = /** @class */ (function () {
     // constructor
-    function Portfolio(userId, portfolioName, holdings) {
+    function Portfolio(userId, portfolioName, holdings, description) {
         this.userId = userId;
         this.portfolioName = portfolioName;
         this.holdings = holdings;
+        this.description = description;
     }
     // -------
     // methods
@@ -203,6 +204,10 @@ var Portfolio = /** @class */ (function () {
     // delete holding
     Portfolio.prototype.deleteHoldings = function () {
         this.holdings = [];
+    };
+    // get description
+    Portfolio.prototype.getDescription = function () {
+        return this.description;
     };
     // get dollar return
     // TODO: account for profits

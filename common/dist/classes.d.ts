@@ -31,10 +31,12 @@ export declare class Portfolio implements IPortfolio, IPortfolioMethods {
     userId: number;
     portfolioName: string;
     holdings: Holding[];
-    constructor(userId: number, portfolioName: string, holdings: Holding[]);
+    description?: string;
+    constructor(userId: number, portfolioName: string, holdings: Holding[], description?: string);
     addHoldings(holdingInput: Holding | Holding[]): void;
     deleteHolding(tcgplayerId: number): void;
     deleteHoldings(): void;
+    getDescription(): string | undefined;
     getDollarReturn(prices: Map<number, number>): number | undefined;
     getHoldings(): Holding[];
     getMarketValue(prices: Map<number, number>): number | undefined;

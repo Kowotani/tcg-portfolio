@@ -106,9 +106,11 @@ export interface ITransaction {
 export interface IReactTableTransaction extends ITransaction {
     delete?: boolean;
 }
-export interface IHolding {
-    tcgplayerId: number;
+interface IHoldingBase {
     transactions: ITransaction[];
+}
+export interface IHolding extends IHoldingBase {
+    tcgplayerId: number;
 }
 export interface IHoldingMethods {
     addTransactions(txnInput: ITransaction | ITransaction[]): void;
@@ -135,15 +137,16 @@ export interface IHoldingMethods {
     getPercentageReturn(price: number): number | undefined;
     getAnnualizedReturn(price: number): number | undefined;
 }
-export interface IHydratedHolding {
+export interface IHydratedHolding extends IHoldingBase {
     product: IProduct;
-    transactions: ITransaction[];
 }
-export interface IPortfolio {
+interface IPortfolioBase {
     userId: number;
     portfolioName: string;
-    holdings: IHolding[];
     description?: string;
+}
+export interface IPortfolio extends IPortfolioBase {
+    holdings: IHolding[];
 }
 export interface IPortfolioMethods {
     addHoldings(holdingInput: IHolding | IHolding[]): void;
@@ -151,6 +154,7 @@ export interface IPortfolioMethods {
     deleteHoldings(): void;
     getUserId(): number;
     getPortfolioName(): string;
+    getDescription(): string | undefined;
     getHoldings(): IHolding[];
     getTotalCost(): number | undefined;
     getTotalRevenue(): number | undefined;
@@ -163,9 +167,7 @@ export interface IPortfolioMethods {
     getDollarReturn(prices: Map<number, number>): number | undefined;
     getPercentageReturn(prices: Map<number, number>): number | undefined;
 }
-export interface IHydratedPortfolio {
-    userId: number;
-    portfolioName: string;
+export interface IHydratedPortfolio extends IPortfolioBase {
     hydratedHoldings: IHydratedHolding[];
 }
 export declare const ADD_PRODUCT_URL = "/product";
@@ -191,3 +193,4 @@ export declare function isIPrice(arg: any): arg is IPrice;
 export declare function isIPriceData(arg: any): arg is IPriceData;
 export declare function isIProduct(arg: any): arg is IProduct;
 export declare function isITransaction(arg: any): arg is ITransaction;
+export {};

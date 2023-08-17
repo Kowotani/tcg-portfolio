@@ -270,9 +270,13 @@ export interface IReactTableTransaction extends ITransaction {
 }
 
 // holding
-export interface IHolding {
-  tcgplayerId: number,
+
+interface IHoldingBase {
   transactions: ITransaction[],
+}
+
+export interface IHolding extends IHoldingBase{
+  tcgplayerId: number,
 }
 
 export interface IHoldingMethods {
@@ -312,18 +316,20 @@ export interface IHoldingMethods {
   getAnnualizedReturn(price: number): number | undefined,
 }
 
-export interface IHydratedHolding {
+export interface IHydratedHolding extends IHoldingBase {
   product: IProduct,
-  transactions: ITransaction[],
 }
 
 // portfolio
 
-export interface IPortfolio {
+interface IPortfolioBase {
   userId: number,
   portfolioName: string,
-  holdings: IHolding[],
   description?: string,
+}
+
+export interface IPortfolio extends IPortfolioBase {
+  holdings: IHolding[],
 }
 
 export interface IPortfolioMethods {
@@ -354,9 +360,7 @@ export interface IPortfolioMethods {
   getPercentageReturn(prices: Map<number, number>): number | undefined,
 }
 
-export interface IHydratedPortfolio {
-  userId: number,
-  portfolioName: string,
+export interface IHydratedPortfolio extends IPortfolioBase {
   hydratedHoldings: IHydratedHolding[],
 }
 
