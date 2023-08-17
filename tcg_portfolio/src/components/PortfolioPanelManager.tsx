@@ -19,7 +19,7 @@ import {
 import { HoldingCard } from './HoldingCard'
 import { InputErrorWrapper } from './InputField'
 import { FilterInput } from './FilterInput'
-import { PortfolioOverview } from './PortfolioOverview'
+import { AllPortfolios } from './Allortfolios'
 import { ProductSearchResult } from './ProductSearchResult'
 import { SearchInput } from './SearchInput'
 import { UserContext } from '../state/UserContext'
@@ -40,15 +40,15 @@ export const PortfolioPanelManager = () => {
   // =====
 
   const { user } = useContext(UserContext) as IUserContext
-  const [ nav, setNav ] = useState(PortfolioPanelNav.Overview)
+  const [ nav, setNav ] = useState(PortfolioPanelNav.All)
 
   // ----------
   // breadcrumb
   // ----------
 
   const breadcrumbTrail = 
-    nav === PortfolioPanelNav.Overview
-      ? ['Portfolio', 'Overview']
+    nav === PortfolioPanelNav.All
+      ? ['Portfolio', 'All Portfolios']
 
       : nav === PortfolioPanelNav.Edit
         ? ['Portfolio', 'Edit']
@@ -73,8 +73,8 @@ export const PortfolioPanelManager = () => {
       </Breadcrumb>
 
       {/* Portfolio Overview */}
-      {nav === PortfolioPanelNav.Overview 
-        && <PortfolioOverview />
+      {nav === PortfolioPanelNav.All 
+        && <AllPortfolios />
       }
 
       {/* Add Portfolio */}

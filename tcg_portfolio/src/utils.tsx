@@ -24,8 +24,8 @@ export const NonVisibileProductSubtypes = [
 // Portfolio panel subpages
 export enum PortfolioPanelNav {
   Add = 'Add',
+  All = 'All',
   Edit = 'Edit',
-  Overview = 'Overview',
   Performance = 'Performance',
 }
 

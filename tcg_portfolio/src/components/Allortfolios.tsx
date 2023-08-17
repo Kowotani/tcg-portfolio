@@ -10,10 +10,6 @@ import {
   IHydratedHolding, IHydratedPortfolio, IProduct, 
   ITransaction, ProductLanguage, ProductSubtype, ProductType, TCG, 
   TransactionType,
-
-  isIHydratedHolding,
-
-  assert, GET_PRODUCTS_URL, isASCII
 } from 'common'
 import { PortfolioCard } from './PortfolioCard'
 import { InputErrorWrapper } from './InputField'
@@ -22,12 +18,11 @@ import { UserContext } from '../state/UserContext'
 import { 
   IUserContext,
 
-  filterFnHoldingCard, filterFnProductSearchResult, sortFnHydratedHoldingAsc, 
-  sortFnProductSearchResults
+  sortFnHydratedHoldingAsc, 
 } from '../utils' 
 
 
-export const PortfolioOverview = () => {
+export const AllPortfolios = () => {
 
   // =====
   // state
