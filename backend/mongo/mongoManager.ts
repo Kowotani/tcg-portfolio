@@ -295,6 +295,33 @@ export async function getPortfolio(
 
 /*
 DESC
+  Retrieves all Portfolio documents for the input userId
+INPUT
+  userId: The associated userId
+RETURN
+  An array of Portfolio documents
+*/
+export async function getPortfolios(
+  userId: number
+): Promise<HydratedDocument<IMPortfolio, IPortfolioMethods>[]> {
+
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    const docs = await Portfolio.find({'userId': userId})
+    return docs
+
+  } catch(err) {
+
+    console.log(`An error occurred in getPortfolios(): ${err}`)
+    return []
+  } 
+}
+
+/*
+DESC
   Sets a Portfolio's holdings to the provided input
 INPUT 
   portfolio: The Portfolio to update
@@ -611,8 +638,8 @@ async function main(): Promise<number> {
   // const p233232 = await getProduct({'tcgplayerId': 233232})
   // const p449558 = await getProduct({'tcgplayerId': 449558})
 
-  // const userId = 456
-  // const portfolioName = 'Beta Investments'
+  // const userId = 1234
+  // const portfolioName = 'Gamma Investments'
   // let holdings = [
   //   {
   //     tcgplayerId: 233232,
@@ -658,7 +685,16 @@ async function main(): Promise<number> {
   //   console.log('Portfolio holdings not added')
   // }
 
-  // // -- Add portfolio
+  // -- Get portfolios
+  
+  // res = await getPortfolios(userId)
+  // if (res) {
+  //   console.log(res)
+  // } else {
+  //   console.log('Portfolios not retrieved')
+  // }
+
+  // -- Add portfolio
 
   // res = await addPortfolio(portfolio)
   // if (res) {

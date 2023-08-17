@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -35,7 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertPrices = exports.setProductProperty = exports.insertProducts = exports.getProducts = exports.getProduct = exports.setPortfolioProperty = exports.setPortfolioHoldings = exports.getPortfolio = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHoldings = void 0;
+exports.insertPrices = exports.setProductProperty = exports.insertProducts = exports.getProducts = exports.getProduct = exports.setPortfolioProperty = exports.setPortfolioHoldings = exports.getPortfolios = exports.getPortfolio = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHoldings = void 0;
 // imports
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
@@ -43,6 +39,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
+// import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
@@ -279,6 +276,29 @@ function getPortfolio(portfolio) {
     });
 }
 exports.getPortfolio = getPortfolio;
+/*
+DESC
+  Retrieves all Portfolio documents for the input userId
+INPUT
+  userId: The associated userId
+RETURN
+  An array of Portfolio documents
+*/
+function getPortfolios(userId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            const docs = yield Portfolio.find({ 'userId': userId });
+            return docs;
+        }
+        catch (err) {
+            console.log(`An error occurred in getPortfolios(): ${err}`);
+            return [];
+        }
+    });
+}
+exports.getPortfolios = getPortfolios;
 /*
 DESC
   Sets a Portfolio's holdings to the provided input
@@ -527,8 +547,8 @@ function main() {
         // }
         // const p233232 = await getProduct({'tcgplayerId': 233232})
         // const p449558 = await getProduct({'tcgplayerId': 449558})
-        const userId = 456;
-        const portfolioName = 'Beta Investments';
+        // const userId = 1234
+        // const portfolioName = 'Gamma Investments'
         // let holdings = [
         //   {
         //     tcgplayerId: 233232,
@@ -555,12 +575,12 @@ function main() {
         //     ]
         //     }
         //   ]
-        const portfolio = {
-            userId: userId,
-            portfolioName: portfolioName,
-            holdings: [],
-            description: 'Foobar'
-        };
+        // const portfolio: IPortfolio = {
+        //   userId: userId, 
+        //   portfolioName: portfolioName,
+        //   holdings: [],
+        //   description: 'Foobar'
+        // }
         // let tcgplayerId = 233232
         // // // -- Set portfolio holdings
         // res = await addPortfolioHoldings(portfolio, holdings)
@@ -569,14 +589,20 @@ function main() {
         // } else {
         //   console.log('Portfolio holdings not added')
         // }
-        // // -- Add portfolio
-        res = yield addPortfolio(portfolio);
-        if (res) {
-            console.log('Portfolio successfully created');
-        }
-        else {
-            console.log('Portfolio not created');
-        }
+        // -- Get portfolios
+        // res = await getPortfolios(userId)
+        // if (res) {
+        //   console.log(res)
+        // } else {
+        //   console.log('Portfolios not retrieved')
+        // }
+        // -- Add portfolio
+        // res = await addPortfolio(portfolio)
+        // if (res) {
+        //   console.log('Portfolio successfully created')
+        // } else {
+        //   console.log('Portfolio not created')
+        // }
         // // -- Delete portfolio
         // res = await deletePortfolio(userId, portfolioName)
         // if (res) {
