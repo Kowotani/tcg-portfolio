@@ -29,6 +29,7 @@ const MetricSummaryItem = (
     value,
     formattedPrefix = '',
     formattedPrecision = 0,
+    formattedSuffix = '',
     placeholder,
     titleStyle,
     variant,
@@ -44,7 +45,8 @@ const MetricSummaryItem = (
     ? Math.abs(value) 
     : undefined
   const formattedPrice = absValue 
-    ? getFormattedPrice(absValue, locale, formattedPrefix, formattedPrecision)
+    ? getFormattedPrice(absValue, locale, formattedPrefix, formattedPrecision, 
+        formattedSuffix)
     : undefined
 
   return (
@@ -99,6 +101,7 @@ export type TMetricSummaryItem = {
   value?: number,
   formattedPrefix?: string,
   formattedPrecision?: number,
+  formattedSuffix?: string,
   placeholder?: string,
   titleStyle?: {[key: string]: string},
 }
