@@ -31,8 +31,6 @@ import {
   getAverageCost, getAverageRevenue, getPurchaseQuantity, getSaleQuantity, 
   getTotalCost, getTotalRevenue,
 } from 'common'
-import { 
-   } from 'common'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
 import { ProductDescription } from './ProductDescription'
