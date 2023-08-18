@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { ADD_PRODUCT_URL, getProductSubtypes, IProduct, isASCII, ProductLanguage, 
   ProductPostStatus, ProductType, ProductSubtype, TCG, TCGToProductType, 
-  TProductPostBody } from 'common';
+  TProductPostReqBody } from 'common';
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField';
 import { SideBarNavContext } from '../state/SideBarNavContext';
@@ -450,7 +450,7 @@ export const AddProductForm = () => {
       onSubmit={() => {
 
         // create POST body         
-        let body: TProductPostBody = {
+        let body: TProductPostReqBody = {
           formData: getPostFormData(),
         }
 
