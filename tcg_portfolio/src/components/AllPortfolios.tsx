@@ -7,9 +7,13 @@ import {
   Text
 } from '@chakra-ui/react'
 import { 
-  IHydratedHolding, IHydratedPortfolio, IProduct, 
+  IPopulatedHolding, IPopulatedPortfolio, IProduct, 
   ITransaction, ProductLanguage, ProductSubtype, ProductType, TCG, 
   TransactionType,
+
+  GET_PORTFOLIOS_URL,
+
+  TDataResBody
 } from 'common'
 import { PortfolioCard } from './PortfolioCard'
 import { InputErrorWrapper } from './InputField'
@@ -18,7 +22,7 @@ import { UserContext } from '../state/UserContext'
 import { 
   IUserContext,
 
-  sortFnHydratedHoldingAsc, 
+  sortFnPopulatedHoldingAsc, 
 } from '../utils' 
 
 
@@ -32,8 +36,38 @@ export const AllPortfolios = () => {
   const { user } = useContext(UserContext) as IUserContext
 
 
+  // =====
+  // hooks
+  // =====
+
+  // // initial load of user Portfolios
+  // useEffect(() => {
+  //   axios({
+  //     method: 'get',
+  //     url: GET_PORTFOLIOS_URL,
+  //     params: {
+  //       userId: user.userId
+  //     }
+  //   })
+  //   .then(res => {
+  //     const resData = res.data
+  //     assert(resData )
+  //     const portfolios: IPortfolio[] = res.data.data
+  //     const existingTCGPlayerIds = portfolio.hydratedHoldings.map(
+  //       (holding: IPopulatedHolding) => holding.product.tcgplayerId
+  //     )
+  //     const searchableProducts = products.filter((product: IProduct) => {
+  //       return !existingTCGPlayerIds.includes(product.tcgplayerId)
+  //     })
+      
+  //   })
+  //   .catch(err => {
+  //     console.log('Error fetching Portfolios: ' + err)
+  //   })
+  // }, [])
+
   // ==============
-  // Main Component
+  // main component
   // ==============
 
   // ====================================
@@ -59,14 +93,14 @@ export const AllPortfolios = () => {
     setCode: 'KLD',
   }
 
-  const fooHolding: IHydratedHolding = {
+  const fooHolding: IPopulatedHolding = {
     product: fooProduct,
     transactions: fooTransactions
   }
-  const fooPortfolio: IHydratedPortfolio = {
+  const fooPortfolio: IPopulatedPortfolio = {
     userId: 1234,
     portfolioName: 'Alpha Investments',
-    hydratedHoldings: [fooHolding].sort(sortFnHydratedHoldingAsc),
+    populatedHoldings: [fooHolding].sort(sortFnPopulatedHoldingAsc),
     description: 'The floppiest tacos this side of Florida'
   }
 
@@ -83,7 +117,7 @@ export const AllPortfolios = () => {
 
       {/* Portfolios */}
       <PortfolioCard 
-        hydratedPortfolio={fooPortfolio}
+        populatedPortfolio={fooPortfolio}
         onPortfolioDelete={(fooPortfolio) => console.log('deleted portfolio')}
         onPortfolioUpdate={(fooPortfolio) => console.log('updated portfolio')}
       />

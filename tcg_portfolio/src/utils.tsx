@@ -1,7 +1,7 @@
 import { 
-  IHydratedHolding, IProduct, ProductLanguage, ProductSubtype, 
+  IPopulatedHolding, IProduct, ProductLanguage, ProductSubtype, 
   
-  assert, isIHydratedHolding, isIProduct
+  assert, isIPopulatedHolding, isIProduct
 } from 'common'
 import * as _ from 'lodash'
 
@@ -136,8 +136,8 @@ REF
 */
 export function filterFnHoldingCard(
   searchinput: string
-): (element: IHydratedHolding) => boolean {
-  return function(holding: IHydratedHolding) {
+): (element: IPopulatedHolding) => boolean {
+  return function(holding: IPopulatedHolding) {
     return isMatchingProduct(holding.product, searchinput)
   }
 }
@@ -265,14 +265,14 @@ export function getProductNameWithLanguage(product: IProduct): string {
 
 /*
 DESC
-  Helper function used for generating sorting keys for IHydratedHolding
+  Helper function used for generating sorting keys for IPopulatedHolding
   sorting functions
 INPUT
-  holding: The IHydratedHolding
+  holding: The IPopulatedHolding
 RETURN
   The generated sorting key
 */
-function genHydratedHoldingKey(holding: IHydratedHolding): string {
+function genPopulatedHoldingKey(holding: IPopulatedHolding): string {
   return holding.product.name
     + holding.product.tcg
     + holding.product.type
@@ -297,35 +297,35 @@ function genProductSearchResultKey(product: IProduct): string {
 
 /*
 DESC
-  Function used for sorting IHydratedHolding in ascending order
+  Function used for sorting IPopulatedHolding in ascending order
 INPUT
-  a: The first IHydratedHolding
-  b: The second IHydratedHolding
+  a: The first IPopulatedHolding
+  b: The second IPopulatedHolding
 RETURN
   A negative number if a < b, otherwise a positive number if a > b
 */
-export function sortFnHydratedHoldingAsc(a: any, b: any): number {
-  assert(isIHydratedHolding(a))
-  assert(isIHydratedHolding(b))
-  const keyA = genHydratedHoldingKey(a)
-  const keyB = genHydratedHoldingKey(b)
+export function sortFnPopulatedHoldingAsc(a: any, b: any): number {
+  assert(isIPopulatedHolding(a))
+  assert(isIPopulatedHolding(b))
+  const keyA = genPopulatedHoldingKey(a)
+  const keyB = genPopulatedHoldingKey(b)
   return keyA < keyB ? -1 : keyB > keyA ? 1 : 0
 }
 
 /*
 DESC
-  Function used for sorting IHydratedHolding in descending order
+  Function used for sorting IPopulatedHolding in descending order
 INPUT
-  a: The first IHydratedHolding
-  b: The second IHydratedHolding
+  a: The first IPopulatedHolding
+  b: The second IPopulatedHolding
 RETURN
   A negative number if a > b, otherwise a positive number if a < b
 */
-export function sortFnHydratedHoldingDesc(a: any, b: any): number {
-  assert(isIHydratedHolding(a))
-  assert(isIHydratedHolding(b))
-  const keyA = genHydratedHoldingKey(a)
-  const keyB = genHydratedHoldingKey(b)
+export function sortFnPopulatedHoldingDesc(a: any, b: any): number {
+  assert(isIPopulatedHolding(a))
+  assert(isIPopulatedHolding(b))
+  const keyA = genPopulatedHoldingKey(a)
+  const keyB = genPopulatedHoldingKey(b)
   return keyA < keyB ? 1 : keyB > keyA ? -1 : 0
 }
 

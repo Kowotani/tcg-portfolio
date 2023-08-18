@@ -1,6 +1,6 @@
 // imports
 import { 
-  IHydratedPortfolio, IProduct,
+  IProduct,
 
   PortfolioGetStatus, ProductPostStatus, ProductsGetStatus, 
   

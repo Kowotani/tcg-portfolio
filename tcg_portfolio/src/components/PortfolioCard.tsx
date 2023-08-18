@@ -11,15 +11,15 @@ import {
   VStack
 } from '@chakra-ui/react'
 import { 
-  IHydratedPortfolio, 
+  IPopulatedPortfolio, 
 } from 'common'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 
 
 type TPortfolioCardProps = {
-  hydratedPortfolio: IHydratedPortfolio,
-  onPortfolioDelete: (portfolio: IHydratedPortfolio) => void,
-  onPortfolioUpdate: (portfolio: IHydratedPortfolio) => void,
+  populatedPortfolio: IPopulatedPortfolio,
+  onPortfolioDelete: (portfolio: IPopulatedPortfolio) => void,
+  onPortfolioUpdate: (portfolio: IPopulatedPortfolio) => void,
 }
 export const PortfolioCard = (
   props: PropsWithChildren<TPortfolioCardProps>
@@ -29,7 +29,7 @@ export const PortfolioCard = (
   // state
   // =====
 
-  const [ portfolio, setPortfolio ] = useState(props.hydratedPortfolio)
+  const [ portfolio, setPortfolio ] = useState(props.populatedPortfolio)
 
 
   // =========
@@ -112,11 +112,11 @@ export const PortfolioCard = (
             <VStack spacing={0} width='100%'>
               <Box display='flex' justifyContent='space-between' width='100%'>
                 <Text align='left' fontWeight='bold'>
-                  {props.hydratedPortfolio.portfolioName}
+                  {props.populatedPortfolio.portfolioName}
                 </Text>
                 <CloseButton 
                   onClick={
-                    () => props.onPortfolioDelete(props.hydratedPortfolio)
+                    () => props.onPortfolioDelete(props.populatedPortfolio)
                   }
                 />
               </Box>
@@ -129,7 +129,7 @@ export const PortfolioCard = (
                 {/* Description */}
                 <Box fontSize='large' maxW='20%'>
                   <Text as='em' align='left' noOfLines={2}>
-                    {props.hydratedPortfolio.description}
+                    {props.populatedPortfolio.description}
                   </Text>
                 </Box>
 

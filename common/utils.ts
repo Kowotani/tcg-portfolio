@@ -2,8 +2,8 @@ import {
   TDataResBody, TProductPostReqBody, TProductPostResBody, TResBody,
 } from './api'
 import {
-  IHolding, IHydratedHolding, IHydratedPortfolio, IPrice, IPriceData, 
-  IPortfolio, IProduct, ITransaction, ProductLanguage, ProductSubtype, 
+  IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, IPrice, 
+  IPriceData, IProduct, ITransaction, ProductLanguage, ProductSubtype, 
   ProductType, TCG, TCGPriceType, TransactionType,
 
   ProductTypeToProductSubtype, TCGToProductSubtype, 
@@ -173,13 +173,13 @@ export function isIHolding(arg: any): arg is IHolding {
 
 /*
 DESC
-  Returns whether or not the input is an IHydratedHolding
+  Returns whether or not the input is an IPopulatedHolding
 INPUT
-  arg: An object that might be an IHydratedHolding 
+  arg: An object that might be an IPopulatedHolding 
 RETURN
-  TRUE if the input is an IHydratedHolding, FALSE otherwise
+  TRUE if the input is an IPopulatedHolding, FALSE otherwise
 */
-export function isIHydratedHolding(arg: any): arg is IHydratedHolding {
+export function isIPopulatedHolding(arg: any): arg is IPopulatedHolding {
   return arg
     && arg.product && isIProduct(arg.product)
     && arg.transactions && Array.isArray(arg.transactions)
@@ -190,19 +190,19 @@ export function isIHydratedHolding(arg: any): arg is IHydratedHolding {
 
 /*
 DESC
-  Returns whether or not the input is an IHydratedPortfolio
+  Returns whether or not the input is an IPopulatedPortfolio
 INPUT
-  arg: An object that might be an IHydratedPortfolio 
+  arg: An object that might be an IPopulatedPortfolio 
 RETURN
-  TRUE if the input is an IHydratedPortfolio, FALSE otherwise
+  TRUE if the input is an IPopulatedPortfolio, FALSE otherwise
 */
-export function isIHydratedPortfolio(arg: any): arg is IHydratedPortfolio {
+export function isIPopulatedPortfolio(arg: any): arg is IPopulatedPortfolio {
   return arg
     && arg.userId && typeof(arg.userId) === 'number'
     && arg.portfolioName && typeof(arg.portfolioName) === 'string'
     && arg.holdings && Array.isArray(arg.holdings)
       && _.every(arg.holdings.forEach((el: any) => {
-        return isIHydratedHolding(el)
+        return isIPopulatedHolding(el)
       }))
 }
 

@@ -7,11 +7,11 @@ import {
   Text
 } from '@chakra-ui/react'
 import { 
-  IHydratedHolding, IHydratedPortfolio, IProduct, 
+  IPopulatedHolding, IPopulatedPortfolio, IProduct, 
   ITransaction, ProductLanguage, ProductSubtype, ProductType, TCG, 
   TransactionType,
 
-  isIHydratedHolding,
+  isIPopulatedHolding,
 
   assert, GET_PRODUCTS_URL, isASCII
 } from 'common'
@@ -24,7 +24,7 @@ import { SideBarNavContext } from '../state/SideBarNavContext'
 import { 
   ISideBarNavContext, SideBarNav, 
 
-  filterFnHoldingCard, filterFnProductSearchResult, sortFnHydratedHoldingAsc, 
+  filterFnHoldingCard, filterFnProductSearchResult, sortFnPopulatedHoldingAsc, 
   sortFnProductSearchResults
 } from '../utils' 
 
@@ -76,14 +76,14 @@ export const EditPortfolioForm = (
     setCode: 'KLD',
   }
 
-  const fooHolding: IHydratedHolding = {
+  const fooHolding: IPopulatedHolding = {
     product: fooProduct,
     transactions: fooTransactions
   }
-  const fooPortfolio: IHydratedPortfolio = {
+  const fooPortfolio: IPopulatedPortfolio = {
     userId: 1234,
     portfolioName: 'Alpha Investments',
-    hydratedHoldings: [fooHolding].sort(sortFnHydratedHoldingAsc)
+    populatedHoldings: [fooHolding].sort(sortFnPopulatedHoldingAsc)
   }
 
 
@@ -162,21 +162,21 @@ export const EditPortfolioForm = (
     but not deleted (see onHoldingDelete()), such as when the underlying 
     Transactions change
   INPUT
-    holding: The updated IHydratedHolding
+    holding: The updated IPopulatedHolding
   */
-  function onHoldingUpdate(holding: IHydratedHolding): void {
+  function onHoldingUpdate(holding: IPopulatedHolding): void {
     // create new holdings
-    const ix = portfolio.hydratedHoldings.findIndex((h: IHydratedHolding) => {
+    const ix = portfolio.populatedHoldings.findIndex((h: IPopulatedHolding) => {
       return h.product.tcgplayerId === holding.product.tcgplayerId
     })
-    assert(ix >= 0 && ix < portfolio.hydratedHoldings.length)
-    const newHoldings = portfolio.hydratedHoldings
+    assert(ix >= 0 && ix < portfolio.populatedHoldings.length)
+    const newHoldings = portfolio.populatedHoldings
     newHoldings.splice(ix, 1, holding)
 
     // set new holdings
     setPortfolio({
       ...portfolio,
-      hydratedHoldings: newHoldings
+      populatedHoldings: newHoldings
     })
   }
 
@@ -202,15 +202,15 @@ export const EditPortfolioForm = (
     setSearchableProducts(newSearchableProducts)
 
     // update portfolio
-    const newHoldings = portfolio.hydratedHoldings
+    const newHoldings = portfolio.populatedHoldings
       .concat([{
         product: product,
         transactions: []
       }])
-      .sort(sortFnHydratedHoldingAsc)
+      .sort(sortFnPopulatedHoldingAsc)
     setPortfolio({
       ...portfolio, 
-      hydratedHoldings: newHoldings
+      populatedHoldings: newHoldings
     })
   }
 
@@ -219,25 +219,25 @@ export const EditPortfolioForm = (
     Handler function to update various states after the user deletes a Holding
     from the Portfolio
   INPUT
-    holding: The IHydratedHolding to delete
+    holding: The IPopulatedHolding to delete
   */
-  function onHoldingDelete(holding: IHydratedHolding): void {
+  function onHoldingDelete(holding: IPopulatedHolding): void {
     // update searchable products
-    const matchingHolding = portfolio.hydratedHoldings.find(
-      (h: IHydratedHolding) => {
+    const matchingHolding = portfolio.populatedHoldings.find(
+      (h: IPopulatedHolding) => {
         return h.product.tcgplayerId === holding.product.tcgplayerId
     })
-    assert(isIHydratedHolding(matchingHolding))
+    assert(isIPopulatedHolding(matchingHolding))
     setSearchableProducts([...searchableProducts, matchingHolding.product])
 
     // update portfolio
-    const newHoldings = portfolio.hydratedHoldings.filter(
-      (h: IHydratedHolding) => {
+    const newHoldings = portfolio.populatedHoldings.filter(
+      (h: IPopulatedHolding) => {
         return h.product.tcgplayerId !== holding.product.tcgplayerId 
     })
     setPortfolio({
       ...portfolio,
-      hydratedHoldings: newHoldings
+      populatedHoldings: newHoldings
     })
 
     // clear search 
@@ -257,8 +257,8 @@ export const EditPortfolioForm = (
     })
     .then(res => {
       const products: IProduct[] = res.data.data
-      const existingTCGPlayerIds = portfolio.hydratedHoldings.map(
-        (holding: IHydratedHolding) => holding.product.tcgplayerId
+      const existingTCGPlayerIds = portfolio.populatedHoldings.map(
+        (holding: IPopulatedHolding) => holding.product.tcgplayerId
       )
       const searchableProducts = products.filter((product: IProduct) => {
         return !existingTCGPlayerIds.includes(product.tcgplayerId)
@@ -341,25 +341,25 @@ export const EditPortfolioForm = (
       {holdingFilter.length > 0 &&
         <Box width='100%'>
           <Text fontSize='lg' as='em'>
-          {portfolio.hydratedHoldings.filter(filterFnHoldingCard(holdingFilter)).length}
+          {portfolio.populatedHoldings.filter(filterFnHoldingCard(holdingFilter)).length}
           &nbsp;of&nbsp;
-          {portfolio.hydratedHoldings.length} 
+          {portfolio.populatedHoldings.length} 
           &nbsp;holding
-          {portfolio.hydratedHoldings.length > 1 ? 's': ''}
+          {portfolio.populatedHoldings.length > 1 ? 's': ''}
           &nbsp;displayed
           </Text>
         </Box>
       }
 
       {/* Holding Cards */}
-      {portfolio.hydratedHoldings
+      {portfolio.populatedHoldings
         .filter(filterFnHoldingCard(holdingFilter))
-        .map((holding: IHydratedHolding) => {
+        .map((holding: IPopulatedHolding) => {
           return (
             <Box key={holding.product.tcgplayerId}>
               <HoldingCard 
                 
-                hydratedHolding={holding}
+                populatedHolding={holding}
                 onHoldingDelete={onHoldingDelete}
                 onHoldingUpdate={onHoldingUpdate}
               />

@@ -12,7 +12,7 @@ import {
   VStack
 } from '@chakra-ui/react'
 import { 
-  IHydratedHolding, ITransaction,
+  IPopulatedHolding, ITransaction,
 
   getAverageCost, getAverageRevenue, getProfit, getPurchaseQuantity, 
   getQuantity, getSaleQuantity,
@@ -25,9 +25,9 @@ import { getProductNameWithLanguage } from '../utils'
 
 
 type THoldingCardProps = {
-  hydratedHolding: IHydratedHolding,
-  onHoldingDelete: (holding: IHydratedHolding) => void,
-  onHoldingUpdate: (holding: IHydratedHolding) => void,
+  populatedHolding: IPopulatedHolding,
+  onHoldingDelete: (holding: IPopulatedHolding) => void,
+  onHoldingUpdate: (holding: IPopulatedHolding) => void,
 }
 export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
 
@@ -39,7 +39,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
   // state
   // =====
 
-  const [ holding, setHolding ] = useState(props.hydratedHolding)
+  const [ holding, setHolding ] = useState(props.populatedHolding)
   const [ transactions, setTransactions ] = useState(holding.transactions)
 
 
@@ -126,17 +126,17 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
           >
             {/* Product Image */}
             <ProductImage 
-              product={props.hydratedHolding.product} 
+              product={props.populatedHolding.product} 
               boxSize='100px'
             />
             <VStack spacing={0} width='100%'>
               <Box display='flex' justifyContent='space-between' width='100%'>
                 <Text align='left' fontWeight='bold'>
-                  {getProductNameWithLanguage(props.hydratedHolding.product)}
+                  {getProductNameWithLanguage(props.populatedHolding.product)}
                 </Text>
                 <CloseButton 
                   onClick={
-                    () => props.onHoldingDelete(props.hydratedHolding)
+                    () => props.onHoldingDelete(props.populatedHolding)
                   }
                 />
               </Box>
@@ -148,7 +148,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
               >
                 {/* Product Desc */}
                 <ProductDescription 
-                  product={props.hydratedHolding.product} 
+                  product={props.populatedHolding.product} 
                   showHeader={false} 
                   fontSize='large'
                   textAlign='left'
@@ -186,7 +186,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
       <EditTransactionsModal 
         isOpen={isOpen} 
         onClose={onClose} 
-        product={props.hydratedHolding.product}
+        product={props.populatedHolding.product}
         setTransactions={handleSetTransactions}
         transactions={transactions}
       />

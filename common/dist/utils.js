@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransaction = exports.isIProduct = exports.isIPriceData = exports.isIPrice = exports.isIPortfolio = exports.isIHydratedPortfolio = exports.isIHydratedHolding = exports.isIHolding = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransaction = exports.isIProduct = exports.isIPriceData = exports.isIPrice = exports.isIPortfolio = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHolding = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 // =========
@@ -159,13 +159,13 @@ function isIHolding(arg) {
 exports.isIHolding = isIHolding;
 /*
 DESC
-  Returns whether or not the input is an IHydratedHolding
+  Returns whether or not the input is an IPopulatedHolding
 INPUT
-  arg: An object that might be an IHydratedHolding
+  arg: An object that might be an IPopulatedHolding
 RETURN
-  TRUE if the input is an IHydratedHolding, FALSE otherwise
+  TRUE if the input is an IPopulatedHolding, FALSE otherwise
 */
-function isIHydratedHolding(arg) {
+function isIPopulatedHolding(arg) {
     return arg
         && arg.product && isIProduct(arg.product)
         && arg.transactions && Array.isArray(arg.transactions)
@@ -173,25 +173,25 @@ function isIHydratedHolding(arg) {
             return isITransaction(el);
         }));
 }
-exports.isIHydratedHolding = isIHydratedHolding;
+exports.isIPopulatedHolding = isIPopulatedHolding;
 /*
 DESC
-  Returns whether or not the input is an IHydratedPortfolio
+  Returns whether or not the input is an IPopulatedPortfolio
 INPUT
-  arg: An object that might be an IHydratedPortfolio
+  arg: An object that might be an IPopulatedPortfolio
 RETURN
-  TRUE if the input is an IHydratedPortfolio, FALSE otherwise
+  TRUE if the input is an IPopulatedPortfolio, FALSE otherwise
 */
-function isIHydratedPortfolio(arg) {
+function isIPopulatedPortfolio(arg) {
     return arg
         && arg.userId && typeof (arg.userId) === 'number'
         && arg.portfolioName && typeof (arg.portfolioName) === 'string'
         && arg.holdings && Array.isArray(arg.holdings)
         && _.every(arg.holdings.forEach(function (el) {
-            return isIHydratedHolding(el);
+            return isIPopulatedHolding(el);
         }));
 }
-exports.isIHydratedPortfolio = isIHydratedPortfolio;
+exports.isIPopulatedPortfolio = isIPopulatedPortfolio;
 /*
 DESC
   Returns whether or not the input is an IPortfolio
@@ -310,6 +310,7 @@ RETURN
 */
 function isTDataResBody(arg) {
     return arg
+        // TODO: implement the type check
         && arg.data
         && isTResBody(arg);
 }

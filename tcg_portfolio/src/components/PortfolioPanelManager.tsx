@@ -7,27 +7,15 @@ import {
   Spacer,
   Text
 } from '@chakra-ui/react'
-import { 
-  IHydratedHolding, IHydratedPortfolio, IProduct, 
-  ITransaction, ProductLanguage, ProductSubtype, ProductType, TCG, 
-  TransactionType,
-
-  isIHydratedHolding,
-
-  assert, GET_PRODUCTS_URL, isASCII
-} from 'common'
 import { HoldingCard } from './HoldingCard'
 import { InputErrorWrapper } from './InputField'
 import { FilterInput } from './FilterInput'
-import { AllPortfolios } from './Allortfolios'
+import { AllPortfolios } from './AllPortfolios'
 import { ProductSearchResult } from './ProductSearchResult'
 import { SearchInput } from './SearchInput'
 import { UserContext } from '../state/UserContext'
 import { 
   IUserContext, PortfolioPanelNav,
-
-  filterFnHoldingCard, filterFnProductSearchResult, sortFnHydratedHoldingAsc, 
-  sortFnProductSearchResults
 } from '../utils' 
 import { EditPortfolioForm } from './EditPortfolioForm'
 

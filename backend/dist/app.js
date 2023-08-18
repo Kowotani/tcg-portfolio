@@ -46,6 +46,7 @@ app.get(common_1.GET_PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, voi
         const data = yield (0, mongoManager_1.getPortfolios)(userId);
         // return Portfolios
         res.status(200);
+        // TODO: Add a type inference for this
         const body = {
             data: data,
             message: common_1.PortfolioGetStatus.Success
@@ -108,7 +109,7 @@ INPUT
     subtype [OPTIONAL]: ProductSubType enum
     setCode [OPTIONAL]: Product set code
 RETURN
-  Response body with status codes and messages
+  TProductPostResBody response with status codes
 
   Status Code
     201: The Product was successfully added
@@ -127,7 +128,7 @@ app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0
         const body = {
             tcgplayerId: data.tcgplayerId,
             message: common_1.ProductPostStatus.AlreadyExists,
-            data: [],
+            data: undefined,
         };
         res.send(body);
     }
@@ -157,7 +158,7 @@ app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0
                 const body = {
                     tcgplayerId: data.tcgplayerId,
                     message: common_1.ProductPostStatus.Error,
-                    data: [],
+                    data: undefined,
                 };
                 res.send(body);
             }
@@ -168,7 +169,7 @@ app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0
             const body = {
                 tcgplayerId: data.tcgplayerId,
                 message: common_1.ProductPostStatus.Error + ': ' + err,
-                data: [],
+                data: undefined,
             };
             res.send(body);
         }
