@@ -310,7 +310,12 @@ export async function getPortfolios(
 
   try {
 
-    const docs = await Portfolio.find({'userId': userId})
+    const docs = await Portfolio
+      .find({'userId': userId})
+      .populate({
+        path: 'holdings',
+        populate: {path: 'product'}
+      })
     return docs
 
   } catch(err) {

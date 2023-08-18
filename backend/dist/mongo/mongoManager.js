@@ -293,7 +293,12 @@ function getPortfolios(userId) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const docs = yield Portfolio.find({ 'userId': userId });
+            const docs = yield Portfolio
+                .find({ 'userId': userId })
+                .populate({
+                path: 'holdings',
+                populate: { path: 'product' }
+            });
             return docs;
         }
         catch (err) {
