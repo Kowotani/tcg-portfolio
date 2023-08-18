@@ -16,7 +16,16 @@ export declare enum ProductsGetStatus {
 export declare const GET_PORTFOLIOS_URL = "/portfolios";
 export declare const ADD_PRODUCT_URL = "/product";
 export declare const GET_PRODUCTS_URL = "/products";
-export declare type TProductPostBody = {
+export declare type TResBody = {
+    message: string;
+};
+export declare type TDataResBody = TResBody & {
+    data: any;
+};
+export declare type TProductPostResBody = TDataResBody & {
+    tcgplayerId: number;
+};
+export declare type TProductPostReqBody = {
     formData: IProduct;
     imageUrl?: string;
 };

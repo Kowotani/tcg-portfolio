@@ -127,6 +127,7 @@ app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0
         const body = {
             tcgplayerId: data.tcgplayerId,
             message: common_1.ProductPostStatus.AlreadyExists,
+            data: [],
         };
         res.send(body);
     }
@@ -156,6 +157,7 @@ app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0
                 const body = {
                     tcgplayerId: data.tcgplayerId,
                     message: common_1.ProductPostStatus.Error,
+                    data: [],
                 };
                 res.send(body);
             }
@@ -166,6 +168,7 @@ app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0
             const body = {
                 tcgplayerId: data.tcgplayerId,
                 message: common_1.ProductPostStatus.Error + ': ' + err,
+                data: [],
             };
             res.send(body);
         }

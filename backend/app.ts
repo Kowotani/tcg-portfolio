@@ -1,11 +1,15 @@
 // imports
 import { 
-  PortfolioGetStatus, ProductPostStatus, ProductsGetStatus, TProductPostBody,
+  PortfolioGetStatus, ProductPostStatus, ProductsGetStatus, 
+  
+  TDataResBody, TProductPostReqBody, TProductPostResBody, TResBody, 
 
   ADD_PRODUCT_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL
 } from 'common';
 import express from 'express';
-import { getPortfolios, getProduct, getProducts, insertProducts } from './mongo/mongoManager';
+import { 
+  getPortfolios, getProduct, getProducts, insertProducts 
+} from './mongo/mongoManager';
 import multer from 'multer';
 import { loadImageToS3 } from './aws/s3Manager';
 
@@ -45,7 +49,7 @@ app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
 
     // return Portfolios
     res.status(200)
-    const body = {
+    const body: TDataResBody = {
       data: data,
       message: PortfolioGetStatus.Success
     }
@@ -54,7 +58,7 @@ app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
   // error
   } catch (err) {
     res.status(500)
-    const body = {
+    const body: TResBody = {
       message: PortfolioGetStatus.Error + ': ' + err
     }
     res.send(body)
@@ -85,7 +89,7 @@ app.get(GET_PRODUCTS_URL, async (req: any, res: any) => {
 
     // return Products
     res.status(200)
-    const body = {
+    const body: TDataResBody = {
       data: data,
       message: ProductsGetStatus.Success
     }
@@ -94,7 +98,7 @@ app.get(GET_PRODUCTS_URL, async (req: any, res: any) => {
   // error
   } catch (err) {
     res.status(500)
-    const body = {
+    const body: TResBody = {
       message: ProductPostStatus.Error + ': ' + err
     }
     res.send(body)
@@ -124,24 +128,25 @@ RETURN
 app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
 
   // variables
-  const body: TProductPostBody = req.body
+  const body: TProductPostReqBody = req.body
   const data = body.formData
-  const tcgPlayerId = data.tcgplayerId as number
+  const tcgPlayerId = data.tcgplayerId
 
   // check if product already exists (via tcgplayerId)
   const query = await getProduct({tcgplayerId: tcgPlayerId})
   if (query !== null) { 
     res.status(202)
-    const body = {
+    const body: TProductPostResBody = {
       tcgplayerId: data.tcgplayerId,
       message: ProductPostStatus.AlreadyExists,
+      data: [],
     }
     res.send(body)
 
   } else {
   
     try {
-
+      
       // add product
       const numInserted = await insertProducts([data])
 
@@ -153,7 +158,7 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
       // success
       if (numInserted > 0) {
         res.status(201)
-        const body = {
+        const body: TProductPostResBody = {
           tcgplayerId: data.tcgplayerId,
           message: isImageLoaded
             ? ProductPostStatus.Added
@@ -165,9 +170,10 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
       // error
       } else {
         res.status(500)
-        const body = {
+        const body: TProductPostResBody = {
           tcgplayerId: data.tcgplayerId,
           message: ProductPostStatus.Error,
+          data: [],
         }        
         res.send(body)
       }
@@ -175,9 +181,10 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
     // error
     } catch (err) {
       res.status(500)
-      const body = {
+      const body: TProductPostResBody = {
         tcgplayerId: data.tcgplayerId,
         message: ProductPostStatus.Error + ': ' + err,
+        data: [],
       }        
       res.send(body)
     }

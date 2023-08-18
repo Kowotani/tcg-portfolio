@@ -38,10 +38,27 @@ export const GET_PRODUCTS_URL = '/products'
 // types
 // =====
 
-// -- FE / BE endpoints
+// -- responses
+
+// base body response
+export type TResBody = {
+  message: string
+}
+
+// body for successful response with data
+export type TDataResBody = TResBody & {
+  data: any
+}
 
 // body for POST request to /product
-export type TProductPostBody = {
+export type TProductPostResBody = TDataResBody & {
+  tcgplayerId: number
+}
+
+// -- requests
+
+// body for POST request to /product
+export type TProductPostReqBody = {
   formData: IProduct,
   imageUrl?: string, 
 }
