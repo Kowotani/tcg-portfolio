@@ -21,5 +21,5 @@ export declare function isIPriceData(arg: any): arg is IPriceData;
 export declare function isIProduct(arg: any): arg is IProduct;
 export declare function isITransaction(arg: any): arg is ITransaction;
 export declare function isTResBody(arg: any): arg is TResBody;
-export declare function isTDataResBody(arg: any): arg is TDataResBody;
-export declare function isTProductPostResBody(arg: any): arg is TProductPostResBody;
+export declare function isTDataResBody<Type>(arg: any): arg is TDataResBody<Type>;
+export declare function isTProductPostResBody<Type>(arg: any): arg is TProductPostResBody<Type>;

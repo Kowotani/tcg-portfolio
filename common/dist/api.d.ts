@@ -19,10 +19,10 @@ export declare const GET_PRODUCTS_URL = "/products";
 export declare type TResBody = {
     message: string;
 };
-export declare type TDataResBody = TResBody & {
-    data: any;
+export declare type TDataResBody<Type> = TResBody & {
+    data: Type;
 };
-export declare type TProductPostResBody = TDataResBody & {
+export declare type TProductPostResBody<Type> = TDataResBody<Type> & {
     tcgplayerId: number;
 };
 export declare type TProductPostReqBody = {

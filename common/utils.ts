@@ -325,9 +325,10 @@ INPUT
 RETURN
   TRUE if the input is an TDataResBody, FALSE otherwise
 */
-export function isTDataResBody(arg: any): arg is TDataResBody {
+export function isTDataResBody<Type>(arg: any): arg is TDataResBody<Type> {
   return arg
-    && arg.data && typeof(arg.data) === 'object'
+    // TODO: implement the type check
+    && arg.data
     && isTResBody(arg)
 }
 
@@ -339,8 +340,10 @@ INPUT
 RETURN
   TRUE if the input is an TProductPostResBody, FALSE otherwise
 */
-export function isTProductPostResBody(arg: any): arg is TProductPostResBody {
+export function isTProductPostResBody<Type>(
+  arg: any
+): arg is TProductPostResBody<Type> {
   return arg
     && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
-    && isTDataResBody(arg)
+    && isTDataResBody<Type>(arg)
 }

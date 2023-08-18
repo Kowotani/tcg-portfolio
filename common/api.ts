@@ -46,12 +46,12 @@ export type TResBody = {
 }
 
 // body for successful response with data
-export type TDataResBody = TResBody & {
-  data: any
+export type TDataResBody<Type> = TResBody & {
+  data: Type
 }
 
 // body for POST request to /product
-export type TProductPostResBody = TDataResBody & {
+export type TProductPostResBody<Type> = TDataResBody<Type> & {
   tcgplayerId: number
 }
 

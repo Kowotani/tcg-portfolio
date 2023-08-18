@@ -1,5 +1,7 @@
 // imports
 import { 
+  IHydratedPortfolio, IProduct,
+
   PortfolioGetStatus, ProductPostStatus, ProductsGetStatus, 
   
   TDataResBody, TProductPostReqBody, TProductPostResBody, TResBody, 
@@ -49,7 +51,8 @@ app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
 
     // return Portfolios
     res.status(200)
-    const body: TDataResBody = {
+    // TODO: Add a type inference for this
+    const body = {
       data: data,
       message: PortfolioGetStatus.Success
     }
@@ -89,7 +92,7 @@ app.get(GET_PRODUCTS_URL, async (req: any, res: any) => {
 
     // return Products
     res.status(200)
-    const body: TDataResBody = {
+    const body: TDataResBody<IProduct[]> = {
       data: data,
       message: ProductsGetStatus.Success
     }
@@ -118,7 +121,7 @@ INPUT
     subtype [OPTIONAL]: ProductSubType enum
     setCode [OPTIONAL]: Product set code
 RETURN
-  Response body with status codes and messages
+  TProductPostResBody response with status codes
 
   Status Code
     201: The Product was successfully added
@@ -136,10 +139,10 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
   const query = await getProduct({tcgplayerId: tcgPlayerId})
   if (query !== null) { 
     res.status(202)
-    const body: TProductPostResBody = {
+    const body: TProductPostResBody<undefined> = {
       tcgplayerId: data.tcgplayerId,
       message: ProductPostStatus.AlreadyExists,
-      data: [],
+      data: undefined,
     }
     res.send(body)
 
@@ -158,7 +161,7 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
       // success
       if (numInserted > 0) {
         res.status(201)
-        const body: TProductPostResBody = {
+        const body: TProductPostResBody<IProduct> = {
           tcgplayerId: data.tcgplayerId,
           message: isImageLoaded
             ? ProductPostStatus.Added
@@ -170,10 +173,10 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
       // error
       } else {
         res.status(500)
-        const body: TProductPostResBody = {
+        const body: TProductPostResBody<undefined> = {
           tcgplayerId: data.tcgplayerId,
           message: ProductPostStatus.Error,
-          data: [],
+          data: undefined,
         }        
         res.send(body)
       }
@@ -181,10 +184,10 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
     // error
     } catch (err) {
       res.status(500)
-      const body: TProductPostResBody = {
+      const body: TProductPostResBody<undefined> = {
         tcgplayerId: data.tcgplayerId,
         message: ProductPostStatus.Error + ': ' + err,
-        data: [],
+        data: undefined,
       }        
       res.send(body)
     }

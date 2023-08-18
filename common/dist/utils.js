@@ -310,7 +310,7 @@ RETURN
 */
 function isTDataResBody(arg) {
     return arg
-        && arg.data && typeof (arg.data) === 'object'
+        && arg.data
         && isTResBody(arg);
 }
 exports.isTDataResBody = isTDataResBody;
