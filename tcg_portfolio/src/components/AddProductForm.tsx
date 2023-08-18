@@ -10,9 +10,15 @@ import {
   useToast,
   VStack, 
 } from '@chakra-ui/react';
-import { ADD_PRODUCT_URL, getProductSubtypes, IProduct, isASCII, ProductLanguage, 
-  ProductPostStatus, ProductType, ProductSubtype, TCG, TCGToProductType, 
-  TProductPostReqBody } from 'common';
+import { 
+  IProduct, ProductLanguage, 
+  ProductType, ProductSubtype, TCG, TCGToProductType, 
+  
+  getProductSubtypes, isASCII,
+
+  assert, ADD_PRODUCT_URL, isTProductPostResBody, ProductPostStatus, 
+  TProductPostReqBody
+} from 'common';
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField';
 import { SideBarNavContext } from '../state/SideBarNavContext';
@@ -471,23 +477,30 @@ export const AddProductForm = () => {
         // success
         .then(res => {
 
+          // type check
+          const resData = res.data
+          assert(
+            isTProductPostResBody(resData), 
+            'Unrecognized response type from POST to /product'
+          )
+
           // product was added
           if (res.status === 201) {
 
             // added with image
-            if (res.data.message === ProductPostStatus.Added) {
+            if (resData.message === ProductPostStatus.Added) {
               toast({
                 title: 'Success!',
-                description: `${ProductPostStatus.Added}: ${res.data.tcgplayerId}`,
+                description: `${ProductPostStatus.Added}: ${resData.tcgplayerId}`,
                 status: 'success',
                 isClosable: true,
               })        
 
             // added without image
-            } else if (res.data.message === ProductPostStatus.AddedWithoutImage) {
+            } else if (resData.message === ProductPostStatus.AddedWithoutImage) {
               toast({
                 title: 'Partial Success',
-                description: `${ProductPostStatus.AddedWithoutImage}: ${res.data.tcgplayerId}`,
+                description: `${ProductPostStatus.AddedWithoutImage}: ${resData.tcgplayerId}`,
                 status: 'info',
                 isClosable: true,
               })        
@@ -497,7 +510,7 @@ export const AddProductForm = () => {
           } else if (res.status === 202) {
             toast({
               title: 'Notice',
-              description: `${ProductPostStatus.AlreadyExists}: ${res.data.tcgplayerId}`,
+              description: `${ProductPostStatus.AlreadyExists}: ${resData.tcgplayerId}`,
               status: 'warning',
               isClosable: true,
             })  
@@ -506,9 +519,17 @@ export const AddProductForm = () => {
         })
         // error
         .catch(res => {
+
+          // type check
+          const resData = res.data
+          assert(
+            isTProductPostResBody(resData), 
+            'Unrecognized response type from POST to /product'
+          )
+                    
           toast({
             title: 'Error!',
-            description: `${res.statusText}: ${res.data}`,
+            description: `${res.statusText}: ${resData}`,
             status: 'error',
             isClosable: true,
           })          
