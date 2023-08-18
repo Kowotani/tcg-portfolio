@@ -24,12 +24,49 @@ const port = 3030;
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
+// =========
+// portfolio
+// =========
+/*
+DESC
+  Handle GET request for all Portfolio documents for the input userId
+INPUT
+  userId: The userId who owns the Portfolios
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The Portfolio documents were returned successfully
+    500: An error occurred
+*/
+app.get(common_1.GET_PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // query Portfolios
+        const userId = req.query.userId;
+        const data = yield (0, mongoManager_1.getPortfolios)(userId);
+        // return Portfolios
+        res.status(200);
+        const body = {
+            data: data,
+            message: common_1.PortfolioGetStatus.Success
+        };
+        res.send(body);
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: common_1.PortfolioGetStatus.Error + ': ' + err
+        };
+        res.send(body);
+    }
+}));
 // =======
 // product
 // =======
 /*
 DESC
-  Handle request for documents of all Products
+  Handle GET request for all Product documents
 RETURN
   Response body with status codes and messages
 
@@ -60,7 +97,7 @@ app.get(common_1.GET_PRODUCTS_URL, (req, res) => __awaiter(void 0, void 0, void 
 }));
 /*
 DESC
-  Handle request to add a Product
+  Handle POST request to add a Product
 INPUT
   Request body in multipart/form-data containing
     tcgplayerId: The TCGplayer product id

@@ -1,8 +1,11 @@
 // imports
-import { ADD_PRODUCT_URL, GET_PRODUCTS_URL, ProductPostStatus, 
-  ProductsGetStatus, TProductPostBody } from 'common';
+import { 
+  PortfolioGetStatus, ProductPostStatus, ProductsGetStatus, TProductPostBody,
+
+  ADD_PRODUCT_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL
+} from 'common';
 import express from 'express';
-import { getProduct, getProducts, insertProducts } from './mongo/mongoManager';
+import { getPortfolios, getProduct, getProducts, insertProducts } from './mongo/mongoManager';
 import multer from 'multer';
 import { loadImageToS3 } from './aws/s3Manager';
 
@@ -16,13 +19,56 @@ app.get('/', (req: any, res: any) => {
 });
 
 
+// =========
+// portfolio
+// =========
+
+/*
+DESC
+  Handle GET request for all Portfolio documents for the input userId
+INPUT
+  userId: The userId who owns the Portfolios
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The Portfolio documents were returned successfully
+    500: An error occurred
+*/
+app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
+
+  try {
+
+    // query Portfolios
+    const userId = req.query.userId
+    const data = await getPortfolios(userId)
+
+    // return Portfolios
+    res.status(200)
+    const body = {
+      data: data,
+      message: PortfolioGetStatus.Success
+    }
+    res.send(body)
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body = {
+      message: PortfolioGetStatus.Error + ': ' + err
+    }
+    res.send(body)
+  }
+})
+
+
 // =======
 // product
 // =======
 
 /*
 DESC
-  Handle request for documents of all Products
+  Handle GET request for all Product documents
 RETURN
   Response body with status codes and messages
 
@@ -57,7 +103,7 @@ app.get(GET_PRODUCTS_URL, async (req: any, res: any) => {
 
 /*
 DESC
-  Handle request to add a Product
+  Handle POST request to add a Product
 INPUT
   Request body in multipart/form-data containing
     tcgplayerId: The TCGplayer product id
