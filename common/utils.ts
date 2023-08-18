@@ -1,4 +1,7 @@
 import {
+  TDataResBody, TProductPostReqBody, TProductPostResBody, TResBody,
+} from './api'
+import {
   IHolding, IHydratedHolding, IHydratedPortfolio, IPrice, IPriceData, 
   IPortfolio, IProduct, ITransaction, ProductLanguage, ProductSubtype, 
   ProductType, TCG, TCGPriceType, TransactionType,
@@ -297,4 +300,47 @@ export function isITransaction(arg: any): arg is ITransaction {
     && arg.date && arg.date instanceof Date
     && arg.price && typeof(arg.price) === 'number'
     && arg.quantity && typeof(arg.quantity) === 'number'
+}
+
+// -- HTTP responses
+
+/*
+DESC
+  Returns whether or not the input is a TResBody
+INPUT
+  arg: An object that might be an TResBody 
+RETURN
+  TRUE if the input is an TResBody, FALSE otherwise
+*/
+export function isTResBody(arg: any): arg is TResBody {
+  return arg
+    && arg.message && typeof(arg.message) === 'string'
+}
+
+/*
+DESC
+  Returns whether or not the input is a TDataResBody
+INPUT
+  arg: An object that might be an TDataResBody 
+RETURN
+  TRUE if the input is an TDataResBody, FALSE otherwise
+*/
+export function isTDataResBody(arg: any): arg is TDataResBody {
+  return arg
+    && arg.data && typeof(arg.data) === 'object'
+    && isTResBody(arg)
+}
+
+/*
+DESC
+  Returns whether or not the input is a TProductPostResBody
+INPUT
+  arg: An object that might be an TProductPostResBody 
+RETURN
+  TRUE if the input is an TProductPostResBody, FALSE otherwise
+*/
+export function isTProductPostResBody(arg: any): arg is TProductPostResBody {
+  return arg
+    && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
+    && isTDataResBody(arg)
 }

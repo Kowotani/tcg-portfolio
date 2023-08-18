@@ -1,3 +1,4 @@
+import { TDataResBody, TProductPostResBody, TResBody } from './api';
 import { IHolding, IHydratedHolding, IHydratedPortfolio, IPrice, IPriceData, IPortfolio, IProduct, ITransaction, ProductSubtype, ProductType, TCG } from './dataModels';
 export declare const DAYS_PER_YEAR = 365;
 export declare const MILLISECONDS_PER_SECOND = 1000;
@@ -19,3 +20,6 @@ export declare function isIPrice(arg: any): arg is IPrice;
 export declare function isIPriceData(arg: any): arg is IPriceData;
 export declare function isIProduct(arg: any): arg is IProduct;
 export declare function isITransaction(arg: any): arg is ITransaction;
+export declare function isTResBody(arg: any): arg is TResBody;
+export declare function isTDataResBody(arg: any): arg is TDataResBody;
+export declare function isTProductPostResBody(arg: any): arg is TProductPostResBody;

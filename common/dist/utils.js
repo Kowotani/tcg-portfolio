@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isITransaction = exports.isIProduct = exports.isIPriceData = exports.isIPrice = exports.isIPortfolio = exports.isIHydratedPortfolio = exports.isIHydratedHolding = exports.isIHolding = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransaction = exports.isIProduct = exports.isIPriceData = exports.isIPrice = exports.isIPortfolio = exports.isIHydratedPortfolio = exports.isIHydratedHolding = exports.isIHolding = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 // =========
@@ -286,3 +286,45 @@ function isITransaction(arg) {
         && arg.quantity && typeof (arg.quantity) === 'number';
 }
 exports.isITransaction = isITransaction;
+// -- HTTP responses
+/*
+DESC
+  Returns whether or not the input is a TResBody
+INPUT
+  arg: An object that might be an TResBody
+RETURN
+  TRUE if the input is an TResBody, FALSE otherwise
+*/
+function isTResBody(arg) {
+    return arg
+        && arg.message && typeof (arg.message) === 'string';
+}
+exports.isTResBody = isTResBody;
+/*
+DESC
+  Returns whether or not the input is a TDataResBody
+INPUT
+  arg: An object that might be an TDataResBody
+RETURN
+  TRUE if the input is an TDataResBody, FALSE otherwise
+*/
+function isTDataResBody(arg) {
+    return arg
+        && arg.data && typeof (arg.data) === 'object'
+        && isTResBody(arg);
+}
+exports.isTDataResBody = isTDataResBody;
+/*
+DESC
+  Returns whether or not the input is a TProductPostResBody
+INPUT
+  arg: An object that might be an TProductPostResBody
+RETURN
+  TRUE if the input is an TProductPostResBody, FALSE otherwise
+*/
+function isTProductPostResBody(arg) {
+    return arg
+        && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
+        && isTDataResBody(arg);
+}
+exports.isTProductPostResBody = isTProductPostResBody;
