@@ -1,4 +1,4 @@
-import { IHolding, IHoldingMethods, IPortfolio, IPortfolioMethods, ITransaction } from './utils';
+import { IHolding, IHoldingMethods, IPortfolio, IPortfolioMethods, ITransaction } from './dataModels';
 export declare class Holding implements IHolding, IHoldingMethods {
     tcgplayerId: number;
     transactions: ITransaction[];

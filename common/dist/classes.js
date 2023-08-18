@@ -2,6 +2,7 @@
 exports.__esModule = true;
 exports.Portfolio = exports.Holding = void 0;
 var _ = require("lodash");
+var dataModels_1 = require("./dataModels");
 var utils_1 = require("./utils");
 // =======
 // Holding
@@ -108,7 +109,7 @@ var Holding = /** @class */ (function () {
     // get purchases
     Holding.prototype.getPurchases = function () {
         return this.transactions.filter(function (txn) {
-            return txn.type === utils_1.TransactionType.Purchase;
+            return txn.type === dataModels_1.TransactionType.Purchase;
         });
     };
     // get purchase quantity
@@ -128,7 +129,7 @@ var Holding = /** @class */ (function () {
     // get sales
     Holding.prototype.getSales = function () {
         return this.transactions.filter(function (txn) {
-            return txn.type === utils_1.TransactionType.Sale;
+            return txn.type === dataModels_1.TransactionType.Sale;
         });
     };
     // get sale quantity

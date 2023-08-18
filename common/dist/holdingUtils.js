@@ -2,6 +2,7 @@
 exports.__esModule = true;
 exports.getTotalRevenue = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getProfit = exports.getAverageRevenue = exports.getAverageCost = void 0;
 var _ = require("lodash");
+var dataModels_1 = require("./dataModels");
 var utils_1 = require("./utils");
 /*
 DESC
@@ -65,7 +66,7 @@ RETURN
 */
 function getPurchases(transactions) {
     return transactions.filter(function (txn) {
-        return txn.type === utils_1.TransactionType.Purchase;
+        return txn.type === dataModels_1.TransactionType.Purchase;
     });
 }
 exports.getPurchases = getPurchases;
@@ -110,7 +111,7 @@ RETURN
 */
 function getSales(transactions) {
     return transactions.filter(function (txn) {
-        return txn.type === utils_1.TransactionType.Sale;
+        return txn.type === dataModels_1.TransactionType.Sale;
     });
 }
 exports.getSales = getSales;

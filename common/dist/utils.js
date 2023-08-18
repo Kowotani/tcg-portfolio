@@ -1,7 +1,7 @@
 "use strict";
-var _a, _b, _c;
 exports.__esModule = true;
-exports.isITransaction = exports.isIProduct = exports.isIPriceData = exports.isIPrice = exports.isIPortfolio = exports.isIHydratedPortfolio = exports.isIHydratedHolding = exports.isIHolding = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = exports.ProductsGetStatus = exports.ProductPostStatus = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isITransaction = exports.isIProduct = exports.isIPriceData = exports.isIPrice = exports.isIPortfolio = exports.isIHydratedPortfolio = exports.isIHydratedHolding = exports.isIHolding = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 // =========
 // constants
@@ -9,187 +9,6 @@ var _ = require("lodash");
 exports.DAYS_PER_YEAR = 365;
 exports.MILLISECONDS_PER_SECOND = 1000;
 exports.SECONDS_PER_DAY = 86400;
-// =====
-// enums
-// =====
-// -- FE / BE api
-// POST to /product status
-var ProductPostStatus;
-(function (ProductPostStatus) {
-    ProductPostStatus["Added"] = "tcgplayerId added";
-    ProductPostStatus["AddedWithoutImage"] = "tcgplayerId added (without image)";
-    ProductPostStatus["AlreadyExists"] = "tcgplayerId already exists";
-    ProductPostStatus["Error"] = "Error creating the Product doc";
-})(ProductPostStatus = exports.ProductPostStatus || (exports.ProductPostStatus = {}));
-var ProductsGetStatus;
-(function (ProductsGetStatus) {
-    ProductsGetStatus["Success"] = "Successfully retried Product docs";
-    ProductsGetStatus["Error"] = "Error retreiving Product docs";
-})(ProductsGetStatus = exports.ProductsGetStatus || (exports.ProductsGetStatus = {}));
-// -- mongodb
-// timeseries granularity
-var TimeseriesGranularity;
-(function (TimeseriesGranularity) {
-    TimeseriesGranularity["Seconds"] = "seconds";
-    TimeseriesGranularity["Minutes"] = "minutes";
-    TimeseriesGranularity["Hours"] = "hours";
-})(TimeseriesGranularity = exports.TimeseriesGranularity || (exports.TimeseriesGranularity = {}));
-;
-// -- product features
-// product language
-var ProductLanguage;
-(function (ProductLanguage) {
-    ProductLanguage["English"] = "ENG";
-    ProductLanguage["Japanese"] = "JPN";
-})(ProductLanguage = exports.ProductLanguage || (exports.ProductLanguage = {}));
-;
-// product subtype
-var ProductSubtype;
-(function (ProductSubtype) {
-    ProductSubtype["Collector"] = "Collector";
-    ProductSubtype["CommanderDeck"] = "Commander Deck";
-    ProductSubtype["Draft"] = "Draft";
-    ProductSubtype["EliteTrainerBox"] = "Elite Trainer Box";
-    ProductSubtype["FABVersionTwo"] = "2.0";
-    ProductSubtype["FirstEdition"] = "1st Edition";
-    ProductSubtype["Foil"] = "Foil";
-    ProductSubtype["FoilEteched"] = "Foil Etched";
-    ProductSubtype["NonFoil"] = "Non-Foil";
-    ProductSubtype["SecondEdition"] = "2nd Edition";
-    ProductSubtype["Set"] = "Set";
-    ProductSubtype["TexturedFoil"] = "Textured Foil";
-    ProductSubtype["UltraPremiumCollection"] = "Ultra Premium Collection";
-    ProductSubtype["Unlimited"] = "Unlimited";
-})(ProductSubtype = exports.ProductSubtype || (exports.ProductSubtype = {}));
-;
-// product type
-var ProductType;
-(function (ProductType) {
-    ProductType["BoosterBox"] = "Booster Box";
-    ProductType["Bundle"] = "Bundle";
-    ProductType["CommanderDeck"] = "Commander Deck";
-    ProductType["CommanderDeckSet"] = "Commander Deck Set";
-    ProductType["SecretLair"] = "Secret Lair";
-})(ProductType = exports.ProductType || (exports.ProductType = {}));
-;
-// TCG
-var TCG;
-(function (TCG) {
-    TCG["FleshAndBlood"] = "Flesh and Blood";
-    TCG["MagicTheGathering"] = "Magic: The Gathering";
-    TCG["MetaZoo"] = "MetaZoo";
-    TCG["Pokemon"] = "Pokemon";
-    TCG["Sorcery"] = "Sorcery";
-})(TCG = exports.TCG || (exports.TCG = {}));
-;
-// -- scraper 
-// TCG price types
-var TCGPriceType;
-(function (TCGPriceType) {
-    TCGPriceType["MarketPrice"] = "Market Price";
-    TCGPriceType["BuylistMarketPrice"] = "Buylist Market Price";
-    TCGPriceType["ListedMedianPrice"] = "Listed Median Price";
-})(TCGPriceType = exports.TCGPriceType || (exports.TCGPriceType = {}));
-// -- portfolio
-// transaction type
-var TransactionType;
-(function (TransactionType) {
-    TransactionType["Purchase"] = "Purchase";
-    TransactionType["Sale"] = "Sale";
-})(TransactionType = exports.TransactionType || (exports.TransactionType = {}));
-// ====================
-// relationship objects
-// ====================
-// https://stackoverflow.com/questions/44243060/use-enum-as-restricted-key-type-in-typescript
-// TCG -> product type
-exports.TCGToProductType = (_a = {},
-    // FAB
-    _a[TCG.FleshAndBlood] = [
-        ProductType.BoosterBox,
-    ],
-    // MTG
-    _a[TCG.MagicTheGathering] = [
-        ProductType.BoosterBox,
-        ProductType.Bundle,
-        ProductType.CommanderDeck,
-        ProductType.CommanderDeckSet,
-        ProductType.SecretLair,
-    ],
-    // Metazoo
-    _a[TCG.MetaZoo] = [
-        ProductType.BoosterBox,
-    ],
-    // Pokemon
-    _a[TCG.Pokemon] = [
-        ProductType.BoosterBox,
-        ProductType.Bundle,
-    ],
-    // Sorcery
-    _a[TCG.Sorcery] = [
-        ProductType.BoosterBox
-    ],
-    _a);
-// product type -> product subtype
-exports.ProductTypeToProductSubtype = (_b = {},
-    // Booster box
-    _b[ProductType.BoosterBox] = [
-        ProductSubtype.Collector,
-        ProductSubtype.Draft,
-        ProductSubtype.FABVersionTwo,
-        ProductSubtype.FirstEdition,
-        ProductSubtype.SecondEdition,
-        ProductSubtype.Set,
-        ProductSubtype.Unlimited,
-    ],
-    // Bundle 
-    _b[ProductType.Bundle] = [
-        ProductSubtype.EliteTrainerBox,
-        ProductSubtype.UltraPremiumCollection
-    ],
-    // Secret Lair
-    _b[ProductType.SecretLair] = [
-        ProductSubtype.CommanderDeck,
-        ProductSubtype.Foil,
-        ProductSubtype.FoilEteched,
-        ProductSubtype.NonFoil,
-        ProductSubtype.TexturedFoil,
-    ],
-    _b);
-// TCG -> product subtype
-exports.TCGToProductSubtype = (_c = {},
-    // FAB
-    _c[TCG.FleshAndBlood] = [
-        ProductSubtype.FABVersionTwo,
-        ProductSubtype.FirstEdition,
-        ProductSubtype.Unlimited,
-    ],
-    // MTG
-    _c[TCG.MagicTheGathering] = [
-        ProductSubtype.Collector,
-        ProductSubtype.CommanderDeck,
-        ProductSubtype.Draft,
-        ProductSubtype.Foil,
-        ProductSubtype.FoilEteched,
-        ProductSubtype.NonFoil,
-        ProductSubtype.Set,
-        ProductSubtype.TexturedFoil,
-    ],
-    // Metazoo
-    _c[TCG.MetaZoo] = [
-        ProductSubtype.FirstEdition,
-        ProductSubtype.SecondEdition,
-    ],
-    // Pokemon
-    _c[TCG.Pokemon] = [
-        ProductSubtype.EliteTrainerBox,
-        ProductSubtype.UltraPremiumCollection,
-    ],
-    _c);
-// ======
-// routes
-// ======
-exports.ADD_PRODUCT_URL = '/product';
-exports.GET_PRODUCTS_URL = '/products';
 // =========
 // functions
 // =========
@@ -234,8 +53,8 @@ RETURN
   An array of ProductSubtypes for the given TCG and ProductType
 */
 function getProductSubtypes(tcg, productType) {
-    var tcgArray = exports.TCGToProductSubtype[tcg];
-    var productTypeArray = exports.ProductTypeToProductSubtype[productType];
+    var tcgArray = dataModels_1.TCGToProductSubtype[tcg];
+    var productTypeArray = dataModels_1.ProductTypeToProductSubtype[productType];
     return _.intersection(tcgArray, productTypeArray);
 }
 exports.getProductSubtypes = getProductSubtypes;
@@ -288,7 +107,7 @@ RETURN
   TRUE if the input matches a TCGPriceType value
 */
 function isTCGPriceTypeValue(value) {
-    var arr = Object.values(TCGPriceType).map(function (v) { return v.toString(); });
+    var arr = Object.values(dataModels_1.TCGPriceType).map(function (v) { return v.toString(); });
     return arr.includes(value);
 }
 exports.isTCGPriceTypeValue = isTCGPriceTypeValue;
@@ -440,14 +259,14 @@ function isIProduct(arg) {
     return arg
         // require
         && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
-        && arg.tcg && _.values(TCG).includes(arg.tcg)
+        && arg.tcg && _.values(dataModels_1.TCG).includes(arg.tcg)
         && arg.releaseDate && arg.releaseDate instanceof Date
         && arg.name && typeof (arg.name) === 'string'
-        && arg.type && _.values(ProductType).includes(arg.type)
-        && arg.language && _.values(ProductLanguage).includes(arg.language)
+        && arg.type && _.values(dataModels_1.ProductType).includes(arg.type)
+        && arg.language && _.values(dataModels_1.ProductLanguage).includes(arg.language)
         // optional
         && arg.msrp ? typeof (arg.msrp) === 'number' : true
-        && arg.subtype ? _.values(ProductSubtype).includes(arg.subtype) : true
+        && arg.subtype ? _.values(dataModels_1.ProductSubtype).includes(arg.subtype) : true
         && arg.setCode ? typeof (arg.setCode) === 'string' : true;
 }
 exports.isIProduct = isIProduct;
@@ -461,7 +280,7 @@ RETURN
 */
 function isITransaction(arg) {
     return arg
-        && arg.type && _.values(TransactionType).includes(arg.type)
+        && arg.type && _.values(dataModels_1.TransactionType).includes(arg.type)
         && arg.date && arg.date instanceof Date
         && arg.price && typeof (arg.price) === 'number'
         && arg.quantity && typeof (arg.quantity) === 'number';

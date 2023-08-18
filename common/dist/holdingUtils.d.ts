@@ -1,4 +1,4 @@
-import { ITransaction } from './utils';
+import { ITransaction } from './dataModels';
 export declare function getAverageCost(transactions: ITransaction[]): number | undefined;
 export declare function getAverageRevenue(transactions: ITransaction[]): number | undefined;
 export declare function getProfit(transactions: ITransaction[]): number | undefined;

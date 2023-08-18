@@ -1,7 +1,10 @@
 import * as _ from 'lodash'
-import { assert, DAYS_PER_YEAR, IHolding, IHoldingMethods, IPortfolio, 
-  IPortfolioMethods, ITransaction, MILLISECONDS_PER_SECOND, SECONDS_PER_DAY, 
+import { 
+  IHolding, IHoldingMethods, IPortfolio, IPortfolioMethods, ITransaction,  
   TransactionType 
+} from './dataModels'
+import {
+  assert, DAYS_PER_YEAR, MILLISECONDS_PER_SECOND, SECONDS_PER_DAY
 } from './utils'
 
 

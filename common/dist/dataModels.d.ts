@@ -1,0 +1,160 @@
+export declare enum TimeseriesGranularity {
+    Seconds = "seconds",
+    Minutes = "minutes",
+    Hours = "hours"
+}
+export declare enum ProductLanguage {
+    English = "ENG",
+    Japanese = "JPN"
+}
+export declare enum ProductSubtype {
+    Collector = "Collector",
+    CommanderDeck = "Commander Deck",
+    Draft = "Draft",
+    EliteTrainerBox = "Elite Trainer Box",
+    FABVersionTwo = "2.0",
+    FirstEdition = "1st Edition",
+    Foil = "Foil",
+    FoilEteched = "Foil Etched",
+    NonFoil = "Non-Foil",
+    SecondEdition = "2nd Edition",
+    Set = "Set",
+    TexturedFoil = "Textured Foil",
+    UltraPremiumCollection = "Ultra Premium Collection",
+    Unlimited = "Unlimited"
+}
+export declare enum ProductType {
+    BoosterBox = "Booster Box",
+    Bundle = "Bundle",
+    CommanderDeck = "Commander Deck",
+    CommanderDeckSet = "Commander Deck Set",
+    SecretLair = "Secret Lair"
+}
+export declare enum TCG {
+    FleshAndBlood = "Flesh and Blood",
+    MagicTheGathering = "Magic: The Gathering",
+    MetaZoo = "MetaZoo",
+    Pokemon = "Pokemon",
+    Sorcery = "Sorcery"
+}
+export declare enum TCGPriceType {
+    MarketPrice = "Market Price",
+    BuylistMarketPrice = "Buylist Market Price",
+    ListedMedianPrice = "Listed Median Price"
+}
+export declare enum TransactionType {
+    Purchase = "Purchase",
+    Sale = "Sale"
+}
+export declare const TCGToProductType: {
+    [key in TCG]: ProductType[];
+};
+export declare const ProductTypeToProductSubtype: {
+    [key in ProductType]?: ProductSubtype[];
+};
+export declare const TCGToProductSubtype: {
+    [key in TCG]?: ProductSubtype[];
+};
+export interface IUser {
+    userId: number;
+    userName: string;
+    passwordHash: string;
+    passwordSalt: string;
+    email: string;
+}
+export interface IPrice {
+    priceDate: Date;
+    tcgplayerId: number;
+    granularity: string;
+    prices: IPriceData;
+}
+export interface IPriceData {
+    marketPrice: number;
+    buylistMarketPrice?: number;
+    listedMedianPrice?: number;
+}
+export interface IProduct {
+    tcgplayerId: number;
+    tcg: TCG;
+    releaseDate: Date;
+    name: string;
+    type: ProductType;
+    language: ProductLanguage;
+    msrp?: number;
+    subtype?: ProductSubtype;
+    setCode?: string;
+}
+export interface ITransaction {
+    type: TransactionType;
+    date: Date;
+    price: number;
+    quantity: number;
+}
+export interface IReactTableTransaction extends ITransaction {
+    delete?: boolean;
+}
+interface IHoldingBase {
+    transactions: ITransaction[];
+}
+export interface IHolding extends IHoldingBase {
+    tcgplayerId: number;
+}
+export interface IHoldingMethods {
+    addTransactions(txnInput: ITransaction | ITransaction[]): void;
+    deleteTransaction(txn: ITransaction): void;
+    deleteTransactions(): void;
+    getTcgplayerId(): number;
+    getTransactions(): ITransaction[];
+    getPurchases(): ITransaction[];
+    getFirstPurchaseDate(): Date | undefined;
+    getLastPurchaseDate(): Date | undefined;
+    getSales(): ITransaction[];
+    getPurchaseQuantity(): number;
+    getSaleQuantity(): number;
+    getQuantity(): number;
+    hasPurchases(): boolean;
+    hasSales(): boolean;
+    getTotalCost(): number | undefined;
+    getTotalRevenue(): number | undefined;
+    getAverageCost(): number | undefined;
+    getAverageRevenue(): number | undefined;
+    getProfit(): number | undefined;
+    getMarketValue(price: number): number | undefined;
+    getDollarReturn(price: number): number | undefined;
+    getPercentageReturn(price: number): number | undefined;
+    getAnnualizedReturn(price: number): number | undefined;
+}
+export interface IHydratedHolding extends IHoldingBase {
+    product: IProduct;
+}
+interface IPortfolioBase {
+    userId: number;
+    portfolioName: string;
+    description?: string;
+}
+export interface IPortfolio extends IPortfolioBase {
+    holdings: IHolding[];
+}
+export interface IPortfolioMethods {
+    addHoldings(holdingInput: IHolding | IHolding[]): void;
+    deleteHolding(tcgplayerId: number): void;
+    deleteHoldings(): void;
+    getUserId(): number;
+    getPortfolioName(): string;
+    getDescription(): string | undefined;
+    getHoldings(): IHolding[];
+    getTotalCost(): number | undefined;
+    getTotalRevenue(): number | undefined;
+    getProfit(): number | undefined;
+    getMarketValue(prices: Map<number, number>): number | undefined;
+    hasHolding(tcgplayerId: number): boolean;
+    hasHoldings(): boolean;
+    hasPurchases(): boolean;
+    hasSales(): boolean;
+    getDollarReturn(prices: Map<number, number>): number | undefined;
+    getPercentageReturn(prices: Map<number, number>): number | undefined;
+}
+export interface IHydratedPortfolio extends IPortfolioBase {
+    hydratedHoldings: IHydratedHolding[];
+}
+export {};

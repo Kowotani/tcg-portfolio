@@ -1,5 +1,6 @@
 import * as _ from 'lodash'
-import { assert, ITransaction, TransactionType } from './utils'
+import { ITransaction, TransactionType } from './dataModels'
+import { assert } from './utils'
 
 /*
 DESC
