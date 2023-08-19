@@ -1,5 +1,5 @@
 // imports
-import { getProducts, insertPrices } from '../mongo/mongoManager';
+import { getProductDocs, insertPrices } from '../mongo/mongoManager';
 import { scrape } from './scraper';
 import { IPrice, IPriceData, TimeseriesGranularity } from 'common';
 
@@ -17,7 +17,7 @@ RETURN
 async function loadPrices(): Promise<number> {
 
   // get all Products
-  const productDocs = await getProducts();
+  const productDocs = await getProductDocs();
   console.log(`Retrieved prods: ${JSON.stringify(productDocs, null, 4)}`);
 
   // scrape price data

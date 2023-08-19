@@ -43,7 +43,7 @@ app.get(common_1.GET_PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, voi
     try {
         // query Portfolios
         const userId = req.query.userId;
-        const data = yield (0, mongoManager_1.getPortfolios)(userId);
+        const data = yield (0, mongoManager_1.getPortfolioDocs)(userId);
         // return Portfolios
         res.status(200);
         // TODO: Add a type inference for this
@@ -78,7 +78,7 @@ RETURN
 app.get(common_1.GET_PRODUCTS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // query Products
-        const data = yield (0, mongoManager_1.getProducts)();
+        const data = yield (0, mongoManager_1.getProductDocs)();
         // return Products
         res.status(200);
         const body = {
@@ -106,8 +106,8 @@ INPUT
     name: Product name
     type: ProductType enum
     language: ProductLanguage enum
-    subtype [OPTIONAL]: ProductSubType enum
-    setCode [OPTIONAL]: Product set code
+    subtype?: ProductSubType enum
+    setCode?: Product set code
 RETURN
   TProductPostResBody response with status codes
 
@@ -122,7 +122,7 @@ app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0
     const data = body.formData;
     const tcgPlayerId = data.tcgplayerId;
     // check if product already exists (via tcgplayerId)
-    const query = yield (0, mongoManager_1.getProduct)({ tcgplayerId: tcgPlayerId });
+    const query = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: tcgPlayerId });
     if (query !== null) {
         res.status(202);
         const body = {

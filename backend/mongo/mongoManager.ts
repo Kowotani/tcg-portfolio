@@ -8,7 +8,6 @@ import { IMHolding } from './models/holdingSchema';
 import { IMPortfolio, portfolioSchema } from './models/portfolioSchema';
 import { IMPrice, priceSchema } from './models/priceSchema';
 import { IMProduct, productSchema } from './models/productSchema';
-// import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common';
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
@@ -70,7 +69,7 @@ export async function addPortfolioHoldings(
     }
 
     // check if portfolio exists
-    const portfolioDoc = await getPortfolio(portfolio)
+    const portfolioDoc = await getPortfolioDoc(portfolio)
     if (portfolioDoc instanceof Portfolio === false) {
       console.log(`${portfolioName} does not exist for userId: ${userId}`)
       return false
@@ -78,7 +77,7 @@ export async function addPortfolioHoldings(
     assert(portfolioDoc instanceof Portfolio)
  
     // check if all products exist
-    const productDocs = await getProducts()
+    const productDocs = await getProductDocs()
     const productTcgplayerIds = productDocs.map((doc: IMProduct) => {
       return doc.tcgplayerId
     })
@@ -135,6 +134,7 @@ INPUT
   userId: The associated userId
   portfolioName: The portfolio's name
   holdings: An array of Holdings
+  description?: A description of the portfolio
 RETURN
   TRUE if the Portfolio was successfully created, FALSE otherwise
 */
@@ -151,7 +151,7 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
   try {
 
     // check if portfolioName exists for this userId
-    const doc = await getPortfolio(portfolio)
+    const doc = await getPortfolioDoc(portfolio)
     if (doc instanceof Portfolio) {
       console.log(`${portfolioName} already exists for userId: ${userId}`)
       return false
@@ -194,7 +194,7 @@ export async function deletePortfolio(portfolio: IPortfolio): Promise<boolean> {
   try {
 
     // check if portfolioName exists for this userId
-    const doc = await getPortfolio(portfolio)
+    const doc = await getPortfolioDoc(portfolio)
     if (doc instanceof Portfolio === false) {
       console.log(`${portfolioName} does not exist for userId: ${userId}`)
       return false
@@ -237,7 +237,7 @@ export async function deletePortfolioHolding(
   try {  
 
     // check if portfolio exists
-    const portfolioDoc = await getPortfolio(portfolio)
+    const portfolioDoc = await getPortfolioDoc(portfolio)
     if (portfolioDoc instanceof Portfolio === false) {
       console.log(`${portfolio.portfolioName} does not exist for userId: ${userId}`)
       return false
@@ -271,7 +271,7 @@ INPUT
 RETURN
   The document if found, else null
 */
-export async function getPortfolio(
+export async function getPortfolioDoc(
   portfolio: IPortfolio
 ): Promise<HydratedDocument<IMPortfolio, IPortfolioMethods> | null> {
 
@@ -288,7 +288,7 @@ export async function getPortfolio(
 
   } catch(err) {
 
-    console.log(`An error occurred in getPortfolio(): ${err}`)
+    console.log(`An error occurred in getPortfolioDoc(): ${err}`)
     return null
   } 
 }
@@ -301,7 +301,7 @@ INPUT
 RETURN
   An array of Portfolio documents
 */
-export async function getPortfolios(
+export async function getPortfolioDocs(
   userId: number
 ): Promise<HydratedDocument<IMPortfolio, IPortfolioMethods>[]> {
 
@@ -310,17 +310,12 @@ export async function getPortfolios(
 
   try {
 
-    const docs = await Portfolio
-      .find({'userId': userId})
-      .populate({
-        path: 'holdings',
-        populate: {path: 'product'}
-      })
+    const docs = await Portfolio.find({'userId': userId})
     return docs
 
   } catch(err) {
 
-    console.log(`An error occurred in getPortfolios(): ${err}`)
+    console.log(`An error occurred in getPortfolioDocs(): ${err}`)
     return []
   } 
 }
@@ -345,7 +340,7 @@ export async function setPortfolioHoldings(
   try {
 
     // check if Portfolio exists
-    const portfolioDoc = await getPortfolio(portfolio)
+    const portfolioDoc = await getPortfolioDoc(portfolio)
     if (portfolioDoc instanceof Portfolio === false) {
       console.log(`Portfolio not found (${portfolio.userId}, ${portfolio.portfolioName})`)
     }
@@ -413,7 +408,7 @@ export async function setPortfolioProperty(
   try {
 
     // check if Portfolio exists
-    const portfolioDoc = await getPortfolio(portfolio)
+    const portfolioDoc = await getPortfolioDoc(portfolio)
     if (portfolioDoc instanceof Portfolio === false) {
       console.log(`Portfolio not found (${portfolio.userId}, ${portfolio.portfolioName})`)
     }
@@ -446,17 +441,17 @@ INPUT
 RETURN
   The document if found, else null
 */
-interface IGetProductParameters {
+interface IgetProductDocParameters {
   tcgplayerId?: number;
   hexStringId?: string;  // 24 char hex string
 }
-export async function getProduct(
-  { tcgplayerId, hexStringId }: IGetProductParameters = {}
+export async function getProductDoc(
+  { tcgplayerId, hexStringId }: IgetProductDocParameters = {}
 ): Promise<HydratedDocument<IProduct> | null> {
 
   // check that tcgplayer_id or id is provided
   if (tcgplayerId === undefined && hexStringId === undefined) {
-    console.log('No tcgplayerId or hexStringId provided to getProduct()') 
+    console.log('No tcgplayerId or hexStringId provided to getProductDoc()') 
     return null
   }
 
@@ -472,7 +467,7 @@ export async function getProduct(
 
   } catch(err) {
 
-    console.log(`An error occurred in getProduct(): ${err}`)
+    console.log(`An error occurred in getProductDoc(): ${err}`)
     return null
   } 
 }
@@ -483,7 +478,7 @@ DESC
 RETURN
   Array of Product docs
 */
-export async function getProducts(): Promise<HydratedDocument<IMProduct>[]> {
+export async function getProductDocs(): Promise<HydratedDocument<IMProduct>[]> {
 
   // connect to db
   await mongoose.connect(url);
@@ -495,7 +490,7 @@ export async function getProducts(): Promise<HydratedDocument<IMProduct>[]> {
 
   } catch(err) {
 
-    console.log(`An error occurred in getProducts(): ${err}`)
+    console.log(`An error occurred in getProductDocs(): ${err}`)
     return []
   }
 }
@@ -549,7 +544,7 @@ export async function setProductProperty(
   try {
 
     // check if Product exists
-    const productDoc = await getProduct({tcgplayerId: tcgplayerId})
+    const productDoc = await getProductDoc({tcgplayerId: tcgplayerId})
     if (productDoc instanceof Product === false) {
       console.log(`Product not found for tcgplayerId: ${tcgplayerId}`)
     }
@@ -589,7 +584,7 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
   try {
 
     // create map of Product tcgplayerId -> ObjectId
-    const productDocs = await getProducts()
+    const productDocs = await getProductDocs()
     let idMap = new Map<number, mongoose.Types.ObjectId>()
     productDocs.forEach(doc => {
       idMap.set(doc.tcgplayerId, doc._id)
@@ -613,7 +608,8 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
   }
 }
 
-async function main(): Promise<number> {
+// import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
+async function main(): Promise<number> {  
 
   let res
 
@@ -640,8 +636,8 @@ async function main(): Promise<number> {
   //   console.log('Product not updated')
   // }
 
-  // const p233232 = await getProduct({'tcgplayerId': 233232})
-  // const p449558 = await getProduct({'tcgplayerId': 449558})
+  // const p233232 = await getProductDoc({'tcgplayerId': 233232})
+  // const p449558 = await getProductDoc({'tcgplayerId': 449558})
 
   // const userId = 1234
   // const portfolioName = 'Gamma Investments'
@@ -692,7 +688,7 @@ async function main(): Promise<number> {
 
   // -- Get portfolios
   
-  // res = await getPortfolios(userId)
+  // res = await getPortfolioDocs(userId)
   // if (res) {
   //   console.log(res)
   // } else {

@@ -25,7 +25,7 @@ RETURN
 function loadPrices() {
     return __awaiter(this, void 0, void 0, function* () {
         // get all Products
-        const productDocs = yield (0, mongoManager_1.getProducts)();
+        const productDocs = yield (0, mongoManager_1.getProductDocs)();
         console.log(`Retrieved prods: ${JSON.stringify(productDocs, null, 4)}`);
         // scrape price data
         const tcgplayerIds = productDocs.map(doc => doc.tcgplayerId);

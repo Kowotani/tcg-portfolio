@@ -10,7 +10,7 @@ import {
 } from 'common';
 import express from 'express';
 import { 
-  getPortfolios, getProduct, getProducts, insertProducts 
+  getPortfolioDocs, getProductDoc, getProductDocs, insertProducts 
 } from './mongo/mongoManager';
 import multer from 'multer';
 import { loadImageToS3 } from './aws/s3Manager';
@@ -47,7 +47,7 @@ app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
 
     // query Portfolios
     const userId = req.query.userId
-    const data = await getPortfolios(userId)
+    const data = await getPortfolioDocs(userId)
 
     // return Portfolios
     res.status(200)
@@ -88,7 +88,7 @@ app.get(GET_PRODUCTS_URL, async (req: any, res: any) => {
   try {
 
     // query Products
-    const data = await getProducts()
+    const data = await getProductDocs()
 
     // return Products
     res.status(200)
@@ -118,8 +118,8 @@ INPUT
     name: Product name
     type: ProductType enum
     language: ProductLanguage enum
-    subtype [OPTIONAL]: ProductSubType enum
-    setCode [OPTIONAL]: Product set code
+    subtype?: ProductSubType enum
+    setCode?: Product set code
 RETURN
   TProductPostResBody response with status codes
 
@@ -136,7 +136,7 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
   const tcgPlayerId = data.tcgplayerId
 
   // check if product already exists (via tcgplayerId)
-  const query = await getProduct({tcgplayerId: tcgPlayerId})
+  const query = await getProductDoc({tcgplayerId: tcgPlayerId})
   if (query !== null) { 
     res.status(202)
     const body: TProductPostResBody<undefined> = {
