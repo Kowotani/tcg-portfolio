@@ -353,21 +353,23 @@ export async function getPortfolios(
         populate: {path: 'product'}
       })
       .select('-holdings.tcgplayerId')
-    const portfolios: IPopulatedPortfolio[] = docs.map((portfolio: IMPortfolio) => {
+    const portfolios: IPopulatedPortfolio[] = docs.map(
+      (portfolio: IMPortfolio) => {
 
-      // create populatedHoldings
-      const populatedHoldings: IPopulatedHolding[] = portfolio.holdings.map((el: any) => {
-        assert(isIPopulatedHolding(el))
-        return el
-      })
+        // create populatedHoldings
+        const populatedHoldings: IPopulatedHolding[] = portfolio.holdings.map(
+          (el: any) => {
+            assert(isIPopulatedHolding(el))
+            return el
+        })
 
-      // create populatedPortfolio
-      return {
-        userId: portfolio.userId,
-        portfolioName: portfolio.portfolioName,
-        description: portfolio.description,
-        populatedHoldings: populatedHoldings
-      }
+        // create populatedPortfolio
+        return {
+          userId: portfolio.userId,
+          portfolioName: portfolio.portfolioName,
+          description: portfolio.description,
+          populatedHoldings: populatedHoldings
+        }
     })
 
     return portfolios
