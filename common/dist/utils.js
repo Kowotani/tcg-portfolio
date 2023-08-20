@@ -1,8 +1,9 @@
 "use strict";
 exports.__esModule = true;
-exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransaction = exports.isIProduct = exports.isIPriceData = exports.isIPrice = exports.isIPortfolio = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHolding = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransaction = exports.isIProduct = exports.isIPriceData = exports.isIPrice = exports.isIPortfolio = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHolding = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
+var util_1 = require("util");
 // =========
 // constants
 // =========
@@ -111,6 +112,16 @@ function isTCGPriceTypeValue(value) {
     return arr.includes(value);
 }
 exports.isTCGPriceTypeValue = isTCGPriceTypeValue;
+/*
+DESC
+  Console.logs the input Object with full details
+INPUT
+  arg: An Object
+*/
+function logObject(arg) {
+    console.log((0, util_1.inspect)(arg, false, null, true));
+}
+exports.logObject = logObject;
 /*
 DESC
   Function used for sorting dates in ascending order

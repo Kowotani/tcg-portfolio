@@ -9,6 +9,7 @@ import {
   ProductTypeToProductSubtype, TCGToProductSubtype, 
 } from './dataModels'
 import * as _ from 'lodash'
+import { inspect } from 'util'
 
 
 // =========
@@ -121,6 +122,16 @@ RETURN
 export function isTCGPriceTypeValue(value: string): boolean {
   const arr = Object.values(TCGPriceType).map(v => v.toString());
   return arr.includes(value);
+}
+
+/*
+DESC
+  Console.logs the input Object with full details
+INPUT
+  arg: An Object
+*/
+export function logObject(arg: Object): void {
+  console.log(inspect(arg, false, null, true))
 }
 
 /*
