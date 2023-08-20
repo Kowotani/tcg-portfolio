@@ -1,21 +1,30 @@
 // imports
-import { assert, IHolding, IPortfolio, IPortfolioMethods, IPrice, 
-  IProduct } from 'common';
-import * as _ from 'lodash';
-import mongoose from 'mongoose';
-import { HydratedDocument} from 'mongoose';
-import { IMHolding } from './models/holdingSchema';
-import { IMPortfolio, portfolioSchema } from './models/portfolioSchema';
-import { IMPrice, priceSchema } from './models/priceSchema';
-import { IMProduct, productSchema } from './models/productSchema';
+import { 
+  IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
+  IPortfolioMethods, IPrice, IProduct,
+
+  assert, isIPopulatedHolding, logObject
+} from 'common'
+import * as _ from 'lodash'
+import mongoose from 'mongoose'
+import { HydratedDocument} from 'mongoose'
+import { IMHolding } from './models/holdingSchema'
+import { IMPortfolio, portfolioSchema } from './models/portfolioSchema'
+import { IMPrice, priceSchema } from './models/priceSchema'
+import { IMProduct, productSchema } from './models/productSchema'
+
+
+// =======
+// globals
+// =======
 
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 
 // mongoose models
-const Portfolio = mongoose.model('Portfolio', portfolioSchema);
-const Product = mongoose.model('Product', productSchema);
-const Price = mongoose.model('Price', priceSchema);
+const Portfolio = mongoose.model('Portfolio', portfolioSchema)
+const Product = mongoose.model('Product', productSchema)
+const Price = mongoose.model('Price', priceSchema)
 
 
 // =========
@@ -316,6 +325,56 @@ export async function getPortfolioDocs(
   } catch(err) {
 
     console.log(`An error occurred in getPortfolioDocs(): ${err}`)
+    return []
+  } 
+}
+
+/*
+DESC
+  Retrieves all IPopulatedPortfolios for the input userId
+INPUT
+  userId: The associated userId
+RETURN
+  An array of IPopulatedPortfolios
+*/
+export async function getPortfolios(
+  userId: number
+): Promise<IPopulatedPortfolio[]> {
+
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    const docs = await Portfolio
+      .find({'userId': userId})
+      .populate({
+        path: 'holdings',
+        populate: {path: 'product'}
+      })
+      .select('-holdings.tcgplayerId')
+    const portfolios: IPopulatedPortfolio[] = docs.map((portfolio: IMPortfolio) => {
+
+      // create populatedHoldings
+      const populatedHoldings: IPopulatedHolding[] = portfolio.holdings.map((el: any) => {
+        assert(isIPopulatedHolding(el))
+        return el
+      })
+
+      // create populatedPortfolio
+      return {
+        userId: portfolio.userId,
+        portfolioName: portfolio.portfolioName,
+        description: portfolio.description,
+        populatedHoldings: populatedHoldings
+      }
+    })
+
+    return portfolios
+
+  } catch(err) {
+
+    console.log(`An error occurred in getPortfolios(): ${err}`)
     return []
   } 
 }
@@ -639,7 +698,7 @@ async function main(): Promise<number> {
   // const p233232 = await getProductDoc({'tcgplayerId': 233232})
   // const p449558 = await getProductDoc({'tcgplayerId': 449558})
 
-  // const userId = 1234
+  const userId = 1234
   // const portfolioName = 'Gamma Investments'
   // let holdings = [
   //   {
@@ -694,6 +753,13 @@ async function main(): Promise<number> {
   // } else {
   //   console.log('Portfolios not retrieved')
   // }
+
+  res = await getPortfolios(userId)
+  if (res) {
+    logObject(res)
+  } else {
+    console.log('Portfolios not retrieved')
+  }
 
   // -- Add portfolio
 
