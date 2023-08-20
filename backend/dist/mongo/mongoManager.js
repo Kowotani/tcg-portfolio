@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -124,7 +128,6 @@ function addPortfolioHoldings(portfolio, holdingInput) {
                     transactions: holding.transactions
                 };
             });
-            console.log(holdings);
             portfolioDoc.addHoldings(holdings);
             return true;
         }
@@ -152,7 +155,6 @@ function addPortfolio(portfolio) {
         yield mongoose_1.default.connect(url);
         const userId = portfolio.userId;
         const portfolioName = portfolio.portfolioName;
-        const holdings = portfolio.holdings;
         const description = portfolio.description;
         try {
             // check if portfolioName exists for this userId
@@ -161,13 +163,28 @@ function addPortfolio(portfolio) {
                 console.log(`${portfolioName} already exists for userId: ${userId}`);
                 return false;
             }
-            // create the portfolio  
-            yield Portfolio.create({
-                userId,
-                portfolioName,
-                holdings,
-                description,
+            // add Product ObjectId to Holdings
+            const productDocs = yield getProductDocs();
+            const holdings = portfolio.holdings.map((holding) => {
+                const productDoc = productDocs.find((product) => {
+                    return product.tcgplayerId === holding.tcgplayerId;
+                });
+                (0, common_1.assert)(productDoc instanceof Product, 'Product not found in addPortfolio()');
+                return (Object.assign(Object.assign({}, holding), { product: productDoc._id }));
             });
+            // create IPortfolio
+            let newPortfolio = {
+                userId: userId,
+                portfolioName: portfolioName,
+                holdings: holdings
+            };
+            if (description) {
+                newPortfolio['description'] = portfolio.description;
+            }
+            (0, common_1.logObject)(newPortfolio);
+            (0, common_1.assert)((0, common_1.isIPortfolio)(newPortfolio), 'newPortfolio object is not an IPortfolio in addPortfolio()');
+            // create the portfolio  
+            yield Portfolio.create(newPortfolio);
             return true;
         }
         catch (err) {
@@ -569,12 +586,12 @@ function insertPrices(docs) {
     });
 }
 exports.insertPrices = insertPrices;
-// import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
+const common_2 = require("common");
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let res;
         // const product: IProduct = {
-        //   tcgplayerId: 123,
+        //   tcgplayerId: 449558,
         //   tcg: TCG.MagicTheGathering,
         //   releaseDate: new Date(),
         //   name: 'Foo',
@@ -594,40 +611,27 @@ function main() {
         // }
         // const p233232 = await getProductDoc({'tcgplayerId': 233232})
         // const p449558 = await getProductDoc({'tcgplayerId': 449558})
-        const userId = 1234;
-        // const portfolioName = 'Gamma Investments'
-        // let holdings = [
-        //   {
-        //     tcgplayerId: 233232,
-        //     product: p233232?._id,
-        //     transactions: [
-        //     {
-        //       type: TransactionType.Sale,
-        //       date: new Date(),
-        //       price: 4.56,
-        //       quantity: 999,
-        //     }
-        //     ]
-        //   },
-        //   {
-        //     tcgplayerId: 449558,
-        //     product: p449558?._id,
-        //     transactions: [
-        //       {
-        //       type: TransactionType.Purchase,
-        //       date: new Date(),
-        //       price: 789,
-        //       quantity: 10,
-        //       }
-        //     ]
-        //     }
-        //   ]
-        // const portfolio: IPortfolio = {
-        //   userId: userId, 
-        //   portfolioName: portfolioName,
-        //   holdings: [],
-        //   description: 'Foobar'
-        // }
+        const userId = 789;
+        const portfolioName = 'Omega Investments';
+        let holdings = [
+            {
+                tcgplayerId: 449558,
+                transactions: [
+                    {
+                        type: common_2.TransactionType.Purchase,
+                        date: new Date(),
+                        price: 789,
+                        quantity: 10,
+                    }
+                ]
+            }
+        ];
+        const portfolio = {
+            userId: userId,
+            portfolioName: portfolioName,
+            holdings: holdings,
+            description: 'Foobar'
+        };
         // let tcgplayerId = 233232
         // // // -- Set portfolio holdings
         // res = await addPortfolioHoldings(portfolio, holdings)
@@ -643,20 +647,20 @@ function main() {
         // } else {
         //   console.log('Portfolios not retrieved')
         // }
-        res = yield getPortfolios(userId);
+        // res = await getPortfolios(userId)
+        // if (res) {
+        //   logObject(res)
+        // } else {
+        //   console.log('Portfolios not retrieved')
+        // }
+        // -- Add portfolio
+        res = yield addPortfolio(portfolio);
         if (res) {
-            (0, common_1.logObject)(res);
+            console.log('Portfolio successfully created');
         }
         else {
-            console.log('Portfolios not retrieved');
+            console.log('Portfolio not created');
         }
-        // -- Add portfolio
-        // res = await addPortfolio(portfolio)
-        // if (res) {
-        //   console.log('Portfolio successfully created')
-        // } else {
-        //   console.log('Portfolio not created')
-        // }
         // // -- Delete portfolio
         // res = await deletePortfolio(userId, portfolioName)
         // if (res) {

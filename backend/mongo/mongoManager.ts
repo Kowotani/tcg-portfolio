@@ -3,7 +3,7 @@ import {
   IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
   IPortfolioMethods, IPrice, IProduct,
 
-  assert, isIPopulatedHolding, logObject
+  assert, isIPopulatedHolding, isIPortfolio
 } from 'common'
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
@@ -124,7 +124,6 @@ export async function addPortfolioHoldings(
         transactions: holding.transactions
       } as IMHolding
     })
-    console.log(holdings)
 
     portfolioDoc.addHoldings(holdings)
     return true
@@ -154,7 +153,6 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
 
   const userId = portfolio.userId
   const portfolioName = portfolio.portfolioName
-  const holdings = portfolio.holdings
   const description = portfolio.description
 
   try {
@@ -166,13 +164,36 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
       return false
     } 
 
-    // create the portfolio  
-    await Portfolio.create({
-      userId,
-      portfolioName,
-      holdings,
-      description,
+    // add Product ObjectId to Holdings
+    const productDocs = await getProductDocs()
+    const holdings = portfolio.holdings.map((holding: IHolding) => {
+      const productDoc = productDocs.find((product: IProduct) => {
+        return product.tcgplayerId === holding.tcgplayerId
+      })
+      assert(
+        productDoc instanceof Product, 
+        'Product not found in addPortfolio()')
+      return ({
+        ...holding,
+        product: productDoc._id
+      })
     })
+
+    // create IPortfolio
+    let newPortfolio: any = {
+      userId: userId,
+      portfolioName: portfolioName,
+      holdings: holdings
+    }
+    if (description) {
+      newPortfolio['description'] = portfolio.description
+    }
+    assert(
+      isIPortfolio(newPortfolio),
+      'newPortfolio object is not an IPortfolio in addPortfolio()')
+
+    // create the portfolio  
+    await Portfolio.create(newPortfolio)
 
     return true
 
@@ -669,13 +690,13 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
   }
 }
 
-// import { TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
+// import { logObject, TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
 async function main(): Promise<number> {  
 
   let res
 
   // const product: IProduct = {
-  //   tcgplayerId: 123,
+  //   tcgplayerId: 449558,
   //   tcg: TCG.MagicTheGathering,
   //   releaseDate: new Date(),
   //   name: 'Foo',
@@ -700,39 +721,26 @@ async function main(): Promise<number> {
   // const p233232 = await getProductDoc({'tcgplayerId': 233232})
   // const p449558 = await getProductDoc({'tcgplayerId': 449558})
 
-  const userId = 1234
-  // const portfolioName = 'Gamma Investments'
-  // let holdings = [
-  //   {
-  //     tcgplayerId: 233232,
-  //     product: p233232?._id,
-  //     transactions: [
-  //     {
-  //       type: TransactionType.Sale,
-  //       date: new Date(),
-  //       price: 4.56,
-  //       quantity: 999,
-  //     }
-  //     ]
-  //   },
+  // const userId = 789
+  // const portfolioName = 'Omega Investments'
+  // let holdings: IHolding[] = [
   //   {
   //     tcgplayerId: 449558,
-  //     product: p449558?._id,
   //     transactions: [
   //       {
-  //       type: TransactionType.Purchase,
-  //       date: new Date(),
-  //       price: 789,
-  //       quantity: 10,
+  //         type: TransactionType.Purchase,
+  //         date: new Date(),
+  //         price: 789,
+  //         quantity: 10,
   //       }
   //     ]
-  //     }
-  //   ]
-  
+  //   }
+  // ]
+
   // const portfolio: IPortfolio = {
   //   userId: userId, 
   //   portfolioName: portfolioName,
-  //   holdings: [],
+  //   holdings: holdings,
   //   description: 'Foobar'
   // }
   
@@ -756,12 +764,12 @@ async function main(): Promise<number> {
   //   console.log('Portfolios not retrieved')
   // }
 
-  res = await getPortfolios(userId)
-  if (res) {
-    logObject(res)
-  } else {
-    console.log('Portfolios not retrieved')
-  }
+  // res = await getPortfolios(userId)
+  // if (res) {
+  //   logObject(res)
+  // } else {
+  //   console.log('Portfolios not retrieved')
+  // }
 
   // -- Add portfolio
 
