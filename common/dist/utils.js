@@ -186,8 +186,8 @@ function isIPopulatedPortfolio(arg) {
     return arg
         && arg.userId && typeof (arg.userId) === 'number'
         && arg.portfolioName && typeof (arg.portfolioName) === 'string'
-        && arg.holdings && Array.isArray(arg.holdings)
-        && _.every(arg.holdings.forEach(function (el) {
+        && arg.populatedHoldings && Array.isArray(arg.populatedHoldings)
+        && _.every(arg.populatedHoldings.forEach(function (el) {
             return isIPopulatedHolding(el);
         }));
 }
