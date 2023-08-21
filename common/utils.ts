@@ -184,6 +184,22 @@ export function isIHolding(arg: any): arg is IHolding {
 
 /*
 DESC
+  Returns whether or not the input is an IHolding[]
+INPUT
+  arg: An object that might be an IHolding[] 
+RETURN
+  TRUE if the input is an IHolding[], FALSE otherwise
+*/
+export function isIHoldingArray(arg: any): arg is IHolding[] {
+  return arg
+    && Array.isArray(arg)
+    && _.every(arg.map((el: any) => {
+      return isIHolding(el)
+    }))
+}
+
+/*
+DESC
   Returns whether or not the input is an IPopulatedHolding
 INPUT
   arg: An object that might be an IPopulatedHolding 
@@ -212,9 +228,27 @@ export function isIPopulatedPortfolio(arg: any): arg is IPopulatedPortfolio {
     && arg.userId && typeof(arg.userId) === 'number'
     && arg.portfolioName && typeof(arg.portfolioName) === 'string'
     && arg.populatedHoldings && Array.isArray(arg.populatedHoldings)
-      && _.every(arg.populatedHoldings.forEach((el: any) => {
+      && _.every(arg.populatedHoldings.map((el: any) => {
         return isIPopulatedHolding(el)
       }))
+}
+
+/*
+DESC
+  Returns whether or not the input is an IPopulatedPortfolio[]
+INPUT
+  arg: An object that might be an IPopulatedPortfolio[] 
+RETURN
+  TRUE if the input is an IPopulatedPortfolio[], FALSE otherwise
+*/
+export function isIPopulatedPortfolioArray(
+  arg: any
+): arg is IPopulatedPortfolio[] {
+  return arg
+    && Array.isArray(arg)
+    && _.every(arg.map((el: any) => {
+      return isIPopulatedPortfolio(el)
+    }))
 }
 
 /*
@@ -230,9 +264,25 @@ export function isIPortfolio(arg: any): arg is IPortfolio {
     && arg.userId && typeof(arg.userId) === 'number'
     && arg.portfolioName && typeof(arg.portfolioName) === 'string'
     && arg.holdings && Array.isArray(arg.holdings)
-      && _.every(arg.holdings.forEach((el: any) => {
+      && _.every(arg.holdings.map((el: any) => {
         return isIHolding(el)
       }))
+}
+
+/*
+DESC
+  Returns whether or not the input is an IPortfolio[]
+INPUT
+  arg: An object that might be an IPortfolio[] 
+RETURN
+  TRUE if the input is an IPortfolio[], FALSE otherwise
+*/
+export function isIPortfolioArray(arg: any): arg is IPortfolio[] {
+  return arg
+    && Array.isArray(arg)
+    && _.every(arg.map((el: any) => {
+      return isIPortfolio(el)
+    }))
 }
 
 /*
@@ -249,6 +299,22 @@ export function isIPrice(arg: any): arg is IPrice {
     && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
     && arg.granularity && typeof(arg.granularity) === 'string'
     && arg.prices && isIPriceData(arg.prices)
+}
+
+/*
+DESC
+  Returns whether or not the input is an IPrice[]
+INPUT
+  arg: An object that might be an IPrice[]
+RETURN
+  TRUE if the input is an IPrice[], FALSE otherwise
+*/
+export function isIPriceArray(arg: any): arg is IPrice {
+  return arg
+    && Array.isArray(arg)
+    && _.every(arg.map((el: any) => {
+      return isIPrice(el)
+    }))
 }
 
 /*
@@ -271,6 +337,22 @@ export function isIPriceData(arg: any): arg is IPriceData {
     && arg.listedMedianPrice 
       ? typeof(arg.listedMedianPrice) === 'number' 
       : true
+}
+
+/*
+DESC
+  Returns whether or not the input is an IPriceData[]
+INPUT
+  arg: An object that might be an IPriceData[] 
+RETURN
+  TRUE if the input is an IPriceData[], FALSE otherwise
+*/
+export function isIPriceDataArray(arg: any): arg is IPriceData[] {
+  return arg
+    && Array.isArray(arg)
+    && _.every(arg.map((el: any) => {
+      return isIPriceData(el)
+    }))
 }
 
 /*
@@ -312,6 +394,23 @@ export function isITransaction(arg: any): arg is ITransaction {
     && arg.price && typeof(arg.price) === 'number'
     && arg.quantity && typeof(arg.quantity) === 'number'
 }
+
+/*
+DESC
+  Returns whether or not the input is an ITransaction[]
+INPUT
+  arg: An object that might be an ITransaction[] 
+RETURN
+  TRUE if the input is an ITransaction[], FALSE otherwise
+*/
+export function isITransactionArray(arg: any): arg is ITransaction[] {
+  return arg
+    && Array.isArray(arg)
+    && _.every(arg.map((el: any) => {
+      return isITransaction(el)
+    }))
+}
+
 
 // -- HTTP responses
 

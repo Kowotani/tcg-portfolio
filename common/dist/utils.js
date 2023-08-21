@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransaction = exports.isIProduct = exports.isIPriceData = exports.isIPrice = exports.isIPortfolio = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHolding = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 var util_1 = require("util");
@@ -170,6 +170,22 @@ function isIHolding(arg) {
 exports.isIHolding = isIHolding;
 /*
 DESC
+  Returns whether or not the input is an IHolding[]
+INPUT
+  arg: An object that might be an IHolding[]
+RETURN
+  TRUE if the input is an IHolding[], FALSE otherwise
+*/
+function isIHoldingArray(arg) {
+    return arg
+        && Array.isArray(arg)
+        && _.every(arg.map(function (el) {
+            return isIHolding(el);
+        }));
+}
+exports.isIHoldingArray = isIHoldingArray;
+/*
+DESC
   Returns whether or not the input is an IPopulatedHolding
 INPUT
   arg: An object that might be an IPopulatedHolding
@@ -198,11 +214,27 @@ function isIPopulatedPortfolio(arg) {
         && arg.userId && typeof (arg.userId) === 'number'
         && arg.portfolioName && typeof (arg.portfolioName) === 'string'
         && arg.populatedHoldings && Array.isArray(arg.populatedHoldings)
-        && _.every(arg.populatedHoldings.forEach(function (el) {
+        && _.every(arg.populatedHoldings.map(function (el) {
             return isIPopulatedHolding(el);
         }));
 }
 exports.isIPopulatedPortfolio = isIPopulatedPortfolio;
+/*
+DESC
+  Returns whether or not the input is an IPopulatedPortfolio[]
+INPUT
+  arg: An object that might be an IPopulatedPortfolio[]
+RETURN
+  TRUE if the input is an IPopulatedPortfolio[], FALSE otherwise
+*/
+function isIPopulatedPortfolioArray(arg) {
+    return arg
+        && Array.isArray(arg)
+        && _.every(arg.map(function (el) {
+            return isIPopulatedPortfolio(el);
+        }));
+}
+exports.isIPopulatedPortfolioArray = isIPopulatedPortfolioArray;
 /*
 DESC
   Returns whether or not the input is an IPortfolio
@@ -216,11 +248,27 @@ function isIPortfolio(arg) {
         && arg.userId && typeof (arg.userId) === 'number'
         && arg.portfolioName && typeof (arg.portfolioName) === 'string'
         && arg.holdings && Array.isArray(arg.holdings)
-        && _.every(arg.holdings.forEach(function (el) {
+        && _.every(arg.holdings.map(function (el) {
             return isIHolding(el);
         }));
 }
 exports.isIPortfolio = isIPortfolio;
+/*
+DESC
+  Returns whether or not the input is an IPortfolio[]
+INPUT
+  arg: An object that might be an IPortfolio[]
+RETURN
+  TRUE if the input is an IPortfolio[], FALSE otherwise
+*/
+function isIPortfolioArray(arg) {
+    return arg
+        && Array.isArray(arg)
+        && _.every(arg.map(function (el) {
+            return isIPortfolio(el);
+        }));
+}
+exports.isIPortfolioArray = isIPortfolioArray;
 /*
 DESC
   Returns whether or not the input is an IPrice
@@ -237,6 +285,22 @@ function isIPrice(arg) {
         && arg.prices && isIPriceData(arg.prices);
 }
 exports.isIPrice = isIPrice;
+/*
+DESC
+  Returns whether or not the input is an IPrice[]
+INPUT
+  arg: An object that might be an IPrice[]
+RETURN
+  TRUE if the input is an IPrice[], FALSE otherwise
+*/
+function isIPriceArray(arg) {
+    return arg
+        && Array.isArray(arg)
+        && _.every(arg.map(function (el) {
+            return isIPrice(el);
+        }));
+}
+exports.isIPriceArray = isIPriceArray;
 /*
 DESC
   Returns whether or not the input is an IPriceData
@@ -258,6 +322,22 @@ function isIPriceData(arg) {
             : true;
 }
 exports.isIPriceData = isIPriceData;
+/*
+DESC
+  Returns whether or not the input is an IPriceData[]
+INPUT
+  arg: An object that might be an IPriceData[]
+RETURN
+  TRUE if the input is an IPriceData[], FALSE otherwise
+*/
+function isIPriceDataArray(arg) {
+    return arg
+        && Array.isArray(arg)
+        && _.every(arg.map(function (el) {
+            return isIPriceData(el);
+        }));
+}
+exports.isIPriceDataArray = isIPriceDataArray;
 /*
 DESC
   Returns whether or not the input is an IProduct
@@ -297,6 +377,22 @@ function isITransaction(arg) {
         && arg.quantity && typeof (arg.quantity) === 'number';
 }
 exports.isITransaction = isITransaction;
+/*
+DESC
+  Returns whether or not the input is an ITransaction[]
+INPUT
+  arg: An object that might be an ITransaction[]
+RETURN
+  TRUE if the input is an ITransaction[], FALSE otherwise
+*/
+function isITransactionArray(arg) {
+    return arg
+        && Array.isArray(arg)
+        && _.every(arg.map(function (el) {
+            return isITransaction(el);
+        }));
+}
+exports.isITransactionArray = isITransactionArray;
 // -- HTTP responses
 /*
 DESC
