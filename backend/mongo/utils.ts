@@ -91,7 +91,7 @@ INPUT
 RETURN
   An IMHolding[]
 */
-export async function convertIHoldingsToIMHoldings(
+export async function getIMHoldingsFromIHoldings(
   holdings: IHolding[]
 ): Promise<IMHolding[]> {
 
@@ -104,7 +104,7 @@ export async function convertIHoldingsToIMHoldings(
     })
     assert(
       productDoc instanceof Product, 
-      'Product not found in convertIHoldingsToIMHoldings()')
+      'Product not found in getIMHoldingsFromIHoldings()')
 
     // create IMHolding
     return ({

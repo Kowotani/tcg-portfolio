@@ -3,15 +3,15 @@ import {
   IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
   IPortfolioMethods, IPrice, IProduct,
 
-  assert, isIPopulatedHolding, isIPortfolio
+  assert, isIHoldingArray, isIPopulatedHolding, isIPortfolio
 } from 'common'
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
 import { HydratedDocument} from 'mongoose'
-import { IMHolding } from './models/holdingSchema'
 import { IMPortfolio, portfolioSchema } from './models/portfolioSchema'
 import { IMPrice, priceSchema } from './models/priceSchema'
 import { IMProduct, productSchema } from './models/productSchema'
+import { isValidHoldings, getIMHoldingsFromIHoldings } from './utils'
 
 
 // =======
@@ -68,15 +68,6 @@ export async function addPortfolioHoldings(
       return false
     }
 
-    // check if all holdings have unique tcgplayerId
-    const holdingTcgplayerIds = holdingsToAdd.map((holding: IHolding) => {
-      return holding.tcgplayerId
-    })
-    if (holdingTcgplayerIds.length > _.uniq(holdingTcgplayerIds).length) {
-      console.log(`Duplicate tcgplayerIds detected in: ${holdingsToAdd}`)
-      return false
-    }
-
     // check if portfolio exists
     const portfolioDoc = await getPortfolioDoc(portfolio)
     if (portfolioDoc instanceof Portfolio === false) {
@@ -85,45 +76,29 @@ export async function addPortfolioHoldings(
     }
     assert(portfolioDoc instanceof Portfolio)
  
-    // check if all products exist
-    const productDocs = await getProductDocs()
-    const productTcgplayerIds = productDocs.map((doc: IMProduct) => {
-      return doc.tcgplayerId
-    })
-    const unknownTcgplayerIds = _.difference(
-      holdingTcgplayerIds, productTcgplayerIds)
-
-    if (unknownTcgplayerIds.length > 0) {
-      console.log(`Product not found for tcgplayerIds: ${unknownTcgplayerIds}`)
+    // validate holdingsToAdd
+    const validHoldings = await isValidHoldings(holdingsToAdd)
+    if (!validHoldings) {
+      console.log('Holdings failed validation in addPortfolioHoldings()')
       return false
     }
 
     // check if any holding already exists
+    const tcgplayerIds = holdingsToAdd.map((holding: IHolding) => {
+      return holding.tcgplayerId
+    })
     const portfolioTcgplayerIds = portfolioDoc.getHoldings().map(
-      (holding: IHolding) =>{ return holding.tcgplayerId })
+      (holding: IHolding) => { return holding.tcgplayerId })
     const existingHoldings = _.intersection(
-      portfolioTcgplayerIds, holdingTcgplayerIds)
+      portfolioTcgplayerIds, tcgplayerIds)
 
     if (existingHoldings.length > 0) {
-      console.log(`Portoflio holdings exist for tcgplayerIds: ${existingHoldings}`)
+      console.log(`Portfolio holdings already exist for tcgplayerIds: ${existingHoldings}`)
       return false
     }
 
-    // add holdings
-    const holdings = holdingsToAdd.map((holding: IHolding) => {
-
-      // get product doc
-      const productDoc = productDocs.find((doc: IMProduct) => {
-        return doc.tcgplayerId === holding.tcgplayerId
-      })
-      assert(productDoc instanceof Product)      
-
-      return {
-        product: productDoc._id,
-        tcgplayerId: holding.tcgplayerId,
-        transactions: holding.transactions
-      } as IMHolding
-    })
+    // get IMHolding[]
+    const holdings = await getIMHoldingsFromIHoldings(holdingsToAdd)
 
     portfolioDoc.addHoldings(holdings)
     return true
@@ -164,20 +139,8 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
       return false
     } 
 
-    // add Product ObjectId to Holdings
-    const productDocs = await getProductDocs()
-    const holdings = portfolio.holdings.map((holding: IHolding) => {
-      const productDoc = productDocs.find((product: IProduct) => {
-        return product.tcgplayerId === holding.tcgplayerId
-      })
-      assert(
-        productDoc instanceof Product, 
-        'Product not found in addPortfolio()')
-      return ({
-        ...holding,
-        product: productDoc._id
-      })
-    })
+    // get IMHolding[]
+    const holdings = await getIMHoldingsFromIHoldings(portfolio.holdings)
 
     // create IPortfolio
     let newPortfolio: any = {
@@ -428,31 +391,21 @@ export async function setPortfolioHoldings(
     }
     assert(portfolioDoc instanceof Portfolio)
 
-    // back up existing holdings
-    const existingHoldings = portfolioDoc.holdings
+    // convert input to Array, if necessary
+    const holdings = Array.isArray(holdingInput) ? holdingInput : [holdingInput]
 
-    // remove any existing holdings
-    portfolioDoc.holdings = []
-    await portfolioDoc.save()
-
-    // check if there are any holdings to add
-    if (Array.isArray(holdingInput) && holdingInput.length === 0) {
-      return true
-    }
-
-    // add all holdings
-    const res = await addPortfolioHoldings(portfolio, holdingInput)
-
-    if (!res) {
-      console.log('addPortfolioHoldings() failed in setPortfolioHoldings()')
-      portfolioDoc.holdings = existingHoldings
-      await portfolioDoc.save()
+    // validate Holdings
+    const validHoldings = await isValidHoldings(holdings)
+    if (!validHoldings) {
+      console.log('Holdings failed validation in setPortfolioHoldings()')
       return false
-
-    } else {
-      await portfolioDoc.save()
-      return true
     }
+
+    // get IMHolding[]
+    const newHoldings = await getIMHoldingsFromIHoldings(holdings)
+    portfolioDoc.holdings = newHoldings
+    await portfolioDoc.save()
+    return true
 
   } catch(err) {
 
@@ -481,12 +434,6 @@ export async function setPortfolioProperty(
   // connect to db
   await mongoose.connect(url)
 
-  // check if holdings is trying to be set
-  if (key === 'holdings') {
-    console.log('setPortfolioProperty() cannot set the holdings property, use setPortfolioHoldings() instead')
-    return false
-  }
-
   try {
 
     // check if Portfolio exists
@@ -496,11 +443,20 @@ export async function setPortfolioProperty(
     }
     assert(portfolioDoc instanceof Portfolio)
 
-    // update Portfolio
-    portfolioDoc.set(key, value)
-    await portfolioDoc.save()
+    // call separate setPortfolioHoldings()
+    if (key === 'holdings') {
+      assert(isIHoldingArray(value))
+      const res = await setPortfolioHoldings(portfolio, value)
 
-    return true
+      return res
+
+    // set the key
+    } else {
+      portfolioDoc.set(key, value)
+      await portfolioDoc.save()
+
+      return true
+    }
 
   } catch(err) {
 
@@ -690,7 +646,7 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
   }
 }
 
-// import { logObject, TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
+import { logObject, TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
 async function main(): Promise<number> {  
 
   let res
@@ -725,28 +681,27 @@ async function main(): Promise<number> {
   // const portfolioName = 'Omega Investments'
   // let holdings: IHolding[] = [
   //   {
-  //     tcgplayerId: 449558,
+  //     tcgplayerId: 233232,
   //     transactions: [
   //       {
   //         type: TransactionType.Purchase,
   //         date: new Date(),
-  //         price: 789,
-  //         quantity: 10,
-  //       }
+  //         price: 99,
+  //         quantity: 1,
+  //       },
   //     ]
-  //   }
+  //   },
   // ]
 
   // const portfolio: IPortfolio = {
   //   userId: userId, 
   //   portfolioName: portfolioName,
   //   holdings: holdings,
-  //   description: 'Foobar'
   // }
   
   // let tcgplayerId = 233232
   
-  // // // -- Set portfolio holdings
+  // // -- Add portfolio holdings
 
   // res = await addPortfolioHoldings(portfolio, holdings)
   // if (res) {
@@ -755,7 +710,16 @@ async function main(): Promise<number> {
   //   console.log('Portfolio holdings not added')
   // }
 
-  // -- Get portfolios
+  // -- Set portfolio holdings
+
+  // res = await setPortfolioProperty(portfolio, 'description', 'Taco Bell')
+  // if (res) {
+  //   console.log('Portfolio holdings successfully set')
+  // } else {
+  //   console.log('Portfolio holdings not set')
+  // }
+
+  // // -- Get portfolios
   
   // res = await getPortfolioDocs(userId)
   // if (res) {
