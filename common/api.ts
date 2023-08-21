@@ -50,14 +50,22 @@ export type TDataResBody<Type> = TResBody & {
   data: Type
 }
 
-// body for POST request to /product
+/*
+  Endpoint:   ADD_PRODUCT_URL
+  Type:       POST
+  Req / Res:  Response
+*/
 export type TProductPostResBody<Type> = TDataResBody<Type> & {
   tcgplayerId: number
 }
 
 // -- requests
 
-// body for POST request to /product
+/*
+  Endpoint:   ADD_PRODUCT_URL
+  Type:       POST
+  Req / Res:  Request
+*/
 export type TProductPostReqBody = {
   formData: IProduct,
   imageUrl?: string, 

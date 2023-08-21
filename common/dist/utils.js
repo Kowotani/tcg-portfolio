@@ -351,7 +351,7 @@ function isIProduct(arg) {
         // require
         && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
         && arg.tcg && _.values(dataModels_1.TCG).includes(arg.tcg)
-        && arg.releaseDate && arg.releaseDate instanceof Date
+        && arg.releaseDate && !Number.isNaN(Date.parse(arg.releaseDate))
         && arg.name && typeof (arg.name) === 'string'
         && arg.type && _.values(dataModels_1.ProductType).includes(arg.type)
         && arg.language && _.values(dataModels_1.ProductLanguage).includes(arg.language)
@@ -372,7 +372,7 @@ RETURN
 function isITransaction(arg) {
     return arg
         && arg.type && _.values(dataModels_1.TransactionType).includes(arg.type)
-        && arg.date && arg.date instanceof Date
+        && arg.date && !Number.isNaN(Date.parse(arg.date))
         && arg.price && typeof (arg.price) === 'number'
         && arg.quantity && typeof (arg.quantity) === 'number';
 }

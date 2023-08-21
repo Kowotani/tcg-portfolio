@@ -1,5 +1,5 @@
 import {
-  TDataResBody, TProductPostReqBody, TProductPostResBody, TResBody,
+  TDataResBody, TProductPostResBody, TResBody,
 } from './api'
 import {
   IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, IPrice, 
@@ -368,7 +368,7 @@ export function isIProduct(arg: any): arg is IProduct {
     // require
     && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
     && arg.tcg && _.values(TCG).includes(arg.tcg)
-    && arg.releaseDate && arg.releaseDate instanceof Date
+    && arg.releaseDate && !Number.isNaN(Date.parse(arg.releaseDate))
     && arg.name && typeof(arg.name) === 'string'
     && arg.type && _.values(ProductType).includes(arg.type)
     && arg.language && _.values(ProductLanguage).includes(arg.language)
@@ -390,7 +390,7 @@ RETURN
 export function isITransaction(arg: any): arg is ITransaction {
   return arg
     && arg.type && _.values(TransactionType).includes(arg.type)
-    && arg.date && arg.date instanceof Date
+    && arg.date && !Number.isNaN(Date.parse(arg.date))
     && arg.price && typeof(arg.price) === 'number'
     && arg.quantity && typeof(arg.quantity) === 'number'
 }
