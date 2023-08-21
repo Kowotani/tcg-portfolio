@@ -10,7 +10,7 @@ import {
 } from 'common';
 import express from 'express';
 import { 
-  getPortfolioDocs, getProductDoc, getProductDocs, insertProducts 
+  getPortfolios, getProductDoc, getProductDocs, insertProducts 
 } from './mongo/mongoManager';
 import multer from 'multer';
 import { loadImageToS3 } from './aws/s3Manager';
@@ -31,7 +31,7 @@ app.get('/', (req: any, res: any) => {
 
 /*
 DESC
-  Handle GET request for all Portfolio documents for the input userId
+  Handle GET request for all IPopulatedPortfolios for the input userId
 INPUT
   userId: The userId who owns the Portfolios
 RETURN
@@ -47,7 +47,7 @@ app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
 
     // query Portfolios
     const userId = req.query.userId
-    const data = await getPortfolioDocs(userId)
+    const data = await getPortfolios(userId)
 
     // return Portfolios
     res.status(200)

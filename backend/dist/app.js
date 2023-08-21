@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 // =========
 /*
 DESC
-  Handle GET request for all Portfolio documents for the input userId
+  Handle GET request for all IPopulatedPortfolios for the input userId
 INPUT
   userId: The userId who owns the Portfolios
 RETURN
@@ -43,7 +43,7 @@ app.get(common_1.GET_PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, voi
     try {
         // query Portfolios
         const userId = req.query.userId;
-        const data = yield (0, mongoManager_1.getPortfolioDocs)(userId);
+        const data = yield (0, mongoManager_1.getPortfolios)(userId);
         // return Portfolios
         res.status(200);
         // TODO: Add a type inference for this

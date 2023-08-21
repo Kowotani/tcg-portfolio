@@ -7,24 +7,17 @@ import {
   Text
 } from '@chakra-ui/react'
 import { 
-  IPopulatedHolding, IPopulatedPortfolio, IProduct, 
-  ITransaction, ProductLanguage, ProductSubtype, ProductType, TCG, 
-  TransactionType,
+  IPopulatedPortfolio, 
 
   GET_PORTFOLIOS_URL,
 
-  TDataResBody
+  assert
 } from 'common'
 import { PortfolioCard } from './PortfolioCard'
-import { InputErrorWrapper } from './InputField'
-import { FilterInput } from './FilterInput'
 import { UserContext } from '../state/UserContext'
-import { 
-  IUserContext,
-
-  sortFnPopulatedHoldingAsc, 
-} from '../utils' 
-
+import { IUserContext } from '../utils' 
+import { isIPopulatedPortfolioArray } from 'common'
+import * as _ from 'lodash'
 
 export const AllPortfolios = () => {
 
@@ -32,7 +25,7 @@ export const AllPortfolios = () => {
   // state
   // =====
 
-  const [ portfolios, setPortfolios ] = useState('')
+  const [ portfolios, setPortfolios ] = useState([] as IPopulatedPortfolio[])
   const { user } = useContext(UserContext) as IUserContext
 
 
@@ -40,73 +33,29 @@ export const AllPortfolios = () => {
   // hooks
   // =====
 
-  // // initial load of user Portfolios
-  // useEffect(() => {
-  //   axios({
-  //     method: 'get',
-  //     url: GET_PORTFOLIOS_URL,
-  //     params: {
-  //       userId: user.userId
-  //     }
-  //   })
-  //   .then(res => {
-  //     const resData = res.data
-  //     assert(resData )
-  //     const portfolios: IPortfolio[] = res.data.data
-  //     const existingTCGPlayerIds = portfolio.hydratedHoldings.map(
-  //       (holding: IPopulatedHolding) => holding.product.tcgplayerId
-  //     )
-  //     const searchableProducts = products.filter((product: IProduct) => {
-  //       return !existingTCGPlayerIds.includes(product.tcgplayerId)
-  //     })
-      
-  //   })
-  //   .catch(err => {
-  //     console.log('Error fetching Portfolios: ' + err)
-  //   })
-  // }, [])
+  // initial load of user Portfolios
+  useEffect(() => {
+    axios({
+      method: 'get',
+      url: GET_PORTFOLIOS_URL,
+      params: {
+        userId: user.userId
+      }
+    })
+    .then(res => {
+      const portfolios = res.data.data
+      assert(isIPopulatedPortfolioArray(portfolios))
+      setPortfolios(portfolios)
+    })
+    .catch(err => {
+      console.log('Error fetching Portfolios: ' + err)
+    })
+  }, [])
+
 
   // ==============
   // main component
   // ==============
-
-  // ====================================
-  // dummy data start
-
-  const fooTransactions: ITransaction[] = [
-    {
-      type: TransactionType.Purchase,
-      date: new Date(),
-      quantity: 123,
-      price: 5.67
-    }
-  ]
-
-  const fooProduct: IProduct = {
-    tcgplayerId: 121527,
-    tcg: TCG.MagicTheGathering,
-    releaseDate: new Date(),
-    name: 'Kaladesh',
-    type: ProductType.BoosterBox,
-    language: ProductLanguage.English,
-    subtype: ProductSubtype.Draft,
-    setCode: 'KLD',
-  }
-
-  const fooHolding: IPopulatedHolding = {
-    product: fooProduct,
-    transactions: fooTransactions
-  }
-  const fooPortfolio: IPopulatedPortfolio = {
-    userId: 1234,
-    portfolioName: 'Alpha Investments',
-    populatedHoldings: [fooHolding].sort(sortFnPopulatedHoldingAsc),
-    description: 'The floppiest tacos this side of Florida'
-  }
-
-
-  // dummy data end
-  // ====================================
 
   return (
     <>
@@ -116,11 +65,18 @@ export const AllPortfolios = () => {
       </Box>
 
       {/* Portfolios */}
-      <PortfolioCard 
-        populatedPortfolio={fooPortfolio}
-        onPortfolioDelete={(fooPortfolio) => console.log('deleted portfolio')}
-        onPortfolioUpdate={(fooPortfolio) => console.log('updated portfolio')}
-      />
+      {portfolios.map((portfolio: IPopulatedPortfolio) => {
+        return (
+          <Box key={portfolio.portfolioName}>
+            <PortfolioCard 
+              populatedPortfolio={portfolio}
+              onPortfolioDelete={() => console.log('deleted portfolio')}
+              onPortfolioUpdate={() => console.log('updated portfolio')}
+            />
+            <Spacer h='8px' />
+          </Box>
+        )
+      })}
     </>
   )
 }

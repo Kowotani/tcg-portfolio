@@ -579,17 +579,17 @@ function main() {
         // }
         // const p233232 = await getProductDoc({'tcgplayerId': 233232})
         // const p449558 = await getProductDoc({'tcgplayerId': 449558})
-        const userId = 789;
-        const portfolioName = 'Omega Investments';
+        const userId = 1234;
+        const portfolioName = 'Beta Investments';
         let holdings = [
             {
-                tcgplayerId: 233232,
+                tcgplayerId: 449558,
                 transactions: [
                     {
                         type: common_2.TransactionType.Purchase,
                         date: new Date(),
-                        price: 99,
-                        quantity: 1,
+                        price: 4.56,
+                        quantity: 123,
                     },
                 ]
             },
@@ -598,6 +598,7 @@ function main() {
             userId: userId,
             portfolioName: portfolioName,
             holdings: holdings,
+            description: "Taco Bell leftovers"
         };
         // let tcgplayerId = 233232
         // // -- Add portfolio holdings
@@ -608,13 +609,12 @@ function main() {
         //   console.log('Portfolio holdings not added')
         // }
         // -- Set portfolio holdings
-        res = yield setPortfolioProperty(portfolio, 'description', 'Taco Bell');
-        if (res) {
-            console.log('Portfolio holdings successfully set');
-        }
-        else {
-            console.log('Portfolio holdings not set');
-        }
+        // res = await setPortfolioProperty(portfolio, 'description', 'Taco Bell')
+        // if (res) {
+        //   console.log('Portfolio holdings successfully set')
+        // } else {
+        //   console.log('Portfolio holdings not set')
+        // }
         // // -- Get portfolios
         // res = await getPortfolioDocs(userId)
         // if (res) {
@@ -629,12 +629,13 @@ function main() {
         //   console.log('Portfolios not retrieved')
         // }
         // -- Add portfolio
-        // res = await addPortfolio(portfolio)
-        // if (res) {
-        //   console.log('Portfolio successfully created')
-        // } else {
-        //   console.log('Portfolio not created')
-        // }
+        res = yield addPortfolio(portfolio);
+        if (res) {
+            console.log('Portfolio successfully created');
+        }
+        else {
+            console.log('Portfolio not created');
+        }
         // // -- Delete portfolio
         // res = await deletePortfolio(userId, portfolioName)
         // if (res) {
