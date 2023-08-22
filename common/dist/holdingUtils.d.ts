@@ -9,6 +9,6 @@ export declare function getHoldingRealizedPnl(holding: IHolding | IPopulatedHold
 export declare function getHoldingSales(holding: IHolding | IPopulatedHolding): ITransaction[];
 export declare function getHoldingSaleQuantity(holding: IHolding | IPopulatedHolding): number;
 export declare function getHoldingTotalCost(holding: IHolding | IPopulatedHolding): number;
-export declare function getHoldingTotalPnl(holding: IHolding | IPopulatedHolding, price: number): number;
+export declare function getHoldingTotalPnl(holding: IHolding | IPopulatedHolding, price: number): number | undefined;
 export declare function getHoldingTotalRevenue(holding: IHolding | IPopulatedHolding): number;
 export declare function getHoldingUnrealizedPnl(holding: IHolding | IPopulatedHolding, price: number): number | undefined;

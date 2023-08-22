@@ -74,113 +74,6 @@ export enum TransactionType {
 }
 
 
-// ====================
-// relationship objects
-// ====================
-
-// https://stackoverflow.com/questions/44243060/use-enum-as-restricted-key-type-in-typescript
-// TCG -> product type
-export const TCGToProductType: { [key in TCG]: ProductType[] } = {
-
-  // FAB
-  [TCG.FleshAndBlood]: [
-    ProductType.BoosterBox,
-  ],
-
-  // MTG
-  [TCG.MagicTheGathering]: [
-    ProductType.BoosterBox,
-    ProductType.Bundle,
-    ProductType.CommanderDeck,
-    ProductType.CommanderDeckSet,
-    ProductType.SecretLair,
-  ],
-
-  // Metazoo
-  [TCG.MetaZoo]: [
-    ProductType.BoosterBox,
-  ],
-
-  // Pokemon
-  [TCG.Pokemon]: [
-    ProductType.BoosterBox,
-    ProductType.Bundle,
-  ],
-
-  // Sorcery
-  [TCG.Sorcery]: [
-    ProductType.BoosterBox
-  ]
-}
-
-// product type -> product subtype
-export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubtype[] } = {
-
-  // Booster box
-  [ProductType.BoosterBox]: [
-    ProductSubtype.Collector,
-    ProductSubtype.Draft,
-    ProductSubtype.FABVersionTwo,
-    ProductSubtype.FirstEdition,
-    ProductSubtype.SecondEdition,
-    ProductSubtype.Set,
-    ProductSubtype.Unlimited,
-  ],
-
-  // Bundle 
-  [ProductType.Bundle]: [
-    ProductSubtype.EliteTrainerBox,
-    ProductSubtype.UltraPremiumCollection
-  ],
-
-  // Secret Lair
-  [ProductType.SecretLair]: [
-    ProductSubtype.CommanderDeck,
-    ProductSubtype.Foil,
-    ProductSubtype.FoilEteched,
-    ProductSubtype.NonFoil,
-    ProductSubtype.TexturedFoil,
-  ],
-}
-
-// TCG -> product subtype
-export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
-
-  // FAB
-  [TCG.FleshAndBlood]: [
-    ProductSubtype.FABVersionTwo,
-    ProductSubtype.FirstEdition,
-    ProductSubtype.Unlimited,
-  ],
-
-  // MTG
-  [TCG.MagicTheGathering]: [
-    ProductSubtype.Collector,
-    ProductSubtype.CommanderDeck,
-    ProductSubtype.Draft,
-    ProductSubtype.Foil,
-    ProductSubtype.FoilEteched,
-    ProductSubtype.NonFoil,
-    ProductSubtype.Set,
-    ProductSubtype.TexturedFoil,
-  ],
-
-  // Metazoo
-  [TCG.MetaZoo]: [
-    ProductSubtype.FirstEdition,
-    ProductSubtype.SecondEdition,
-  ],
-
-  // Pokemon
-  [TCG.Pokemon]: [
-    ProductSubtype.EliteTrainerBox,
-    ProductSubtype.UltraPremiumCollection,
-  ],  
-
-  // Sorcery
-}
-
-
 // ==========
 // interfaces
 // ==========
@@ -335,4 +228,121 @@ export interface IPortfolioMethods {
 
 export interface IPopulatedPortfolio extends IPortfolioBase {
   populatedHoldings: IPopulatedHolding[],
+}
+
+
+// ====================
+// relationship objects
+// ====================
+
+// https://stackoverflow.com/questions/44243060/use-enum-as-restricted-key-type-in-typescript
+// TCG -> product type
+export const TCGToProductType: { [key in TCG]: ProductType[] } = {
+
+  // FAB
+  [TCG.FleshAndBlood]: [
+    ProductType.BoosterBox,
+  ],
+
+  // MTG
+  [TCG.MagicTheGathering]: [
+    ProductType.BoosterBox,
+    ProductType.Bundle,
+    ProductType.CommanderDeck,
+    ProductType.CommanderDeckSet,
+    ProductType.SecretLair,
+  ],
+
+  // Metazoo
+  [TCG.MetaZoo]: [
+    ProductType.BoosterBox,
+  ],
+
+  // Pokemon
+  [TCG.Pokemon]: [
+    ProductType.BoosterBox,
+    ProductType.Bundle,
+  ],
+
+  // Sorcery
+  [TCG.Sorcery]: [
+    ProductType.BoosterBox
+  ]
+}
+
+// product type -> product subtype
+export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubtype[] } = {
+
+  // Booster box
+  [ProductType.BoosterBox]: [
+    ProductSubtype.Collector,
+    ProductSubtype.Draft,
+    ProductSubtype.FABVersionTwo,
+    ProductSubtype.FirstEdition,
+    ProductSubtype.SecondEdition,
+    ProductSubtype.Set,
+    ProductSubtype.Unlimited,
+  ],
+
+  // Bundle 
+  [ProductType.Bundle]: [
+    ProductSubtype.EliteTrainerBox,
+    ProductSubtype.UltraPremiumCollection
+  ],
+
+  // Secret Lair
+  [ProductType.SecretLair]: [
+    ProductSubtype.CommanderDeck,
+    ProductSubtype.Foil,
+    ProductSubtype.FoilEteched,
+    ProductSubtype.NonFoil,
+    ProductSubtype.TexturedFoil,
+  ],
+}
+
+// TCG -> product subtype
+export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
+
+  // FAB
+  [TCG.FleshAndBlood]: [
+    ProductSubtype.FABVersionTwo,
+    ProductSubtype.FirstEdition,
+    ProductSubtype.Unlimited,
+  ],
+
+  // MTG
+  [TCG.MagicTheGathering]: [
+    ProductSubtype.Collector,
+    ProductSubtype.CommanderDeck,
+    ProductSubtype.Draft,
+    ProductSubtype.Foil,
+    ProductSubtype.FoilEteched,
+    ProductSubtype.NonFoil,
+    ProductSubtype.Set,
+    ProductSubtype.TexturedFoil,
+  ],
+
+  // Metazoo
+  [TCG.MetaZoo]: [
+    ProductSubtype.FirstEdition,
+    ProductSubtype.SecondEdition,
+  ],
+
+  // Pokemon
+  [TCG.Pokemon]: [
+    ProductSubtype.EliteTrainerBox,
+    ProductSubtype.UltraPremiumCollection,
+  ],  
+
+  // Sorcery
+}
+
+
+// =====
+// types
+// =====
+
+// map of TcgplayerId -> prices
+export type TTcgplayerIdPrices = {
+  [tcgplayerId: number]: number
 }

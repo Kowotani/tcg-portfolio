@@ -1,0 +1,10 @@
+import { IHolding, IPopulatedHolding, IPortfolio, IPopulatedPortfolio, TTcgplayerIdPrices } from './dataModels';
+export declare function getPortfolioHoldings(portfolio: IPortfolio | IPopulatedPortfolio): IHolding[] | IPopulatedHolding[];
+export declare function getPortfolioPercentPnl(portfolio: IPortfolio | IPopulatedPortfolio, prices: TTcgplayerIdPrices): number | undefined;
+export declare function getPortfolioPurchaseQuantity(portfolio: IPortfolio | IPopulatedPortfolio): number;
+export declare function getPortfolioRealizedPnl(portfolio: IPortfolio | IPopulatedPortfolio): number | undefined;
+export declare function getPortfolioSaleQuantity(portfolio: IPortfolio | IPopulatedPortfolio): number;
+export declare function getPortfolioTotalCost(portfolio: IPortfolio | IPopulatedPortfolio): number;
+export declare function getPortfolioTotalPnl(portfolio: IPortfolio | IPopulatedPortfolio, prices: TTcgplayerIdPrices): number | undefined;
+export declare function getPortfolioTotalRevenue(portfolio: IPortfolio | IPopulatedPortfolio): number;
+export declare function getPortfolioUnrealizedPnl(portfolio: IPortfolio | IPopulatedPortfolio, prices: TTcgplayerIdPrices): number | undefined;

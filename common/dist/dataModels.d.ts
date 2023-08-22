@@ -46,15 +46,6 @@ export declare enum TransactionType {
     Purchase = "Purchase",
     Sale = "Sale"
 }
-export declare const TCGToProductType: {
-    [key in TCG]: ProductType[];
-};
-export declare const ProductTypeToProductSubtype: {
-    [key in ProductType]?: ProductSubtype[];
-};
-export declare const TCGToProductSubtype: {
-    [key in TCG]?: ProductSubtype[];
-};
 export interface IUser {
     userId: number;
     userName: string;
@@ -157,4 +148,16 @@ export interface IPortfolioMethods {
 export interface IPopulatedPortfolio extends IPortfolioBase {
     populatedHoldings: IPopulatedHolding[];
 }
+export declare const TCGToProductType: {
+    [key in TCG]: ProductType[];
+};
+export declare const ProductTypeToProductSubtype: {
+    [key in ProductType]?: ProductSubtype[];
+};
+export declare const TCGToProductSubtype: {
+    [key in TCG]?: ProductSubtype[];
+};
+export declare type TTcgplayerIdPrices = {
+    [tcgplayerId: number]: number;
+};
 export {};

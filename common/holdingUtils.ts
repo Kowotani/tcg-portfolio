@@ -50,16 +50,18 @@ INPUT
   holding: An IHolding
   price: The market price
 RETURN
-  The total pnl as a percentage return relative to the total cost
+  The total pnl as a percentage return relative to the total cost, or undefined
+  if total cost === 0
 */
 export function getHoldingPercentPnl(
   holding: IHolding | IPopulatedHolding,
   price: number
 ): number | undefined {
   const totalCost = getHoldingTotalCost(holding)
+  const totalPnl = getHoldingTotalPnl(holding, price)
   return totalCost === 0
     ? undefined 
-    : getHoldingTotalPnl(holding, price) / totalCost
+    : totalPnl / totalCost
 }
 
 /*
@@ -102,7 +104,7 @@ DESC
 INPUT
   holding: An IHolding
 RETURN
-  The item quantity available from the input ITransaction
+  The item quantity available from the input IHolding
 */
 export function getHoldingQuantity(
   holding: IHolding | IPopulatedHolding
@@ -155,7 +157,7 @@ DESC
 INPUT
   holding: An IHolding
 RETURN
-  The sale quantity from the input ITransaction
+  The sale quantity from the input IHolding
 */
 export function getHoldingSaleQuantity(
   holding: IHolding | IPopulatedHolding
@@ -194,14 +196,17 @@ INPUT
   price: The market price
 RETURN
   The total pnl based on the market price and avg cost vs avg rev from the
-  IHolding
+  IHolding, or undefined if realizedPnl and unrealizedPnl are both undefined
 */
 export function getHoldingTotalPnl(
   holding: IHolding | IPopulatedHolding,
   price: number
-): number {
-  return getHoldingRealizedPnl(holding) 
-    + getHoldingUnrealizedPnl(holding, price) ?? 0
+): number | undefined {
+  const realizedPnl = getHoldingRealizedPnl(holding) 
+  const unrealizedPnl = getHoldingUnrealizedPnl(holding, price)
+  return (realizedPnl === undefined && unrealizedPnl === undefined)  
+    ? undefined
+    : (realizedPnl ?? 0) + (unrealizedPnl ?? 0)
 }
 
 /*
@@ -211,7 +216,7 @@ DESC
 INPUT
   holding: An IHolding
 RETURN
-  The total sale revenue from the input ITransaction
+  The total sale revenue from the input IHolding
 */
 export function getHoldingTotalRevenue(
   holding: IHolding | IPopulatedHolding

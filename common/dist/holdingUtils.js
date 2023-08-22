@@ -46,13 +46,15 @@ INPUT
   holding: An IHolding
   price: The market price
 RETURN
-  The total pnl as a percentage return relative to the total cost
+  The total pnl as a percentage return relative to the total cost, or undefined
+  if total cost === 0
 */
 function getHoldingPercentPnl(holding, price) {
     var totalCost = getHoldingTotalCost(holding);
+    var totalPnl = getHoldingTotalPnl(holding, price);
     return totalCost === 0
         ? undefined
-        : getHoldingTotalPnl(holding, price) / totalCost;
+        : totalPnl / totalCost;
 }
 exports.getHoldingPercentPnl = getHoldingPercentPnl;
 /*
@@ -92,7 +94,7 @@ DESC
 INPUT
   holding: An IHolding
 RETURN
-  The item quantity available from the input ITransaction
+  The item quantity available from the input IHolding
 */
 function getHoldingQuantity(holding) {
     var value = getHoldingPurchaseQuantity(holding)
@@ -140,7 +142,7 @@ DESC
 INPUT
   holding: An IHolding
 RETURN
-  The sale quantity from the input ITransaction
+  The sale quantity from the input IHolding
 */
 function getHoldingSaleQuantity(holding) {
     var value = _.sumBy(getHoldingSales(holding), function (txn) {
@@ -175,12 +177,14 @@ INPUT
   price: The market price
 RETURN
   The total pnl based on the market price and avg cost vs avg rev from the
-  IHolding
+  IHolding, or undefined if realizedPnl and unrealizedPnl are both undefined
 */
 function getHoldingTotalPnl(holding, price) {
-    var _a;
-    return (_a = getHoldingRealizedPnl(holding)
-        + getHoldingUnrealizedPnl(holding, price)) !== null && _a !== void 0 ? _a : 0;
+    var realizedPnl = getHoldingRealizedPnl(holding);
+    var unrealizedPnl = getHoldingUnrealizedPnl(holding, price);
+    return (realizedPnl === undefined && unrealizedPnl === undefined)
+        ? undefined
+        : (realizedPnl !== null && realizedPnl !== void 0 ? realizedPnl : 0) + (unrealizedPnl !== null && unrealizedPnl !== void 0 ? unrealizedPnl : 0);
 }
 exports.getHoldingTotalPnl = getHoldingTotalPnl;
 /*
@@ -190,7 +194,7 @@ DESC
 INPUT
   holding: An IHolding
 RETURN
-  The total sale revenue from the input ITransaction
+  The total sale revenue from the input IHolding
 */
 function getHoldingTotalRevenue(holding) {
     var value = _.sumBy(getHoldingSales(holding), function (txn) {
