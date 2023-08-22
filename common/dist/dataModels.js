@@ -55,6 +55,7 @@ var ProductType;
 var TCG;
 (function (TCG) {
     TCG["FleshAndBlood"] = "Flesh and Blood";
+    TCG["Lorcana"] = "Lorcana";
     TCG["MagicTheGathering"] = "Magic: The Gathering";
     TCG["MetaZoo"] = "MetaZoo";
     TCG["Pokemon"] = "Pokemon";
@@ -85,6 +86,10 @@ exports.TCGToProductType = (_a = {},
     // FAB
     _a[TCG.FleshAndBlood] = [
         ProductType.BoosterBox,
+    ],
+    // Lorcana
+    _a[TCG.Lorcana] = [
+        ProductType.BoosterBox
     ],
     // MTG
     _a[TCG.MagicTheGathering] = [

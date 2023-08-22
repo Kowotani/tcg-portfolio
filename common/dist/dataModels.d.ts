@@ -32,6 +32,7 @@ export declare enum ProductType {
 }
 export declare enum TCG {
     FleshAndBlood = "Flesh and Blood",
+    Lorcana = "Lorcana",
     MagicTheGathering = "Magic: The Gathering",
     MetaZoo = "MetaZoo",
     Pokemon = "Pokemon",

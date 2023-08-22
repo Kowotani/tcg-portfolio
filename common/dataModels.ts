@@ -49,6 +49,7 @@ export enum ProductType {
 // TCG
 export enum TCG {
   FleshAndBlood = 'Flesh and Blood',
+  Lorcana = 'Lorcana',
   MagicTheGathering = 'Magic: The Gathering',
   MetaZoo = 'MetaZoo',
   Pokemon = 'Pokemon',
@@ -244,6 +245,11 @@ export const TCGToProductType: { [key in TCG]: ProductType[] } = {
     ProductType.BoosterBox,
   ],
 
+  // Lorcana
+  [TCG.Lorcana]: [
+    ProductType.BoosterBox
+  ],
+
   // MTG
   [TCG.MagicTheGathering]: [
     ProductType.BoosterBox,
@@ -252,7 +258,7 @@ export const TCGToProductType: { [key in TCG]: ProductType[] } = {
     ProductType.CommanderDeckSet,
     ProductType.SecretLair,
   ],
-
+  
   // Metazoo
   [TCG.MetaZoo]: [
     ProductType.BoosterBox,
