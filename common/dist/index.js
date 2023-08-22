@@ -13,4 +13,5 @@ exports.__esModule = true;
 __exportStar(require("./api"), exports);
 __exportStar(require("./dataModels"), exports);
 __exportStar(require("./holdingUtils"), exports);
+__exportStar(require("./portfolioUtils"), exports);
 __exportStar(require("./utils"), exports);
