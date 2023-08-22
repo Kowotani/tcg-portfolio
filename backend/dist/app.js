@@ -120,10 +120,10 @@ app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0
     // variables
     const body = req.body;
     const data = body.formData;
-    const tcgPlayerId = data.tcgplayerId;
+    const tcgplayerId = data.tcgplayerId;
     // check if product already exists (via tcgplayerId)
-    const query = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: tcgPlayerId });
-    if (query !== null) {
+    const query = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: tcgplayerId });
+    if (query instanceof mongoManager_1.Product) {
         res.status(202);
         const body = {
             tcgplayerId: data.tcgplayerId,
@@ -138,7 +138,7 @@ app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0
             const numInserted = yield (0, mongoManager_1.insertProducts)([data]);
             // load image to S3
             const isImageLoaded = body.imageUrl
-                ? yield (0, s3Manager_1.loadImageToS3)(tcgPlayerId, body.imageUrl)
+                ? yield (0, s3Manager_1.loadImageToS3)(tcgplayerId, body.imageUrl)
                 : false;
             // success
             if (numInserted > 0) {

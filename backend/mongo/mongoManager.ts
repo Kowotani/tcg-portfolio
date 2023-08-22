@@ -22,9 +22,9 @@ import { areValidHoldings, getIMHoldingsFromIHoldings } from '../utils'
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 
 // mongoose models
-const Portfolio = mongoose.model('Portfolio', portfolioSchema)
-const Product = mongoose.model('Product', productSchema)
-const Price = mongoose.model('Price', priceSchema)
+export const Portfolio = mongoose.model('Portfolio', portfolioSchema)
+export const Product = mongoose.model('Product', productSchema)
+export const Price = mongoose.model('Price', priceSchema)
 
 
 // =========
@@ -479,12 +479,12 @@ INPUT
 RETURN
   The document if found, else null
 */
-interface IgetProductDocParameters {
+interface IGetProductDocParameters {
   tcgplayerId?: number;
   hexStringId?: string;  // 24 char hex string
 }
 export async function getProductDoc(
-  { tcgplayerId, hexStringId }: IgetProductDocParameters = {}
+  { tcgplayerId, hexStringId }: IGetProductDocParameters = {}
 ): Promise<HydratedDocument<IProduct> | null> {
 
   // check that tcgplayer_id or id is provided
@@ -497,10 +497,9 @@ export async function getProductDoc(
   await mongoose.connect(url)
 
   try {
-
-    const doc = Number.isInteger(tcgplayerId)
+    const doc = tcgplayerId
       ? await Product.findOne({ 'tcgplayerId': tcgplayerId })
-      : await Product.findById(hexStringId);
+      : await Product.findById(hexStringId)
     return doc
 
   } catch(err) {
@@ -698,9 +697,6 @@ async function main(): Promise<number> {
   //   portfolioName: portfolioName,
   //   holdings: holdings,
   // }
-  
-  // let tcgplayerId = 233232
-  
   // // -- Add portfolio holdings
 
   // res = await addPortfolioHoldings(portfolio, holdings)

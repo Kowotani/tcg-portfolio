@@ -31,7 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.setPortfolioProperty = exports.setPortfolioHoldings = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHoldings = void 0;
+exports.insertPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.setPortfolioProperty = exports.setPortfolioHoldings = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHoldings = exports.Price = exports.Product = exports.Portfolio = void 0;
 // imports
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
@@ -46,9 +46,9 @@ const utils_1 = require("../utils");
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 // mongoose models
-const Portfolio = mongoose_1.default.model('Portfolio', portfolioSchema_1.portfolioSchema);
-const Product = mongoose_1.default.model('Product', productSchema_1.productSchema);
-const Price = mongoose_1.default.model('Price', priceSchema_1.priceSchema);
+exports.Portfolio = mongoose_1.default.model('Portfolio', portfolioSchema_1.portfolioSchema);
+exports.Product = mongoose_1.default.model('Product', productSchema_1.productSchema);
+exports.Price = mongoose_1.default.model('Price', priceSchema_1.priceSchema);
 // =========
 // functions
 // =========
@@ -82,11 +82,11 @@ function addPortfolioHoldings(portfolio, holdingInput) {
             }
             // check if portfolio exists
             const portfolioDoc = yield getPortfolioDoc(portfolio);
-            if (portfolioDoc instanceof Portfolio === false) {
+            if (portfolioDoc instanceof exports.Portfolio === false) {
                 console.log(`${portfolioName} does not exist for userId: ${userId}`);
                 return false;
             }
-            (0, common_1.assert)(portfolioDoc instanceof Portfolio);
+            (0, common_1.assert)(portfolioDoc instanceof exports.Portfolio);
             // validate holdingsToAdd
             const validHoldings = yield (0, utils_1.areValidHoldings)(holdingsToAdd);
             if (!validHoldings) {
@@ -136,7 +136,7 @@ function addPortfolio(portfolio) {
         try {
             // check if portfolioName exists for this userId
             const doc = yield getPortfolioDoc(portfolio);
-            if (doc instanceof Portfolio) {
+            if (doc instanceof exports.Portfolio) {
                 console.log(`${portfolioName} already exists for userId: ${userId}`);
                 return false;
             }
@@ -153,7 +153,7 @@ function addPortfolio(portfolio) {
             }
             (0, common_1.assert)((0, common_1.isIPortfolio)(newPortfolio), 'newPortfolio object is not an IPortfolio in addPortfolio()');
             // create the portfolio  
-            yield Portfolio.create(newPortfolio);
+            yield exports.Portfolio.create(newPortfolio);
             return true;
         }
         catch (err) {
@@ -181,12 +181,12 @@ function deletePortfolio(portfolio) {
         try {
             // check if portfolioName exists for this userId
             const doc = yield getPortfolioDoc(portfolio);
-            if (doc instanceof Portfolio === false) {
+            if (doc instanceof exports.Portfolio === false) {
                 console.log(`${portfolioName} does not exist for userId: ${userId}`);
                 return false;
             }
             // delete the portfolio  
-            const res = yield Portfolio.deleteOne({
+            const res = yield exports.Portfolio.deleteOne({
                 'userId': userId,
                 'portfolioName': portfolioName,
             });
@@ -217,11 +217,11 @@ function deletePortfolioHolding(portfolio, tcgplayerId) {
         try {
             // check if portfolio exists
             const portfolioDoc = yield getPortfolioDoc(portfolio);
-            if (portfolioDoc instanceof Portfolio === false) {
+            if (portfolioDoc instanceof exports.Portfolio === false) {
                 console.log(`${portfolio.portfolioName} does not exist for userId: ${userId}`);
                 return false;
             }
-            (0, common_1.assert)(portfolioDoc instanceof Portfolio);
+            (0, common_1.assert)(portfolioDoc instanceof exports.Portfolio);
             // check if holding exists
             if (!portfolioDoc.hasHolding(tcgplayerId)) {
                 console.log(`tcgplayerId: ${tcgplayerId} does not exist in portfolio: (${userId}, ${portfolioName})`);
@@ -252,7 +252,7 @@ function getPortfolioDoc(portfolio) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const doc = yield Portfolio.findOne({
+            const doc = yield exports.Portfolio.findOne({
                 'userId': portfolio.userId,
                 'portfolioName': portfolio.portfolioName,
             });
@@ -278,7 +278,7 @@ function getPortfolioDocs(userId) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const docs = yield Portfolio.find({ 'userId': userId });
+            const docs = yield exports.Portfolio.find({ 'userId': userId });
             return docs;
         }
         catch (err) {
@@ -301,7 +301,7 @@ function getPortfolios(userId) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const docs = yield Portfolio
+            const docs = yield exports.Portfolio
                 .find({ 'userId': userId })
                 .populate({
                 path: 'holdings',
@@ -347,10 +347,10 @@ function setPortfolioHoldings(portfolio, holdingInput) {
         try {
             // check if Portfolio exists
             const portfolioDoc = yield getPortfolioDoc(portfolio);
-            if (portfolioDoc instanceof Portfolio === false) {
+            if (portfolioDoc instanceof exports.Portfolio === false) {
                 console.log(`Portfolio not found (${portfolio.userId}, ${portfolio.portfolioName})`);
             }
-            (0, common_1.assert)(portfolioDoc instanceof Portfolio);
+            (0, common_1.assert)(portfolioDoc instanceof exports.Portfolio);
             // convert input to Array, if necessary
             const holdings = Array.isArray(holdingInput) ? holdingInput : [holdingInput];
             // validate Holdings
@@ -390,10 +390,10 @@ function setPortfolioProperty(portfolio, key, value) {
         try {
             // check if Portfolio exists
             const portfolioDoc = yield getPortfolioDoc(portfolio);
-            if (portfolioDoc instanceof Portfolio === false) {
+            if (portfolioDoc instanceof exports.Portfolio === false) {
                 console.log(`Portfolio not found (${portfolio.userId}, ${portfolio.portfolioName})`);
             }
-            (0, common_1.assert)(portfolioDoc instanceof Portfolio);
+            (0, common_1.assert)(portfolioDoc instanceof exports.Portfolio);
             // call separate setPortfolioHoldings()
             if (key === 'holdings') {
                 (0, common_1.assert)((0, common_1.isIHoldingArray)(value));
@@ -424,9 +424,9 @@ function getProductDoc({ tcgplayerId, hexStringId } = {}) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const doc = Number.isInteger(tcgplayerId)
-                ? yield Product.findOne({ 'tcgplayerId': tcgplayerId })
-                : yield Product.findById(hexStringId);
+            const doc = tcgplayerId
+                ? yield exports.Product.findOne({ 'tcgplayerId': tcgplayerId })
+                : yield exports.Product.findById(hexStringId);
             return doc;
         }
         catch (err) {
@@ -447,7 +447,7 @@ function getProductDocs() {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const docs = yield Product.find({});
+            const docs = yield exports.Product.find({});
             return docs;
         }
         catch (err) {
@@ -470,7 +470,7 @@ function insertProducts(docs) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const res = yield Product.insertMany(docs);
+            const res = yield exports.Product.insertMany(docs);
             return res.length;
         }
         catch (err) {
@@ -498,10 +498,10 @@ function setProductProperty(tcgplayerId, key, value) {
         try {
             // check if Product exists
             const productDoc = yield getProductDoc({ tcgplayerId: tcgplayerId });
-            if (productDoc instanceof Product === false) {
+            if (productDoc instanceof exports.Product === false) {
                 console.log(`Product not found for tcgplayerId: ${tcgplayerId}`);
             }
-            (0, common_1.assert)(productDoc instanceof Product);
+            (0, common_1.assert)(productDoc instanceof exports.Product);
             // update Product
             productDoc.set(key, value);
             yield productDoc.save();
@@ -540,7 +540,7 @@ function insertPrices(docs) {
             const priceDocs = docs.map(doc => {
                 return Object.assign({ product: idMap.get(doc.tcgplayerId) }, doc);
             });
-            const res = yield Price.insertMany(priceDocs);
+            const res = yield exports.Price.insertMany(priceDocs);
             return res.length;
         }
         catch (err) {
@@ -594,7 +594,6 @@ function main() {
         //   portfolioName: portfolioName,
         //   holdings: holdings,
         // }
-        // let tcgplayerId = 233232
         // // -- Add portfolio holdings
         // res = await addPortfolioHoldings(portfolio, holdings)
         // if (res) {

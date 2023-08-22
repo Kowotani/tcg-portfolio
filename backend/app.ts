@@ -10,7 +10,9 @@ import {
 } from 'common';
 import express from 'express';
 import { 
-  getPortfolios, getProductDoc, getProductDocs, insertProducts 
+  getPortfolios, getProductDoc, getProductDocs, insertProducts,
+
+  Product
 } from './mongo/mongoManager';
 import multer from 'multer';
 import { loadImageToS3 } from './aws/s3Manager';
@@ -133,11 +135,11 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
   // variables
   const body: TProductPostReqBody = req.body
   const data = body.formData
-  const tcgPlayerId = data.tcgplayerId
+  const tcgplayerId = data.tcgplayerId
 
   // check if product already exists (via tcgplayerId)
-  const query = await getProductDoc({tcgplayerId: tcgPlayerId})
-  if (query !== null) { 
+  const query = await getProductDoc({tcgplayerId: tcgplayerId})
+  if (query instanceof Product) { 
     res.status(202)
     const body: TProductPostResBody<undefined> = {
       tcgplayerId: data.tcgplayerId,
@@ -149,13 +151,12 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
   } else {
   
     try {
-      
       // add product
       const numInserted = await insertProducts([data])
 
       // load image to S3
       const isImageLoaded = body.imageUrl
-        ? await loadImageToS3(tcgPlayerId, body.imageUrl)
+        ? await loadImageToS3(tcgplayerId, body.imageUrl)
         : false
 
       // success

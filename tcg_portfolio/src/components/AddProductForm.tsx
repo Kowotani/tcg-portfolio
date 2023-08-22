@@ -17,7 +17,8 @@ import {
   getProductSubtypes, isASCII,
 
   assert, ADD_PRODUCT_URL, isTProductPostResBody, ProductPostStatus, 
-  TProductPostReqBody
+  TProductPostReqBody,
+  logObject
 } from 'common';
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField';
@@ -477,12 +478,8 @@ export const AddProductForm = () => {
         // success
         .then(res => {
 
-          // type check
+          // TODO: type check
           const resData = res.data
-          assert(
-            isTProductPostResBody(resData), 
-            'Unrecognized response type from POST to /product'
-          )
 
           // product was added
           if (res.status === 201) {
@@ -520,12 +517,9 @@ export const AddProductForm = () => {
         // error
         .catch(res => {
 
-          // type check
+          // TODO: type check
+
           const resData = res.data
-          assert(
-            isTProductPostResBody(resData), 
-            'Unrecognized response type from POST to /product'
-          )
                     
           toast({
             title: 'Error!',
