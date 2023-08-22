@@ -1,13 +1,13 @@
 import { 
   IHolding, ITransaction,  
 
-  assert, getQuantity
+  assert, getHoldingQuantity
 } from 'common'
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
-import { IMHolding } from './models/holdingSchema'
-import { IMProduct, productSchema } from './models/productSchema'
-import { getProductDocs } from './mongoManager'
+import { IMHolding } from './mongo/models/holdingSchema'
+import { IMProduct, productSchema } from './mongo/models/productSchema'
+import { getProductDocs } from './mongo/mongoManager'
 
 
 // models
@@ -29,7 +29,7 @@ INPUT
 RETURN
   TRUE if the input is a valid set of IHolding[], FALSE otherwise
 */
-export async function isValidHoldings(holdings: IHolding[]): Promise<boolean> {
+export async function areValidHoldings(holdings: IHolding[]): Promise<boolean> {
   
   // unique tcgplayerId
   const tcgplayerIds = holdings.map((holding: IHolding) => {
@@ -53,7 +53,7 @@ export async function isValidHoldings(holdings: IHolding[]): Promise<boolean> {
 
   // quantity >= 0
   if (!_.every(holdings, (holding: IHolding) => {
-    return isValidTransactions(holding.transactions)
+    return hasValidTransactions(holding)
   })) {
     return false
   }
@@ -64,17 +64,18 @@ export async function isValidHoldings(holdings: IHolding[]): Promise<boolean> {
 
 /*
 DESC
-  Validates whether the input Transactions are valid. The validity checks are:
+  Validates whether the input IHolding has valid Transactions. The validity 
+  checks are:
     - the net quantity is greater than or equal to 0
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding[]
 RETURN
-  TRUE if the input is a valid set of ITransaction[], FALSE otherwise
+  TRUE if the input IHolding has valid set of ITransaction[], FALSE otherwise
 */
-export function isValidTransactions(transactions: ITransaction[]): boolean {
+export function hasValidTransactions(holding: IHolding): boolean {
 
   // net quantity
-  return getQuantity(transactions) >= 0
+  return getHoldingQuantity(holding) >= 0
 }
 
 

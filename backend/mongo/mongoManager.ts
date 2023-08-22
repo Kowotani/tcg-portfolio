@@ -11,7 +11,7 @@ import { HydratedDocument} from 'mongoose'
 import { IMPortfolio, portfolioSchema } from './models/portfolioSchema'
 import { IMPrice, priceSchema } from './models/priceSchema'
 import { IMProduct, productSchema } from './models/productSchema'
-import { isValidHoldings, getIMHoldingsFromIHoldings } from './utils'
+import { areValidHoldings, getIMHoldingsFromIHoldings } from '../utils'
 
 
 // =======
@@ -77,7 +77,7 @@ export async function addPortfolioHoldings(
     assert(portfolioDoc instanceof Portfolio)
  
     // validate holdingsToAdd
-    const validHoldings = await isValidHoldings(holdingsToAdd)
+    const validHoldings = await areValidHoldings(holdingsToAdd)
     if (!validHoldings) {
       console.log('Holdings failed validation in addPortfolioHoldings()')
       return false
@@ -395,7 +395,7 @@ export async function setPortfolioHoldings(
     const holdings = Array.isArray(holdingInput) ? holdingInput : [holdingInput]
 
     // validate Holdings
-    const validHoldings = await isValidHoldings(holdings)
+    const validHoldings = await areValidHoldings(holdings)
     if (!validHoldings) {
       console.log('Holdings failed validation in setPortfolioHoldings()')
       return false

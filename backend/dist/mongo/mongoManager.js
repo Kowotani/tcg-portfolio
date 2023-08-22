@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -43,7 +39,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const portfolioSchema_1 = require("./models/portfolioSchema");
 const priceSchema_1 = require("./models/priceSchema");
 const productSchema_1 = require("./models/productSchema");
-const utils_1 = require("./utils");
+const utils_1 = require("../utils");
 // =======
 // globals
 // =======
@@ -92,7 +88,7 @@ function addPortfolioHoldings(portfolio, holdingInput) {
             }
             (0, common_1.assert)(portfolioDoc instanceof Portfolio);
             // validate holdingsToAdd
-            const validHoldings = yield (0, utils_1.isValidHoldings)(holdingsToAdd);
+            const validHoldings = yield (0, utils_1.areValidHoldings)(holdingsToAdd);
             if (!validHoldings) {
                 console.log('Holdings failed validation in addPortfolioHoldings()');
                 return false;
@@ -358,7 +354,7 @@ function setPortfolioHoldings(portfolio, holdingInput) {
             // convert input to Array, if necessary
             const holdings = Array.isArray(holdingInput) ? holdingInput : [holdingInput];
             // validate Holdings
-            const validHoldings = yield (0, utils_1.isValidHoldings)(holdings);
+            const validHoldings = yield (0, utils_1.areValidHoldings)(holdings);
             if (!validHoldings) {
                 console.log('Holdings failed validation in setPortfolioHoldings()');
                 return false;
@@ -554,7 +550,6 @@ function insertPrices(docs) {
     });
 }
 exports.insertPrices = insertPrices;
-const common_2 = require("common");
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let res;
@@ -579,27 +574,26 @@ function main() {
         // }
         // const p233232 = await getProductDoc({'tcgplayerId': 233232})
         // const p449558 = await getProductDoc({'tcgplayerId': 449558})
-        const userId = 1234;
-        const portfolioName = 'Beta Investments';
-        let holdings = [
-            {
-                tcgplayerId: 449558,
-                transactions: [
-                    {
-                        type: common_2.TransactionType.Purchase,
-                        date: new Date(),
-                        price: 4.56,
-                        quantity: 123,
-                    },
-                ]
-            },
-        ];
-        const portfolio = {
-            userId: userId,
-            portfolioName: portfolioName,
-            holdings: holdings,
-            description: "Taco Bell leftovers"
-        };
+        // const userId = 789
+        // const portfolioName = 'Omega Investments'
+        // let holdings: IHolding[] = [
+        //   {
+        //     tcgplayerId: 233232,
+        //     transactions: [
+        //       {
+        //         type: TransactionType.Purchase,
+        //         date: new Date(),
+        //         price: 99,
+        //         quantity: 1,
+        //       },
+        //     ]
+        //   },
+        // ]
+        // const portfolio: IPortfolio = {
+        //   userId: userId, 
+        //   portfolioName: portfolioName,
+        //   holdings: holdings,
+        // }
         // let tcgplayerId = 233232
         // // -- Add portfolio holdings
         // res = await addPortfolioHoldings(portfolio, holdings)
@@ -629,13 +623,12 @@ function main() {
         //   console.log('Portfolios not retrieved')
         // }
         // -- Add portfolio
-        res = yield addPortfolio(portfolio);
-        if (res) {
-            console.log('Portfolio successfully created');
-        }
-        else {
-            console.log('Portfolio not created');
-        }
+        // res = await addPortfolio(portfolio)
+        // if (res) {
+        //   console.log('Portfolio successfully created')
+        // } else {
+        //   console.log('Portfolio not created')
+        // }
         // // -- Delete portfolio
         // res = await deletePortfolio(userId, portfolioName)
         // if (res) {
