@@ -104,18 +104,19 @@ RETURN
   TRUE if the Product matches the searchInput, FALSE otherwise
 */
 function isMatchingProduct(product: IProduct, searchInput: string): boolean {
+  const escapedInput = _.escapeRegExp(searchInput)
   return (
     // name
-    _.toLower(product.name).match(_.toLower(searchInput)) !== null
+    _.toLower(product.name).match(_.toLower(escapedInput)) !== null
 
     // TCG
-    || _.toLower(product.tcg).match(_.toLower(searchInput)) !== null
+    || _.toLower(product.tcg).match(_.toLower(escapedInput)) !== null
 
     // ProductType
-    || _.toLower(product.type).match(_.toLower(searchInput)) !== null
+    || _.toLower(product.type).match(_.toLower(escapedInput)) !== null
 
     // ProductSubtype
-    || (_.toLower(product.subtype).match(_.toLower(searchInput)) !== null
+    || (_.toLower(product.subtype).match(_.toLower(escapedInput)) !== null
       && !NonVisibileProductSubtypes.includes(
         product.subtype as ProductSubtype)
       )
