@@ -14,8 +14,8 @@ import {
 import { 
   IPopulatedHolding, ITransaction,
 
-  getAverageCost, getAverageRevenue, getPurchaseQuantity, 
-  getQuantity, getSaleQuantity,
+  getHoldingAverageCost, getHoldingAverageRevenue, getHoldingPurchaseQuantity, 
+  getHoldingQuantity, getHoldingSaleQuantity,
 } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
 import { ProductDescription } from './ProductDescription'
@@ -57,19 +57,19 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
   const quantitySummary: TMetricSummaryItem[] = [
     {
       title: 'Purchases:',
-      value: getPurchaseQuantity(transactions),
+      value: getHoldingPurchaseQuantity(holding),
       placeholder: '-',
       titleStyle: {},
     },
     {
       title: 'Sales:',
-      value: getSaleQuantity(transactions),
+      value: getHoldingSaleQuantity(holding),
       placeholder: '-',
       titleStyle: {},
     },
     {
       title: 'Quantity:',
-      value: getQuantity(transactions),
+      value: getHoldingQuantity(holding),
       placeholder: '-',
       titleStyle: {},
     },
@@ -78,7 +78,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
   const profitSummary: TMetricSummaryItem[] = [
     {
       title: 'Avg Cost:',
-      value: getAverageCost(transactions),
+      value: getHoldingAverageCost(holding),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
@@ -86,7 +86,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     },
     {
       title: 'Avg Rev:',
-      value: getAverageRevenue(transactions),
+      value: getHoldingAverageRevenue(holding),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',

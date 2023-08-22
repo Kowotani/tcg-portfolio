@@ -26,10 +26,10 @@ import {
   VStack
 } from '@chakra-ui/react'
 import { 
-  IReactTableTransaction, IProduct, ITransaction, TransactionType,
+  IHolding, IReactTableTransaction, IProduct, ITransaction, TransactionType,
 
-  getAverageCost, getAverageRevenue, getPurchaseQuantity, getSaleQuantity, 
-  getTotalCost, getTotalRevenue,
+  getHoldingAverageCost, getHoldingAverageRevenue, getHoldingPurchaseQuantity, 
+  getHoldingSaleQuantity, getHoldingTotalCost, getHoldingTotalRevenue,
 } from 'common'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
@@ -324,22 +324,27 @@ export const EditTransactionsModal = (
   // transaction summary items
   // -------------------------
 
+  const holding: IHolding = {
+    tcgplayerId: 0,
+    transactions: transactions
+  }
+
   const purchaseSummaryItems: TMetricSummaryItem[] = [
     {
       title: 'Purchases',
-      value: getPurchaseQuantity(transactions),
+      value: getHoldingPurchaseQuantity(holding),
       placeholder: '-',
     },
     {
       title: 'Total Cost',
-      value: getTotalCost(transactions),
+      value: getHoldingTotalCost(holding),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
     },
     {
       title: 'Avg Cost',
-      value: getAverageCost(transactions),
+      value: getHoldingAverageCost(holding),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
@@ -349,19 +354,19 @@ export const EditTransactionsModal = (
   const saleSummaryItems: TMetricSummaryItem[] = [
     {
       title: 'Sales',
-      value: getSaleQuantity(transactions),
+      value: getHoldingSaleQuantity(holding),
       placeholder: '-',
     },
     {
       title: 'Total Rev',
-      value: getTotalRevenue(transactions),
+      value: getHoldingTotalRevenue(holding),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
     },
     {
       title: 'Avg Rev',
-      value: getAverageRevenue(transactions),
+      value: getHoldingAverageRevenue(holding),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
@@ -409,7 +414,8 @@ export const EditTransactionsModal = (
 
   // validate that purchases >= sales
   function hasNonNegativeQuantity(): boolean {
-    return getPurchaseQuantity(transactions) >= getSaleQuantity(transactions)
+    return getHoldingPurchaseQuantity(holding) 
+      >= getHoldingSaleQuantity(holding)
   }
 
   // ----------------
@@ -543,7 +549,7 @@ export const EditTransactionsModal = (
               
               {/* Sales */}
               {
-                getSaleQuantity(transactions) > 0 
+                getHoldingSaleQuantity(holding) > 0 
                   ? (
                     <Card>
                       <CardBody>

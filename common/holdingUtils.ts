@@ -1,75 +1,79 @@
 import * as _ from 'lodash'
-import { ITransaction, TransactionType } from './dataModels'
+import { 
+  IHolding, IPopulatedHolding, ITransaction, TransactionType 
+} from './dataModels'
 import { assert } from './utils'
 
 /*
 DESC
-  Returns the average purchase cost from the input ITransaction[]. This value
+  Returns the average purchase cost from the input IHolding. This value
   should never be negative
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
-  The average purchase cost from the input ITransaction[], or undefined
+  The average purchase cost from the input IHolding, or undefined
   if purchaseQuantity === 0
 */
-export function getAverageCost(
-  transactions: ITransaction[]
+export function getHoldingAverageCost(
+  holding: IHolding | IPopulatedHolding
 ): number | undefined {
-  const quantity = getPurchaseQuantity(transactions)
+  const quantity = getHoldingPurchaseQuantity(holding)
   return quantity === 0 
     ? undefined
-    : getTotalCost(transactions) / quantity
+    : getHoldingTotalCost(holding) / quantity
 }
 
 /*
 DESC
-  Returns the average sale revemue from the input ITransaction[]. This value
+  Returns the average sale revemue from the input IHolding. This value
   should never be negative
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
-  The average sale revenue from the input ITransaction[], or undefined
+  The average sale revenue from the input IHolding, or undefined
   if saleQuantity === 0
 */
-export function getAverageRevenue(
-  transactions: ITransaction[]
+export function getHoldingAverageRevenue(
+  holding: IHolding | IPopulatedHolding
 ): number | undefined {
-  const quantity = getSaleQuantity(transactions)
-  return quantity === 0 
+  const saleQuantity = getHoldingSaleQuantity(holding)
+  return saleQuantity === 0 
     ? undefined
-    : getTotalRevenue(transactions) / quantity
+    : getHoldingTotalRevenue(holding) / saleQuantity
 }
 
 /*
 DESC
-  Returns the total pnl percent from the input ITransaction[] and price relative
+  Returns the total pnl percent from the input IHolding and price relative
   to the total cost
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
   price: The market price
 RETURN
   The total pnl as a percentage return relative to the total cost
 */
-export function getPercentPnl(
-  transactions: ITransaction[],
+export function getHoldingPercentPnl(
+  holding: IHolding | IPopulatedHolding,
   price: number
 ): number | undefined {
-  const totalCost = getTotalCost(transactions)
+  const totalCost = getHoldingTotalCost(holding)
   return totalCost === 0
     ? undefined 
-    : getTotalPnl(transactions, price) / totalCost
+    : getHoldingTotalPnl(holding, price) / totalCost
 }
 
 /*
 DESC
-  Returns the purchases from the input ITransaction[]
+  Returns the purchase ITransactions from the input IHolding
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
-  An array of purchases from the ITransaction[]
+  An array of purchase ITransactions from the IHolding
 */
-export function getPurchases(transactions: ITransaction[]): ITransaction[] {
-  return transactions.filter((txn: ITransaction) => {
+export function getHoldingPurchases(
+  holding: IHolding | IPopulatedHolding
+): ITransaction[] {
+  return holding.transactions.filter((txn: ITransaction) => {
     return txn.type === TransactionType.Purchase
 })}
 
@@ -78,15 +82,17 @@ DESC
   Returns the purchase quantity from the input ITransaction. This value
   should never be negative
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
   The purchase quantity from the input ITransaction
 */
-export function getPurchaseQuantity(transactions: ITransaction[]): number {
-  const value = _.sumBy(getPurchases(transactions), (txn: ITransaction) => {
+export function getHoldingPurchaseQuantity(
+  holding: IHolding | IPopulatedHolding
+): number {
+  const value = _.sumBy(getHoldingPurchases(holding), (txn: ITransaction) => {
     return txn.quantity
   })
-  assert(value >= 0, 'getPurchaseQuantity() is not at least 0')
+  assert(value >= 0, 'getHoldingPurchaseQuantity() is not at least 0')
   return value
 }
 
@@ -94,13 +100,16 @@ export function getPurchaseQuantity(transactions: ITransaction[]): number {
 DESC
   Returns the total cost of items 
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
   The item quantity available from the input ITransaction
 */
-export function getQuantity(transactions: ITransaction[]): number {
-  const value = getPurchaseQuantity(transactions) - getSaleQuantity(transactions)
-  assert(value >= 0, 'getQuantity() is not at least 0')
+export function getHoldingQuantity(
+  holding: IHolding | IPopulatedHolding
+): number {
+  const value = getHoldingPurchaseQuantity(holding) 
+    - getHoldingSaleQuantity(holding)
+  assert(value >= 0, 'getHoldingQuantity() is not at least 0')
   return value
 }
 
@@ -109,98 +118,108 @@ DESC
   Returns the realized pnl determined as:
     pnl = salesQuantity * (avgRev - avgCost)
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
   The realized pnl based on sales and avg cost vs avg revenue from the 
-  ITransaction[], or undefined if saleQuantity === 0
+  IHolding, or undefined if saleQuantity === 0
 */
-export function getRealizedPnl(transactions: ITransaction[]): number | undefined {
-  const saleQuantity = getSaleQuantity(transactions)
+export function getHoldingRealizedPnl(
+  holding: IHolding | IPopulatedHolding
+): number | undefined {
+  const saleQuantity = getHoldingSaleQuantity(holding)
   return saleQuantity === 0 
     ? undefined
-    : (getAverageRevenue(transactions) - getAverageCost(transactions))
+    : (getHoldingAverageRevenue(holding) - getHoldingAverageCost(holding))
       * saleQuantity
 }
 
 /*
 DESC
-  Returns the sales from the input ITransaction[]
+  Returns the sale ITransactions from the input IHolding
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
-  An array of sales from the ITransaction[]
+  An array of sale ITransactions from the IHolding
 */
-export function getSales(transactions: ITransaction[]): ITransaction[] {
-  return transactions.filter((txn: ITransaction) => {
+export function getHoldingSales(
+  holding: IHolding | IPopulatedHolding
+): ITransaction[] {
+  return holding.transactions.filter((txn: ITransaction) => {
     return txn.type === TransactionType.Sale
 })}
 
 /*
 DESC
-  Returns the sale quantity from the input ITransaction[]. This value
+  Returns the sale quantity from the input IHolding. This value
   should never be negative
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
   The sale quantity from the input ITransaction
 */
-export function getSaleQuantity(transactions: ITransaction[]): number {
-  const value = _.sumBy(getSales(transactions), (txn: ITransaction) => {
+export function getHoldingSaleQuantity(
+  holding: IHolding | IPopulatedHolding
+): number {
+  const value = _.sumBy(getHoldingSales(holding), (txn: ITransaction) => {
     return txn.quantity
   })
-  assert(value >= 0, 'getSaleQuantity() is not at least 0')
+  assert(value >= 0, 'getHoldingSaleQuantity() is not at least 0')
   return value
 }
 
 /*
 DESC
-  Returns the total purchase cost from the input ITransaction[]. This value
+  Returns the total purchase cost from the input IHolding. This value
   should never be negative
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
   The total purchase cost from the input ITransaction
 */
-export function getTotalCost(transactions: ITransaction[]): number {
-  const value = _.sumBy(getPurchases(transactions), (txn: ITransaction) => {
+export function getHoldingTotalCost(
+  holding: IHolding | IPopulatedHolding
+): number {
+  const value = _.sumBy(getHoldingPurchases(holding), (txn: ITransaction) => {
     return txn.quantity * txn.price
   })
-  assert(value >= 0, 'getTotalCost() is not at least 0')
+  assert(value >= 0, 'getHoldingTotalCost() is not at least 0')
   return value
 }
 
 /*
 DESC
-  Returns the total pnl from the input ITransaction[] and price
+  Returns the total pnl from the input IHolding and price
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
   price: The market price
 RETURN
   The total pnl based on the market price and avg cost vs avg rev from the
-  ITransaction[]
+  IHolding
 */
-export function getTotalPnl(
-  transactions: ITransaction[],
+export function getHoldingTotalPnl(
+  holding: IHolding | IPopulatedHolding,
   price: number
 ): number {
-  return getRealizedPnl(transactions) 
-    + getUnrealizedPnl(transactions, price) ?? 0
+  return getHoldingRealizedPnl(holding) 
+    + getHoldingUnrealizedPnl(holding, price) ?? 0
 }
 
 /*
 DESC
-  Returns the total sale revenue from the input ITransaction[]. This value
+  Returns the total sale revenue from the input IHolding. This value
   should never be negative
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
   The total sale revenue from the input ITransaction
 */
-export function getTotalRevenue(transactions: ITransaction[]): number {
-  const value = _.sumBy(getSales(transactions), (txn: ITransaction) => {
+export function getHoldingTotalRevenue(
+  holding: IHolding | IPopulatedHolding
+): number {
+  const value = _.sumBy(getHoldingSales(holding), (txn: ITransaction) => {
     return txn.quantity * txn.price
   })
-  assert(value >= 0, 'getTotalRev() is not at least 0')
+  assert(value >= 0, 'getHoldingTotalRev() is not at least 0')
   return value
 }
 
@@ -209,18 +228,18 @@ DESC
   Returns the unrealized pnl determined as:
     pnl = quantity * (price - avgCost)
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
   price: The market price
 RETURN
   The unrealized pnl based on market price and avg cost from the 
-  ITransaction[], or undefined if quantity === 0
+  IHolding, or undefined if quantity === 0
 */
-export function getUnrealizedPnl(
-  transactions: ITransaction[],
+export function getHoldingUnrealizedPnl(
+  holding: IHolding | IPopulatedHolding,
   price: number
 ): number | undefined {
-  const quantity = getQuantity(transactions)
+  const quantity = getHoldingQuantity(holding)
   return quantity === 0 
     ? undefined
-    : (price - getAverageCost(transactions)) * quantity
+    : (price - getHoldingAverageCost(holding)) * quantity
 }

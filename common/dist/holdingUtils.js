@@ -1,219 +1,220 @@
 "use strict";
 exports.__esModule = true;
-exports.getUnrealizedPnl = exports.getTotalRevenue = exports.getTotalPnl = exports.getTotalCost = exports.getSaleQuantity = exports.getSales = exports.getRealizedPnl = exports.getQuantity = exports.getPurchaseQuantity = exports.getPurchases = exports.getPercentPnl = exports.getAverageRevenue = exports.getAverageCost = void 0;
+exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = void 0;
 var _ = require("lodash");
 var dataModels_1 = require("./dataModels");
 var utils_1 = require("./utils");
 /*
 DESC
-  Returns the average purchase cost from the input ITransaction[]. This value
+  Returns the average purchase cost from the input IHolding. This value
   should never be negative
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
-  The average purchase cost from the input ITransaction[], or undefined
+  The average purchase cost from the input IHolding, or undefined
   if purchaseQuantity === 0
 */
-function getAverageCost(transactions) {
-    var quantity = getPurchaseQuantity(transactions);
+function getHoldingAverageCost(holding) {
+    var quantity = getHoldingPurchaseQuantity(holding);
     return quantity === 0
         ? undefined
-        : getTotalCost(transactions) / quantity;
+        : getHoldingTotalCost(holding) / quantity;
 }
-exports.getAverageCost = getAverageCost;
+exports.getHoldingAverageCost = getHoldingAverageCost;
 /*
 DESC
-  Returns the average sale revemue from the input ITransaction[]. This value
+  Returns the average sale revemue from the input IHolding. This value
   should never be negative
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
-  The average sale revenue from the input ITransaction[], or undefined
+  The average sale revenue from the input IHolding, or undefined
   if saleQuantity === 0
 */
-function getAverageRevenue(transactions) {
-    var quantity = getSaleQuantity(transactions);
-    return quantity === 0
+function getHoldingAverageRevenue(holding) {
+    var saleQuantity = getHoldingSaleQuantity(holding);
+    return saleQuantity === 0
         ? undefined
-        : getTotalRevenue(transactions) / quantity;
+        : getHoldingTotalRevenue(holding) / saleQuantity;
 }
-exports.getAverageRevenue = getAverageRevenue;
+exports.getHoldingAverageRevenue = getHoldingAverageRevenue;
 /*
 DESC
-  Returns the total pnl percent from the input ITransaction[] and price relative
+  Returns the total pnl percent from the input IHolding and price relative
   to the total cost
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
   price: The market price
 RETURN
   The total pnl as a percentage return relative to the total cost
 */
-function getPercentPnl(transactions, price) {
-    var totalCost = getTotalCost(transactions);
+function getHoldingPercentPnl(holding, price) {
+    var totalCost = getHoldingTotalCost(holding);
     return totalCost === 0
         ? undefined
-        : getTotalPnl(transactions, price) / totalCost;
+        : getHoldingTotalPnl(holding, price) / totalCost;
 }
-exports.getPercentPnl = getPercentPnl;
+exports.getHoldingPercentPnl = getHoldingPercentPnl;
 /*
 DESC
-  Returns the purchases from the input ITransaction[]
+  Returns the purchase ITransactions from the input IHolding
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
-  An array of purchases from the ITransaction[]
+  An array of purchase ITransactions from the IHolding
 */
-function getPurchases(transactions) {
-    return transactions.filter(function (txn) {
+function getHoldingPurchases(holding) {
+    return holding.transactions.filter(function (txn) {
         return txn.type === dataModels_1.TransactionType.Purchase;
     });
 }
-exports.getPurchases = getPurchases;
+exports.getHoldingPurchases = getHoldingPurchases;
 /*
 DESC
   Returns the purchase quantity from the input ITransaction. This value
   should never be negative
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
   The purchase quantity from the input ITransaction
 */
-function getPurchaseQuantity(transactions) {
-    var value = _.sumBy(getPurchases(transactions), function (txn) {
+function getHoldingPurchaseQuantity(holding) {
+    var value = _.sumBy(getHoldingPurchases(holding), function (txn) {
         return txn.quantity;
     });
-    (0, utils_1.assert)(value >= 0, 'getPurchaseQuantity() is not at least 0');
+    (0, utils_1.assert)(value >= 0, 'getHoldingPurchaseQuantity() is not at least 0');
     return value;
 }
-exports.getPurchaseQuantity = getPurchaseQuantity;
+exports.getHoldingPurchaseQuantity = getHoldingPurchaseQuantity;
 /*
 DESC
   Returns the total cost of items
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
   The item quantity available from the input ITransaction
 */
-function getQuantity(transactions) {
-    var value = getPurchaseQuantity(transactions) - getSaleQuantity(transactions);
-    (0, utils_1.assert)(value >= 0, 'getQuantity() is not at least 0');
+function getHoldingQuantity(holding) {
+    var value = getHoldingPurchaseQuantity(holding)
+        - getHoldingSaleQuantity(holding);
+    (0, utils_1.assert)(value >= 0, 'getHoldingQuantity() is not at least 0');
     return value;
 }
-exports.getQuantity = getQuantity;
+exports.getHoldingQuantity = getHoldingQuantity;
 /*
 DESC
   Returns the realized pnl determined as:
     pnl = salesQuantity * (avgRev - avgCost)
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
   The realized pnl based on sales and avg cost vs avg revenue from the
-  ITransaction[], or undefined if saleQuantity === 0
+  IHolding, or undefined if saleQuantity === 0
 */
-function getRealizedPnl(transactions) {
-    var saleQuantity = getSaleQuantity(transactions);
+function getHoldingRealizedPnl(holding) {
+    var saleQuantity = getHoldingSaleQuantity(holding);
     return saleQuantity === 0
         ? undefined
-        : (getAverageRevenue(transactions) - getAverageCost(transactions))
+        : (getHoldingAverageRevenue(holding) - getHoldingAverageCost(holding))
             * saleQuantity;
 }
-exports.getRealizedPnl = getRealizedPnl;
+exports.getHoldingRealizedPnl = getHoldingRealizedPnl;
 /*
 DESC
-  Returns the sales from the input ITransaction[]
+  Returns the sale ITransactions from the input IHolding
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
-  An array of sales from the ITransaction[]
+  An array of sale ITransactions from the IHolding
 */
-function getSales(transactions) {
-    return transactions.filter(function (txn) {
+function getHoldingSales(holding) {
+    return holding.transactions.filter(function (txn) {
         return txn.type === dataModels_1.TransactionType.Sale;
     });
 }
-exports.getSales = getSales;
+exports.getHoldingSales = getHoldingSales;
 /*
 DESC
-  Returns the sale quantity from the input ITransaction[]. This value
+  Returns the sale quantity from the input IHolding. This value
   should never be negative
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
   The sale quantity from the input ITransaction
 */
-function getSaleQuantity(transactions) {
-    var value = _.sumBy(getSales(transactions), function (txn) {
+function getHoldingSaleQuantity(holding) {
+    var value = _.sumBy(getHoldingSales(holding), function (txn) {
         return txn.quantity;
     });
-    (0, utils_1.assert)(value >= 0, 'getSaleQuantity() is not at least 0');
+    (0, utils_1.assert)(value >= 0, 'getHoldingSaleQuantity() is not at least 0');
     return value;
 }
-exports.getSaleQuantity = getSaleQuantity;
+exports.getHoldingSaleQuantity = getHoldingSaleQuantity;
 /*
 DESC
-  Returns the total purchase cost from the input ITransaction[]. This value
+  Returns the total purchase cost from the input IHolding. This value
   should never be negative
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
   The total purchase cost from the input ITransaction
 */
-function getTotalCost(transactions) {
-    var value = _.sumBy(getPurchases(transactions), function (txn) {
+function getHoldingTotalCost(holding) {
+    var value = _.sumBy(getHoldingPurchases(holding), function (txn) {
         return txn.quantity * txn.price;
     });
-    (0, utils_1.assert)(value >= 0, 'getTotalCost() is not at least 0');
+    (0, utils_1.assert)(value >= 0, 'getHoldingTotalCost() is not at least 0');
     return value;
 }
-exports.getTotalCost = getTotalCost;
+exports.getHoldingTotalCost = getHoldingTotalCost;
 /*
 DESC
-  Returns the total pnl from the input ITransaction[] and price
+  Returns the total pnl from the input IHolding and price
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
   price: The market price
 RETURN
   The total pnl based on the market price and avg cost vs avg rev from the
-  ITransaction[]
+  IHolding
 */
-function getTotalPnl(transactions, price) {
+function getHoldingTotalPnl(holding, price) {
     var _a;
-    return (_a = getRealizedPnl(transactions)
-        + getUnrealizedPnl(transactions, price)) !== null && _a !== void 0 ? _a : 0;
+    return (_a = getHoldingRealizedPnl(holding)
+        + getHoldingUnrealizedPnl(holding, price)) !== null && _a !== void 0 ? _a : 0;
 }
-exports.getTotalPnl = getTotalPnl;
+exports.getHoldingTotalPnl = getHoldingTotalPnl;
 /*
 DESC
-  Returns the total sale revenue from the input ITransaction[]. This value
+  Returns the total sale revenue from the input IHolding. This value
   should never be negative
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
 RETURN
   The total sale revenue from the input ITransaction
 */
-function getTotalRevenue(transactions) {
-    var value = _.sumBy(getSales(transactions), function (txn) {
+function getHoldingTotalRevenue(holding) {
+    var value = _.sumBy(getHoldingSales(holding), function (txn) {
         return txn.quantity * txn.price;
     });
-    (0, utils_1.assert)(value >= 0, 'getTotalRev() is not at least 0');
+    (0, utils_1.assert)(value >= 0, 'getHoldingTotalRev() is not at least 0');
     return value;
 }
-exports.getTotalRevenue = getTotalRevenue;
+exports.getHoldingTotalRevenue = getHoldingTotalRevenue;
 /*
 DESC
   Returns the unrealized pnl determined as:
     pnl = quantity * (price - avgCost)
 INPUT
-  transactions: An ITransaction[]
+  holding: An IHolding
   price: The market price
 RETURN
   The unrealized pnl based on market price and avg cost from the
-  ITransaction[], or undefined if quantity === 0
+  IHolding, or undefined if quantity === 0
 */
-function getUnrealizedPnl(transactions, price) {
-    var quantity = getQuantity(transactions);
+function getHoldingUnrealizedPnl(holding, price) {
+    var quantity = getHoldingQuantity(holding);
     return quantity === 0
         ? undefined
-        : (price - getAverageCost(transactions)) * quantity;
+        : (price - getHoldingAverageCost(holding)) * quantity;
 }
-exports.getUnrealizedPnl = getUnrealizedPnl;
+exports.getHoldingUnrealizedPnl = getHoldingUnrealizedPnl;
