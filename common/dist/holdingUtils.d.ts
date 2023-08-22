@@ -1,11 +1,14 @@
 import { ITransaction } from './dataModels';
 export declare function getAverageCost(transactions: ITransaction[]): number | undefined;
 export declare function getAverageRevenue(transactions: ITransaction[]): number | undefined;
-export declare function getProfit(transactions: ITransaction[]): number | undefined;
+export declare function getPercentPnl(transactions: ITransaction[], price: number): number | undefined;
 export declare function getPurchases(transactions: ITransaction[]): ITransaction[];
 export declare function getPurchaseQuantity(transactions: ITransaction[]): number;
 export declare function getQuantity(transactions: ITransaction[]): number;
+export declare function getRealizedPnl(transactions: ITransaction[]): number | undefined;
 export declare function getSales(transactions: ITransaction[]): ITransaction[];
 export declare function getSaleQuantity(transactions: ITransaction[]): number;
 export declare function getTotalCost(transactions: ITransaction[]): number;
+export declare function getTotalPnl(transactions: ITransaction[], price: number): number;
 export declare function getTotalRevenue(transactions: ITransaction[]): number;
+export declare function getUnrealizedPnl(transactions: ITransaction[], price: number): number | undefined;

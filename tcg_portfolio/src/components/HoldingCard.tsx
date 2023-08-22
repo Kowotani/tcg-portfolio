@@ -14,7 +14,7 @@ import {
 import { 
   IPopulatedHolding, ITransaction,
 
-  getAverageCost, getAverageRevenue, getProfit, getPurchaseQuantity, 
+  getAverageCost, getAverageRevenue, getPurchaseQuantity, 
   getQuantity, getSaleQuantity,
 } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
@@ -91,15 +91,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
       formattedPrecision: 2,
       placeholder: '$ -',
       titleStyle: {},
-    },
-    {
-      title: 'Profit:',
-      value: getProfit(transactions),
-      formattedPrefix: '$',
-      formattedPrecision: 2,
-      placeholder: '$ -',
-      titleStyle: {},
-    },
+    }
   ]
 
   // =====
