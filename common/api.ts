@@ -1,27 +1,46 @@
-import { IProduct } from "./dataModels"
+import { IProduct, TTcgplayerIdPrices } from "./dataModels"
 
 
 // =====
 // enums
 // =====
 
-// GET to /portfolios status
-export enum PortfolioGetStatus {
-  Success = 'Successfully retrieved Portfolio docs',
-  Error = 'Error retrieving Portfolio docs',
+/*
+  Endpoint:   GET_PORTFOLIOS_URL
+  Type:       GET
+*/
+export enum GetPortfoliosStatus {
+  Success = 'Successfully retrieved Portfolios',
+  Error = 'Error retrieving Portfolios',
 }
 
-// POST to /product status
-export enum ProductPostStatus {
+/*
+  Endpoint:   GET_LATEST_PRICES_URL
+  Type:       GET
+*/
+export enum GetPricesStatus {
+  Success = 'Successfully retrieved latest Prices',
+  Error = 'Error retrieving latest Prices',
+}
+
+/*
+  Endpoint:   ADD_PRODUCT_URL
+  Type:       POST
+*/
+export enum PostProductStatus {
   Added = 'tcgplayerId added',
   AddedWithoutImage = 'tcgplayerId added (without image)',
   AlreadyExists = 'tcgplayerId already exists',
   Error = 'Error creating the Product doc',
 }
 
-export enum ProductsGetStatus {
-  Success = 'Successfully retrieved Product docs',
-  Error = 'Error retrieving Product docs',
+/*
+  Endpoint:   GET_PRODUCTS_URL
+  Type:       GET
+*/
+export enum GetProductsStatus {
+  Success = 'Successfully retrieved Products',
+  Error = 'Error retrieving Products',
 }
 
 
@@ -29,8 +48,9 @@ export enum ProductsGetStatus {
 // routes
 // ======
 
-export const GET_PORTFOLIOS_URL = '/portfolios'
 export const ADD_PRODUCT_URL = '/product'
+export const GET_LATEST_PRICES_URL = '/prices/latest'
+export const GET_PORTFOLIOS_URL = '/portfolios'
 export const GET_PRODUCTS_URL = '/products'
 
 
@@ -38,7 +58,9 @@ export const GET_PRODUCTS_URL = '/products'
 // types
 // =====
 
-// -- responses
+// ---------
+// responses
+// ---------
 
 // base body response
 export type TResBody = {
@@ -59,7 +81,16 @@ export type TProductPostResBody<Type> = TDataResBody<Type> & {
   tcgplayerId: number
 }
 
-// -- requests
+/*
+  Endpoint:   GET_LATEST_PRICES_URL
+  Type:       GET
+  Req / Res:  Response
+*/
+export type TPricesGetResBody = TDataResBody<TTcgplayerIdPrices>
+
+// --------
+// requests
+// --------
 
 /*
   Endpoint:   ADD_PRODUCT_URL

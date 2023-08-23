@@ -2,7 +2,7 @@
 import { 
   IProduct,
 
-  PortfolioGetStatus, ProductPostStatus, ProductsGetStatus, 
+  GetPortfoliosStatus, PostProductStatus, GetProductsStatus, 
   
   TDataResBody, TProductPostReqBody, TProductPostResBody, TResBody, 
 
@@ -56,7 +56,7 @@ app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
     // TODO: Add a type inference for this
     const body = {
       data: data,
-      message: PortfolioGetStatus.Success
+      message: GetPortfoliosStatus.Success
     }
     res.send(body)
 
@@ -64,7 +64,7 @@ app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
   } catch (err) {
     res.status(500)
     const body: TResBody = {
-      message: PortfolioGetStatus.Error + ': ' + err
+      message: GetPortfoliosStatus.Error + ': ' + err
     }
     res.send(body)
   }
@@ -96,7 +96,7 @@ app.get(GET_PRODUCTS_URL, async (req: any, res: any) => {
     res.status(200)
     const body: TDataResBody<IProduct[]> = {
       data: data,
-      message: ProductsGetStatus.Success
+      message: GetProductsStatus.Success
     }
     res.send(body)
 
@@ -104,7 +104,7 @@ app.get(GET_PRODUCTS_URL, async (req: any, res: any) => {
   } catch (err) {
     res.status(500)
     const body: TResBody = {
-      message: ProductPostStatus.Error + ': ' + err
+      message: PostProductStatus.Error + ': ' + err
     }
     res.send(body)
   }
@@ -143,7 +143,7 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
     res.status(202)
     const body: TProductPostResBody<undefined> = {
       tcgplayerId: data.tcgplayerId,
-      message: ProductPostStatus.AlreadyExists,
+      message: PostProductStatus.AlreadyExists,
       data: undefined,
     }
     res.send(body)
@@ -165,8 +165,8 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
         const body: TProductPostResBody<IProduct> = {
           tcgplayerId: data.tcgplayerId,
           message: isImageLoaded
-            ? ProductPostStatus.Added
-            : ProductPostStatus.AddedWithoutImage,
+            ? PostProductStatus.Added
+            : PostProductStatus.AddedWithoutImage,
           data: data,
         }
         res.send(body)
@@ -176,7 +176,7 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
         res.status(500)
         const body: TProductPostResBody<undefined> = {
           tcgplayerId: data.tcgplayerId,
-          message: ProductPostStatus.Error,
+          message: PostProductStatus.Error,
           data: undefined,
         }        
         res.send(body)
@@ -187,7 +187,7 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
       res.status(500)
       const body: TProductPostResBody<undefined> = {
         tcgplayerId: data.tcgplayerId,
-        message: ProductPostStatus.Error + ': ' + err,
+        message: PostProductStatus.Error + ': ' + err,
         data: undefined,
       }        
       res.send(body)
