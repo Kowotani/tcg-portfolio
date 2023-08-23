@@ -3,7 +3,9 @@ import {
   IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
   IPortfolioMethods, IPrice, IProduct,
 
-  assert, isIHoldingArray, isIPopulatedHolding, isIPortfolio
+  TTcgplayerIdPrices,
+
+  assert, isIHoldingArray, isIPopulatedHolding, isIPortfolio, logObject
 } from 'common'
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
@@ -253,6 +255,75 @@ export async function deletePortfolioHolding(
     console.log(`An error occurred in deletePortfolioHolding(): ${err}`)
     return false
   }
+}
+
+/*
+DESC
+  Retrieves the latest market Prices for all Products
+RETURN
+  A TTcgplayerIdPrices object
+*/
+export async function getLatestPrices(): Promise<TTcgplayerIdPrices | null> {
+
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    // get list of Price data with the following shape
+    /*
+      {
+        _id: { tcgplayerId: number},
+        data: [
+          [
+            datestring,
+            number
+          ]
+        ]
+      }
+    */
+    const priceData = await Price.aggregate()
+      .group({
+        _id: {
+          tcgplayerId: '$tcgplayerId',
+          priceDate: '$priceDate'
+        },
+        marketPrice: {
+          $avg: '$prices.marketPrice'
+        },
+      })
+      .group({
+        _id: {
+          tcgplayerId: '$_id.tcgplayerId'
+        },
+        data: {
+          '$topN': {
+            output: [
+              '$_id.priceDate', 
+              '$marketPrice'
+            ], 
+            sortBy: {
+              '_id.priceDate': -1
+            }, 
+            n: 1
+        }}
+      })
+      .exec()
+    
+    // create the TTcgplayerIdPrices
+    let prices: TTcgplayerIdPrices = {}
+    priceData.forEach((el: any) => {
+      prices[el._id.tcgplayerId] = el.data[0][1]
+    })
+    
+    return prices
+
+  } catch(err) {
+
+    console.log(`An error occurred in getLatestPrices(): ${err}`)
+    return null
+  } 
+
 }
 
 /*
@@ -645,10 +716,17 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
   }
 }
 
-import { logObject, TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
+// import { logObject, TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
 async function main(): Promise<number> {  
 
   let res
+
+  res = await getLatestPrices()
+  if (res) {
+    logObject(res)
+  } else {
+    console.log('Could not retrieve latest prices')
+  }
 
   // const product: IProduct = {
   //   tcgplayerId: 449558,

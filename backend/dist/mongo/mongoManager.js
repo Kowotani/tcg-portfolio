@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.setPortfolioProperty = exports.setPortfolioHoldings = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHoldings = exports.Price = exports.Product = exports.Portfolio = void 0;
+exports.insertPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.setPortfolioProperty = exports.setPortfolioHoldings = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.getLatestPrices = exports.deletePortfolioHolding = exports.deletePortfolio = exports.addPortfolio = exports.addPortfolioHoldings = exports.Price = exports.Product = exports.Portfolio = void 0;
 // imports
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
@@ -242,6 +242,71 @@ function deletePortfolioHolding(portfolio, tcgplayerId) {
     });
 }
 exports.deletePortfolioHolding = deletePortfolioHolding;
+/*
+DESC
+  Retrieves the latest market Prices for all Products
+RETURN
+  A TTcgplayerIdPrices object
+*/
+function getLatestPrices() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            // get list of Price data with the following shape
+            /*
+              {
+                _id: { tcgplayerId: number},
+                data: [
+                  [
+                    datestring,
+                    number
+                  ]
+                ]
+              }
+            */
+            const priceData = yield exports.Price.aggregate()
+                .group({
+                _id: {
+                    tcgplayerId: '$tcgplayerId',
+                    priceDate: '$priceDate'
+                },
+                marketPrice: {
+                    $avg: '$prices.marketPrice'
+                },
+            })
+                .group({
+                _id: {
+                    tcgplayerId: '$_id.tcgplayerId'
+                },
+                data: {
+                    '$topN': {
+                        output: [
+                            '$_id.priceDate',
+                            '$marketPrice'
+                        ],
+                        sortBy: {
+                            '_id.priceDate': -1
+                        },
+                        n: 1
+                    }
+                }
+            })
+                .exec();
+            // create the TTcgplayerIdPrices
+            let prices = {};
+            priceData.forEach((el) => {
+                prices[el._id.tcgplayerId] = el.data[0][1];
+            });
+            return prices;
+        }
+        catch (err) {
+            console.log(`An error occurred in getLatestPrices(): ${err}`);
+            return null;
+        }
+    });
+}
+exports.getLatestPrices = getLatestPrices;
 /*
 DESC
   Retrieves the Portfolio document by userId and portfolioName
@@ -554,9 +619,17 @@ function insertPrices(docs) {
     });
 }
 exports.insertPrices = insertPrices;
+// import { logObject, TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let res;
+        res = yield getLatestPrices();
+        if (res) {
+            (0, common_1.logObject)(res);
+        }
+        else {
+            console.log('Could not retrieve latest prices');
+        }
         // const product: IProduct = {
         //   tcgplayerId: 449558,
         //   tcg: TCG.MagicTheGathering,
