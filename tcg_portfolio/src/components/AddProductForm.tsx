@@ -16,9 +16,7 @@ import {
   
   getProductSubtypes, isASCII,
 
-  assert, ADD_PRODUCT_URL, isTProductPostResBody, ProductPostStatus, 
-  TProductPostReqBody,
-  logObject
+  ADD_PRODUCT_URL, PostProductStatus, TProductPostReqBody
 } from 'common';
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField';
@@ -485,19 +483,19 @@ export const AddProductForm = () => {
           if (res.status === 201) {
 
             // added with image
-            if (resData.message === ProductPostStatus.Added) {
+            if (resData.message === PostProductStatus.Added) {
               toast({
                 title: 'Success!',
-                description: `${ProductPostStatus.Added}: ${resData.tcgplayerId}`,
+                description: `${PostProductStatus.Added}: ${resData.tcgplayerId}`,
                 status: 'success',
                 isClosable: true,
               })        
 
             // added without image
-            } else if (resData.message === ProductPostStatus.AddedWithoutImage) {
+            } else if (resData.message === PostProductStatus.AddedWithoutImage) {
               toast({
                 title: 'Partial Success',
-                description: `${ProductPostStatus.AddedWithoutImage}: ${resData.tcgplayerId}`,
+                description: `${PostProductStatus.AddedWithoutImage}: ${resData.tcgplayerId}`,
                 status: 'info',
                 isClosable: true,
               })        
@@ -507,7 +505,7 @@ export const AddProductForm = () => {
           } else if (res.status === 202) {
             toast({
               title: 'Notice',
-              description: `${ProductPostStatus.AlreadyExists}: ${resData.tcgplayerId}`,
+              description: `${PostProductStatus.AlreadyExists}: ${resData.tcgplayerId}`,
               status: 'warning',
               isClosable: true,
             })  

@@ -1,4 +1,4 @@
-import { IProduct, TTcgplayerIdPrices } from "./dataModels";
+import { IProduct } from "./dataModels";
 export declare enum GetPortfoliosStatus {
     Success = "Successfully retrieved Portfolios",
     Error = "Error retrieving Portfolios"
@@ -30,7 +30,6 @@ export declare type TDataResBody<Type> = TResBody & {
 export declare type TProductPostResBody<Type> = TDataResBody<Type> & {
     tcgplayerId: number;
 };
-export declare type TPricesGetResBody = TDataResBody<TTcgplayerIdPrices>;
 export declare type TProductPostReqBody = {
     formData: IProduct;
     imageUrl?: string;

@@ -1,4 +1,4 @@
-import { IProduct, TTcgplayerIdPrices } from "./dataModels"
+import { IProduct } from "./dataModels"
 
 
 // =====
@@ -80,13 +80,6 @@ export type TDataResBody<Type> = TResBody & {
 export type TProductPostResBody<Type> = TDataResBody<Type> & {
   tcgplayerId: number
 }
-
-/*
-  Endpoint:   GET_LATEST_PRICES_URL
-  Type:       GET
-  Req / Res:  Response
-*/
-export type TPricesGetResBody = TDataResBody<TTcgplayerIdPrices>
 
 // --------
 // requests
