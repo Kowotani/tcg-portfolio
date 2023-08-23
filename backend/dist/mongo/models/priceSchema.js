@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.priceSchema = exports.priceDataSchema = void 0;
+// imports
+const common_1 = require("common");
 const mongoose_1 = require("mongoose");
 // =======
 // schemas
@@ -34,5 +36,11 @@ exports.priceSchema = new mongoose_1.Schema({
     prices: {
         type: exports.priceDataSchema,
         required: true
+    }
+}, {
+    timeseries: {
+        timeField: 'priceDate',
+        metaField: 'tcgplayerId',
+        granularity: common_1.TimeseriesGranularity.Hours
     }
 });
