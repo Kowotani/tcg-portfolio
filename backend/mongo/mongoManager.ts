@@ -11,9 +11,11 @@ import * as _ from 'lodash'
 import mongoose from 'mongoose'
 import { HydratedDocument} from 'mongoose'
 import { IMPortfolio, portfolioSchema } from './models/portfolioSchema'
-import { IMPrice, priceSchema } from './models/priceSchema'
+import { priceSchema } from './models/priceSchema'
 import { IMProduct, productSchema } from './models/productSchema'
-import { areValidHoldings, getIMHoldingsFromIHoldings } from '../utils'
+import { 
+  areValidHoldings, getIMHoldingsFromIHoldings, getIMPricesFromIPrices 
+} from '../utils'
 
 
 // =======
@@ -274,12 +276,7 @@ export async function getLatestPrices(): Promise<TTcgplayerIdPrices | null> {
     /*
       {
         _id: { tcgplayerId: number},
-        data: [
-          [
-            datestring,
-            number
-          ]
-        ]
+        data: [[ datestring, number ]]
       }
     */
     const priceData = await Price.aggregate()
@@ -691,20 +688,8 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
 
   try {
 
-    // create map of Product tcgplayerId -> ObjectId
-    const productDocs = await getProductDocs()
-    let idMap = new Map<number, mongoose.Types.ObjectId>()
-    productDocs.forEach(doc => {
-      idMap.set(doc.tcgplayerId, doc._id)
-    })
-
-    // convert IPrice[] into IMPrice[]
-    const priceDocs = docs.map(doc => {
-      return {
-        product: idMap.get(doc.tcgplayerId),
-        ...doc
-      } as IMPrice
-    })
+    // create IMPrice[]
+    const priceDocs = await getIMPricesFromIPrices(docs)
 
     const res = await Price.insertMany(priceDocs);
     return res.length
@@ -721,12 +706,12 @@ async function main(): Promise<number> {
 
   let res
 
-  res = await getLatestPrices()
-  if (res) {
-    logObject(res)
-  } else {
-    console.log('Could not retrieve latest prices')
-  }
+  // res = await getLatestPrices()
+  // if (res) {
+  //   logObject(res)
+  // } else {
+  //   console.log('Could not retrieve latest prices')
+  // }
 
   // const product: IProduct = {
   //   tcgplayerId: 449558,

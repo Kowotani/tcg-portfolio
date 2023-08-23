@@ -257,12 +257,7 @@ function getLatestPrices() {
             /*
               {
                 _id: { tcgplayerId: number},
-                data: [
-                  [
-                    datestring,
-                    number
-                  ]
-                ]
+                data: [[ datestring, number ]]
               }
             */
             const priceData = yield exports.Price.aggregate()
@@ -599,16 +594,8 @@ function insertPrices(docs) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            // create map of Product tcgplayerId -> ObjectId
-            const productDocs = yield getProductDocs();
-            let idMap = new Map();
-            productDocs.forEach(doc => {
-                idMap.set(doc.tcgplayerId, doc._id);
-            });
-            // convert IPrice[] into IMPrice[]
-            const priceDocs = docs.map(doc => {
-                return Object.assign({ product: idMap.get(doc.tcgplayerId) }, doc);
-            });
+            // create IMPrice[]
+            const priceDocs = yield (0, utils_1.getIMPricesFromIPrices)(docs);
             const res = yield exports.Price.insertMany(priceDocs);
             return res.length;
         }
