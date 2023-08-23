@@ -1,7 +1,7 @@
 // imports
-import { getProductDocs, insertPrices } from '../mongo/mongoManager';
-import { scrape } from './scraper';
-import { IPrice, IPriceData, TimeseriesGranularity } from 'common';
+import { getProductDocs, insertPrices } from '../mongo/mongoManager'
+import { scrape } from './scraper'
+import { IPrice, IPriceData, TimeseriesGranularity } from 'common'
 
 
 // ==============
@@ -17,23 +17,23 @@ RETURN
 async function loadPrices(): Promise<number> {
 
   // get all Products
-  const productDocs = await getProductDocs();
-  console.log(`Retrieved prods: ${JSON.stringify(productDocs, null, 4)}`);
+  const productDocs = await getProductDocs()
+  console.log(`Retrieved prods: ${JSON.stringify(productDocs, null, 4)}`)
 
   // scrape price data
-  const tcgplayerIds = productDocs.map( doc => doc.tcgplayerId );
-  const scrapedPrices = await scrape(tcgplayerIds);
+  const tcgplayerIds = productDocs.map( doc => doc.tcgplayerId )
+  const scrapedPrices = await scrape(tcgplayerIds)
 
   // insert price data
-  let priceDate = new Date();
-  priceDate.setMinutes(0,0,0);
+  let priceDate = new Date()
+  priceDate.setMinutes(0,0,0)
 
-  let priceDocs: IPrice[] = [];
+  let priceDocs: IPrice[] = []
 
   // iterate through each Product
   for (const productDoc of productDocs) {
 
-    const tcgplayerId = productDoc.tcgplayerId;
+    const tcgplayerId = productDoc.tcgplayerId
 
     // get price data
     const priceData = scrapedPrices.get(tcgplayerId)
@@ -41,7 +41,12 @@ async function loadPrices(): Promise<number> {
     // handle products without price data
     if (priceData === undefined) {
 
-      console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
+      console.log(`No price data found for tcgplayerId: ${tcgplayerId}`)
+
+    // exclude products with missing marketPrice
+    } else if (priceData.marketPrice === undefined) {
+
+      console.log(`No marketPrice data found for tcgplayerId: ${tcgplayerId}`)
 
     // construct IPrice object
     } else {
@@ -51,11 +56,11 @@ async function loadPrices(): Promise<number> {
       }
 
       if (priceData.buylistMarketPrice !== null) {
-        prices.buylistMarketPrice = priceData.buylistMarketPrice;
+        prices.buylistMarketPrice = priceData.buylistMarketPrice
       }
 
       if (priceData.listedMedianPrice !== null) {
-        prices.listedMedianPrice = priceData.listedMedianPrice;
+        prices.listedMedianPrice = priceData.listedMedianPrice
       }
 
       const price: IPrice = {
@@ -68,14 +73,14 @@ async function loadPrices(): Promise<number> {
       priceDocs.push(price);
     }    
   }
-  // console.log(JSON.stringify(priceDocs, null, 4));
-  const numInserted = await insertPrices(priceDocs);
-  return numInserted;
+
+  const numInserted = await insertPrices(priceDocs)
+  return numInserted
 }
 
 async function main() {
-  const numInserted = await loadPrices();
-  console.log(`Inserted ${numInserted} docs`);
+  const numInserted = await loadPrices()
+  console.log(`Inserted ${numInserted} docs`)
 }
 
 main()

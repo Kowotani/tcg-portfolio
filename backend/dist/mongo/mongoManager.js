@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -610,13 +606,12 @@ exports.insertPrices = insertPrices;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let res;
-        res = yield getLatestPrices();
-        if (res) {
-            (0, common_1.logObject)(res);
-        }
-        else {
-            console.log('Could not retrieve latest prices');
-        }
+        // res = await getLatestPrices()
+        // if (res) {
+        //   logObject(res)
+        // } else {
+        //   console.log('Could not retrieve latest prices')
+        // }
         // const product: IProduct = {
         //   tcgplayerId: 449558,
         //   tcg: TCG.MagicTheGathering,

@@ -42,6 +42,10 @@ function loadPrices() {
             // handle products without price data
             if (priceData === undefined) {
                 console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
+                // exclude products with missing marketPrice
+            }
+            else if (priceData.marketPrice === undefined) {
+                console.log(`No marketPrice data found for tcgplayerId: ${tcgplayerId}`);
                 // construct IPrice object
             }
             else {
@@ -63,7 +67,6 @@ function loadPrices() {
                 priceDocs.push(price);
             }
         }
-        // console.log(JSON.stringify(priceDocs, null, 4));
         const numInserted = yield (0, mongoManager_1.insertPrices)(priceDocs);
         return numInserted;
     });

@@ -5,7 +5,7 @@ import {
 
   TTcgplayerIdPrices,
 
-  assert, isIHoldingArray, isIPopulatedHolding, isIPortfolio, logObject
+  assert, isIHoldingArray, isIPopulatedHolding, isIPortfolio
 } from 'common'
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
