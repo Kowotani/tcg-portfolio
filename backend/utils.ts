@@ -1,11 +1,12 @@
 import { 
-  IHolding, ITransaction,  
+  IHolding, IPrice,  
 
   assert, getHoldingQuantity
 } from 'common'
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
 import { IMHolding } from './mongo/models/holdingSchema'
+import { IMPrice } from './mongo/models/priceSchema'
 import { IMProduct, productSchema } from './mongo/models/productSchema'
 import { getProductDocs } from './mongo/mongoManager'
 
@@ -105,7 +106,8 @@ export async function getIMHoldingsFromIHoldings(
     })
     assert(
       productDoc instanceof Product, 
-      'Product not found in getIMHoldingsFromIHoldings()')
+      'Product not found in getIMHoldingsFromIHoldings()'
+    )
 
     // create IMHolding
     return ({
@@ -115,4 +117,39 @@ export async function getIMHoldingsFromIHoldings(
   })
 
   return newHoldings
+}
+
+/*
+DESC
+  Converts an IPrice[] to an IMPrice[], which entails:
+    - adding the product field with Product ObjectId
+INPUT
+  prices: An IPrice[]
+RETURN
+  An IMPrice[]
+*/
+export async function getIMPricesFromIPrices(
+  prices: IPrice[]
+): Promise<IMPrice[]> {
+
+  const productDocs = await getProductDocs()
+  const newPrices = prices.map((price: IPrice) => {
+
+    // find Product
+    const productDoc = productDocs.find((product: IMProduct) => {
+      return product.tcgplayerId === price.tcgplayerId
+    })
+    assert(
+      productDoc instanceof Product, 
+      'Product not found in getIMPricesFromIPrices()'
+    )
+
+    // create IMPrice
+    return ({
+      ...price,
+      product: productDoc._id
+    } as IMPrice)
+  })
+
+  return newPrices
 }

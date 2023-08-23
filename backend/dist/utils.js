@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getIMHoldingsFromIHoldings = exports.hasValidTransactions = exports.areValidHoldings = void 0;
+exports.getIMPricesFromIPrices = exports.getIMHoldingsFromIHoldings = exports.hasValidTransactions = exports.areValidHoldings = void 0;
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -131,3 +131,28 @@ function getIMHoldingsFromIHoldings(holdings) {
     });
 }
 exports.getIMHoldingsFromIHoldings = getIMHoldingsFromIHoldings;
+/*
+DESC
+  Converts an IPrice[] to an IMPrice[], which entails:
+    - adding the product field with Product ObjectId
+INPUT
+  prices: An IPrice[]
+RETURN
+  An IMPrice[]
+*/
+function getIMPricesFromIPrices(prices) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const productDocs = yield (0, mongoManager_1.getProductDocs)();
+        const newPrices = prices.map((price) => {
+            // find Product
+            const productDoc = productDocs.find((product) => {
+                return product.tcgplayerId === price.tcgplayerId;
+            });
+            (0, common_1.assert)(productDoc instanceof Product, 'Product not found in getIMPricesFromIPrices()');
+            // create IMPrice
+            return Object.assign(Object.assign({}, price), { product: productDoc._id });
+        });
+        return newPrices;
+    });
+}
+exports.getIMPricesFromIPrices = getIMPricesFromIPrices;
