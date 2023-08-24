@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -113,8 +109,8 @@ function addPortfolioHoldings(portfolio, holdingInput) {
             return true;
         }
         catch (err) {
-            console.log(`An error occurred in addPortfolioHolding(): ${err}`);
-            return false;
+            const errMsg = `An error occurred in addPortfolioHolding(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -161,8 +157,8 @@ function addPortfolio(portfolio) {
             return true;
         }
         catch (err) {
-            console.log(`An error occurred in addPortfolio(): ${err}`);
-            return false;
+            const errMsg = `An error occurred in addPortfolio(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -197,8 +193,8 @@ function deletePortfolio(portfolio) {
             return res.deletedCount === 1;
         }
         catch (err) {
-            console.log(`An error occurred in deletePortfolio(): ${err}`);
-            return false;
+            const errMsg = `An error occurred in deletePortfolio(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -236,8 +232,8 @@ function deletePortfolioHolding(portfolio, tcgplayerId) {
             return true;
         }
         catch (err) {
-            console.log(`An error occurred in deletePortfolioHolding(): ${err}`);
-            return false;
+            const errMsg = `An error occurred in deletePortfolioHolding(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -328,8 +324,8 @@ function getPortfolioDoc(portfolio) {
             return doc;
         }
         catch (err) {
-            console.log(`An error occurred in getPortfolioDoc(): ${err}`);
-            return null;
+            const errMsg = `An error occurred in getPortfolioDoc(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -351,8 +347,8 @@ function getPortfolioDocs(userId) {
             return docs;
         }
         catch (err) {
-            console.log(`An error occurred in getPortfolioDocs(): ${err}`);
-            return [];
+            const errMsg = `An error occurred in getPortfolioDocs(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -394,8 +390,8 @@ function getPortfolios(userId) {
             return portfolios;
         }
         catch (err) {
-            console.log(`An error occurred in getPortfolios(): ${err}`);
-            return [];
+            const errMsg = `An error occurred in getPortfolios(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -435,8 +431,8 @@ function setPortfolioHoldings(portfolio, holdingInput) {
             return true;
         }
         catch (err) {
-            console.log(`An error occurred in setPortfolioHoldings(): ${err}`);
-            return false;
+            const errMsg = `An error occurred in setPortfolioHoldings(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -477,8 +473,8 @@ function setPortfolioProperty(portfolio, key, value) {
             }
         }
         catch (err) {
-            console.log(`An error occurred in setPortfolioProperty(): ${err}`);
-            return false;
+            const errMsg = `An error occurred in setPortfolioProperty(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -499,8 +495,8 @@ function getProductDoc({ tcgplayerId, hexStringId } = {}) {
             return doc;
         }
         catch (err) {
-            console.log(`An error occurred in getProductDoc(): ${err}`);
-            return null;
+            const errMsg = `An error occurred in getProductDoc(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -520,8 +516,8 @@ function getProductDocs() {
             return docs;
         }
         catch (err) {
-            console.log(`An error occurred in getProductDocs(): ${err}`);
-            return [];
+            const errMsg = `An error occurred in getProductDocs(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -543,8 +539,8 @@ function insertProducts(docs) {
             return res.length;
         }
         catch (err) {
-            console.log(`An error occurred in insertProducts(): ${err}`);
-            return -1;
+            const errMsg = `An error occurred in insertProducts(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -577,8 +573,8 @@ function setProductProperty(tcgplayerId, key, value) {
             return true;
         }
         catch (err) {
-            console.log(`An error occurred in setProductProperty(): ${err}`);
-            return false;
+            const errMsg = `An error occurred in setProductProperty(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }
@@ -605,8 +601,8 @@ function insertPrices(docs) {
             return res.length;
         }
         catch (err) {
-            console.log(`An error occurred in insertPrices(): ${err}`);
-            return -1;
+            const errMsg = `An error occurred in insertPrices(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }

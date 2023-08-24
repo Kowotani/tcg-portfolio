@@ -107,8 +107,8 @@ export async function addPortfolioHoldings(
     
   } catch(err) {
     
-    console.log(`An error occurred in addPortfolioHolding(): ${err}`)
-    return false
+    const errMsg = `An error occurred in addPortfolioHolding(): ${err}`
+    throw new Error(errMsg)
   }
 }
 
@@ -164,8 +164,8 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
 
   } catch(err) {
 
-    console.log(`An error occurred in addPortfolio(): ${err}`)
-    return false
+    const errMsg = `An error occurred in addPortfolio(): ${err}`
+    throw new Error(errMsg)
   }
 }
 
@@ -204,8 +204,8 @@ export async function deletePortfolio(portfolio: IPortfolio): Promise<boolean> {
 
   } catch(err) {
 
-    console.log(`An error occurred in deletePortfolio(): ${err}`)
-    return false
+    const errMsg = `An error occurred in deletePortfolio(): ${err}`
+    throw new Error(errMsg)
   }
 }
 
@@ -252,8 +252,8 @@ export async function deletePortfolioHolding(
     
   } catch(err) {
 
-    console.log(`An error occurred in deletePortfolioHolding(): ${err}`)
-    return false
+    const errMsg = `An error occurred in deletePortfolioHolding(): ${err}`
+    throw new Error(errMsg)
   }
 }
 
@@ -354,8 +354,8 @@ export async function getPortfolioDoc(
 
   } catch(err) {
 
-    console.log(`An error occurred in getPortfolioDoc(): ${err}`)
-    return null
+    const errMsg = `An error occurred in getPortfolioDoc(): ${err}`
+    throw new Error(errMsg)
   } 
 }
 
@@ -381,8 +381,8 @@ export async function getPortfolioDocs(
 
   } catch(err) {
 
-    console.log(`An error occurred in getPortfolioDocs(): ${err}`)
-    return []
+    const errMsg = `An error occurred in getPortfolioDocs(): ${err}`
+    throw new Error(errMsg)
   } 
 }
 
@@ -433,8 +433,8 @@ export async function getPortfolios(
 
   } catch(err) {
 
-    console.log(`An error occurred in getPortfolios(): ${err}`)
-    return []
+    const errMsg = `An error occurred in getPortfolios(): ${err}`
+    throw new Error(errMsg)
   } 
 }
 
@@ -482,8 +482,8 @@ export async function setPortfolioHoldings(
 
   } catch(err) {
 
-    console.log(`An error occurred in setPortfolioHoldings(): ${err}`);
-    return false
+    const errMsg = `An error occurred in setPortfolioHoldings(): ${err}`
+    throw new Error(errMsg)
   }  
 }
 
@@ -533,8 +533,8 @@ export async function setPortfolioProperty(
 
   } catch(err) {
 
-    console.log(`An error occurred in setPortfolioProperty(): ${err}`);
-    return false
+    const errMsg = `An error occurred in setPortfolioProperty(): ${err}`
+    throw new Error(errMsg)
   }
 }
 
@@ -577,8 +577,8 @@ export async function getProductDoc(
 
   } catch(err) {
 
-    console.log(`An error occurred in getProductDoc(): ${err}`)
-    return null
+    const errMsg = `An error occurred in getProductDoc(): ${err}`
+    throw new Error(errMsg)
   } 
 }
 
@@ -600,8 +600,8 @@ export async function getProductDocs(): Promise<HydratedDocument<IMProduct>[]> {
 
   } catch(err) {
 
-    console.log(`An error occurred in getProductDocs(): ${err}`)
-    return []
+    const errMsg = `An error occurred in getProductDocs(): ${err}`
+    throw new Error(errMsg)
   }
 }
 
@@ -626,8 +626,8 @@ export async function insertProducts(docs: IProduct[]): Promise<number> {
     
   } catch(err) {
   
-    console.log(`An error occurred in insertProducts(): ${err}`)
-    return -1
+    const errMsg = `An error occurred in insertProducts(): ${err}`
+    throw new Error(errMsg)
   }
 }
 
@@ -668,8 +668,8 @@ export async function setProductProperty(
 
   } catch(err) {
 
-    console.log(`An error occurred in setProductProperty(): ${err}`);
-    return false
+    const errMsg = `An error occurred in setProductProperty(): ${err}`
+    throw new Error(errMsg)
   }
 }
 
@@ -701,8 +701,8 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
     
   } catch(err) {
   
-    console.log(`An error occurred in insertPrices(): ${err}`);
-    return -1
+    const errMsg = `An error occurred in insertPrices(): ${err}`
+    throw new Error(errMsg)
   }
 }
 
