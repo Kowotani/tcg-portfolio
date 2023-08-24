@@ -1,30 +1,26 @@
 // imports
 import { 
-  IProduct,
+  IDatedPriceData, IProduct,
 
-  GetPortfoliosStatus, PostProductStatus, GetProductsStatus, 
+  GetPortfoliosStatus, GetPricesStatus, GetProductsStatus, PostProductStatus,
   
   TDataResBody, TProductPostReqBody, TProductPostResBody, TResBody, 
 
-  ADD_PRODUCT_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL
-} from 'common';
-import express from 'express';
+  ADD_PRODUCT_URL, GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL
+} from 'common'
+import express from 'express'
 import { 
-  getPortfolios, getProductDoc, getProductDocs, insertProducts,
+  getLatestPrices, getPortfolios, getProductDoc, getProductDocs, insertProducts,
 
   Product
-} from './mongo/mongoManager';
-import multer from 'multer';
-import { loadImageToS3 } from './aws/s3Manager';
+} from './mongo/mongoManager'
+import multer from 'multer'
+import { loadImageToS3 } from './aws/s3Manager'
 
-const upload = multer();
-const app = express();
+const upload = multer()
+const app = express()
 
-const port = 3030;
-
-app.get('/', (req: any, res: any) => {
-  res.send('Hello World!');
-});
+const port = 3030
 
 
 // =========
@@ -65,6 +61,46 @@ app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
     res.status(500)
     const body: TResBody = {
       message: GetPortfoliosStatus.Error + ': ' + err
+    }
+    res.send(body)
+  }
+})
+
+
+// =======
+// prices
+// =======
+
+/*
+DESC
+  Handle GET request for latest Prices of all Products
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The Prices were returned successfully
+    500: An error occurred
+*/
+app.get(GET_LATEST_PRICES_URL, async (req: any, res: any) => {
+
+  try {
+
+    // query Prices
+    const data = await getLatestPrices()
+
+    // return Prices
+    res.status(200)
+    const body: TDataResBody<{[tcgplayerId: number]: IDatedPriceData}> = {
+      data: Object.fromEntries(data),
+      message: GetPricesStatus.Success
+    }
+    res.send(body)
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: GetPricesStatus.Error + ': ' + err
     }
     res.send(body)
   }

@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -242,7 +246,7 @@ exports.deletePortfolioHolding = deletePortfolioHolding;
 DESC
   Retrieves the latest market Prices for all Products
 RETURN
-  A TTcgplayerIdPrices object
+  A Map<number, IDatedPriceData> where the key is a tcgplayerId
 */
 function getLatestPrices() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -264,7 +268,7 @@ function getLatestPrices() {
                 },
                 marketPrice: {
                     $avg: '$prices.marketPrice'
-                },
+                }
             })
                 .group({
                 _id: {
@@ -285,15 +289,20 @@ function getLatestPrices() {
             })
                 .exec();
             // create the TTcgplayerIdPrices
-            let prices = {};
+            let prices = new Map();
             priceData.forEach((el) => {
-                prices[el._id.tcgplayerId] = el.data[0][1];
+                prices.set(el._id.tcgplayerId, {
+                    priceDate: el.data[0][0],
+                    prices: {
+                        marketPrice: el.data[0][1]
+                    }
+                });
             });
             return prices;
         }
         catch (err) {
-            console.log(`An error occurred in getLatestPrices(): ${err}`);
-            return null;
+            const errMsg = `An error occurred in getLatestPrices(): ${err}`;
+            throw new Error(errMsg);
         }
     });
 }

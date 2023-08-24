@@ -1,6 +1,6 @@
 // imports
 import { 
-  IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
+  IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
   IPortfolioMethods, IPrice, IPriceData, IProduct,
 
   assert, isIHoldingArray, isIPopulatedHolding, isIPortfolio
@@ -261,10 +261,9 @@ export async function deletePortfolioHolding(
 DESC
   Retrieves the latest market Prices for all Products
 RETURN
-  A Map<number, IPriceData> where the key is a tcgplayerId
+  A Map<number, IDatedPriceData> where the key is a tcgplayerId
 */
-export async function getLatestPrices(): 
-  Promise<Map<number, IPriceData> | null> {
+export async function getLatestPrices(): Promise<Map<number, IDatedPriceData>> {
 
   // connect to db
   await mongoose.connect(url)
@@ -295,7 +294,6 @@ export async function getLatestPrices():
         data: {
           '$topN': {
             output: [
-              // TODO: possibly remove this
               '$_id.priceDate', 
               '$marketPrice'
             ], 
@@ -308,19 +306,24 @@ export async function getLatestPrices():
       .exec()
     
     // create the TTcgplayerIdPrices
-    let prices = new Map<number, IPriceData>()
+    let prices = new Map<number, IDatedPriceData>()
     priceData.forEach((el: any) => {
       prices.set(
         el._id.tcgplayerId, 
-        {marketPrice: el.data[0][1]} as IPriceData
+        {
+          priceDate: el.data[0][0],
+          prices: {
+            marketPrice: el.data[0][1]
+          }
+        } as IDatedPriceData
     )})
     
     return prices
 
   } catch(err) {
 
-    console.log(`An error occurred in getLatestPrices(): ${err}`)
-    return null
+    const errMsg = `An error occurred in getLatestPrices(): ${err}`
+    throw new Error(errMsg)
   } 
 
 }
