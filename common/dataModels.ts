@@ -91,12 +91,15 @@ export interface IUser {
 
 // -- Price
 
-// stores the price snapshot data
-export interface IPrice {
+export interface IDatedPriceData {
   priceDate: Date;
+  prices: IPriceData;
+}
+
+// stores the price snapshot data
+export interface IPrice extends IDatedPriceData {
   tcgplayerId: number;
   granularity: string;
-  prices: IPriceData;
 }
 
 // stores the scraped price data

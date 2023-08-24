@@ -54,11 +54,13 @@ export interface IUser {
     passwordSalt: string;
     email: string;
 }
-export interface IPrice {
+export interface IDatedPriceData {
     priceDate: Date;
+    prices: IPriceData;
+}
+export interface IPrice extends IDatedPriceData {
     tcgplayerId: number;
     granularity: string;
-    prices: IPriceData;
 }
 export interface IPriceData {
     marketPrice: number;
