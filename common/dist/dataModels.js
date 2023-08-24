@@ -147,6 +147,7 @@ exports.TCGToProductSubtype = (_c = {},
         ProductSubtype.FirstEdition,
         ProductSubtype.Unlimited,
     ],
+    // Lorcana
     // MTG
     _c[TCG.MagicTheGathering] = [
         ProductSubtype.Collector,

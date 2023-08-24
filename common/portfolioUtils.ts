@@ -1,8 +1,6 @@
 import * as _ from 'lodash'
 import { 
-  IHolding, IPopulatedHolding, IPortfolio, IPopulatedPortfolio, 
-  
-  TTcgplayerIdPrices
+  IHolding, IPopulatedHolding, IPortfolio, IPopulatedPortfolio, IPriceData
 } from './dataModels'
 import { assert, isIHolding, isIPortfolio } from './utils'
 import { 
@@ -33,14 +31,14 @@ DESC
   to the total cost
 INPUT
   portfolio: An IPortfolio
-  prices: A TTcgplayerIdPrices
+  prices: A Map<number, IPriceData> where the key is a tcgplayerId
 RETURN
   The total pnl as a percentage return relative to the total cost, or undefined
   if total cost === 0
 */
 export function getPortfolioPercentPnl(
   portfolio: IPortfolio | IPopulatedPortfolio,
-  prices: TTcgplayerIdPrices
+  prices: Map<number, IPriceData>
 ): number | undefined {
   const totalCost = getPortfolioTotalCost(portfolio)
   const totalPnl = getPortfolioTotalPnl(portfolio, prices)
@@ -135,14 +133,14 @@ DESC
   Returns the total pnl from the input IHolding and price
 INPUT
   portfolio: An IPortfolio
-  prices: A TTcgplayerIdPrices
+  prices: A Map<number, IPriceData> where the key is a tcgplayerId
 RETURN
   The total pnl based on the market price and avg cost vs avg rev from the
   IHolding, or undefined if both realizedPnl and unrealizedPnl are undefined
 */
 export function getPortfolioTotalPnl(
   portfolio: IPortfolio | IPopulatedPortfolio,
-  prices: TTcgplayerIdPrices
+  prices: Map<number, IPriceData>
 ): number | undefined {
   const realizedPnl = getPortfolioRealizedPnl(portfolio)
   const unrealizedPnl = getPortfolioUnrealizedPnl(portfolio, prices)
@@ -176,13 +174,13 @@ DESC
   Returns the unrealized pnl determined as the summed IHolding unrealized pnl
 INPUT
   portfolio: An IPortfolio
-  prices: A TTcgplayerIdPrices
+  prices: A Map<number, IPriceData> where the key is a tcgplayerId
 RETURN
   The unrealized pnl based on the IHoldings, or undefined if quantity === 0
 */
 export function getPortfolioUnrealizedPnl(
   portfolio: IPortfolio | IPopulatedPortfolio,
-  prices: TTcgplayerIdPrices
+  prices: Map<number, IPriceData>
 ): number | undefined {
   const holdings = getPortfolioHoldings(portfolio)
   const quantity = getPortfolioPurchaseQuantity(portfolio) 
@@ -191,8 +189,8 @@ export function getPortfolioUnrealizedPnl(
     ? undefined
     : _.sum(holdings.map((holding: IHolding | IPopulatedHolding) => {
       const price = isIHolding(holding) 
-        ? prices[holding.tcgplayerId]
-        : prices[holding.product.tcgplayerId]
+        ? prices.get(holding.tcgplayerId).marketPrice
+        : prices.get(holding.product.tcgplayerId).marketPrice
       return getHoldingUnrealizedPnl(holding, price)
     }))
 }

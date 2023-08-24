@@ -158,7 +158,4 @@ export declare const ProductTypeToProductSubtype: {
 export declare const TCGToProductSubtype: {
     [key in TCG]?: ProductSubtype[];
 };
-export declare type TTcgplayerIdPrices = {
-    [tcgplayerId: number]: number;
-};
 export {};

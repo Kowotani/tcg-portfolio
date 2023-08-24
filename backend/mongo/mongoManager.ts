@@ -1,9 +1,7 @@
 // imports
 import { 
   IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
-  IPortfolioMethods, IPrice, IProduct,
-
-  TTcgplayerIdPrices,
+  IPortfolioMethods, IPrice, IPriceData, IProduct,
 
   assert, isIHoldingArray, isIPopulatedHolding, isIPortfolio
 } from 'common'
@@ -263,9 +261,10 @@ export async function deletePortfolioHolding(
 DESC
   Retrieves the latest market Prices for all Products
 RETURN
-  A TTcgplayerIdPrices object
+  A Map<number, IPriceData> where the key is a tcgplayerId
 */
-export async function getLatestPrices(): Promise<TTcgplayerIdPrices | null> {
+export async function getLatestPrices(): 
+  Promise<Map<number, IPriceData> | null> {
 
   // connect to db
   await mongoose.connect(url)
@@ -287,7 +286,7 @@ export async function getLatestPrices(): Promise<TTcgplayerIdPrices | null> {
         },
         marketPrice: {
           $avg: '$prices.marketPrice'
-        },
+        }
       })
       .group({
         _id: {
@@ -296,6 +295,7 @@ export async function getLatestPrices(): Promise<TTcgplayerIdPrices | null> {
         data: {
           '$topN': {
             output: [
+              // TODO: possibly remove this
               '$_id.priceDate', 
               '$marketPrice'
             ], 
@@ -308,10 +308,12 @@ export async function getLatestPrices(): Promise<TTcgplayerIdPrices | null> {
       .exec()
     
     // create the TTcgplayerIdPrices
-    let prices: TTcgplayerIdPrices = {}
+    let prices = new Map<number, IPriceData>()
     priceData.forEach((el: any) => {
-      prices[el._id.tcgplayerId] = el.data[0][1]
-    })
+      prices.set(
+        el._id.tcgplayerId, 
+        {marketPrice: el.data[0][1]} as IPriceData
+    )})
     
     return prices
 

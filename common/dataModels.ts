@@ -316,6 +316,8 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
     ProductSubtype.Unlimited,
   ],
 
+  // Lorcana
+
   // MTG
   [TCG.MagicTheGathering]: [
     ProductSubtype.Collector,
@@ -341,14 +343,4 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
   ],  
 
   // Sorcery
-}
-
-
-// =====
-// types
-// =====
-
-// map of TcgplayerId -> prices
-export type TTcgplayerIdPrices = {
-  [tcgplayerId: number]: number
 }

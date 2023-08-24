@@ -24,7 +24,7 @@ DESC
   to the total cost
 INPUT
   portfolio: An IPortfolio
-  prices: A TTcgplayerIdPrices
+  prices: A Map<number, IPriceData> where the key is a tcgplayerId
 RETURN
   The total pnl as a percentage return relative to the total cost, or undefined
   if total cost === 0
@@ -113,7 +113,7 @@ DESC
   Returns the total pnl from the input IHolding and price
 INPUT
   portfolio: An IPortfolio
-  prices: A TTcgplayerIdPrices
+  prices: A Map<number, IPriceData> where the key is a tcgplayerId
 RETURN
   The total pnl based on the market price and avg cost vs avg rev from the
   IHolding, or undefined if both realizedPnl and unrealizedPnl are undefined
@@ -149,7 +149,7 @@ DESC
   Returns the unrealized pnl determined as the summed IHolding unrealized pnl
 INPUT
   portfolio: An IPortfolio
-  prices: A TTcgplayerIdPrices
+  prices: A Map<number, IPriceData> where the key is a tcgplayerId
 RETURN
   The unrealized pnl based on the IHoldings, or undefined if quantity === 0
 */
@@ -161,8 +161,8 @@ function getPortfolioUnrealizedPnl(portfolio, prices) {
         ? undefined
         : _.sum(holdings.map(function (holding) {
             var price = (0, utils_1.isIHolding)(holding)
-                ? prices[holding.tcgplayerId]
-                : prices[holding.product.tcgplayerId];
+                ? prices.get(holding.tcgplayerId).marketPrice
+                : prices.get(holding.product.tcgplayerId).marketPrice;
             return (0, holdingUtils_1.getHoldingUnrealizedPnl)(holding, price);
         }));
 }
