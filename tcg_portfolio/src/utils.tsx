@@ -1,5 +1,5 @@
 import { 
-  IPriceData, IPopulatedHolding, IProduct, ProductLanguage, ProductSubtype, 
+  IDatedPriceData, IPopulatedHolding, IProduct, ProductLanguage, ProductSubtype, 
   
   assert, isIPopulatedHolding, isIProduct
 } from 'common'
@@ -66,8 +66,8 @@ export const SideBarNav = {
 
 // LatestPriceContext
 export interface ILatestPricesContext {
-  latestPrices: Map<number, IPriceData>,
-  setLatestPrices: React.Dispatch<React.SetStateAction<Map<number, IPriceData>>>
+  latestPrices: Map<number, IDatedPriceData>,
+  setLatestPrices: React.Dispatch<React.SetStateAction<Map<number, IDatedPriceData>>>
 }
 
 // SideBarNav

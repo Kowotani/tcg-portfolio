@@ -1,5 +1,5 @@
 import { createContext, PropsWithChildren, useState } from 'react'
-import { IPriceData } from 'common'
+import { IDatedPriceData } from 'common'
 import { ILatestPricesContext } from '../utils'
 
 // create context
@@ -10,7 +10,7 @@ export const LatestPricesContext
 export const LatestPricesProvider = (props: PropsWithChildren) => {
 
   const [latestPrices, setLatestPrices] 
-    = useState(new Map<number, IPriceData>())
+    = useState(new Map<number, IDatedPriceData>())
 
   const value = {latestPrices, setLatestPrices}
 
