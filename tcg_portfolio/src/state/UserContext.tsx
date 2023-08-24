@@ -2,7 +2,7 @@ import { createContext, PropsWithChildren, useState } from 'react'
 import { IUser, IUserContext, UserType } from '../utils'
 
 // create context
-export const UserContext = createContext<IUserContext | null>(null);
+export const UserContext = createContext<IUserContext | null>(null)
 
 // create Provider
 export const UserProvider = (props: PropsWithChildren) => {

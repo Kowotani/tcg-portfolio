@@ -2,7 +2,7 @@ import { createContext, PropsWithChildren, useState } from 'react'
 import { ISideBarNavContext, SideBarNav } from '../utils'
 
 // create context
-export const SideBarNavContext = createContext<ISideBarNavContext | null>(null);
+export const SideBarNavContext = createContext<ISideBarNavContext | null>(null)
 
 // create Provider
 export const SideBarNavProvider = (props: PropsWithChildren) => {

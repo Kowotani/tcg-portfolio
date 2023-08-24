@@ -4,10 +4,10 @@ import { ILatestPricesContext } from '../utils'
 
 // create context
 export const LatestPricesContext 
-  = createContext<ILatestPricesContext | null>(null);
+  = createContext<ILatestPricesContext | null>(null)
 
 // create Provider
-export const UserProvider = (props: PropsWithChildren) => {
+export const LatestPricesProvider = (props: PropsWithChildren) => {
 
   const [latestPrices, setLatestPrices] 
     = useState(new Map<number, IPriceData>())
