@@ -6,7 +6,7 @@ import {
   IPriceData, IProduct, ITransaction, ProductLanguage, ProductSubtype, 
   ProductType, TCG, TCGPriceType, TransactionType,
 
-  ProductTypeToProductSubtype, TCGToProductSubtype, 
+  ProductTypeToProductSubtype, TCGToProductSubtype, IDatedPriceData, 
 } from './dataModels'
 import * as _ from 'lodash'
 import { inspect } from 'util'
@@ -167,6 +167,33 @@ export function sortFnDateDesc(a: Date, b: Date): number {
 
 /*
 DESC
+  Returns whether or not the input is a Date
+INPUT
+  arg: An object that might be a Date 
+RETURN
+  TRUE if the input is a Date, FALSE otherwise
+*/
+export function isDate(arg: any): arg is Date {
+  return arg
+    && !Number.isNaN(Date.parse(arg))
+}
+
+/*
+DESC
+  Returns whether or not the input is an IDatedPriceData
+INPUT
+  arg: An object that might be an IDatedPriceData 
+RETURN
+  TRUE if the input is an IDatedPriceData, FALSE otherwise
+*/
+export function isIDatedPriceData(arg: any): arg is IDatedPriceData {
+  return arg
+    && arg.priceDate && isDate(arg.priceDate)
+    && arg.prices && isIPriceData(arg.prices)
+}
+
+/*
+DESC
   Returns whether or not the input is an IHolding
 INPUT
   arg: An object that might be an IHolding 
@@ -295,7 +322,7 @@ RETURN
 */
 export function isIPrice(arg: any): arg is IPrice {
   return arg
-    && arg.priceDate && arg.priceData instanceof Date
+    && arg.priceDate && isDate(arg.priceData)
     && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
     && arg.granularity && typeof(arg.granularity) === 'string'
     && arg.prices && isIPriceData(arg.prices)
@@ -368,7 +395,7 @@ export function isIProduct(arg: any): arg is IProduct {
     // require
     && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
     && arg.tcg && _.values(TCG).includes(arg.tcg)
-    && arg.releaseDate && !Number.isNaN(Date.parse(arg.releaseDate))
+    && arg.releaseDate && isDate(arg.releaseDate)
     && arg.name && typeof(arg.name) === 'string'
     && arg.type && _.values(ProductType).includes(arg.type)
     && arg.language && _.values(ProductLanguage).includes(arg.language)
@@ -390,7 +417,7 @@ RETURN
 export function isITransaction(arg: any): arg is ITransaction {
   return arg
     && arg.type && _.values(TransactionType).includes(arg.type)
-    && arg.date && !Number.isNaN(Date.parse(arg.date))
+    && arg.date && isDate(arg.date)
     && arg.price && typeof(arg.price) === 'number'
     && arg.quantity && typeof(arg.quantity) === 'number'
 }

@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 var util_1 = require("util");
@@ -153,6 +153,33 @@ exports.sortFnDateDesc = sortFnDateDesc;
 // ===========
 /*
 DESC
+  Returns whether or not the input is a Date
+INPUT
+  arg: An object that might be a Date
+RETURN
+  TRUE if the input is a Date, FALSE otherwise
+*/
+function isDate(arg) {
+    return arg
+        && !Number.isNaN(Date.parse(arg));
+}
+exports.isDate = isDate;
+/*
+DESC
+  Returns whether or not the input is an IDatedPriceData
+INPUT
+  arg: An object that might be an IDatedPriceData
+RETURN
+  TRUE if the input is an IDatedPriceData, FALSE otherwise
+*/
+function isIDatedPriceData(arg) {
+    return arg
+        && arg.priceDate && isDate(arg.priceDate)
+        && arg.prices && isIPriceData(arg.prices);
+}
+exports.isIDatedPriceData = isIDatedPriceData;
+/*
+DESC
   Returns whether or not the input is an IHolding
 INPUT
   arg: An object that might be an IHolding
@@ -279,7 +306,7 @@ RETURN
 */
 function isIPrice(arg) {
     return arg
-        && arg.priceDate && arg.priceData instanceof Date
+        && arg.priceDate && isDate(arg.priceData)
         && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
         && arg.granularity && typeof (arg.granularity) === 'string'
         && arg.prices && isIPriceData(arg.prices);
@@ -351,7 +378,7 @@ function isIProduct(arg) {
         // require
         && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
         && arg.tcg && _.values(dataModels_1.TCG).includes(arg.tcg)
-        && arg.releaseDate && !Number.isNaN(Date.parse(arg.releaseDate))
+        && arg.releaseDate && isDate(arg.releaseDate)
         && arg.name && typeof (arg.name) === 'string'
         && arg.type && _.values(dataModels_1.ProductType).includes(arg.type)
         && arg.language && _.values(dataModels_1.ProductLanguage).includes(arg.language)
@@ -372,7 +399,7 @@ RETURN
 function isITransaction(arg) {
     return arg
         && arg.type && _.values(dataModels_1.TransactionType).includes(arg.type)
-        && arg.date && !Number.isNaN(Date.parse(arg.date))
+        && arg.date && isDate(arg.date)
         && arg.price && typeof (arg.price) === 'number'
         && arg.quantity && typeof (arg.quantity) === 'number';
 }

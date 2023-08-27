@@ -1,5 +1,5 @@
 import { TDataResBody, TProductPostResBody, TResBody } from './api';
-import { IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, IPrice, IPriceData, IProduct, ITransaction, ProductSubtype, ProductType, TCG } from './dataModels';
+import { IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, IPrice, IPriceData, IProduct, ITransaction, ProductSubtype, ProductType, TCG, IDatedPriceData } from './dataModels';
 export declare const DAYS_PER_YEAR = 365;
 export declare const MILLISECONDS_PER_SECOND = 1000;
 export declare const SECONDS_PER_DAY = 86400;
@@ -13,6 +13,8 @@ export declare function isTCGPriceTypeValue(value: string): boolean;
 export declare function logObject(arg: Object): void;
 export declare function sortFnDateAsc(a: Date, b: Date): number;
 export declare function sortFnDateDesc(a: Date, b: Date): number;
+export declare function isDate(arg: any): arg is Date;
+export declare function isIDatedPriceData(arg: any): arg is IDatedPriceData;
 export declare function isIHolding(arg: any): arg is IHolding;
 export declare function isIHoldingArray(arg: any): arg is IHolding[];
 export declare function isIPopulatedHolding(arg: any): arg is IPopulatedHolding;
