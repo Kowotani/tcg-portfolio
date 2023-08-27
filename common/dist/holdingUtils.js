@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = void 0;
+exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingMarketValue = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = void 0;
 var _ = require("lodash");
 var dataModels_1 = require("./dataModels");
 var utils_1 = require("./utils");
@@ -38,6 +38,24 @@ function getHoldingAverageRevenue(holding) {
         : getHoldingTotalRevenue(holding) / saleQuantity;
 }
 exports.getHoldingAverageRevenue = getHoldingAverageRevenue;
+/*
+DESC
+  Returns the market value of the Holding based on the input price
+INPUT
+  holding: An IHolding
+  price: The market price
+RETURN
+  The market value of the Holding, or undefined if both getHoldingRealizedPnl()
+  and getHoldingUnrealizedPnl() are undefined
+*/
+function getHoldingMarketValue(holding, price) {
+    var realizedPnl = getHoldingRealizedPnl(holding);
+    var unrealizedPnl = getHoldingUnrealizedPnl(holding, price);
+    return (realizedPnl || unrealizedPnl)
+        ? (realizedPnl !== null && realizedPnl !== void 0 ? realizedPnl : 0) + (unrealizedPnl !== null && unrealizedPnl !== void 0 ? unrealizedPnl : 0)
+        : undefined;
+}
+exports.getHoldingMarketValue = getHoldingMarketValue;
 /*
 DESC
   Returns the total pnl percent from the input IHolding and price relative
@@ -159,10 +177,15 @@ DESC
 INPUT
   holding: An IHolding
 RETURN
-  The total purchase cost from the input ITransaction
+  The total purchase cost from the input ITransaction, or undefined if there
+  are no purchases
 */
 function getHoldingTotalCost(holding) {
-    var value = _.sumBy(getHoldingPurchases(holding), function (txn) {
+    var purchases = getHoldingPurchases(holding);
+    if (purchases.length === 0) {
+        return undefined;
+    }
+    var value = _.sumBy(purchases, function (txn) {
         return txn.quantity * txn.price;
     });
     (0, utils_1.assert)(value >= 0, 'getHoldingTotalCost() is not at least 0');
@@ -171,20 +194,21 @@ function getHoldingTotalCost(holding) {
 exports.getHoldingTotalCost = getHoldingTotalCost;
 /*
 DESC
-  Returns the total pnl from the input IHolding and price
+  Returns the total pnl from the input IHolding and price, defined as:
+    totalPnl = marketValue - totalCost
 INPUT
   holding: An IHolding
   price: The market price
 RETURN
-  The total pnl based on the market price and avg cost vs avg rev from the
-  IHolding, or undefined if realizedPnl and unrealizedPnl are both undefined
+  The total pnl defined as marketValue - totalCost, or undefined if totalCost
+  and marketValue are both undefined
 */
 function getHoldingTotalPnl(holding, price) {
-    var realizedPnl = getHoldingRealizedPnl(holding);
-    var unrealizedPnl = getHoldingUnrealizedPnl(holding, price);
-    return (realizedPnl === undefined && unrealizedPnl === undefined)
-        ? undefined
-        : (realizedPnl !== null && realizedPnl !== void 0 ? realizedPnl : 0) + (unrealizedPnl !== null && unrealizedPnl !== void 0 ? unrealizedPnl : 0);
+    var totalCost = getHoldingTotalCost(holding);
+    var marketValue = getHoldingMarketValue(holding, price);
+    return (totalCost && marketValue)
+        ? marketValue - totalCost
+        : undefined;
 }
 exports.getHoldingTotalPnl = getHoldingTotalPnl;
 /*

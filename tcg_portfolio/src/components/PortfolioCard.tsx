@@ -13,9 +13,8 @@ import {
 import { 
   IPopulatedPortfolio, 
   
-  getPortfolioPercentPnl, 
-  
-  getPortfolioRealizedPnl, getPortfolioTotalCost, getPortfolioTotalPnl, getPortfolioUnrealizedPnl
+  getPortfolioMarketValue, getPortfolioPercentPnl, getPortfolioTotalCost, 
+  getPortfolioTotalPnl
 } from 'common'
 import * as _ from 'lodash'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
@@ -53,6 +52,7 @@ export const PortfolioCard = (
   // PortfolioSummary
 
   const prices = getIPriceDataMapFromIDatedPriceDataMap(latestPrices)
+  const portfolioPercentPnl = getPortfolioPercentPnl(portfolio, prices)
 
   const valueSummary: TMetricSummaryItem[] = [
     {
@@ -62,21 +62,10 @@ export const PortfolioCard = (
       formattedPrecision: 2,
       placeholder: '$ -',
       titleStyle: {},
-    }
-  ]
-
-  const realizedSummary: TMetricSummaryItem[] = [
-    {
-      title: 'Realized PnL:',
-      value: getPortfolioRealizedPnl(portfolio),
-      formattedPrefix: '$',
-      formattedPrecision: 2,
-      placeholder: '$ -',
-      titleStyle: {},
     },
     {
-      title: 'Unrealized PnL:',
-      value: getPortfolioUnrealizedPnl(portfolio, prices),
+      title: 'Market Value:',
+      value: getPortfolioMarketValue(portfolio, prices),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
@@ -84,10 +73,9 @@ export const PortfolioCard = (
     }
   ]
 
-  const portfolioPercentPnl = getPortfolioPercentPnl(portfolio, prices)
   const profitSummary: TMetricSummaryItem[] = [
     {
-      title: '$ PnL:',
+      title: 'Profit:',
       value: getPortfolioTotalPnl(portfolio, prices),
       formattedPrefix: '$',
       formattedPrecision: 2,
@@ -95,7 +83,7 @@ export const PortfolioCard = (
       titleStyle: {},
     },
     {
-      title: '% PnL:',
+      title: 'Return:',
       value: portfolioPercentPnl
         ? portfolioPercentPnl * 100
         : undefined,
@@ -151,14 +139,6 @@ export const PortfolioCard = (
                 <Box fontSize='large'>
                   <MetricSummary 
                     summaryItems={valueSummary}
-                    variant='list'
-                  />
-                </Box>
-                
-                {/* Realized + Unrealized */}
-                <Box fontSize='large'>
-                  <MetricSummary 
-                    summaryItems={realizedSummary}
                     variant='list'
                   />
                 </Box>

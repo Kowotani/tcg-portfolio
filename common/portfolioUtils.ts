@@ -27,7 +27,28 @@ export function getPortfolioHoldings(
 
 /*
 DESC
-  Returns the total pnl percent from the input IHolding and price relative
+  Returns the market value of the input IPortfolio based on the input price
+INPUT
+  portfolio: An IPortfolio
+  prices: A Map<number, IPriceData> where the key is a tcgplayerId
+RETURN
+  The market value of the Portfolio, or undefined if both getPortfolioRealizedPnl() 
+  and getPortfolioUnrealizedPnl() are undefined
+*/
+export function getPortfolioMarketValue(
+  portfolio: IPortfolio | IPopulatedPortfolio,
+  prices: Map<number, IPriceData>
+): number | undefined {
+  const realizedPnl = getPortfolioRealizedPnl(portfolio) 
+  const unrealizedPnl = getPortfolioUnrealizedPnl(portfolio, prices) 
+  return (realizedPnl || unrealizedPnl)
+    ? (realizedPnl ?? 0) + (unrealizedPnl ?? 0)
+    : undefined
+}
+
+/*
+DESC
+  Returns the total pnl percent for the input IPortfolio and price relative
   to the total cost
 INPUT
   portfolio: An IPortfolio
@@ -44,7 +65,7 @@ export function getPortfolioPercentPnl(
   const totalPnl = getPortfolioTotalPnl(portfolio, prices)
   return totalCost === 0
     ? undefined 
-    : totalPnl / totalCost - 1
+    : totalPnl / totalCost
 }
 
 /*
@@ -115,38 +136,44 @@ DESC
 INPUT
   portfolio: An IPortfolio
 RETURN
-  The total purchase cost from the input IPortfolio
+  The total purchase cost from the input IPortfolio, or undefined if every
+  Holding as undefined total cost
 */
 export function getPortfolioTotalCost(
   portfolio: IPortfolio | IPopulatedPortfolio
 ): number {
-  const holdings = getPortfolioHoldings(portfolio) 
-  const value = _.sum(holdings.map((holding: IHolding | IPopulatedHolding) => {
+  const holdings = getPortfolioHoldings(portfolio)
+  const totalCosts = holdings.map((holding: IHolding | IPopulatedHolding) => {
     return getHoldingTotalCost(holding)
-  }))
+  }) 
+  if (_.every(totalCosts, (el: any) => el === undefined)) {
+    return undefined
+  }
+  const value = _.sum(totalCosts)
   assert(value >= 0, 'getPortfolioTotalCost() is not at least 0')
   return value
 }
 
 /*
 DESC
-  Returns the total pnl from the input IHolding and price
+  Returns the total pnl from the input IPortfolio and prices, defined as:
+    totalPnl = marketValue - totalCost
 INPUT
   portfolio: An IPortfolio
   prices: A Map<number, IPriceData> where the key is a tcgplayerId
 RETURN
-  The total pnl based on the market price and avg cost vs avg rev from the
-  IHolding, or undefined if both realizedPnl and unrealizedPnl are undefined
+  The total pnl defined as marketValue - totalCost, or undefined if totalCost 
+  and marketValue are both undefined
 */
 export function getPortfolioTotalPnl(
   portfolio: IPortfolio | IPopulatedPortfolio,
   prices: Map<number, IPriceData>
 ): number | undefined {
-  const realizedPnl = getPortfolioRealizedPnl(portfolio)
-  const unrealizedPnl = getPortfolioUnrealizedPnl(portfolio, prices)
-  return (realizedPnl === undefined && unrealizedPnl === undefined)
-    ? undefined
-    : (realizedPnl ?? 0) + (unrealizedPnl ?? 0)
+  const totalCost = getPortfolioTotalCost(portfolio)
+  const marketValue = getPortfolioMarketValue(portfolio, prices)
+  return (totalCost && marketValue)
+    ? marketValue - totalCost
+    : undefined
 }
 
 /*
