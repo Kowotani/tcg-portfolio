@@ -34,7 +34,7 @@ function getPortfolioPercentPnl(portfolio, prices) {
     var totalPnl = getPortfolioTotalPnl(portfolio, prices);
     return totalCost === 0
         ? undefined
-        : totalPnl / totalCost;
+        : totalPnl / totalCost - 1;
 }
 exports.getPortfolioPercentPnl = getPortfolioPercentPnl;
 /*

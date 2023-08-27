@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { PropsWithChildren, useContext, useState } from 'react'
 import { 
   Box,
   Button,
@@ -12,8 +12,19 @@ import {
 } from '@chakra-ui/react'
 import { 
   IPopulatedPortfolio, 
+  
+  getPortfolioPercentPnl, 
+  
+  getPortfolioRealizedPnl, getPortfolioTotalCost, getPortfolioTotalPnl, getPortfolioUnrealizedPnl
 } from 'common'
+import * as _ from 'lodash'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
+import { LatestPricesContext } from '../state/LatestPricesContext'
+import { 
+  ILatestPricesContext, 
+
+  getIPriceDataMapFromIDatedPriceDataMap
+} from '../utils'
 
 
 type TPortfolioCardProps = {
@@ -30,6 +41,8 @@ export const PortfolioCard = (
   // =====
 
   const [ portfolio, setPortfolio ] = useState(props.populatedPortfolio)
+  const { latestPrices } 
+    = useContext(LatestPricesContext) as ILatestPricesContext
 
 
   // =========
@@ -39,33 +52,12 @@ export const PortfolioCard = (
 
   // PortfolioSummary
 
-  const holdingSummary: TMetricSummaryItem[] = [
-    {
-      title: 'TCGs:',
-      value: 123,
-      placeholder: '-',
-      titleStyle: {},
-    },
-    {
-      title: 'Holdings:',
-      value: 456,
-      placeholder: '-',
-      titleStyle: {},
-    }
-  ]
+  const prices = getIPriceDataMapFromIDatedPriceDataMap(latestPrices)
 
   const valueSummary: TMetricSummaryItem[] = [
     {
-      title: 'Book Value:',
-      value: 345.67,
-      formattedPrefix: '$',
-      formattedPrecision: 2,
-      placeholder: '$ -',
-      titleStyle: {},
-    },
-    {
-      title: 'Market Value:',
-      value: 567.89,
+      title: 'Total Cost:',
+      value: getPortfolioTotalCost(portfolio),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
@@ -73,23 +65,45 @@ export const PortfolioCard = (
     }
   ]
 
-  const profitSummary: TMetricSummaryItem[] = [
+  const realizedSummary: TMetricSummaryItem[] = [
     {
-      title: '$ Profit:',
-      value: 567.89 - 345.67,
+      title: 'Realized PnL:',
+      value: getPortfolioRealizedPnl(portfolio),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
       titleStyle: {},
     },
     {
-      title: '% Profit:',
-      value: (567.89 / 345.67 - 1) * 100,
+      title: 'Unrealized PnL:',
+      value: getPortfolioUnrealizedPnl(portfolio, prices),
+      formattedPrefix: '$',
+      formattedPrecision: 2,
+      placeholder: '$ -',
+      titleStyle: {},
+    }
+  ]
+
+  const portfolioPercentPnl = getPortfolioPercentPnl(portfolio, prices)
+  const profitSummary: TMetricSummaryItem[] = [
+    {
+      title: '$ PnL:',
+      value: getPortfolioTotalPnl(portfolio, prices),
+      formattedPrefix: '$',
+      formattedPrecision: 2,
+      placeholder: '$ -',
+      titleStyle: {},
+    },
+    {
+      title: '% PnL:',
+      value: portfolioPercentPnl
+        ? portfolioPercentPnl * 100
+        : undefined,
       formattedPrecision: 2,
       formattedSuffix: '%',
       placeholder: '- %',
       titleStyle: {},
-    },
+    }
   ]
 
   // =====
@@ -133,18 +147,18 @@ export const PortfolioCard = (
                   </Text>
                 </Box>
 
-                {/* Holdings */}
-                <Box fontSize='large'>
-                  <MetricSummary 
-                    summaryItems={holdingSummary}
-                    variant='list'
-                  />
-                </Box>
-
                 {/* Value */}
                 <Box fontSize='large'>
                   <MetricSummary 
                     summaryItems={valueSummary}
+                    variant='list'
+                  />
+                </Box>
+                
+                {/* Realized + Unrealized */}
+                <Box fontSize='large'>
+                  <MetricSummary 
+                    summaryItems={realizedSummary}
                     variant='list'
                   />
                 </Box>

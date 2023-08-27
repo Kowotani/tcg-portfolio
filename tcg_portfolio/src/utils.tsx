@@ -1,5 +1,6 @@
 import { 
-  IDatedPriceData, IPopulatedHolding, IProduct, ProductLanguage, ProductSubtype, 
+  IDatedPriceData, IPopulatedHolding, IPriceData, IProduct, ProductLanguage, 
+  ProductSubtype, 
   
   assert, isIDatedPriceData, isIPopulatedHolding, isIProduct
 } from 'common'
@@ -100,9 +101,45 @@ export interface IUserContext {
 // functions
 // =========
 
-// ---------
-// converter
-// ---------
+// ----------
+// converting
+// ----------
+
+/*
+DESC
+  Converts the input IDatedPriceData[] into an IPriceData[]
+INPUT
+  datedPriceData: An IDatedPriceData[]
+RETURN
+  An IPriceData[]
+*/
+export function getIPriceDataFromIDatedPriceData(
+  datedPriceData: IDatedPriceData[]
+): IPriceData[] {
+  const priceData = datedPriceData.map((data: IDatedPriceData) => {
+    return data.prices
+  })
+  return priceData
+}
+
+/*
+DESC
+  Converts the input Map<number, IDatedPriceData> into a
+  Map<number, IPriceData>
+INPUT
+  datedPriceDataMap: A Map<number, IDatedPriceData>
+RETURN
+  A Map<number, IPriceData>
+*/
+export function getIPriceDataMapFromIDatedPriceDataMap(
+  datedPriceDataMap: Map<number, IDatedPriceData>
+): Map<number, IPriceData> {
+  let priceMap = new Map<number, IPriceData>()
+  datedPriceDataMap.forEach((v: IDatedPriceData, k: number) => {
+    priceMap.set(k, v.prices)
+  })
+  return priceMap
+}
 
 /*
 DESC

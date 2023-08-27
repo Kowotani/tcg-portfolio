@@ -44,7 +44,7 @@ export function getPortfolioPercentPnl(
   const totalPnl = getPortfolioTotalPnl(portfolio, prices)
   return totalCost === 0
     ? undefined 
-    : totalPnl / totalCost
+    : totalPnl / totalCost - 1
 }
 
 /*
