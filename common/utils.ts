@@ -25,6 +25,46 @@ export const SECONDS_PER_DAY = 86400
 // functions
 // =========
 
+// ----------
+// converters
+// ----------
+
+/*
+DESC
+  Returns a typed array of properties from the input object
+INPUT
+  obj: An object
+RETURN
+  An array of [key, value] items corresponding to typed properties of the input
+REF
+  https://stackoverflow.com/questions/69019873/how-can-i-get-typed-object-entries-and-object-fromentries-in-typescript
+*/
+// export function getTypeSafeObjectEntries<
+//   const T extends Record<PropertyKey, unknown>
+// >(
+//   obj: T
+// ): { [K in keyof T]: [K, T[K]] }[keyof T][]  {
+//   return Object.entries(obj) as { [K in keyof T]: [K, T[K]] }[keyof T][]
+// }
+
+/*
+DESC
+  Returns an object with typed properties from the input entries
+INPUT
+  entries: An iterable
+RETURN
+  An object whose typed properties correspond to the input iterable entries
+REF
+  https://stackoverflow.com/questions/69019873/how-can-i-get-typed-object-entries-and-object-fromentries-in-typescript
+*/ 
+// export function getTypeSafeObjectFromEntries<
+//   const T extends ReadonlyArray<readonly [PropertyKey, unknown]>
+// > (
+//   entries: T
+// ): { [K in T[number] as K[0]]: K[1] } {
+//   return Object.fromEntries(entries) as { [K in T[number] as K[0]]: K[1] }
+// }
+
 // -------
 // generic
 // -------
@@ -133,6 +173,10 @@ INPUT
 export function logObject(arg: Object): void {
   console.log(inspect(arg, false, null, true))
 }
+
+// -------
+// sorting
+// -------
 
 /*
 DESC
