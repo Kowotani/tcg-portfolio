@@ -1,7 +1,7 @@
 import { 
   IDatedPriceData, IPopulatedHolding, IProduct, ProductLanguage, ProductSubtype, 
   
-  assert, isIPopulatedHolding, isIProduct
+  assert, isIDatedPriceData, isIPopulatedHolding, isIProduct
 } from 'common'
 import * as _ from 'lodash'
 
@@ -100,7 +100,46 @@ export interface IUserContext {
 // functions
 // =========
 
-// -- filtering
+// ---------
+// converter
+// ---------
+
+/*
+DESC
+  Converts the API response from Price endpoints into a useable Map
+INPUT
+  data: An object of format {[k: string]: IDatedPriceData}
+RETURN
+  A Map of [tcgplayerId: IDatedPriceData] 
+*/
+export function getPriceMapFromPriceAPIResponse(
+  data: {[k: string]: IDatedPriceData}
+): Map<number, IDatedPriceData> {
+
+  const priceMap = new Map<number, IDatedPriceData>()
+
+  Object.keys(data).forEach((key: any) => {
+
+    // tcgplayerId check
+    const tcgplayerId = Number(key)
+    assert(
+      _.isNumber(tcgplayerId), 
+      'Unexepcted key type in response body of GET_LATEST_PRICES_URL')
+
+    // datedPriceData check
+    const datedPriceData = data[tcgplayerId]
+    assert(
+      isIDatedPriceData(datedPriceData),
+      'Unexepcted value type in response body of GET_LATEST_PRICES_URL'
+    )
+    priceMap.set(tcgplayerId, datedPriceData)
+  })
+  return priceMap
+}
+
+// ---------
+// filtering
+// ---------
 
 /*
 DESC
@@ -169,7 +208,9 @@ export function filterFnProductSearchResult(
   }
 }
 
-// -- generic
+// -------
+// generic
+// -------
 
 /*
 DESC
@@ -268,7 +309,9 @@ export function getProductNameWithLanguage(product: IProduct): string {
       : ''}`
 }
 
-// -- sorting
+// -------
+// sorting
+// -------
 
 /*
 DESC
