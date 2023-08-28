@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.getISOStringFromDate = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 var util_1 = require("util");
@@ -16,6 +16,22 @@ exports.SECONDS_PER_DAY = 86400;
 // ----------
 // converters
 // ----------
+/*
+  DESC
+    Returns the input Date as an ISODate (YYYY-MM-DD)
+  INPUT
+    date: A Date
+  RETURN
+    A YYYY-MM-DD formatted version of the input date
+*/
+function getISOStringFromDate(date) {
+    var newDate = new Date(date);
+    var year = newDate.getFullYear().toString();
+    var month = newDate.getMonth().toString().padStart(2, '0');
+    var day = (newDate.getDate() + 1).toString().padStart(2, '0');
+    return "".concat(year, "-").concat(month, "-").concat(day);
+}
+exports.getISOStringFromDate = getISOStringFromDate;
 /*
 DESC
   Returns a typed array of properties from the input object

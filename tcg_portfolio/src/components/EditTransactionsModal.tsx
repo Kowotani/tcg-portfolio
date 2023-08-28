@@ -30,6 +30,7 @@ import {
 
   getHoldingAverageCost, getHoldingAverageRevenue, getHoldingPurchaseQuantity, 
   getHoldingSaleQuantity, getHoldingTotalCost, getHoldingTotalRevenue,
+  getISOStringFromDate
 } from 'common'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
@@ -442,7 +443,7 @@ export const EditTransactionsModal = (
 
   const columns = [
     columnHelper.accessor('date', {
-      cell: (info) => info.getValue().toISOString().substring(0, 10),
+      cell: (info) => getISOStringFromDate(info.getValue()),
       header: 'Date',
       sortingFn: 'datetime'
     }),
