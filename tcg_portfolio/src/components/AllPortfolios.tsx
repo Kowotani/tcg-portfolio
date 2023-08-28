@@ -19,7 +19,12 @@ import { IUserContext } from '../utils'
 import { isIPopulatedPortfolioArray } from 'common'
 import * as _ from 'lodash'
 
-export const AllPortfolios = () => {
+type TAllPortfoliosProps = {
+  onEditClick: (portfolio: IPopulatedPortfolio) => void
+}
+export const AllPortfolios = (
+  props: PropsWithChildren<TAllPortfoliosProps>
+) => {
 
   // =====
   // state
@@ -27,7 +32,6 @@ export const AllPortfolios = () => {
 
   const [ portfolios, setPortfolios ] = useState([] as IPopulatedPortfolio[])
   const { user } = useContext(UserContext) as IUserContext
-
 
   // =====
   // hooks
@@ -71,7 +75,7 @@ export const AllPortfolios = () => {
             <PortfolioCard 
               populatedPortfolio={portfolio}
               onPortfolioDelete={() => console.log('deleted portfolio')}
-              onPortfolioUpdate={() => console.log('updated portfolio')}
+              onEditClick={props.onEditClick}
             />
             <Spacer h='8px' />
           </Box>

@@ -67,12 +67,6 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
       placeholder: '-',
       titleStyle: {},
     },
-    {
-      title: 'Quantity:',
-      value: getHoldingQuantity(holding),
-      placeholder: '-',
-      titleStyle: {},
-    },
   ]
 
   const profitSummary: TMetricSummaryItem[] = [
@@ -91,7 +85,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
       formattedPrecision: 2,
       placeholder: '$ -',
       titleStyle: {},
-    }
+    },
   ]
 
   // =====

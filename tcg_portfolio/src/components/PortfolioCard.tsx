@@ -29,7 +29,7 @@ import {
 type TPortfolioCardProps = {
   populatedPortfolio: IPopulatedPortfolio,
   onPortfolioDelete: (portfolio: IPopulatedPortfolio) => void,
-  onPortfolioUpdate: (portfolio: IPopulatedPortfolio) => void,
+  onEditClick: (portfolio: IPopulatedPortfolio) => void,
 }
 export const PortfolioCard = (
   props: PropsWithChildren<TPortfolioCardProps>
@@ -70,7 +70,7 @@ export const PortfolioCard = (
       formattedPrecision: 2,
       placeholder: '$ -',
       titleStyle: {},
-    }
+    },
   ]
 
   const profitSummary: TMetricSummaryItem[] = [
@@ -91,7 +91,7 @@ export const PortfolioCard = (
       formattedSuffix: '%',
       placeholder: '- %',
       titleStyle: {},
-    }
+    },
   ]
 
   // =====
@@ -154,7 +154,7 @@ export const PortfolioCard = (
                 {/* Edit */}
                 <Button 
                   colorScheme='blue' 
-                  onClick={() => console.log('opened portfolio')}
+                  onClick={() => props.onEditClick(portfolio)}
                 >
                   Edit
                 </Button>

@@ -29,7 +29,9 @@ import {
 } from '../utils' 
 
 
-type TEditPortfolioProps = {}
+type TEditPortfolioProps = {
+  portfolio: IPopulatedPortfolio
+}
 export const EditPortfolioForm = (
   props: PropsWithChildren<TEditPortfolioProps>
 ) => {
@@ -53,44 +55,7 @@ export const EditPortfolioForm = (
   // Portfolio
   // ---------
 
-  // ====================================
-  // dummy data start
-
-  const fooTransactions: ITransaction[] = [
-    {
-      type: TransactionType.Purchase,
-      date: new Date(),
-      quantity: 123,
-      price: 5.67
-    }
-  ]
-
-  const fooProduct: IProduct = {
-    tcgplayerId: 121527,
-    tcg: TCG.MagicTheGathering,
-    releaseDate: new Date(),
-    name: 'Kaladesh',
-    type: ProductType.BoosterBox,
-    language: ProductLanguage.English,
-    subtype: ProductSubtype.Draft,
-    setCode: 'KLD',
-  }
-
-  const fooHolding: IPopulatedHolding = {
-    product: fooProduct,
-    transactions: fooTransactions
-  }
-  const fooPortfolio: IPopulatedPortfolio = {
-    userId: 1234,
-    portfolioName: 'Alpha Investments',
-    populatedHoldings: [fooHolding].sort(sortFnPopulatedHoldingAsc)
-  }
-
-
-  // dummy data end
-  // ====================================
-
-  const [ portfolio, setPortfolio ] = useState(fooPortfolio)
+  const [ portfolio, setPortfolio ] = useState(props.portfolio)
 
   // PortfolioName state
   const [ portfolioNameState, setPortfolioNameState ] = useState<{

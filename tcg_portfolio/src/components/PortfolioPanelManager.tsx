@@ -1,13 +1,15 @@
 import { useContext, useEffect, useState, } from 'react'
 import axios from 'axios'
 import { 
-  Box,
   Breadcrumb,
   BreadcrumbItem,
+  Spinner,
   Text
 } from '@chakra-ui/react'
 import { AllPortfolios } from './AllPortfolios'
 import { 
+  IPopulatedPortfolio,
+
   GET_LATEST_PRICES_URL, logObject,
 
   assert
@@ -23,19 +25,21 @@ import {
 } from '../utils' 
 
 
-
-
-
 export const PortfolioPanelManager = () => {
 
   // =====
   // state
   // =====
 
-  const { setLatestPrices } 
+  const { latestPrices, setLatestPrices } 
     = useContext(LatestPricesContext) as ILatestPricesContext
   const { user } = useContext(UserContext) as IUserContext
+
   const [ nav, setNav ] = useState(PortfolioPanelNav.All)
+  const [ activePortfolio, setActivePortfolio ] 
+    = useState({} as IPopulatedPortfolio)
+
+  const isLoadingLatestPrices = latestPrices.size === 0 
 
   // ----------
   // breadcrumb
@@ -49,6 +53,21 @@ export const PortfolioPanelManager = () => {
         ? ['Portfolio', 'Edit']
         : ['Portfolio']
 
+
+  // =========
+  // functions
+  // =========
+
+  /*
+  DESC
+    Function to pass to Portfolio Cards to edit the selected Portfolio
+  INPUT
+    portfolio: An IPopulatedPortfolio
+  */
+    function handleOnEditClick(portfolio: IPopulatedPortfolio): void {
+      setActivePortfolio(portfolio)
+      setNav(PortfolioPanelNav.Edit)
+    }
 
   // =====
   // hooks
@@ -90,35 +109,56 @@ export const PortfolioPanelManager = () => {
 
   
   // ==============
-  // Main Component
+  // main component
   // ==============
 
   return (
     <>
-      {/* Breadcrumb */}
-      <Breadcrumb spacing='8px'>
-        {breadcrumbTrail.map((path: string) => {
-          return (
-            <BreadcrumbItem key={path}>
-              <Text>{path}</Text>
-            </BreadcrumbItem>
-          )
-        })}
-      </Breadcrumb>
+      {isLoadingLatestPrices
+        ? (
+          <Spinner 
+            color='blue.500'
+            emptyColor='gray.200'
+            size='xl'
+            speed='0.75s'
+            thickness='6px'
+          />
+        ) : (
+          <>
+            {/* Breadcrumb */}
+            <Breadcrumb spacing='8px'>
+              {breadcrumbTrail.map((path: string) => {
+                return (
+                  <BreadcrumbItem key={path}>
+                    <Text>{path}</Text>
+                  </BreadcrumbItem>
+                )
+              })}
+            </Breadcrumb>
 
-      {/* Portfolio Overview */}
-      {nav === PortfolioPanelNav.All 
-        && <AllPortfolios />
-      }
+            {/* Portfolio Overview */}
+            {nav === PortfolioPanelNav.All 
+              && (
+                <AllPortfolios 
+                  onEditClick={handleOnEditClick}
+                />
+              )
+            }
 
-      {/* Add Portfolio */}
+            {/* Add Portfolio */}
 
-      {/* Edit Portfolio */}
-      {nav === PortfolioPanelNav.Edit 
-        && <EditPortfolioForm />
-      }
+            {/* Edit Portfolio */}
+            {nav === PortfolioPanelNav.Edit 
+              && (
+                <EditPortfolioForm 
+                  portfolio={activePortfolio}
+                />
+              )
+            }
 
-      {/* Portfolio Performance */}
+            {/* Portfolio Performance */}
+          </>
+      )}
     </>
   )
 }
