@@ -2,18 +2,15 @@ import { PropsWithChildren, useContext, useEffect, useState, } from 'react'
 import axios from 'axios'
 import { 
   Box,
+  Button,
   Input,
   Spacer,
   Text
 } from '@chakra-ui/react'
 import { 
   IPopulatedHolding, IPopulatedPortfolio, IProduct, 
-  ITransaction, ProductLanguage, ProductSubtype, ProductType, TCG, 
-  TransactionType,
 
-  isIPopulatedHolding,
-
-  assert, GET_PRODUCTS_URL, isASCII
+  assert, GET_PRODUCTS_URL, isASCII, isIPopulatedHolding
 } from 'common'
 import { HoldingCard } from './HoldingCard'
 import { InputErrorWrapper } from './InputField'
@@ -30,7 +27,8 @@ import {
 
 
 type TEditPortfolioProps = {
-  portfolio: IPopulatedPortfolio
+  portfolio: IPopulatedPortfolio,
+  onExitEditMode: () => void,
 }
 export const EditPortfolioForm = (
   props: PropsWithChildren<TEditPortfolioProps>
@@ -251,6 +249,23 @@ export const EditPortfolioForm = (
 
   return (
     <>
+      {/* Exit and Save Buttons */}
+      <Box display='flex' justifyContent='flex-end'>
+        <Button 
+          variant='ghost' 
+          onClick={props.onExitEditMode}
+        >
+            Discard Changes
+        </Button>
+        <Box w='16px' />
+        <Button 
+          colorScheme='blue'
+          onClick={props.onExitEditMode}
+        >
+          Save Changes
+        </Button>
+      </Box>
+
       {/* Portfolio Header */}
       <Box bg='teal.500' color='white' fontWeight='medium' p='8px' m='16px 0px'>
         Portfolio Details

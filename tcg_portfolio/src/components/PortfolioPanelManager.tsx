@@ -10,7 +10,7 @@ import { AllPortfolios } from './AllPortfolios'
 import { 
   IPopulatedPortfolio,
 
-  GET_LATEST_PRICES_URL, logObject,
+  GET_LATEST_PRICES_URL,
 
   assert
 } from 'common'
@@ -60,14 +60,23 @@ export const PortfolioPanelManager = () => {
 
   /*
   DESC
-    Function to pass to Portfolio Cards to edit the selected Portfolio
+    Function to pass to children to navigate to All Portfolios
+  */
+  function handleOnEnterAllPortfolios(): void {
+    setActivePortfolio({} as IPopulatedPortfolio)
+    setNav(PortfolioPanelNav.All)
+  }
+
+/*
+  DESC
+    Function to pass to children to enter edit mode of a Portfolio
   INPUT
     portfolio: An IPopulatedPortfolio
   */
-    function handleOnEditClick(portfolio: IPopulatedPortfolio): void {
-      setActivePortfolio(portfolio)
-      setNav(PortfolioPanelNav.Edit)
-    }
+  function handleOnEnterEditMode(portfolio: IPopulatedPortfolio): void {
+    setActivePortfolio(portfolio)
+    setNav(PortfolioPanelNav.Edit)
+  }
 
   // =====
   // hooks
@@ -140,7 +149,7 @@ export const PortfolioPanelManager = () => {
             {nav === PortfolioPanelNav.All 
               && (
                 <AllPortfolios 
-                  onEditClick={handleOnEditClick}
+                  onEditClick={handleOnEnterEditMode}
                 />
               )
             }
@@ -152,6 +161,7 @@ export const PortfolioPanelManager = () => {
               && (
                 <EditPortfolioForm 
                   portfolio={activePortfolio}
+                  onExitEditMode={handleOnEnterAllPortfolios}
                 />
               )
             }
