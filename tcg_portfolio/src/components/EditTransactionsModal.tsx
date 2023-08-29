@@ -30,7 +30,9 @@ import {
 
   getHoldingAverageCost, getHoldingAverageRevenue, getHoldingPurchaseQuantity, 
   getHoldingSaleQuantity, getHoldingTotalCost, getHoldingTotalRevenue,
-  getISOStringFromDate
+  getISOStringFromDate,
+
+  assert, isNumeric
 } from 'common'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
@@ -76,11 +78,16 @@ const AddTransactionForm = (
     return error
   }
 
-  function validatePrice(value: number): string | undefined {
+  function validatePrice(value: number | string): string | undefined {
     let error
     if (!value) {
-      error = 'Price is required'
-    } else if (value <= 0) {
+      return 'Price is required'
+    } else if (!isNumeric(value)) {
+      return 'Not a number'
+    } 
+    const numberValue = Number(value)
+    assert(typeof numberValue === 'number')
+    if (numberValue <= 0) {
       error = 'Must be positive'
     }
     return error
@@ -109,11 +116,12 @@ const AddTransactionForm = (
     e: React.FocusEvent<HTMLInputElement, Element>,
     form: FormikProps<IInputValues>
   ): void {
-    if (e.target.value) {
-      form.setFieldValue('price', Math.max(Number(e.target.value), 1))
-    } else {
-      form.setErrors({'price': 'Price is required'})
+    const error = validatePrice(e.target.value)
+    if (error) {
+      form.setFieldError('price', error)
       form.setFieldTouched('price')
+    } else {
+      form.setFieldValue('price', Math.max(Number(e.target.value), 1))
     }
   }
 
