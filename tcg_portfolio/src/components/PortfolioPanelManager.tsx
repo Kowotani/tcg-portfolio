@@ -3,7 +3,7 @@ import axios from 'axios'
 import { 
   Breadcrumb,
   BreadcrumbItem,
-  Spinner,
+  Progress,
   Text
 } from '@chakra-ui/react'
 import { AllPortfolios } from './AllPortfolios'
@@ -125,12 +125,10 @@ export const PortfolioPanelManager = () => {
     <>
       {isLoadingLatestPrices
         ? (
-          <Spinner 
-            color='blue.500'
-            emptyColor='gray.200'
-            size='xl'
-            speed='0.75s'
-            thickness='6px'
+          <Progress 
+            height='24px'
+            m='8px 0px'
+            isIndeterminate
           />
         ) : (
           <>

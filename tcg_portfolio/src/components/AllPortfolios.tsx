@@ -2,9 +2,8 @@ import { PropsWithChildren, useContext, useEffect, useState, } from 'react'
 import axios from 'axios'
 import { 
   Box,
-  Input,
+  Progress,
   Spacer,
-  Text
 } from '@chakra-ui/react'
 import { 
   IPopulatedPortfolio, 
@@ -32,6 +31,8 @@ export const AllPortfolios = (
 
   const [ portfolios, setPortfolios ] = useState([] as IPopulatedPortfolio[])
   const { user } = useContext(UserContext) as IUserContext
+
+  const isLoadingPortfolios = portfolios.length === 0
 
   // =====
   // hooks
@@ -63,24 +64,41 @@ export const AllPortfolios = (
 
   return (
     <>
-      {/* Header */}
-      <Box bg='teal.500' color='white' fontWeight='medium' p='8px' m='16px 0px'>
-        Portfolios
-      </Box>
+      {isLoadingPortfolios
+        ? (
+          <Progress 
+            height='24px'
+            m='8px 0px'
+            isIndeterminate
+          />
+        ) : (
+          <>
+            {/* Header */}
+            <Box 
+              bg='teal.500' 
+              color='white' 
+              fontWeight='medium' 
+              p='8px' 
+              m='16px 0px'
+            >
+              Portfolios
+            </Box>
 
-      {/* Portfolios */}
-      {portfolios.map((portfolio: IPopulatedPortfolio) => {
-        return (
-          <Box key={portfolio.portfolioName}>
-            <PortfolioCard 
-              populatedPortfolio={portfolio}
-              onPortfolioDelete={() => console.log('deleted portfolio')}
-              onEditClick={props.onEditClick}
-            />
-            <Spacer h='8px' />
-          </Box>
-        )
-      })}
+            {/* Portfolios */}
+            {portfolios.map((portfolio: IPopulatedPortfolio) => {
+              return (
+                <Box key={portfolio.portfolioName}>
+                  <PortfolioCard 
+                    populatedPortfolio={portfolio}
+                    onPortfolioDelete={() => console.log('deleted portfolio')}
+                    onEditClick={props.onEditClick}
+                  />
+                  <Spacer h='16px' />
+                </Box>
+              )
+            })}
+          </>
+      )}
     </>
   )
 }
