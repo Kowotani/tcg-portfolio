@@ -61,11 +61,14 @@ RETURN
   and getPortfolioUnrealizedPnl() are undefined
 */
 function getPortfolioMarketValue(portfolio, prices) {
-    var realizedPnl = getPortfolioRealizedPnl(portfolio);
-    var unrealizedPnl = getPortfolioUnrealizedPnl(portfolio, prices);
-    return (realizedPnl || unrealizedPnl)
-        ? (realizedPnl !== null && realizedPnl !== void 0 ? realizedPnl : 0) + (unrealizedPnl !== null && unrealizedPnl !== void 0 ? unrealizedPnl : 0)
-        : undefined;
+    var holdings = getPortfolioHoldings(portfolio);
+    var marketValues = holdings.map(function (holding) {
+        var price = (0, utils_1.isIHolding)(holding)
+            ? prices.get(holding.tcgplayerId).marketPrice
+            : prices.get(holding.product.tcgplayerId).marketPrice;
+        return (0, holdingUtils_1.getHoldingMarketValue)(holding, price);
+    });
+    return _.sum(marketValues);
 }
 exports.getPortfolioMarketValue = getPortfolioMarketValue;
 /*

@@ -1,7 +1,7 @@
 import { IHolding, IPopulatedHolding, IPortfolio, IPopulatedPortfolio, IPriceData } from './dataModels';
 export declare function getIPortfoliosFromIPopulatedPortfolios(populatedPortfolios: IPopulatedPortfolio[]): IPortfolio[];
 export declare function getPortfolioHoldings(portfolio: IPortfolio | IPopulatedPortfolio): IHolding[] | IPopulatedHolding[];
-export declare function getPortfolioMarketValue(portfolio: IPortfolio | IPopulatedPortfolio, prices: Map<number, IPriceData>): number | undefined;
+export declare function getPortfolioMarketValue(portfolio: IPortfolio | IPopulatedPortfolio, prices: Map<number, IPriceData>): number;
 export declare function getPortfolioPercentPnl(portfolio: IPortfolio | IPopulatedPortfolio, prices: Map<number, IPriceData>): number | undefined;
 export declare function getPortfolioPurchaseQuantity(portfolio: IPortfolio | IPopulatedPortfolio): number;
 export declare function getPortfolioRealizedPnl(portfolio: IPortfolio | IPopulatedPortfolio): number | undefined;

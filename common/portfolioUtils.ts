@@ -4,6 +4,7 @@ import {
 } from './dataModels'
 import { assert, isIHolding, isIPortfolio } from './utils'
 import { 
+  getHoldingMarketValue,
   getHoldingPurchaseQuantity, getHoldingRealizedPnl, getHoldingSaleQuantity, 
   getHoldingTotalCost, getHoldingTotalRevenue, getHoldingUnrealizedPnl,
   getIHoldingsFromIPopulatedHoldings
@@ -27,7 +28,7 @@ export function getIPortfoliosFromIPopulatedPortfolios(
 ): IPortfolio[] {
   const portfolios: IPortfolio[] = populatedPortfolios.map(
     (populatedPortfolio: IPopulatedPortfolio) => {
-      
+
       let portfolio = {
         userId: populatedPortfolio.userId,
         portfolioName: populatedPortfolio.portfolioName,
@@ -81,12 +82,15 @@ RETURN
 export function getPortfolioMarketValue(
   portfolio: IPortfolio | IPopulatedPortfolio,
   prices: Map<number, IPriceData>
-): number | undefined {
-  const realizedPnl = getPortfolioRealizedPnl(portfolio) 
-  const unrealizedPnl = getPortfolioUnrealizedPnl(portfolio, prices) 
-  return (realizedPnl || unrealizedPnl)
-    ? (realizedPnl ?? 0) + (unrealizedPnl ?? 0)
-    : undefined
+): number {
+  const holdings = getPortfolioHoldings(portfolio)
+  const marketValues = holdings.map((holding: IHolding | IPopulatedHolding) => {
+    const price = isIHolding(holding)
+      ? prices.get(holding.tcgplayerId).marketPrice
+      : prices.get(holding.product.tcgplayerId).marketPrice
+    return getHoldingMarketValue(holding, price)
+  })
+  return _.sum(marketValues)
 }
 
 /*

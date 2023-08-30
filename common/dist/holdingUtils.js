@@ -74,10 +74,8 @@ RETURN
 */
 function getHoldingMarketValue(holding, price) {
     var realizedPnl = getHoldingRealizedPnl(holding);
-    var unrealizedPnl = getHoldingUnrealizedPnl(holding, price);
-    return (realizedPnl || unrealizedPnl)
-        ? (realizedPnl !== null && realizedPnl !== void 0 ? realizedPnl : 0) + (unrealizedPnl !== null && unrealizedPnl !== void 0 ? unrealizedPnl : 0)
-        : undefined;
+    var holdingValue = getHoldingQuantity(holding) * price;
+    return (realizedPnl !== null && realizedPnl !== void 0 ? realizedPnl : 0) + holdingValue;
 }
 exports.getHoldingMarketValue = getHoldingMarketValue;
 /*

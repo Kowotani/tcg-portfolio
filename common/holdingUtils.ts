@@ -86,12 +86,10 @@ RETURN
 export function getHoldingMarketValue(
   holding: IHolding | IPopulatedHolding,
   price: number
-): number | undefined {
+): number {
   const realizedPnl = getHoldingRealizedPnl(holding) 
-  const unrealizedPnl = getHoldingUnrealizedPnl(holding, price) 
-  return (realizedPnl || unrealizedPnl)
-    ? (realizedPnl ?? 0) + (unrealizedPnl ?? 0)
-    : undefined
+  const holdingValue = getHoldingQuantity(holding) * price
+  return (realizedPnl ?? 0) + holdingValue
 }
 
 /*
