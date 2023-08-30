@@ -10,17 +10,25 @@ import {
   Input,
   Spacer,
   Text,
+  useToast,
   VStack
 } from '@chakra-ui/react'
 import { 
   IPopulatedHolding, IPopulatedPortfolio, IProduct, 
 
-  assert, GET_PRODUCTS_URL, isASCII, isIPopulatedHolding
+  getIPortfoliosFromIPopulatedPortfolios,
+
+  GET_PRODUCTS_URL, UPDATE_PORTFOLIO_URL, 
+  
+  TPutPortfolioReqBody,
+
+  assert, isASCII, isIPopulatedHolding, isIPortfolio, isTResBody
 } from 'common'
+import { FilterInput } from './FilterInput'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
 import { HoldingCard } from './HoldingCard'
-import { FilterInput } from './FilterInput'
+import * as _ from 'lodash'
 import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
 import { SideBarNavContext } from '../state/SideBarNavContext'
@@ -30,7 +38,6 @@ import {
   filterFnHoldingCard, filterFnProductSearchResult, sortFnPopulatedHoldingAsc, 
   sortFnProductSearchResults
 } from '../utils' 
-import { isAsExpression } from 'typescript'
 
 
 type TEditPortfolioProps = {
@@ -269,6 +276,8 @@ export const EditPortfolioForm = (
     setSearchResults(productResults)
   }, [searchInput, searchableProducts])
 
+  // Axios response toast
+  const toast = useToast()
 
   // ====================
   // PortfolioDetailsForm
@@ -301,9 +310,94 @@ export const EditPortfolioForm = (
           portfolioName: DEFAULT_PORTFOLIO_NAME,
           description: DEFAULT_DESCRIPTION,
         }}
-        onSubmit={(values: IInputValues, actions: FormikHelpers<IInputValues>) => {
-          actions.setSubmitting(false)
-          console.log(values)
+        onSubmit={
+          (values: IInputValues, actions: FormikHelpers<IInputValues>) => {
+
+            // create existingPortfolio IPortfolio
+            const existingPortfolio 
+              = _.head(getIPortfoliosFromIPopulatedPortfolios([props.portfolio]))
+            assert(isIPortfolio(existingPortfolio),
+              'Error converting existing Portfolio to IPortfolio')
+              
+            // create newPortfolio IPortfolio
+            let portfolioTemplate: IPopulatedPortfolio = {
+              userId: props.portfolio.userId,
+              portfolioName: values.portfolioName,
+              populatedHoldings: portfolio.populatedHoldings
+            }
+            if (values.description.length > 0) {
+              portfolioTemplate['description'] = values.description
+            }
+            const newPortfolio 
+              = _.head(getIPortfoliosFromIPopulatedPortfolios([portfolioTemplate]))
+            assert(isIPortfolio(newPortfolio),
+              'Error converting new Portfolio to IPortfolio')              
+
+            // create request body
+            const body: TPutPortfolioReqBody = {
+              existingPortfolio: existingPortfolio,
+              newPortfolio: newPortfolio
+            }
+
+            // submit
+            axios({
+              method: 'put',
+              url: UPDATE_PORTFOLIO_URL,
+              data: body,
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            })
+
+            // success
+            .then(res => {
+              actions.setSubmitting(false)
+
+              const resData = res.data
+              assert(isTResBody(resData),
+                'Unexpected response from UPDATE_PORTFOLIO_URL')
+    
+              // Portoflio was updated
+              if (res.status === 200) {
+                toast({
+                  title: 'Success!',
+                  description: `${resData.message}`,
+                  duration: 3000,
+                  status: 'success',
+                  isClosable: true,
+                })        
+
+              // exit Edit Mode
+              props.onExitEditMode()
+
+              // Portoflio was not updated
+              } else if (res.status === 500) {
+                toast({
+                  title: 'Error!',
+                  description: `${resData.message}`,
+                  duration: 3000,
+                  status: 'error',
+                  isClosable: true,
+                })    
+              }
+    
+            })
+
+            // error
+            .catch(res => {
+              actions.setSubmitting(false)
+
+              // TODO: type check
+              const resData = res.data  
+              
+              toast({
+                title: 'Error!',
+                description: `${res.statusText}: ${resData}`,
+                status: 'error',
+                isClosable: true,
+              })                        
+            })            
+
         }}
         validateOnBlur={false}  // disable validation which overwrites setError
       >
