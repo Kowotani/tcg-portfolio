@@ -34,7 +34,7 @@ export async function areValidHoldings(holdings: IHolding[]): Promise<boolean> {
   
   // unique tcgplayerId
   const tcgplayerIds = holdings.map((holding: IHolding) => {
-    return holding.tcgplayerId
+    return Number(holding.tcgplayerId)
   })
   if (tcgplayerIds.length > _.uniq(tcgplayerIds).length) {
     console.log(`Duplicate tcgplayerIds detected in isValidHoldings()`)
@@ -48,7 +48,7 @@ export async function areValidHoldings(holdings: IHolding[]): Promise<boolean> {
   })
   const unknownTcgplayerIds = _.difference(tcgplayerIds, productTcgplayerIds)
   if (unknownTcgplayerIds.length > 0) {
-    console.log(`Products not found for tcgplayerIds in isValidHoldings(): ${unknownTcgplayerIds}`)
+    console.log(`Products not found for tcgplayerIds in hasValidHoldings(): ${unknownTcgplayerIds}`)
     return false
   }
 
@@ -102,7 +102,7 @@ export async function getIMHoldingsFromIHoldings(
 
     // find Product
     const productDoc = productDocs.find((product: IMProduct) => {
-      return product.tcgplayerId === holding.tcgplayerId
+      return product.tcgplayerId === Number(holding.tcgplayerId)
     })
     assert(
       productDoc instanceof Product, 

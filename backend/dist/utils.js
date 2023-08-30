@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -57,7 +61,7 @@ function areValidHoldings(holdings) {
     return __awaiter(this, void 0, void 0, function* () {
         // unique tcgplayerId
         const tcgplayerIds = holdings.map((holding) => {
-            return holding.tcgplayerId;
+            return Number(holding.tcgplayerId);
         });
         if (tcgplayerIds.length > _.uniq(tcgplayerIds).length) {
             console.log(`Duplicate tcgplayerIds detected in isValidHoldings()`);
@@ -66,11 +70,11 @@ function areValidHoldings(holdings) {
         // all Products exist
         const productDocs = yield (0, mongoManager_1.getProductDocs)();
         const productTcgplayerIds = productDocs.map((doc) => {
-            return doc.tcgplayerId;
+            return Number(doc.tcgplayerId);
         });
         const unknownTcgplayerIds = _.difference(tcgplayerIds, productTcgplayerIds);
         if (unknownTcgplayerIds.length > 0) {
-            console.log(`Products not found for tcgplayerIds in isValidHoldings(): ${unknownTcgplayerIds}`);
+            console.log(`Products not found for tcgplayerIds in hasValidHoldings(): ${unknownTcgplayerIds}`);
             return false;
         }
         // quantity >= 0
@@ -117,7 +121,7 @@ function getIMHoldingsFromIHoldings(holdings) {
         const newHoldings = holdings.map((holding) => {
             // find Product
             const productDoc = productDocs.find((product) => {
-                return product.tcgplayerId === holding.tcgplayerId;
+                return product.tcgplayerId === Number(holding.tcgplayerId);
             });
             (0, common_1.assert)(productDoc instanceof Product, 'Product not found in getIMHoldingsFromIHoldings()');
             // create IMHolding
