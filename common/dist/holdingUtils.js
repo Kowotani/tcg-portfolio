@@ -1,9 +1,33 @@
 "use strict";
 exports.__esModule = true;
-exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingMarketValue = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = void 0;
+exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingMarketValue = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = exports.getIHoldingsFromIPopulatedHoldings = void 0;
 var _ = require("lodash");
 var dataModels_1 = require("./dataModels");
 var utils_1 = require("./utils");
+// ==========
+// converters
+// ==========
+/*
+DESC
+  Returns an IHolding[] derived from the input IPopulatedHolding[]
+INPUT
+  populatedHoldings: An IPopulatedHolding[]
+RETURN
+  An IHolding[]
+*/
+function getIHoldingsFromIPopulatedHoldings(populatedHoldings) {
+    var holdings = populatedHoldings.map(function (populatedHolding) {
+        return {
+            tcgplayerId: populatedHolding.product.tcgplayerId,
+            transactions: populatedHolding.transactions
+        };
+    });
+    return holdings;
+}
+exports.getIHoldingsFromIPopulatedHoldings = getIHoldingsFromIPopulatedHoldings;
+// ==================
+// metric calculators
+// ==================
 /*
 DESC
   Returns the average purchase cost from the input IHolding. This value

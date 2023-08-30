@@ -1,9 +1,38 @@
 "use strict";
 exports.__esModule = true;
-exports.getPortfolioUnrealizedPnl = exports.getPortfolioTotalRevenue = exports.getPortfolioTotalPnl = exports.getPortfolioTotalCost = exports.getPortfolioSaleQuantity = exports.getPortfolioRealizedPnl = exports.getPortfolioPurchaseQuantity = exports.getPortfolioPercentPnl = exports.getPortfolioMarketValue = exports.getPortfolioHoldings = void 0;
+exports.getPortfolioUnrealizedPnl = exports.getPortfolioTotalRevenue = exports.getPortfolioTotalPnl = exports.getPortfolioTotalCost = exports.getPortfolioSaleQuantity = exports.getPortfolioRealizedPnl = exports.getPortfolioPurchaseQuantity = exports.getPortfolioPercentPnl = exports.getPortfolioMarketValue = exports.getPortfolioHoldings = exports.getIPortfoliosFromIPopulatedPortfolios = void 0;
 var _ = require("lodash");
 var utils_1 = require("./utils");
 var holdingUtils_1 = require("./holdingUtils");
+// ==========
+// converters
+// ==========
+/*
+DESC
+  Returns an IPortfolio[] derived from the input IPopulatedPortfolio[]
+INPUT
+  populatedPortfolios: An IPopulatedPortfolio[]
+RETURN
+  An IPortfolio[]
+*/
+function getIPortfoliosFromIPopulatedPortfolios(populatedPortfolios) {
+    var portfolios = populatedPortfolios.map(function (populatedPortfolio) {
+        var portfolio = {
+            userId: populatedPortfolio.userId,
+            portfolioName: populatedPortfolio.portfolioName,
+            holdings: (0, holdingUtils_1.getIHoldingsFromIPopulatedHoldings)(populatedPortfolio.populatedHoldings)
+        };
+        if (populatedPortfolio.description) {
+            portfolio['description'] = populatedPortfolio.description;
+        }
+        return portfolio;
+    });
+    return portfolios;
+}
+exports.getIPortfoliosFromIPopulatedPortfolios = getIPortfoliosFromIPopulatedPortfolios;
+// =======
+// getters
+// =======
 /*
 DESC
   Returns the Holdings for the input IPortfolio
@@ -18,6 +47,9 @@ function getPortfolioHoldings(portfolio) {
         : portfolio.populatedHoldings;
 }
 exports.getPortfolioHoldings = getPortfolioHoldings;
+// ==================
+// metric calculators
+// ==================
 /*
 DESC
   Returns the market value of the input IPortfolio based on the input price

@@ -4,6 +4,37 @@ import {
 } from './dataModels'
 import { assert } from './utils'
 
+
+// ==========
+// converters
+// ==========
+
+/*
+DESC
+  Returns an IHolding[] derived from the input IPopulatedHolding[]
+INPUT
+  populatedHoldings: An IPopulatedHolding[]
+RETURN
+  An IHolding[]
+*/
+export function getIHoldingsFromIPopulatedHoldings(
+  populatedHoldings: IPopulatedHolding[]
+): IHolding[] {
+  const holdings: IHolding[] = populatedHoldings.map(
+    (populatedHolding: IPopulatedHolding) => {
+      return {
+        tcgplayerId: populatedHolding.product.tcgplayerId,
+        transactions: populatedHolding.transactions
+      }
+  })
+  return holdings
+}
+
+
+// ==================
+// metric calculators
+// ==================
+
 /*
 DESC
   Returns the average purchase cost from the input IHolding. This value

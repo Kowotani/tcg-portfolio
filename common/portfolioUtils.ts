@@ -5,9 +5,47 @@ import {
 import { assert, isIHolding, isIPortfolio } from './utils'
 import { 
   getHoldingPurchaseQuantity, getHoldingRealizedPnl, getHoldingSaleQuantity, 
-  getHoldingTotalCost, getHoldingTotalRevenue, getHoldingUnrealizedPnl
+  getHoldingTotalCost, getHoldingTotalRevenue, getHoldingUnrealizedPnl,
+  getIHoldingsFromIPopulatedHoldings
 } from './holdingUtils'
 
+
+// ==========
+// converters
+// ==========
+
+/*
+DESC
+  Returns an IPortfolio[] derived from the input IPopulatedPortfolio[]
+INPUT
+  populatedPortfolios: An IPopulatedPortfolio[]
+RETURN
+  An IPortfolio[]
+*/
+export function getIPortfoliosFromIPopulatedPortfolios(
+  populatedPortfolios: IPopulatedPortfolio[]
+): IPortfolio[] {
+  const portfolios: IPortfolio[] = populatedPortfolios.map(
+    (populatedPortfolio: IPopulatedPortfolio) => {
+      
+      let portfolio = {
+        userId: populatedPortfolio.userId,
+        portfolioName: populatedPortfolio.portfolioName,
+        holdings: getIHoldingsFromIPopulatedHoldings(
+          populatedPortfolio.populatedHoldings)
+      }
+      if (populatedPortfolio.description) {
+        portfolio['description'] = populatedPortfolio.description
+      } 
+      return portfolio
+  })
+
+  return portfolios
+}
+
+// =======
+// getters
+// =======
 
 /*
 DESC
@@ -24,6 +62,11 @@ export function getPortfolioHoldings(
     ? portfolio.holdings
     : portfolio.populatedHoldings
 }
+
+
+// ==================
+// metric calculators
+// ==================
 
 /*
 DESC
