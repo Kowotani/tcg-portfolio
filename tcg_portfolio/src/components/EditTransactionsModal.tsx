@@ -307,6 +307,7 @@ const AddTransactionForm = (
 
                 <Button 
                   colorScheme='green' 
+                  isDisabled={!form.isValid}
                   isLoading={form.isSubmitting}
                   type='submit'
                 >
