@@ -3,14 +3,19 @@ import {
   IDatedPriceData, IProduct,
 
   GetPortfoliosStatus, GetPricesStatus, GetProductsStatus, PostProductStatus,
+  PutPortfoliosStatus,
   
-  TDataResBody, TProductPostReqBody, TProductPostResBody, TResBody, 
+  
+  TDataResBody, TPutPortfolioReqBody, TProductPostReqBody, TProductPostResBody, 
+  TResBody, 
 
-  ADD_PRODUCT_URL, GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL
+  ADD_PRODUCT_URL, GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL,
+  UPDATE_PORTFOLIO_URL
 } from 'common'
 import express from 'express'
 import { 
   getLatestPrices, getPortfolios, getProductDoc, getProductDocs, insertProducts,
+  setPortfolio,
 
   Product
 } from './mongo/mongoManager'
@@ -60,12 +65,67 @@ app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
   } catch (err) {
     res.status(500)
     const body: TResBody = {
-      message: GetPortfoliosStatus.Error + ': ' + err
+      message: `${GetPortfoliosStatus.Error}: ${err}`
     }
     res.send(body)
   }
 })
 
+/*
+DESC
+  Handle PUT request to update a Portfolio
+INPUT
+  Request body in multipart/form-data containing the following structure
+  for both existingPortfolio and newPortfolio objects:
+    userId: The Portfolio userId
+    portfolioName: The Portfolio name
+    holdings: An IHolding[]
+    description?: The Portfolio description
+RETURN
+  TResBody response with status codes
+
+  Status Code
+    200: The Portfolio was successfully updated
+    500: An error occurred
+*/
+app.put(UPDATE_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
+
+  // variables
+  const body: TPutPortfolioReqBody = req.body
+  
+  try {
+
+    // update Portfolio
+    const isUpdated 
+      = await setPortfolio(body.existingPortfolio, body.newPortfolio)
+
+    // success
+    if (isUpdated) {
+      res.status(200)
+      const body: TResBody = {
+        message: PutPortfoliosStatus.Success
+      }
+      res.send(body)
+    
+    // error
+    } else {
+      res.status(500)
+      const body: TResBody = {
+        message: PutPortfoliosStatus.Error
+      }        
+      res.send(body)
+    }
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: `${PutPortfoliosStatus.Error}: ${err}`
+    }        
+    res.send(body)
+  }
+  
+})
 
 // =======
 // prices
@@ -100,7 +160,7 @@ app.get(GET_LATEST_PRICES_URL, async (req: any, res: any) => {
   } catch (err) {
     res.status(500)
     const body: TResBody = {
-      message: GetPricesStatus.Error + ': ' + err
+      message: `${GetPricesStatus.Error}: ${err}`
     }
     res.send(body)
   }
@@ -140,7 +200,7 @@ app.get(GET_PRODUCTS_URL, async (req: any, res: any) => {
   } catch (err) {
     res.status(500)
     const body: TResBody = {
-      message: PostProductStatus.Error + ': ' + err
+      message: `${GetProductsStatus.Error}: ${err}`
     }
     res.send(body)
   }
@@ -223,7 +283,7 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
       res.status(500)
       const body: TProductPostResBody<undefined> = {
         tcgplayerId: data.tcgplayerId,
-        message: PostProductStatus.Error + ': ' + err,
+        message: `${PostProductStatus.Error}: ${err}`,
         data: undefined,
       }        
       res.send(body)

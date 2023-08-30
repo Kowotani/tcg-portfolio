@@ -1,9 +1,11 @@
-import { IProduct } from "./dataModels"
+import { IPortfolio, IProduct } from "./dataModels"
 
 
 // =====
 // enums
 // =====
+
+// -- portfolio
 
 /*
   Endpoint:   GET_PORTFOLIOS_URL
@@ -15,6 +17,17 @@ export enum GetPortfoliosStatus {
 }
 
 /*
+  Endpoint:   UPDATE_PORTFOLIO_URL
+  Type:       PUT
+*/
+export enum PutPortfoliosStatus {
+  Success = 'Successfully updated Portfolio',
+  Error = 'Error updating Portfolio',
+}
+
+// -- prices
+
+/*
   Endpoint:   GET_LATEST_PRICES_URL
   Type:       GET
 */
@@ -22,6 +35,8 @@ export enum GetPricesStatus {
   Success = 'Successfully retrieved latest Prices',
   Error = 'Error retrieving latest Prices',
 }
+
+// -- product
 
 /*
   Endpoint:   ADD_PRODUCT_URL
@@ -48,11 +63,16 @@ export enum GetProductsStatus {
 // routes
 // ======
 
-export const ADD_PRODUCT_URL = '/product'
-export const GET_LATEST_PRICES_URL = '/prices/latest'
+// -- portfolio
 export const GET_PORTFOLIOS_URL = '/portfolios'
+export const UPDATE_PORTFOLIO_URL = '/portfolio'
+
+// -- product
+export const ADD_PRODUCT_URL = '/product'
 export const GET_PRODUCTS_URL = '/products'
 
+// -- prices
+export const GET_LATEST_PRICES_URL = '/prices/latest'
 
 // =====
 // types
@@ -61,6 +81,8 @@ export const GET_PRODUCTS_URL = '/products'
 // ---------
 // responses
 // ---------
+
+// -- base
 
 // base body response
 export type TResBody = {
@@ -71,6 +93,8 @@ export type TResBody = {
 export type TDataResBody<Type> = TResBody & {
   data: Type
 }
+
+// -- product
 
 /*
   Endpoint:   ADD_PRODUCT_URL
@@ -85,6 +109,20 @@ export type TProductPostResBody<Type> = TDataResBody<Type> & {
 // requests
 // --------
 
+// -- portfolio
+
+/*
+  Endpoint:   UPDATE_PORTFOLIO_URL
+  Type:       PUT
+  Req / Res:  Request
+*/
+export type TPutPortfolioReqBody = {
+  existingPortfolio: IPortfolio,
+  newPortfolio: IPortfolio
+}
+
+// -- product
+
 /*
   Endpoint:   ADD_PRODUCT_URL
   Type:       POST
@@ -92,5 +130,5 @@ export type TProductPostResBody<Type> = TDataResBody<Type> & {
 */
 export type TProductPostReqBody = {
   formData: IProduct,
-  imageUrl?: string, 
+  imageUrl?: string
 }

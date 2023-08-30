@@ -54,7 +54,56 @@ app.get(common_1.GET_PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, voi
     catch (err) {
         res.status(500);
         const body = {
-            message: common_1.GetPortfoliosStatus.Error + ': ' + err
+            message: `${common_1.GetPortfoliosStatus.Error}: ${err}`
+        };
+        res.send(body);
+    }
+}));
+/*
+DESC
+  Handle PUT request to update a Portfolio
+INPUT
+  Request body in multipart/form-data containing the following structure
+  for both existingPortfolio and newPortfolio objects:
+    userId: The Portfolio userId
+    portfolioName: The Portfolio name
+    holdings: An IHolding[]
+    description?: The Portfolio description
+RETURN
+  TResBody response with status codes
+
+  Status Code
+    200: The Portfolio was successfully updated
+    500: An error occurred
+*/
+app.put(common_1.UPDATE_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // variables
+    const body = req.body;
+    try {
+        // update Portfolio
+        const isUpdated = yield (0, mongoManager_1.setPortfolio)(body.existingPortfolio, body.newPortfolio);
+        // success
+        if (isUpdated) {
+            res.status(200);
+            const body = {
+                message: common_1.PutPortfoliosStatus.Success
+            };
+            res.send(body);
+            // error
+        }
+        else {
+            res.status(500);
+            const body = {
+                message: common_1.PutPortfoliosStatus.Error
+            };
+            res.send(body);
+        }
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: `${common_1.PutPortfoliosStatus.Error}: ${err}`
         };
         res.send(body);
     }
@@ -88,7 +137,7 @@ app.get(common_1.GET_LATEST_PRICES_URL, (req, res) => __awaiter(void 0, void 0, 
     catch (err) {
         res.status(500);
         const body = {
-            message: common_1.GetPricesStatus.Error + ': ' + err
+            message: `${common_1.GetPricesStatus.Error}: ${err}`
         };
         res.send(body);
     }
@@ -122,7 +171,7 @@ app.get(common_1.GET_PRODUCTS_URL, (req, res) => __awaiter(void 0, void 0, void 
     catch (err) {
         res.status(500);
         const body = {
-            message: common_1.PostProductStatus.Error + ': ' + err
+            message: `${common_1.GetProductsStatus.Error}: ${err}`
         };
         res.send(body);
     }
@@ -199,7 +248,7 @@ app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0
             res.status(500);
             const body = {
                 tcgplayerId: data.tcgplayerId,
-                message: common_1.PostProductStatus.Error + ': ' + err,
+                message: `${common_1.PostProductStatus.Error}: ${err}`,
                 data: undefined,
             };
             res.send(body);

@@ -1,9 +1,10 @@
 "use strict";
 exports.__esModule = true;
-exports.GET_PRODUCTS_URL = exports.GET_PORTFOLIOS_URL = exports.GET_LATEST_PRICES_URL = exports.ADD_PRODUCT_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.GetPricesStatus = exports.GetPortfoliosStatus = void 0;
+exports.GET_LATEST_PRICES_URL = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.UPDATE_PORTFOLIO_URL = exports.GET_PORTFOLIOS_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.GetPricesStatus = exports.PutPortfoliosStatus = exports.GetPortfoliosStatus = void 0;
 // =====
 // enums
 // =====
+// -- portfolio
 /*
   Endpoint:   GET_PORTFOLIOS_URL
   Type:       GET
@@ -14,6 +15,16 @@ var GetPortfoliosStatus;
     GetPortfoliosStatus["Error"] = "Error retrieving Portfolios";
 })(GetPortfoliosStatus = exports.GetPortfoliosStatus || (exports.GetPortfoliosStatus = {}));
 /*
+  Endpoint:   UPDATE_PORTFOLIO_URL
+  Type:       PUT
+*/
+var PutPortfoliosStatus;
+(function (PutPortfoliosStatus) {
+    PutPortfoliosStatus["Success"] = "Successfully updated Portfolio";
+    PutPortfoliosStatus["Error"] = "Error updating Portfolio";
+})(PutPortfoliosStatus = exports.PutPortfoliosStatus || (exports.PutPortfoliosStatus = {}));
+// -- prices
+/*
   Endpoint:   GET_LATEST_PRICES_URL
   Type:       GET
 */
@@ -22,6 +33,7 @@ var GetPricesStatus;
     GetPricesStatus["Success"] = "Successfully retrieved latest Prices";
     GetPricesStatus["Error"] = "Error retrieving latest Prices";
 })(GetPricesStatus = exports.GetPricesStatus || (exports.GetPricesStatus = {}));
+// -- product
 /*
   Endpoint:   ADD_PRODUCT_URL
   Type:       POST
@@ -45,7 +57,11 @@ var GetProductsStatus;
 // ======
 // routes
 // ======
-exports.ADD_PRODUCT_URL = '/product';
-exports.GET_LATEST_PRICES_URL = '/prices/latest';
+// -- portfolio
 exports.GET_PORTFOLIOS_URL = '/portfolios';
+exports.UPDATE_PORTFOLIO_URL = '/portfolio';
+// -- product
+exports.ADD_PRODUCT_URL = '/product';
 exports.GET_PRODUCTS_URL = '/products';
+// -- prices
+exports.GET_LATEST_PRICES_URL = '/prices/latest';
