@@ -22,7 +22,7 @@ import {
   
   TPutPortfolioReqBody,
 
-  assert, isASCII, isIPopulatedHolding, isIPortfolio, isTResBody
+  assert, isASCII, isIPopulatedHolding, isIPortfolio, isTResBody, getHoldingTotalCost
 } from 'common'
 import { FilterInput } from './FilterInput'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
@@ -68,15 +68,6 @@ export const EditPortfolioForm = (
   // ---------
 
   const [ portfolio, setPortfolio ] = useState(props.portfolio)
-
-  // PortfolioName state
-  const [ portfolioNameState, setPortfolioNameState ] = useState<{
-    portfolioName: string | undefined,
-    isInvalid?: boolean, 
-    errorMessage?: string,
-  }>({
-    portfolioName: undefined,
-  })
 
   // --------------
   // Product search
@@ -147,6 +138,28 @@ export const EditPortfolioForm = (
       error = 'Portfolio Name must only contain ASCII characters'
     }
     return error
+  }
+
+  // NOTE: This is a custom validator that is not used for Formik
+  /*
+    DESC
+      Returns any Holding that does not have any Transactions
+    INPUT
+      holdings: An IPopulatedHolding[]
+    RETURN
+      An IPopulatedHolding, or undefined if all Holdings have Transactions
+  */
+  function getHoldingWithoutTransactions(
+    holdings: IPopulatedHolding[]
+  ): IPopulatedHolding | undefined {
+    const emptyHolding = holdings.reduce(
+      (acc: IPopulatedHolding | undefined, cur: IPopulatedHolding) => {
+        if (cur.transactions.length === 0) {
+          acc = cur
+        }
+        return acc
+    }, undefined)
+    return emptyHolding
   }
 
   // --------------
@@ -313,6 +326,21 @@ export const EditPortfolioForm = (
         onSubmit={
           (values: IInputValues, actions: FormikHelpers<IInputValues>) => {
 
+            // check if all Holdings have Transactions
+            const emptyHolding 
+              = getHoldingWithoutTransactions(portfolio.populatedHoldings)
+            if (emptyHolding) {
+              actions.setSubmitting(false)
+              toast({
+                title: `Error: ${emptyHolding.product.name}`,
+                description: `Holding has no Transactions`,
+                status: 'error',
+                variant: 'subtle',
+                isClosable: true,
+              })                 
+              return     
+            }
+
             // create existingPortfolio IPortfolio
             const existingPortfolio 
               = _.head(getIPortfoliosFromIPopulatedPortfolios([props.portfolio]))
@@ -360,8 +388,8 @@ export const EditPortfolioForm = (
               // Portoflio was updated
               if (res.status === 200) {
                 toast({
-                  title: 'Success!',
-                  description: `${resData.message}`,
+                  title: 'Portfolio Updated',
+                  description: `${existingPortfolio.portfolioName} was updated`,
                   duration: 3000,
                   status: 'success',
                   isClosable: true,
@@ -373,7 +401,7 @@ export const EditPortfolioForm = (
               // Portoflio was not updated
               } else if (res.status === 500) {
                 toast({
-                  title: 'Error!',
+                  title: 'Error',
                   description: `${resData.message}`,
                   duration: 3000,
                   status: 'error',
@@ -391,8 +419,8 @@ export const EditPortfolioForm = (
               const resData = res.data  
               
               toast({
-                title: 'Error!',
-                description: `${res.statusText}: ${resData}`,
+                title: 'Error',
+                description: 'Please try again later',
                 status: 'error',
                 isClosable: true,
               })                        

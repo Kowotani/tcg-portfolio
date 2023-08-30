@@ -17,7 +17,7 @@ import {
   getHoldingMarketValue, getHoldingPercentPnl, getHoldingTotalCost, 
   getHoldingTotalPnl,
   
-  assert, isNumeric
+  assert
 } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
