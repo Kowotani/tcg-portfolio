@@ -200,7 +200,11 @@ const AddTransactionForm = (
                         && form.touched?.date as boolean}
                       isRequired={true}
                     >
-                      <HStack display='flex' justifyContent='space-between'>
+                      <HStack 
+                        display='flex' 
+                        alignItems='end' 
+                        justifyContent='space-between'
+                      >
                         <FormLabel>Date</FormLabel>
                         <Box>
                           <Input
@@ -231,7 +235,11 @@ const AddTransactionForm = (
                         && form.touched?.quantity as boolean}
                       isRequired={true}
                     >
-                      <HStack display='flex' justifyContent='space-between'>
+                      <HStack 
+                        display='flex' 
+                        alignItems='end' 
+                        justifyContent='space-between'
+                      >
                         <FormLabel>Quantity</FormLabel>
                         <Box>
                           <NumberInput 
@@ -267,7 +275,11 @@ const AddTransactionForm = (
                         && form.touched?.price as boolean}
                       isRequired={true}
                     >
-                      <HStack display='flex' justifyContent='space-between'>
+                      <HStack 
+                        display='flex' 
+                        alignItems='end' 
+                        justifyContent='space-between'
+                      >
                       <FormLabel>Price</FormLabel>
                         <Box>
                           <InputGroup>
