@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { 
   Box,
   Button,
@@ -14,15 +14,21 @@ import {
 import { 
   IPopulatedHolding, ITransaction,
 
-  getHoldingAverageCost, getHoldingAverageRevenue, getHoldingPurchaseQuantity, 
-  getHoldingQuantity, getHoldingSaleQuantity,
+  getHoldingMarketValue, getHoldingPercentPnl, getHoldingTotalCost, 
+  getHoldingTotalPnl,
+  
+  assert, isNumeric
 } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
+import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
-import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
-import { getProductNameWithLanguage } from '../utils'
+import { LatestPricesContext } from '../state/LatestPricesContext'
+import { 
+  ILatestPricesContext, 
 
+  getIPriceDataMapFromIDatedPriceDataMap, getProductNameWithLanguage
+} from '../utils'
 
 type THoldingCardProps = {
   populatedHolding: IPopulatedHolding,
@@ -41,7 +47,8 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
 
   const [ holding, setHolding ] = useState(props.populatedHolding)
   const [ transactions, setTransactions ] = useState(holding.transactions)
-
+  const { latestPrices } 
+    = useContext(LatestPricesContext) as ILatestPricesContext
 
   // =========
   // functions
@@ -52,38 +59,50 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     setTransactions(txns)
   }
 
-  // MetricSummary
+  // Holding Summary
 
-  const quantitySummary: TMetricSummaryItem[] = [
+  const prices = getIPriceDataMapFromIDatedPriceDataMap(latestPrices)
+  const price = prices.get(holding.product.tcgplayerId)?.marketPrice
+  assert(typeof price === 'number',
+    `Unable to find latest price for tcgplayerId: ${holding.product.tcgplayerId}`)
+  const holdingPercentPnl = getHoldingPercentPnl(holding, price)
+
+  const valueSummary: TMetricSummaryItem[] = [
     {
-      title: 'Purchases:',
-      value: getHoldingPurchaseQuantity(holding),
-      placeholder: '-',
+      title: 'Total Cost:',
+      value: getHoldingTotalCost(holding),
+      formattedPrefix: '$',
+      formattedPrecision: 2,
+      placeholder: '$ -',
       titleStyle: {},
     },
     {
-      title: 'Sales:',
-      value: getHoldingSaleQuantity(holding),
-      placeholder: '-',
+      title: 'Market Value:',
+      value: getHoldingMarketValue(holding, price),
+      formattedPrefix: '$',
+      formattedPrecision: 2,
+      placeholder: '$ -',
       titleStyle: {},
     },
   ]
 
   const profitSummary: TMetricSummaryItem[] = [
     {
-      title: 'Avg Cost:',
-      value: getHoldingAverageCost(holding),
+      title: 'Profit:',
+      value: getHoldingTotalPnl(holding, price),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
       titleStyle: {},
     },
     {
-      title: 'Avg Rev:',
-      value: getHoldingAverageRevenue(holding),
-      formattedPrefix: '$',
+      title: 'Return:',
+      value: holdingPercentPnl
+        ? holdingPercentPnl * 100
+        : undefined,
       formattedPrecision: 2,
-      placeholder: '$ -',
+      formattedSuffix: '%',
+      placeholder: '- %',
       titleStyle: {},
     },
   ]
@@ -144,7 +163,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
                 {/* Quantity */}
                 <Box fontSize='large'>
                   <MetricSummary 
-                    summaryItems={quantitySummary}
+                    summaryItems={valueSummary}
                     variant='list'
                   />
                 </Box>
