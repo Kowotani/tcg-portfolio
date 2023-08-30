@@ -1,9 +1,9 @@
 // imports
 import { 
-  IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
-  IPortfolioMethods, IPrice, IPriceData, IProduct,
+  IDatedPriceData, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
+  IPortfolioMethods, IPrice, IProduct,
 
-  assert, isIHoldingArray, isIPopulatedHolding, isIPortfolio
+  assert, isIPopulatedHolding, isIPortfolio
 } from 'common'
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
@@ -24,6 +24,7 @@ import {
 const url = 'mongodb://localhost:27017/tcgPortfolio';
 
 // mongoose models
+// export const Holding = mongoose.model('Holding', holdingSchema)
 export const Portfolio = mongoose.model('Portfolio', portfolioSchema)
 export const Product = mongoose.model('Product', productSchema)
 export const Price = mongoose.model('Price', priceSchema)
@@ -33,84 +34,158 @@ export const Price = mongoose.model('Price', priceSchema)
 // functions
 // =========
 
-// ---------
-// Portfolio
-// ---------
+// -----
+// Price
+// -----
 
 /*
 DESC
-  Adds a Holding (or array of Holdings) to a Portfolio. Will only add all
-  Holdings or none (ie. if one Holding already exists)
-INPUT
-  portfolio: The Portfolio to contain the holding
-  holding: The Holding to add
+  Retrieves the latest market Prices for all Products
 RETURN
-  TRUE if all Holdings were successfully added to the Portfolio, FALSE otherwise
+  A Map<number, IDatedPriceData> where the key is a tcgplayerId
 */
-export async function addPortfolioHoldings(
-  portfolio: IPortfolio, 
-  holdingInput: IHolding | IHolding[],
-): Promise<boolean> {
+export async function getLatestPrices(): Promise<Map<number, IDatedPriceData>> {
 
   // connect to db
   await mongoose.connect(url)
 
-  const holdingsToAdd = Array.isArray(holdingInput)
-    ? holdingInput
-    : [holdingInput]
-
-  const userId = portfolio.userId
-  const portfolioName = portfolio.portfolioName
-
   try {
 
-    // check if empty holdings array was passed
-    if (holdingsToAdd.length === 0) {
-      console.log(`No holdings found to add`)
-      return false
-    }
-
-    // check if portfolio exists
-    const portfolioDoc = await getPortfolioDoc(portfolio)
-    if (portfolioDoc instanceof Portfolio === false) {
-      console.log(`${portfolioName} does not exist for userId: ${userId}`)
-      return false
-    }
-    assert(portfolioDoc instanceof Portfolio)
- 
-    // validate holdingsToAdd
-    const validHoldings = await areValidHoldings(holdingsToAdd)
-    if (!validHoldings) {
-      console.log('Holdings failed validation in addPortfolioHoldings()')
-      return false
-    }
-
-    // check if any holding already exists
-    const tcgplayerIds = holdingsToAdd.map((holding: IHolding) => {
-      return holding.tcgplayerId
-    })
-    const portfolioTcgplayerIds = portfolioDoc.getHoldings().map(
-      (holding: IHolding) => { return holding.tcgplayerId })
-    const existingHoldings = _.intersection(
-      portfolioTcgplayerIds, tcgplayerIds)
-
-    if (existingHoldings.length > 0) {
-      console.log(`Portfolio holdings already exist for tcgplayerIds: ${existingHoldings}`)
-      return false
-    }
-
-    // get IMHolding[]
-    const holdings = await getIMHoldingsFromIHoldings(holdingsToAdd)
-
-    portfolioDoc.addHoldings(holdings)
-    return true
+    // get list of Price data with the following shape
+    /*
+      {
+        _id: { tcgplayerId: number},
+        data: [[ datestring, number ]]
+      }
+    */
+    const priceData = await Price.aggregate()
+      .group({
+        _id: {
+          tcgplayerId: '$tcgplayerId',
+          priceDate: '$priceDate'
+        },
+        marketPrice: {
+          $avg: '$prices.marketPrice'
+        }
+      })
+      .group({
+        _id: {
+          tcgplayerId: '$_id.tcgplayerId'
+        },
+        data: {
+          '$topN': {
+            output: [
+              '$_id.priceDate', 
+              '$marketPrice'
+            ], 
+            sortBy: {
+              '_id.priceDate': -1
+            }, 
+            n: 1
+        }}
+      })
+      .exec()
     
+    // create the TTcgplayerIdPrices
+    let prices = new Map<number, IDatedPriceData>()
+    priceData.forEach((el: any) => {
+      prices.set(
+        el._id.tcgplayerId, 
+        {
+          priceDate: el.data[0][0],
+          prices: {
+            marketPrice: el.data[0][1]
+          }
+        } as IDatedPriceData
+    )})
+    
+    return prices
+
   } catch(err) {
-    
-    const errMsg = `An error occurred in addPortfolioHolding(): ${err}`
+
+    const errMsg = `An error occurred in getLatestPrices(): ${err}`
     throw new Error(errMsg)
-  }
+  } 
 }
+
+// ---------
+// Portfolio
+// ---------
+
+// /*
+// DESC
+//   Adds a Holding (or array of Holdings) to a Portfolio. Will only add all
+//   Holdings or none (ie. if one Holding already exists)
+// INPUT
+//   portfolio: The Portfolio to contain the holding
+//   holding: The Holding to add
+// RETURN
+//   TRUE if all Holdings were successfully added to the Portfolio, FALSE otherwise
+// */
+// export async function addPortfolioHoldings(
+//   portfolio: IPortfolio, 
+//   holdingInput: IHolding | IHolding[],
+// ): Promise<boolean> {
+
+//   // connect to db
+//   await mongoose.connect(url)
+
+//   const holdingsToAdd = Array.isArray(holdingInput)
+//     ? holdingInput
+//     : [holdingInput]
+
+//   const userId = portfolio.userId
+//   const portfolioName = portfolio.portfolioName
+
+//   try {
+
+//     // check if empty holdings array was passed
+//     if (holdingsToAdd.length === 0) {
+//       console.log(`No holdings found to add`)
+//       return false
+//     }
+
+//     // check if portfolio exists
+//     const portfolioDoc = await getPortfolioDoc(portfolio)
+//     if (portfolioDoc instanceof Portfolio === false) {
+//       console.log(`${portfolioName} does not exist for userId: ${userId}`)
+//       return false
+//     }
+//     assert(portfolioDoc instanceof Portfolio)
+ 
+//     // validate holdingsToAdd
+//     const validHoldings = await areValidHoldings(holdingsToAdd)
+//     if (!validHoldings) {
+//       console.log('Holdings failed validation in addPortfolioHoldings()')
+//       return false
+//     }
+
+//     // check if any holding already exists
+//     const tcgplayerIds = holdingsToAdd.map((holding: IHolding) => {
+//       return holding.tcgplayerId
+//     })
+//     const portfolioTcgplayerIds = portfolioDoc.getHoldings().map(
+//       (holding: IHolding) => { return holding.tcgplayerId })
+//     const existingHoldings = _.intersection(
+//       portfolioTcgplayerIds, tcgplayerIds)
+
+//     if (existingHoldings.length > 0) {
+//       console.log(`Portfolio holdings already exist for tcgplayerIds: ${existingHoldings}`)
+//       return false
+//     }
+
+//     // get IMHolding[]
+//     const holdings = await getIMHoldingsFromIHoldings(holdingsToAdd)
+
+//     portfolioDoc.addHoldings(holdings)
+//     return true
+    
+//   } catch(err) {
+    
+//     const errMsg = `An error occurred in addPortfolioHolding(): ${err}`
+//     throw new Error(errMsg)
+//   }
+// }
 
 /*
 DESC
@@ -209,124 +284,53 @@ export async function deletePortfolio(portfolio: IPortfolio): Promise<boolean> {
   }
 }
 
-/*
-DESC
-  Deletes the Holding for the input tcgplayerId from the input Portfolio
-INPUT
-  portfolio: The Portfolio to contain the holding
-  tcgplayerId: The tcgplayerId of the Holding to delete
-RETURN
-  TRUE if the Holding was successfully deleted from the Portfolio, FALSE otherwise
-*/
-export async function deletePortfolioHolding(
-  portfolio: IPortfolio, 
-  tcgplayerId: number,
-): Promise<boolean> {
+// /*
+// DESC
+//   Deletes the Holding for the input tcgplayerId from the input Portfolio
+// INPUT
+//   portfolio: The Portfolio to contain the holding
+//   tcgplayerId: The tcgplayerId of the Holding to delete
+// RETURN
+//   TRUE if the Holding was successfully deleted from the Portfolio, FALSE otherwise
+// */
+// export async function deletePortfolioHolding(
+//   portfolio: IPortfolio, 
+//   tcgplayerId: number,
+// ): Promise<boolean> {
 
-  // connect to db
-  await mongoose.connect(url)
+//   // connect to db
+//   await mongoose.connect(url)
 
-  const userId = portfolio.userId
-  const portfolioName = portfolio.portfolioName
+//   const userId = portfolio.userId
+//   const portfolioName = portfolio.portfolioName
 
-  try {  
+//   try {  
 
-    // check if portfolio exists
-    const portfolioDoc = await getPortfolioDoc(portfolio)
-    if (portfolioDoc instanceof Portfolio === false) {
-      console.log(`${portfolio.portfolioName} does not exist for userId: ${userId}`)
-      return false
+//     // check if portfolio exists
+//     const portfolioDoc = await getPortfolioDoc(portfolio)
+//     if (portfolioDoc instanceof Portfolio === false) {
+//       console.log(`${portfolio.portfolioName} does not exist for userId: ${userId}`)
+//       return false
 
-    }
-    assert(portfolioDoc instanceof Portfolio)
+//     }
+//     assert(portfolioDoc instanceof Portfolio)
     
-    // check if holding exists
-    if (!portfolioDoc.hasHolding(tcgplayerId)) {
-      console.log(`tcgplayerId: ${tcgplayerId} does not exist in portfolio: (${userId}, ${portfolioName})`)
-      return false
-    } 
+//     // check if holding exists
+//     if (!portfolioDoc.hasHolding(tcgplayerId)) {
+//       console.log(`tcgplayerId: ${tcgplayerId} does not exist in portfolio: (${userId}, ${portfolioName})`)
+//       return false
+//     } 
 
-    // remove the holding
-    portfolioDoc.deleteHolding(tcgplayerId)
-    return true
+//     // remove the holding
+//     portfolioDoc.deleteHolding(tcgplayerId)
+//     return true
     
-  } catch(err) {
+//   } catch(err) {
 
-    const errMsg = `An error occurred in deletePortfolioHolding(): ${err}`
-    throw new Error(errMsg)
-  }
-}
-
-/*
-DESC
-  Retrieves the latest market Prices for all Products
-RETURN
-  A Map<number, IDatedPriceData> where the key is a tcgplayerId
-*/
-export async function getLatestPrices(): Promise<Map<number, IDatedPriceData>> {
-
-  // connect to db
-  await mongoose.connect(url)
-
-  try {
-
-    // get list of Price data with the following shape
-    /*
-      {
-        _id: { tcgplayerId: number},
-        data: [[ datestring, number ]]
-      }
-    */
-    const priceData = await Price.aggregate()
-      .group({
-        _id: {
-          tcgplayerId: '$tcgplayerId',
-          priceDate: '$priceDate'
-        },
-        marketPrice: {
-          $avg: '$prices.marketPrice'
-        }
-      })
-      .group({
-        _id: {
-          tcgplayerId: '$_id.tcgplayerId'
-        },
-        data: {
-          '$topN': {
-            output: [
-              '$_id.priceDate', 
-              '$marketPrice'
-            ], 
-            sortBy: {
-              '_id.priceDate': -1
-            }, 
-            n: 1
-        }}
-      })
-      .exec()
-    
-    // create the TTcgplayerIdPrices
-    let prices = new Map<number, IDatedPriceData>()
-    priceData.forEach((el: any) => {
-      prices.set(
-        el._id.tcgplayerId, 
-        {
-          priceDate: el.data[0][0],
-          prices: {
-            marketPrice: el.data[0][1]
-          }
-        } as IDatedPriceData
-    )})
-    
-    return prices
-
-  } catch(err) {
-
-    const errMsg = `An error occurred in getLatestPrices(): ${err}`
-    throw new Error(errMsg)
-  } 
-
-}
+//     const errMsg = `An error occurred in deletePortfolioHolding(): ${err}`
+//     throw new Error(errMsg)
+//   }
+// }
 
 /*
 DESC
@@ -438,18 +442,67 @@ export async function getPortfolios(
   } 
 }
 
+// /*
+// DESC
+//   Sets a Portfolio's holdings to the provided input
+// INPUT 
+//   portfolio: The Portfolio to update
+//   holdings: An array of IHolding
+// RETURN
+//   TRUE if the holdings were successfully set, FALSE otherwise
+// */
+// export async function setPortfolioHoldings(
+//   portfolio: IPortfolio,
+//   holdingInput: IHolding | IHolding[]
+// ): Promise<boolean> {
+
+//   // connect to db
+//   await mongoose.connect(url)
+
+//   try {
+
+//     // check if Portfolio exists
+//     const portfolioDoc = await getPortfolioDoc(portfolio)
+//     if (portfolioDoc instanceof Portfolio === false) {
+//       console.log(`Portfolio not found (${portfolio.userId}, ${portfolio.portfolioName})`)
+//     }
+//     assert(portfolioDoc instanceof Portfolio)
+
+//     // convert input to Array, if necessary
+//     const holdings = Array.isArray(holdingInput) ? holdingInput : [holdingInput]
+
+//     // validate Holdings
+//     const validHoldings = await areValidHoldings(holdings)
+//     if (!validHoldings) {
+//       console.log('Holdings failed validation in setPortfolioHoldings()')
+//       return false
+//     }
+
+//     // get IMHolding[]
+//     const newHoldings = await getIMHoldingsFromIHoldings(holdings)
+//     portfolioDoc.holdings = newHoldings
+//     await portfolioDoc.save()
+//     return true
+
+//   } catch(err) {
+
+//     const errMsg = `An error occurred in setPortfolioHoldings(): ${err}`
+//     throw new Error(errMsg)
+//   }  
+// }
+
 /*
 DESC
-  Sets a Portfolio's holdings to the provided input
+  Sets an existing Portfolio to be equal to a new Portfolio
 INPUT 
-  portfolio: The Portfolio to update
-  holdings: An array of IHolding
+  existingPortfolio: The Portfolio to update
+  newPortfolio: The new state of the Portfolio
 RETURN
-  TRUE if the holdings were successfully set, FALSE otherwise
+  TRUE if the Portfolio was successfully set, FALSE otherwise
 */
-export async function setPortfolioHoldings(
-  portfolio: IPortfolio,
-  holdingInput: IHolding | IHolding[]
+export async function setPortfolio(
+  existingPortfolio: IPortfolio,
+  newPortfolio: IPortfolio,
 ): Promise<boolean> {
 
   // connect to db
@@ -457,86 +510,92 @@ export async function setPortfolioHoldings(
 
   try {
 
+    // check that userIds match
+    assert(existingPortfolio.userId === newPortfolio.userId,
+      `Mismatched userIds provided to setPortfolio(${existingPortfolio.userId}, ${newPortfolio.userId})`)
+
+    // check that new Portfolio Holdings are valid
+    const hasValidHoldings = await areValidHoldings(newPortfolio.holdings)
+    if (!hasValidHoldings) {
+      const errMsg = 'New portfolio has invalid holdings'
+      throw new Error(errMsg)
+    }
+
     // check if Portfolio exists
-    const portfolioDoc = await getPortfolioDoc(portfolio)
+    const portfolioDoc = await getPortfolioDoc(existingPortfolio)
     if (portfolioDoc instanceof Portfolio === false) {
-      console.log(`Portfolio not found (${portfolio.userId}, ${portfolio.portfolioName})`)
+      const errMsg = `Portfolio not found (${existingPortfolio.userId}, ${existingPortfolio.portfolioName})`
+      throw new Error(errMsg)
     }
     assert(portfolioDoc instanceof Portfolio)
 
-    // convert input to Array, if necessary
-    const holdings = Array.isArray(holdingInput) ? holdingInput : [holdingInput]
-
-    // validate Holdings
-    const validHoldings = await areValidHoldings(holdings)
-    if (!validHoldings) {
-      console.log('Holdings failed validation in setPortfolioHoldings()')
-      return false
+    // create IMPortfolio for new Portfolio
+    const newIMPortfolio = {
+      ...newPortfolio,
+      holdings: await getIMHoldingsFromIHoldings(newPortfolio.holdings)
     }
 
-    // get IMHolding[]
-    const newHoldings = await getIMHoldingsFromIHoldings(holdings)
-    portfolioDoc.holdings = newHoldings
+    // overwrite existing Portfolio with new Portfolio
+    portfolioDoc.overwrite(newIMPortfolio)
     await portfolioDoc.save()
     return true
 
   } catch(err) {
 
-    const errMsg = `An error occurred in setPortfolioHoldings(): ${err}`
-    throw new Error(errMsg)
-  }  
-}
-
-/*
-DESC
-  Sets a property on the specified Portfolio document to the input value. 
-  NOTE: This _cannot_ set the holdings property, use setPortfolioHoldings()
-INPUT 
-  portfolio: The Portfolio to update
-  key: The property name to set
-  value: The property value to set
-RETURN
-  TRUE if the property was successfully set, FALSE otherwise
-*/
-export async function setPortfolioProperty(
-  portfolio: IPortfolio,
-  key: string,
-  value: any
-): Promise<boolean> {
-
-  // connect to db
-  await mongoose.connect(url)
-
-  try {
-
-    // check if Portfolio exists
-    const portfolioDoc = await getPortfolioDoc(portfolio)
-    if (portfolioDoc instanceof Portfolio === false) {
-      console.log(`Portfolio not found (${portfolio.userId}, ${portfolio.portfolioName})`)
-    }
-    assert(portfolioDoc instanceof Portfolio)
-
-    // call separate setPortfolioHoldings()
-    if (key === 'holdings') {
-      assert(isIHoldingArray(value))
-      const res = await setPortfolioHoldings(portfolio, value)
-
-      return res
-
-    // set the key
-    } else {
-      portfolioDoc.set(key, value)
-      await portfolioDoc.save()
-
-      return true
-    }
-
-  } catch(err) {
-
-    const errMsg = `An error occurred in setPortfolioProperty(): ${err}`
+    const errMsg = `An error occurred in setPortfolio(): ${err}`
     throw new Error(errMsg)
   }
 }
+
+// /*
+// DESC
+//   Sets a property on the specified Portfolio document to the input value. 
+// INPUT 
+//   portfolio: The Portfolio to update
+//   key: The property name to set
+//   value: The property value to set
+// RETURN
+//   TRUE if the property was successfully set, FALSE otherwise
+// */
+// export async function setPortfolioProperty(
+//   portfolio: IPortfolio,
+//   key: string,
+//   value: any
+// ): Promise<boolean> {
+
+//   // connect to db
+//   await mongoose.connect(url)
+
+//   try {
+
+//     // check if Portfolio exists
+//     const portfolioDoc = await getPortfolioDoc(portfolio)
+//     if (portfolioDoc instanceof Portfolio === false) {
+//       console.log(`Portfolio not found (${portfolio.userId}, ${portfolio.portfolioName})`)
+//     }
+//     assert(portfolioDoc instanceof Portfolio)
+
+//     // call separate setPortfolioHoldings()
+//     if (key === 'holdings') {
+//       assert(isIHoldingArray(value))
+//       const res = await setPortfolioHoldings(portfolio, value)
+
+//       return res
+
+//     // set the key
+//     } else {
+//       portfolioDoc.set(key, value)
+//       await portfolioDoc.save()
+
+//       return true
+//     }
+
+//   } catch(err) {
+
+//     const errMsg = `An error occurred in setPortfolioProperty(): ${err}`
+//     throw new Error(errMsg)
+//   }
+// }
 
 
 // -------
@@ -744,8 +803,9 @@ async function main(): Promise<number> {
   // const p233232 = await getProductDoc({'tcgplayerId': 233232})
   // const p449558 = await getProductDoc({'tcgplayerId': 449558})
 
-  // const userId = 789
-  // const portfolioName = 'Omega Investments'
+  // const userId = 456
+  // const portfolioName = 'Delta Investments'
+  // const description = 'Washer dryer mechanic'
   // let holdings: IHolding[] = [
   //   {
   //     tcgplayerId: 233232,
@@ -756,15 +816,34 @@ async function main(): Promise<number> {
   //         price: 99,
   //         quantity: 1,
   //       },
-  //     ]
+  //       {
+  //         type: TransactionType.Sale,
+  //         date: new Date(),
+  //         price: 99,
+  //         quantity: 2,
+  //       },        
+  //     ],
   //   },
   // ]
 
+  // // // -- Set Portfolio
   // const portfolio: IPortfolio = {
   //   userId: userId, 
   //   portfolioName: portfolioName,
   //   holdings: holdings,
   // }
+  // const newPortfolio: IPortfolio = {
+  //   userId: userId, 
+  //   portfolioName: portfolioName,
+  //   holdings: holdings,
+  // }
+  // res = await setPortfolio(portfolio, newPortfolio)
+  // if (res) {
+  //   console.log('Portfolio successfully set')
+  // } else {
+  //   console.log('Portfolio not set')
+  // }
+
   // // -- Add portfolio holdings
 
   // res = await addPortfolioHoldings(portfolio, holdings)
