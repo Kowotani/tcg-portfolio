@@ -3,17 +3,23 @@ import axios from 'axios'
 import { 
   Box,
   Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  HStack,
   Input,
   Spacer,
-  Text
+  Text,
+  VStack
 } from '@chakra-ui/react'
 import { 
   IPopulatedHolding, IPopulatedPortfolio, IProduct, 
 
   assert, GET_PRODUCTS_URL, isASCII, isIPopulatedHolding
 } from 'common'
+import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
+  FormikProps } from 'formik'
 import { HoldingCard } from './HoldingCard'
-import { InputErrorWrapper } from './InputField'
 import { FilterInput } from './FilterInput'
 import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
@@ -24,6 +30,7 @@ import {
   filterFnHoldingCard, filterFnProductSearchResult, sortFnPopulatedHoldingAsc, 
   sortFnProductSearchResults
 } from '../utils' 
+import { isAsExpression } from 'typescript'
 
 
 type TEditPortfolioProps = {
@@ -83,36 +90,56 @@ export const EditPortfolioForm = (
   // functions
   // =========
 
+  // -------------------
+  // form input handlers
+  // -------------------
+
+  function handleDescriptionOnBlur(
+    e: React.FocusEvent<HTMLInputElement, Element>,
+    form: FormikProps<IInputValues>
+  ): void {
+    form.setFieldValue('description', e.target.value)
+    form.setFieldTouched('description')
+    const error = validateDescription(e.target.value)
+    if (error) {
+      form.setFieldError('description', error)  
+    }
+  }
+
+    function handlePortfolioNameOnBlur(
+    e: React.FocusEvent<HTMLInputElement, Element>,
+    form: FormikProps<IInputValues>
+  ): void {
+    form.setFieldValue('portfolioName', e.target.value)
+    form.setFieldTouched('portfolioName')
+    const error = validatePortfolioName(e.target.value)
+    if (error) {
+      form.setFieldError('portfolioName', error)
+    }
+  }
+
   // ---------------
   // form validation
   // ---------------
 
-  // validate PortfolioName
-  function validatePortfolioName(input: string): void {
-
-    // empty state
-    if (input.length === 0) {
-      setPortfolioNameState({
-        portfolioName: '',
-        isInvalid: true, 
-        errorMessage: 'Portfolio Name is required',
-      })
-
-    // non-ASCII characters
-    } else if (!isASCII(input)) {
-      setPortfolioNameState({
-        portfolioName: '',
-        isInvalid: true, 
-        errorMessage: 'Portfolio Name must only contain ASCII characters',
-      })
-
-    // valid
-    } else {
-      setPortfolioNameState({ 
-        portfolioName: input,
-        isInvalid: false 
-      })
+  // validate description
+  function validateDescription(value: string): string | undefined {
+    let error
+    if (!isASCII(value)) {
+      error = 'Description must only contain ASCII characters'
     }
+    return error
+  }
+
+  // validate portfolio name
+  function validatePortfolioName(value: string): string | undefined {
+    let error
+    if (value.length === 0) {
+      error = 'Portfolio Name is required'
+    } else if (!isASCII(value)) {
+      error = 'Portfolio Name must only contain ASCII characters'
+    }
+    return error
   }
 
   // --------------
@@ -243,49 +270,136 @@ export const EditPortfolioForm = (
   }, [searchInput, searchableProducts])
 
 
+  // ====================
+  // PortfolioDetailsForm
+  // ====================
+
+  // input interface
+  interface IInputValues {
+    portfolioName: string,
+    description: string
+  }
+
+  // defaults
+  const DEFAULT_PORTFOLIO_NAME = props.portfolio.portfolioName
+  const DEFAULT_DESCRIPTION = props.portfolio.description ?? ''
+
   // ==============
-  // Main Component
+  // main component
   // ==============
 
   return (
     <>
-      {/* Exit and Save Buttons */}
-      <Box display='flex' justifyContent='flex-end'>
-        <Button 
-          variant='ghost' 
-          onClick={props.onExitEditMode}
-        >
-            Discard Changes
-        </Button>
-        <Box w='16px' />
-        <Button 
-          colorScheme='blue'
-          onClick={props.onExitEditMode}
-        >
-          Save Changes
-        </Button>
-      </Box>
-
       {/* Portfolio Header */}
       <Box bg='teal.500' color='white' fontWeight='medium' p='8px' m='16px 0px'>
         Portfolio Details
       </Box>
 
-      {/* Name */}
-      <Box m='32px 0px'>
-        <InputErrorWrapper 
-          leftLabel='Portfolio Name'
-          errorMessage={portfolioNameState.errorMessage}
-          isErrorDisplayed={portfolioNameState.isInvalid && isEditPortfolioForm}
-        >
-          <Input 
-            isInvalid={portfolioNameState.isInvalid}
-            onBlur={e => validatePortfolioName(e.target.value)}
-            defaultValue={portfolio.portfolioName}
-            width='50%'
-          />
-        </InputErrorWrapper>
-      </Box>
+      {/* Portfolio Details Form */}
+      <Formik
+        initialValues={{
+          portfolioName: DEFAULT_PORTFOLIO_NAME,
+          description: DEFAULT_DESCRIPTION,
+        }}
+        onSubmit={(values: IInputValues, actions: FormikHelpers<IInputValues>) => {
+          actions.setSubmitting(false)
+          console.log(values)
+        }}
+        validateOnBlur={false}  // disable validation which overwrites setError
+      >
+        {(form: FormikProps<IInputValues>) => (
+
+          <Form>
+
+            {/* Exit and Save Buttons */}
+            <Box display='flex' justifyContent='flex-end'>
+              <Button 
+                variant='ghost' 
+                onClick={props.onExitEditMode}
+              >
+                  Exit Edit Mode
+              </Button>
+              <Box w='16px' />
+              <Button 
+                colorScheme='blue'
+                isDisabled={!form.isValid}
+                isLoading={form.isSubmitting}
+                type='submit'
+              >
+                Save Changes
+              </Button>
+            </Box>
+
+            <VStack spacing={4} m='16px 0px'>
+
+              {/* Portfolio Name */}
+              <Field name='portfolioName' validate={validatePortfolioName}>
+                  {(field: FieldInputProps<string>) => (
+                    <VStack alignItems='flex-end' spacing={4} width='100%'>
+                      <FormControl 
+                        isInvalid={form.errors?.portfolioName !== undefined
+                          && form.touched?.portfolioName as boolean}
+                        isRequired={true}
+                      >
+                        <Box display='flex' alignItems='end'>
+                          <FormLabel>Portfolio Name</FormLabel>
+                          <Box flexGrow={10}>
+                            <Input
+                              {...field}
+                              type='text'
+                              defaultValue={DEFAULT_PORTFOLIO_NAME}
+                              onBlur={(e) => handlePortfolioNameOnBlur(e, form)}
+                            />
+                            {form.errors?.portfolioName 
+                              ? (
+                                <FormErrorMessage>
+                                  {form.errors.portfolioName as string}
+                                </FormErrorMessage>
+                              ) : undefined
+                            }    
+                          </Box>   
+                        </Box>       
+                      </FormControl>
+                    </VStack>
+                  )}
+                </Field>
+
+              {/* Description */}
+              <Field name='description' validate={validateDescription}>
+                  {(field: FieldInputProps<string>) => (
+                    <VStack alignItems='flex-end' spacing={4} width='100%'>
+                      <FormControl 
+                        isInvalid={form.errors?.description !== undefined
+                          && form.touched?.description as boolean}
+                      >
+                        <Box display='flex' alignItems='end'>
+                          <FormLabel>Description</FormLabel>
+                          <Box flexGrow={10}>
+                            <Input
+                              {...field}
+                              type='text'
+                              defaultValue={DEFAULT_DESCRIPTION}
+                              onBlur={(e) => handleDescriptionOnBlur(e, form)}
+                            />
+                            {form.errors?.description 
+                              ? (
+                                <FormErrorMessage>
+                                  {form.errors.description as string}
+                                </FormErrorMessage>
+                              ) : undefined
+                            }    
+                          </Box>   
+                        </Box>       
+                      </FormControl>
+                    </VStack>
+                  )}
+                </Field>
+
+            </VStack>
+          </Form>
+        )}
+      </Formik>
+
 
       {/* Holdings Header */}
       <Box bg='teal.500' color='white' fontWeight='medium' p='8px' m='16px 0px'>
@@ -343,7 +457,7 @@ export const EditPortfolioForm = (
                 onHoldingDelete={onHoldingDelete}
                 onHoldingUpdate={onHoldingUpdate}
               />
-              <Spacer h='8px'/>
+              <Spacer h='16px'/>
             </Box>
           )
         })
