@@ -152,7 +152,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
                         fontSize='sm'
                         m='0px 8px'                     
                       >
-                        No Active Holdings
+                        Inactive Holding
                       </Badge>
                     )
                     : undefined
