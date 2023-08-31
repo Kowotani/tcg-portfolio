@@ -64,34 +64,25 @@ export const AllPortfolios = (
 
   return (
     <>
+      {/* Header */}
+      <Box 
+        bg='teal.500' 
+        color='white' 
+        fontWeight='medium' 
+        p='8px'
+        m='16px 0px'
+      >
+        Portfolios
+      </Box>
       {isLoadingPortfolios
         ? (
-          <>
-            {/* Dummy Header */}
-            <Box 
-              bg='teal.500' 
-              h='46px'
-              m='16px 0px'
-            />
-            <Progress 
-              height='24px'
-              m='8px 0px'
-              isIndeterminate
-            />
-          </>
+          <Progress 
+            height='24px'
+            m='8px 0px'
+            isIndeterminate
+          />
         ) : (
           <>
-            {/* Header */}
-            <Box 
-              bg='teal.500' 
-              color='white' 
-              fontWeight='medium' 
-              p='8px' 
-              m='16px 0px'
-            >
-              Portfolios
-            </Box>
-
             {/* Portfolios */}
             {portfolios.map((portfolio: IPopulatedPortfolio) => {
               return (
