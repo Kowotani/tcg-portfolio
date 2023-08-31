@@ -1,5 +1,6 @@
 import { PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { 
+  Badge,
   Box,
   Button,
   Card,
@@ -14,8 +15,8 @@ import {
 import { 
   IPopulatedHolding, ITransaction,
 
-  getHoldingMarketValue, getHoldingPercentPnl, getHoldingTotalCost, 
-  getHoldingTotalPnl,
+  getHoldingMarketValue, getHoldingPercentPnl, getHoldingQuantity, 
+  getHoldingTotalCost, getHoldingTotalPnl,
   
   assert
 } from 'common'
@@ -67,6 +68,8 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     `Unable to find latest price for tcgplayerId: ${holding.product.tcgplayerId}`)
   const holdingPercentPnl = getHoldingPercentPnl(holding, price)
 
+  const hasZeroQuantity = getHoldingQuantity(holding) === 0
+
   const valueSummary: TMetricSummaryItem[] = [
     {
       title: 'Total Cost:',
@@ -77,7 +80,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
       titleStyle: {},
     },
     {
-      title: 'Market Value:',
+      title: hasZeroQuantity ? 'Total Rev:' : 'Market Value:',
       value: getHoldingMarketValue(holding, price),
       formattedPrefix: '$',
       formattedPrecision: 2,
@@ -139,11 +142,27 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
                 <Text align='left' fontWeight='bold'>
                   {getProductNameWithLanguage(props.populatedHolding.product)}
                 </Text>
-                <CloseButton 
-                  onClick={
-                    () => props.onHoldingDelete(props.populatedHolding)
+                <Box display='flex' alignItems='center'>
+                  {hasZeroQuantity
+                    ? (
+                      <Badge 
+                        colorScheme='purple' 
+                        variant='subtle' 
+                        borderRadius={10}
+                        fontSize='sm'
+                        m='0px 8px'                     
+                      >
+                        No Active Holdings
+                      </Badge>
+                    )
+                    : undefined
                   }
-                />
+                  <CloseButton 
+                    onClick={
+                      () => props.onHoldingDelete(props.populatedHolding)
+                    }
+                  />
+                </Box>
               </Box>
 
               <HStack
