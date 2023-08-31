@@ -80,16 +80,15 @@ INPUT
   holding: An IHolding
   price: The market price
 RETURN
-  The market value of the Holding, or undefined if both getHoldingRealizedPnl() 
-  and getHoldingUnrealizedPnl() are undefined
+  The market value of the Holding
 */
 export function getHoldingMarketValue(
   holding: IHolding | IPopulatedHolding,
   price: number
 ): number {
-  const realizedPnl = getHoldingRealizedPnl(holding) 
   const holdingValue = getHoldingQuantity(holding) * price
-  return (realizedPnl ?? 0) + holdingValue
+  const totalRev = getHoldingTotalRevenue(holding)
+  return holdingValue + totalRev
 }
 
 /*

@@ -69,13 +69,12 @@ INPUT
   holding: An IHolding
   price: The market price
 RETURN
-  The market value of the Holding, or undefined if both getHoldingRealizedPnl()
-  and getHoldingUnrealizedPnl() are undefined
+  The market value of the Holding
 */
 function getHoldingMarketValue(holding, price) {
-    var realizedPnl = getHoldingRealizedPnl(holding);
     var holdingValue = getHoldingQuantity(holding) * price;
-    return (realizedPnl !== null && realizedPnl !== void 0 ? realizedPnl : 0) + holdingValue;
+    var totalRev = getHoldingTotalRevenue(holding);
+    return holdingValue + totalRev;
 }
 exports.getHoldingMarketValue = getHoldingMarketValue;
 /*
