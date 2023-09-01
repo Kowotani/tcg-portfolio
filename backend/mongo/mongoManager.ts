@@ -765,6 +765,139 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
   }
 }
 
+
+// =====
+// views
+// =====
+
+/*
+DESC
+  This pipeline creates a price summary for all Products that is designed to
+  be used when calculating historical returns
+OUTPUT
+  historicalPrices collection with documents of the form
+  {
+    date: Date,
+    tcgplayerId: number,
+    marketPrice: number,
+    isInterpolated: boolean,
+  }
+*/
+async function updateHistoricalPrices(): Promise<boolean> {
+
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    const res = await Price.aggregate([
+
+      // create timeseries of priceDate
+      {
+        $densify: {
+          field: 'priceDate',
+          partitionByFields: ['tcgplayerId'],
+          range: {
+            step: 1,
+            unit: 'day',
+            bounds: 'full'
+          }
+        }
+      },
+
+      // interpolate missing data points
+      {
+        $fill: {
+          partitionByFields: ['tcgplayerId'],
+          sortBy: {'priceDate': 1},
+          output: {
+            'tcgplayerId': {method: 'locf'},
+            'prices.marketPrice': {method: 'linear'}
+          }
+        }
+      },
+
+      // add isInterpolated and rename priceDate
+      {
+        $addFields: {
+          date: {
+            $dateTrunc: {
+              date: '$priceDate',
+              unit: 'day'
+            }
+          },
+          isInterpolated: {
+            $lte: ['$_id', null]
+          }
+        }
+      },
+
+      // calculate average marketPrice
+      {
+        $group: {
+          _id: {
+            tcgplayerId: '$tcgplayerId',
+            date: '$date'
+          },
+          marketPrice: {
+            $avg: '$prices.marketPrice'
+          },
+          isInterpolated: {
+            $min: '$isInterpolated'
+          }
+        }
+      },
+
+      // filter out null marketPrices
+      // this is due to the releaseDate of Products being different
+      {
+        $match: {
+          marketPrice: {
+            $ne: null
+          }
+        }
+      },
+
+      // surface nested fields
+      {
+        $project: {
+          _id: false,
+          tcgplayerId: '$_id.tcgplayerId',
+          date: '$_id.date',
+          marketPrice: true,
+          isInterpolated: true
+        }
+      },
+
+      // sort results
+      {
+        $sort: {
+          tcgplayerId: 1,
+          date: 1
+        }
+      },
+
+      // write results
+      {
+        $merge: {
+          on: ['tcgplayerId', 'date'], 
+          into: 'historicalPrices',
+          whenMatched: 'replace'
+        }
+      }
+    ])
+    .exec()
+    return true
+
+  } catch(err) {
+    
+    const errMsg = `An error occurred in updateHistoricalPrices(): ${err}`
+    throw new Error(errMsg)
+  }
+
+}
+
+
 // import { logObject, TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
 async function main(): Promise<number> {  
 
@@ -949,6 +1082,14 @@ async function main(): Promise<number> {
   //   console.log('Holding successfully deleted')
   // } else {
   //   console.log('Holding not deleted')
+  // }
+
+  // // -- Create historicalPrices
+  // res = await updateHistoricalPrices()
+  // if (res) {
+  //   console.log('historicalPrices updated')
+  // } else {
+  //   console.log('historicalPrices not updated')
   // }
 
   return 0

@@ -70,7 +70,7 @@ function areValidHoldings(holdings) {
         // all Products exist
         const productDocs = yield (0, mongoManager_1.getProductDocs)();
         const productTcgplayerIds = productDocs.map((doc) => {
-            return Number(doc.tcgplayerId);
+            return doc.tcgplayerId;
         });
         const unknownTcgplayerIds = _.difference(tcgplayerIds, productTcgplayerIds);
         if (unknownTcgplayerIds.length > 0) {
