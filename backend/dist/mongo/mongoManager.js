@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.insertPrices = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = exports.Price = exports.Product = exports.Portfolio = void 0;
+exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.insertPrices = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = exports.Price = exports.Product = exports.Portfolio = void 0;
 // imports
 const common_1 = require("common");
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -58,8 +58,7 @@ function addPortfolio(portfolio) {
             // check if portfolioName exists for this userId
             const portfolioDoc = yield getPortfolioDoc(portfolio);
             if (!(0, utils_1.isPortfolioDoc)(portfolioDoc)) {
-                const errMsg = `${portfolioName} already exists for userId: ${userId}`;
-                throw new Error(errMsg);
+                throw (0, utils_1.genPortfolioAlreadyExistsError)(userId, portfolioName, 'addPortfolio()');
             }
             // get IMHolding[]
             const holdings = yield (0, utils_1.getIMHoldingsFromIHoldings)(portfolio.holdings);
@@ -103,8 +102,7 @@ function deletePortfolio(portfolio) {
             // check if portfolioName exists for this userId
             const portfolioDoc = yield getPortfolioDoc(portfolio);
             if (!(0, utils_1.isPortfolioDoc)(portfolioDoc)) {
-                console.log(`${portfolioName} does not exist for userId: ${userId}`);
-                return false;
+                throw (0, utils_1.genPortfolioNotFoundError)(userId, portfolioName, 'deletePortfolio()');
             }
             // delete the portfolio  
             const res = yield exports.Portfolio.deleteOne({
@@ -241,7 +239,7 @@ function setPortfolio(existingPortfolio, newPortfolio) {
                 const errMsg = `Portfolio not found (${existingPortfolio.userId}, ${existingPortfolio.portfolioName})`;
                 throw new Error(errMsg);
             }
-            (0, common_1.assert)((0, utils_1.isPortfolioDoc)(portfolioDoc), 'Existing portfolio not found in setPortfolio()');
+            (0, common_1.assert)((0, utils_1.isPortfolioDoc)(portfolioDoc), (0, utils_1.genPortfolioNotFoundError)(existingPortfolio.userId, existingPortfolio.portfolioName, 'setPortfolio()').toString());
             // create IMPortfolio for new Portfolio
             const newIMPortfolio = Object.assign(Object.assign({}, newPortfolio), { holdings: yield (0, utils_1.getIMHoldingsFromIHoldings)(newPortfolio.holdings) });
             // overwrite existing Portfolio with new Portfolio
@@ -353,8 +351,8 @@ function getProductDoc({ tcgplayerId, hexStringId } = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         // check that tcgplayer_id or id is provided
         if (tcgplayerId === undefined && hexStringId === undefined) {
-            console.log('No tcgplayerId or hexStringId provided to getProductDoc()');
-            return null;
+            const errMsg = 'No tcgplayerId or hexStringId provided to getProductDoc()';
+            throw new Error(errMsg);
         }
         // connect to db
         yield mongoose_1.default.connect(url);
@@ -434,10 +432,9 @@ function setProductProperty(tcgplayerId, key, value) {
             // check if Product exists
             const productDoc = yield getProductDoc({ tcgplayerId: tcgplayerId });
             if (!(0, utils_1.isProductDoc)(productDoc)) {
-                const errMsg = `Product not found for tcgplayerId: ${tcgplayerId}`;
-                throw new Error(errMsg);
+                throw (0, utils_1.genProductNotFoundError)('setProductProperty()', tcgplayerId);
             }
-            (0, common_1.assert)((0, utils_1.isProductDoc)(productDoc), 'Product not found in setProductProperty');
+            (0, common_1.assert)((0, utils_1.isProductDoc)(productDoc), (0, utils_1.genProductNotFoundError)('setProductProperty()', tcgplayerId).toString());
             // update Product
             productDoc.set(key, value);
             yield productDoc.save();
@@ -568,6 +565,7 @@ function updateHistoricalPrices() {
         }
     });
 }
+exports.updateHistoricalPrices = updateHistoricalPrices;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let res;

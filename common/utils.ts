@@ -95,9 +95,9 @@ INPUT
 */
 export function assert(condition: any, msg?: string): asserts condition {
   if (!condition) {
-    throw new Error('Assertion Error: ' + msg);
+    throw new Error('Assertion Error: ' + msg)
   }
-  }
+}
 
 /*
 DESC

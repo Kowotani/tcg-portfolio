@@ -19,6 +19,191 @@ const Price = mongoose.model('Price', priceSchema)
 const Product = mongoose.model('Product', productSchema)
 
 
+// ==========
+// converters
+// ==========
+
+/*
+DESC
+  Converts an IHolding[] to an IMHolding[], which entails:
+    - adding the product field with Product ObjectId
+INPUT
+  holdings: An IHolding[]
+RETURN
+  An IMHolding[]
+*/
+export async function getIMHoldingsFromIHoldings(
+  holdings: IHolding[]
+): Promise<IMHolding[]> {
+
+  const productDocs = await getProductDocs()
+  const newHoldings = holdings.map((holding: IHolding) => {
+
+    // find Product
+    const productDoc = productDocs.find((product: IMProduct) => {
+      return product.tcgplayerId === Number(holding.tcgplayerId)
+    })
+    assert(
+      isProductDoc(productDoc),
+      genProductNotFoundError('getIMHoldingsFromIHoldings()').toString()
+    )
+
+    // create IMHolding
+    return ({
+      ...holding,
+      product: productDoc._id
+    } as IMHolding)
+  })
+
+  return newHoldings
+}
+
+/*
+DESC
+  Converts an IPrice[] to an IMPrice[], which entails:
+    - adding the product field with Product ObjectId
+INPUT
+  prices: An IPrice[]
+RETURN
+  An IMPrice[]
+*/
+export async function getIMPricesFromIPrices(
+  prices: IPrice[]
+): Promise<IMPrice[]> {
+
+  const productDocs = await getProductDocs()
+  const newPrices = prices.map((price: IPrice) => {
+
+    // find Product
+    const productDoc = productDocs.find((product: IMProduct) => {
+      return product.tcgplayerId === Number(price.tcgplayerId)
+    })
+    assert(
+      isProductDoc(productDoc), 
+      genProductNotFoundError('getIMPricesFromIPrices()').toString()
+    )
+
+    // create IMPrice
+    return ({
+      ...price,
+      product: productDoc._id
+    } as IMPrice)
+  })
+
+  return newPrices
+}
+
+
+// ======
+// errors
+// ======
+
+/*
+DESC
+  Returns an Error with standardized error message when a Portfolio already 
+  exists for a userId / portfolioName combination
+INPUT
+  userId: The userId associated with the Portfolio
+  portfolioName: The portfolioName associated with the Portfolio
+  fnName: The name of the function generating the error
+RETURN
+  An error
+*/
+export function genPortfolioAlreadyExistsError(
+  userId: number, 
+  portfolioName: string,
+  fnName: string
+): Error {
+  const errMsg = `Portfolio ${portfolioName} already exists for userId: ${userId} in ${fnName}`
+  return new Error(errMsg)
+}
+
+/*
+DESC
+  Returns an Error with standardized error message when a Portfolio is not found
+  for a userId / portfolioName combination
+INPUT
+  userId: The userId associated with the Portfolio
+  portfolioName: The portfolioName associated with the Portfolio
+  fnName: The name of the function generating the error
+RETURN
+  An error
+*/
+export function genPortfolioNotFoundError(
+  userId: number, 
+  portfolioName: string,
+  fnName: string
+): Error {
+  const errMsg = userId && portfolioName
+    ? `Portfolio not found for [${userId}, ${portfolioName}] in ${fnName}`
+    : `Portfolio not found in ${fnName}`
+  return new Error(errMsg)
+}
+
+/*
+DESC
+  Returns an Error with standardized error message when a Product is not found
+  for a tcgplayerId
+INPUT
+  tcgplayerId: The tcgplayerId associated with the Product
+  fnName: The name of the function generating the error
+RETURN
+  An error
+*/
+export function genProductNotFoundError(
+  fnName: string,
+  tcgplayerId?: number
+): Error {
+  const errMsg = tcgplayerId
+    ? `Product not found for tcgplayerId: ${tcgplayerId} in ${fnName}`
+    : `Product not found in ${fnName}`
+  return new Error(errMsg)
+}
+
+
+// ===========
+// type guards
+// ===========
+
+/*
+DESC
+  Returns whether or not the input is a Portfolio doc
+INPUT
+  arg: An object that might be a Portfolio doc
+RETURN
+  TRUE if the input is a Portfolio doc, FALSE otherwise
+*/
+export function isPortfolioDoc(arg: any): arg is IMPortfolio {
+  return arg
+    && arg instanceof Portfolio
+}
+
+/*
+DESC
+  Returns whether or not the input is a Price doc
+INPUT
+  arg: An object that might be a Price doc
+RETURN
+  TRUE if the input is a Price doc, FALSE otherwise
+*/
+export function isPriceDoc(arg: any): arg is IMPrice {
+  return arg
+    && arg instanceof Price
+}
+
+/*
+DESC
+  Returns whether or not the input is a Product doc
+INPUT
+  arg: An object that might be a Product doc
+RETURN
+  TRUE if the input is a Product doc, FALSE otherwise
+*/
+export function isProductDoc(arg: any): arg is IMProduct {
+  return arg
+    && arg instanceof Product
+}
+
 
 // ==========
 // validators
@@ -82,123 +267,4 @@ export function hasValidTransactions(holding: IHolding): boolean {
 
   // net quantity
   return getHoldingQuantity(holding) >= 0
-}
-
-
-// ==========
-// converters
-// ==========
-
-/*
-DESC
-  Converts an IHolding[] to an IMHolding[], which entails:
-    - adding the product field with Product ObjectId
-INPUT
-  holdings: An IHolding[]
-RETURN
-  An IMHolding[]
-*/
-export async function getIMHoldingsFromIHoldings(
-  holdings: IHolding[]
-): Promise<IMHolding[]> {
-
-  const productDocs = await getProductDocs()
-  const newHoldings = holdings.map((holding: IHolding) => {
-
-    // find Product
-    const productDoc = productDocs.find((product: IMProduct) => {
-      return product.tcgplayerId === Number(holding.tcgplayerId)
-    })
-    assert(
-      isProductDoc(productDoc),
-      'Product not found in getIMHoldingsFromIHoldings()'
-    )
-
-    // create IMHolding
-    return ({
-      ...holding,
-      product: productDoc._id
-    } as IMHolding)
-  })
-
-  return newHoldings
-}
-
-/*
-DESC
-  Converts an IPrice[] to an IMPrice[], which entails:
-    - adding the product field with Product ObjectId
-INPUT
-  prices: An IPrice[]
-RETURN
-  An IMPrice[]
-*/
-export async function getIMPricesFromIPrices(
-  prices: IPrice[]
-): Promise<IMPrice[]> {
-
-  const productDocs = await getProductDocs()
-  const newPrices = prices.map((price: IPrice) => {
-
-    // find Product
-    const productDoc = productDocs.find((product: IMProduct) => {
-      return product.tcgplayerId === Number(price.tcgplayerId)
-    })
-    assert(
-      isProductDoc(productDoc), 
-      'Product not found in getIMPricesFromIPrices()'
-    )
-
-    // create IMPrice
-    return ({
-      ...price,
-      product: productDoc._id
-    } as IMPrice)
-  })
-
-  return newPrices
-}
-
-
-// ===========
-// type guards
-// ===========
-
-/*
-DESC
-  Returns whether or not the input is a Portfolio doc
-INPUT
-  arg: An object that might be a Portfolio doc
-RETURN
-  TRUE if the input is a Portfolio doc, FALSE otherwise
-*/
-export function isPortfolioDoc(arg: any): arg is IMPortfolio {
-  return arg
-    && arg instanceof Portfolio
-}
-
-/*
-DESC
-  Returns whether or not the input is a Price doc
-INPUT
-  arg: An object that might be a Price doc
-RETURN
-  TRUE if the input is a Price doc, FALSE otherwise
-*/
-export function isPriceDoc(arg: any): arg is IMPrice {
-  return arg
-    && arg instanceof Price
-}
-
-/*
-DESC
-  Returns whether or not the input is a Product doc
-INPUT
-  arg: An object that might be a Product doc
-RETURN
-  TRUE if the input is a Product doc, FALSE otherwise
-*/
-export function isProductDoc(arg: any): arg is IMProduct {
-  return arg
-    && arg instanceof Product
 }

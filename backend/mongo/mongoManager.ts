@@ -12,9 +12,12 @@ import { IMPortfolio, portfolioSchema } from './models/portfolioSchema'
 import { priceSchema } from './models/priceSchema'
 import { IMProduct, productSchema } from './models/productSchema'
 import { 
-  areValidHoldings, getIMHoldingsFromIHoldings, getIMPricesFromIPrices,
+  getIMHoldingsFromIHoldings, getIMPricesFromIPrices,
   
-  isPortfolioDoc, isProductDoc
+  genPortfolioAlreadyExistsError, genPortfolioNotFoundError, 
+  genProductNotFoundError,
+
+  areValidHoldings, isPortfolioDoc, isProductDoc
 } from '../utils'
 // import { logObject, TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
 
@@ -65,8 +68,8 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
     // check if portfolioName exists for this userId
     const portfolioDoc = await getPortfolioDoc(portfolio)
     if (!isPortfolioDoc(portfolioDoc)) {
-      const errMsg = `${portfolioName} already exists for userId: ${userId}`
-      throw new Error(errMsg)
+      throw genPortfolioAlreadyExistsError(userId, portfolioName, 
+        'addPortfolio()')
     } 
 
     // get IMHolding[]
@@ -119,8 +122,8 @@ export async function deletePortfolio(portfolio: IPortfolio): Promise<boolean> {
     // check if portfolioName exists for this userId
     const portfolioDoc = await getPortfolioDoc(portfolio)
     if (!isPortfolioDoc(portfolioDoc)) {
-      console.log(`${portfolioName} does not exist for userId: ${userId}`)
-      return false
+      throw genPortfolioNotFoundError(userId, portfolioName, 
+        'deletePortfolio()')
     }
 
     // delete the portfolio  
@@ -287,7 +290,8 @@ export async function setPortfolio(
     }
     assert(
       isPortfolioDoc(portfolioDoc),
-      'Existing portfolio not found in setPortfolio()'
+      genPortfolioNotFoundError(existingPortfolio.userId, 
+        existingPortfolio.portfolioName, 'setPortfolio()').toString()
     )
 
     // create IMPortfolio for new Portfolio
@@ -433,8 +437,8 @@ export async function getProductDoc(
 
   // check that tcgplayer_id or id is provided
   if (tcgplayerId === undefined && hexStringId === undefined) {
-    console.log('No tcgplayerId or hexStringId provided to getProductDoc()') 
-    return null
+    const errMsg = 'No tcgplayerId or hexStringId provided to getProductDoc()'
+    throw new Error(errMsg)
   }
 
   // connect to db
@@ -527,12 +531,11 @@ export async function setProductProperty(
     // check if Product exists
     const productDoc = await getProductDoc({tcgplayerId: tcgplayerId})
     if (!isProductDoc(productDoc)) {
-      const errMsg = `Product not found for tcgplayerId: ${tcgplayerId}`
-      throw new Error(errMsg)
+      throw genProductNotFoundError('setProductProperty()', tcgplayerId)
     }
     assert(
       isProductDoc(productDoc),
-      'Product not found in setProductProperty'
+      genProductNotFoundError('setProductProperty()', tcgplayerId).toString()
     )
 
     // update Product
@@ -566,7 +569,7 @@ OUTPUT
     isInterpolated: boolean,
   }
 */
-async function updateHistoricalPrices(): Promise<boolean> {
+export async function updateHistoricalPrices(): Promise<boolean> {
 
   // connect to db
   await mongoose.connect(url)

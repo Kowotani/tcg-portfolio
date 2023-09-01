@@ -31,7 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isProductDoc = exports.isPriceDoc = exports.isPortfolioDoc = exports.getIMPricesFromIPrices = exports.getIMHoldingsFromIHoldings = exports.hasValidTransactions = exports.areValidHoldings = void 0;
+exports.hasValidTransactions = exports.areValidHoldings = exports.isProductDoc = exports.isPriceDoc = exports.isPortfolioDoc = exports.genProductNotFoundError = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = exports.getIMPricesFromIPrices = exports.getIMHoldingsFromIHoldings = void 0;
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -43,6 +43,155 @@ const mongoManager_1 = require("./mongo/mongoManager");
 const Portfolio = mongoose_1.default.model('Portfolio', portfolioSchema_1.portfolioSchema);
 const Price = mongoose_1.default.model('Price', priceSchema_1.priceSchema);
 const Product = mongoose_1.default.model('Product', productSchema_1.productSchema);
+// ==========
+// converters
+// ==========
+/*
+DESC
+  Converts an IHolding[] to an IMHolding[], which entails:
+    - adding the product field with Product ObjectId
+INPUT
+  holdings: An IHolding[]
+RETURN
+  An IMHolding[]
+*/
+function getIMHoldingsFromIHoldings(holdings) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const productDocs = yield (0, mongoManager_1.getProductDocs)();
+        const newHoldings = holdings.map((holding) => {
+            // find Product
+            const productDoc = productDocs.find((product) => {
+                return product.tcgplayerId === Number(holding.tcgplayerId);
+            });
+            (0, common_1.assert)(isProductDoc(productDoc), genProductNotFoundError('getIMHoldingsFromIHoldings()').toString());
+            // create IMHolding
+            return Object.assign(Object.assign({}, holding), { product: productDoc._id });
+        });
+        return newHoldings;
+    });
+}
+exports.getIMHoldingsFromIHoldings = getIMHoldingsFromIHoldings;
+/*
+DESC
+  Converts an IPrice[] to an IMPrice[], which entails:
+    - adding the product field with Product ObjectId
+INPUT
+  prices: An IPrice[]
+RETURN
+  An IMPrice[]
+*/
+function getIMPricesFromIPrices(prices) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const productDocs = yield (0, mongoManager_1.getProductDocs)();
+        const newPrices = prices.map((price) => {
+            // find Product
+            const productDoc = productDocs.find((product) => {
+                return product.tcgplayerId === Number(price.tcgplayerId);
+            });
+            (0, common_1.assert)(isProductDoc(productDoc), genProductNotFoundError('getIMPricesFromIPrices()').toString());
+            // create IMPrice
+            return Object.assign(Object.assign({}, price), { product: productDoc._id });
+        });
+        return newPrices;
+    });
+}
+exports.getIMPricesFromIPrices = getIMPricesFromIPrices;
+// ======
+// errors
+// ======
+/*
+DESC
+  Returns an Error with standardized error message when a Portfolio already
+  exists for a userId / portfolioName combination
+INPUT
+  userId: The userId associated with the Portfolio
+  portfolioName: The portfolioName associated with the Portfolio
+  fnName: The name of the function generating the error
+RETURN
+  An error
+*/
+function genPortfolioAlreadyExistsError(userId, portfolioName, fnName) {
+    const errMsg = `Portfolio ${portfolioName} already exists for userId: ${userId} in ${fnName}`;
+    return new Error(errMsg);
+}
+exports.genPortfolioAlreadyExistsError = genPortfolioAlreadyExistsError;
+/*
+DESC
+  Returns an Error with standardized error message when a Portfolio is not found
+  for a userId / portfolioName combination
+INPUT
+  userId: The userId associated with the Portfolio
+  portfolioName: The portfolioName associated with the Portfolio
+  fnName: The name of the function generating the error
+RETURN
+  An error
+*/
+function genPortfolioNotFoundError(userId, portfolioName, fnName) {
+    const errMsg = userId && portfolioName
+        ? `Portfolio not found for [${userId}, ${portfolioName}] in ${fnName}`
+        : `Portfolio not found in ${fnName}`;
+    return new Error(errMsg);
+}
+exports.genPortfolioNotFoundError = genPortfolioNotFoundError;
+/*
+DESC
+  Returns an Error with standardized error message when a Product is not found
+  for a tcgplayerId
+INPUT
+  tcgplayerId: The tcgplayerId associated with the Product
+  fnName: The name of the function generating the error
+RETURN
+  An error
+*/
+function genProductNotFoundError(fnName, tcgplayerId) {
+    const errMsg = tcgplayerId
+        ? `Product not found for tcgplayerId: ${tcgplayerId} in ${fnName}`
+        : `Product not found in ${fnName}`;
+    return new Error(errMsg);
+}
+exports.genProductNotFoundError = genProductNotFoundError;
+// ===========
+// type guards
+// ===========
+/*
+DESC
+  Returns whether or not the input is a Portfolio doc
+INPUT
+  arg: An object that might be a Portfolio doc
+RETURN
+  TRUE if the input is a Portfolio doc, FALSE otherwise
+*/
+function isPortfolioDoc(arg) {
+    return arg
+        && arg instanceof Portfolio;
+}
+exports.isPortfolioDoc = isPortfolioDoc;
+/*
+DESC
+  Returns whether or not the input is a Price doc
+INPUT
+  arg: An object that might be a Price doc
+RETURN
+  TRUE if the input is a Price doc, FALSE otherwise
+*/
+function isPriceDoc(arg) {
+    return arg
+        && arg instanceof Price;
+}
+exports.isPriceDoc = isPriceDoc;
+/*
+DESC
+  Returns whether or not the input is a Product doc
+INPUT
+  arg: An object that might be a Product doc
+RETURN
+  TRUE if the input is a Product doc, FALSE otherwise
+*/
+function isProductDoc(arg) {
+    return arg
+        && arg instanceof Product;
+}
+exports.isProductDoc = isProductDoc;
 // ==========
 // validators
 // ==========
@@ -103,98 +252,3 @@ function hasValidTransactions(holding) {
     return (0, common_1.getHoldingQuantity)(holding) >= 0;
 }
 exports.hasValidTransactions = hasValidTransactions;
-// ==========
-// converters
-// ==========
-/*
-DESC
-  Converts an IHolding[] to an IMHolding[], which entails:
-    - adding the product field with Product ObjectId
-INPUT
-  holdings: An IHolding[]
-RETURN
-  An IMHolding[]
-*/
-function getIMHoldingsFromIHoldings(holdings) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const productDocs = yield (0, mongoManager_1.getProductDocs)();
-        const newHoldings = holdings.map((holding) => {
-            // find Product
-            const productDoc = productDocs.find((product) => {
-                return product.tcgplayerId === Number(holding.tcgplayerId);
-            });
-            (0, common_1.assert)(isProductDoc(productDoc), 'Product not found in getIMHoldingsFromIHoldings()');
-            // create IMHolding
-            return Object.assign(Object.assign({}, holding), { product: productDoc._id });
-        });
-        return newHoldings;
-    });
-}
-exports.getIMHoldingsFromIHoldings = getIMHoldingsFromIHoldings;
-/*
-DESC
-  Converts an IPrice[] to an IMPrice[], which entails:
-    - adding the product field with Product ObjectId
-INPUT
-  prices: An IPrice[]
-RETURN
-  An IMPrice[]
-*/
-function getIMPricesFromIPrices(prices) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const productDocs = yield (0, mongoManager_1.getProductDocs)();
-        const newPrices = prices.map((price) => {
-            // find Product
-            const productDoc = productDocs.find((product) => {
-                return product.tcgplayerId === Number(price.tcgplayerId);
-            });
-            (0, common_1.assert)(isProductDoc(productDoc), 'Product not found in getIMPricesFromIPrices()');
-            // create IMPrice
-            return Object.assign(Object.assign({}, price), { product: productDoc._id });
-        });
-        return newPrices;
-    });
-}
-exports.getIMPricesFromIPrices = getIMPricesFromIPrices;
-// ===========
-// type guards
-// ===========
-/*
-DESC
-  Returns whether or not the input is a Portfolio doc
-INPUT
-  arg: An object that might be a Portfolio doc
-RETURN
-  TRUE if the input is a Portfolio doc, FALSE otherwise
-*/
-function isPortfolioDoc(arg) {
-    return arg
-        && arg instanceof Portfolio;
-}
-exports.isPortfolioDoc = isPortfolioDoc;
-/*
-DESC
-  Returns whether or not the input is a Price doc
-INPUT
-  arg: An object that might be a Price doc
-RETURN
-  TRUE if the input is a Price doc, FALSE otherwise
-*/
-function isPriceDoc(arg) {
-    return arg
-        && arg instanceof Price;
-}
-exports.isPriceDoc = isPriceDoc;
-/*
-DESC
-  Returns whether or not the input is a Product doc
-INPUT
-  arg: An object that might be a Product doc
-RETURN
-  TRUE if the input is a Product doc, FALSE otherwise
-*/
-function isProductDoc(arg) {
-    return arg
-        && arg instanceof Product;
-}
-exports.isProductDoc = isProductDoc;
