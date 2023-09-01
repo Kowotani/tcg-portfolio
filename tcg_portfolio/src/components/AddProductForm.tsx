@@ -137,12 +137,17 @@ export const AddProductForm = () => {
     isInvalid: false,
   });
 
+  // SideBar context
+  const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
+  const isAddProductForm = sideBarNav === SideBarNav.ADD_PRODUCT
 
   // =========
   // functions
   // =========
 
+  // ------------
   // form control
+  // ------------
 
   /*
   DESC
@@ -217,8 +222,88 @@ export const AddProductForm = () => {
     }
   }
 
+  // -----------
+  // form submit
+  // -----------
 
-  // validation
+  function handleFormOnSubmit(): void {
+
+    // create POST body         
+    let body: TProductPostReqBody = {
+      formData: getPostFormData(),
+    }
+
+    // add imageUrl, if exists
+    if (!imageUrlState.isInvalid) {
+      body.imageUrl = imageUrlState.imageUrl
+    }
+
+    // submit
+    axios({
+      method: 'post',
+      url: ADD_PRODUCT_URL,
+      data: body,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    // success
+    .then(res => {
+
+      // TODO: type check
+      const resData = res.data
+
+      // product was added
+      if (res.status === 201) {
+
+        // added with image
+        if (resData.message === PostProductStatus.Added) {
+          toast({
+            title: 'Success!',
+            description: `${PostProductStatus.Added}: ${resData.tcgplayerId}`,
+            status: 'success',
+            isClosable: true,
+          })        
+
+        // added without image
+        } else if (resData.message === PostProductStatus.AddedWithoutImage) {
+          toast({
+            title: 'Partial Success',
+            description: `${PostProductStatus.AddedWithoutImage}: ${resData.tcgplayerId}`,
+            status: 'info',
+            isClosable: true,
+          })        
+        }
+
+      // product already exists
+      } else if (res.status === 202) {
+        toast({
+          title: 'Notice',
+          description: `${PostProductStatus.AlreadyExists}: ${resData.tcgplayerId}`,
+          status: 'warning',
+          isClosable: true,
+        })  
+      }
+
+    })
+    // error
+    .catch(res => {
+
+      // TODO: type check
+      const resData = res.data
+                
+      toast({
+        title: 'Error!',
+        description: `${res.statusText}: ${resData}`,
+        status: 'error',
+        isClosable: true,
+      })          
+    })
+  }
+
+  // ---------------
+  // form validation
+  // ---------------
 
   // validate TCGplayerID
   function validateTCGPlayerID(input: string): void {
@@ -366,7 +451,6 @@ export const AddProductForm = () => {
     }
   }
 
-
   /*
   DESC
     Checks if the input is a valid HTTP URL
@@ -418,9 +502,10 @@ export const AddProductForm = () => {
     return data
   }
 
-  // SideBar context
-  const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
-  const isAddProductForm = sideBarNav === SideBarNav.ADD_PRODUCT
+
+  // =====
+  // hooks
+  // =====
 
   // handle TCG changes
   useEffect(() => {
@@ -452,81 +537,7 @@ export const AddProductForm = () => {
   return (
     <Formik
       initialValues={{}}
-      onSubmit={() => {
-
-        // create POST body         
-        let body: TProductPostReqBody = {
-          formData: getPostFormData(),
-        }
-
-        // add imageUrl, if exists
-        if (!imageUrlState.isInvalid) {
-          body.imageUrl = imageUrlState.imageUrl
-        }
-
-        // submit
-        axios({
-          method: 'post',
-          url: ADD_PRODUCT_URL,
-          data: body,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-        // success
-        .then(res => {
-
-          // TODO: type check
-          const resData = res.data
-
-          // product was added
-          if (res.status === 201) {
-
-            // added with image
-            if (resData.message === PostProductStatus.Added) {
-              toast({
-                title: 'Success!',
-                description: `${PostProductStatus.Added}: ${resData.tcgplayerId}`,
-                status: 'success',
-                isClosable: true,
-              })        
-
-            // added without image
-            } else if (resData.message === PostProductStatus.AddedWithoutImage) {
-              toast({
-                title: 'Partial Success',
-                description: `${PostProductStatus.AddedWithoutImage}: ${resData.tcgplayerId}`,
-                status: 'info',
-                isClosable: true,
-              })        
-            }
-
-          // product already exists
-          } else if (res.status === 202) {
-            toast({
-              title: 'Notice',
-              description: `${PostProductStatus.AlreadyExists}: ${resData.tcgplayerId}`,
-              status: 'warning',
-              isClosable: true,
-            })  
-          }
-
-        })
-        // error
-        .catch(res => {
-
-          // TODO: type check
-
-          const resData = res.data
-                    
-          toast({
-            title: 'Error!',
-            description: `${res.statusText}: ${resData}`,
-            status: 'error',
-            isClosable: true,
-          })          
-        })
-      }}
+      onSubmit={handleFormOnSubmit}
     >
       <Form>
         <VStack 
