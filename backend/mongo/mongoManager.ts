@@ -64,9 +64,9 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
 
     // check if portfolioName exists for this userId
     const portfolioDoc = await getPortfolioDoc(portfolio)
-    if (!isProductDoc(portfolioDoc)) {
-      console.log(`${portfolioName} already exists for userId: ${userId}`)
-      return false
+    if (!isPortfolioDoc(portfolioDoc)) {
+      const errMsg = `${portfolioName} already exists for userId: ${userId}`
+      throw new Error(errMsg)
     } 
 
     // get IMHolding[]
@@ -522,7 +522,8 @@ export async function setProductProperty(
     // check if Product exists
     const productDoc = await getProductDoc({tcgplayerId: tcgplayerId})
     if (!isProductDoc(productDoc)) {
-      console.log(`Product not found for tcgplayerId: ${tcgplayerId}`)
+      const errMsg = `Product not found for tcgplayerId: ${tcgplayerId}`
+      throw new Error(errMsg)
     }
     assert(isProductDoc(productDoc))
 

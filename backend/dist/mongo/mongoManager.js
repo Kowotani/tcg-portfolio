@@ -57,9 +57,9 @@ function addPortfolio(portfolio) {
         try {
             // check if portfolioName exists for this userId
             const portfolioDoc = yield getPortfolioDoc(portfolio);
-            if (!(0, utils_1.isProductDoc)(portfolioDoc)) {
-                console.log(`${portfolioName} already exists for userId: ${userId}`);
-                return false;
+            if (!(0, utils_1.isPortfolioDoc)(portfolioDoc)) {
+                const errMsg = `${portfolioName} already exists for userId: ${userId}`;
+                throw new Error(errMsg);
             }
             // get IMHolding[]
             const holdings = yield (0, utils_1.getIMHoldingsFromIHoldings)(portfolio.holdings);
@@ -434,7 +434,8 @@ function setProductProperty(tcgplayerId, key, value) {
             // check if Product exists
             const productDoc = yield getProductDoc({ tcgplayerId: tcgplayerId });
             if (!(0, utils_1.isProductDoc)(productDoc)) {
-                console.log(`Product not found for tcgplayerId: ${tcgplayerId}`);
+                const errMsg = `Product not found for tcgplayerId: ${tcgplayerId}`;
+                throw new Error(errMsg);
             }
             (0, common_1.assert)((0, utils_1.isProductDoc)(productDoc));
             // update Product
