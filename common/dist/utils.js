@@ -45,7 +45,7 @@ REF
 // export function getTypeSafeObjectEntries<
 //   const T extends Record<PropertyKey, unknown>
 // >(
-//   obj: T
+//   obj: Tfunction
 // ): { [K in keyof T]: [K, T[K]] }[keyof T][]  {
 //   return Object.entries(obj) as { [K in keyof T]: [K, T[K]] }[keyof T][]
 // }
@@ -88,12 +88,12 @@ DESC
 INPUT
   A string to convert
 RETURN
-  The extracted price as a number from the string (eg. '$123.45' => 123.45)
+  The extracted price as a number from the string (eg. '$1,234.56' => 1234.56)
   Will return NaN if the input is not a price string
 */
 function getPriceFromString(value) {
     return isPriceString(value)
-        ? parseFloat(value.substring(1))
+        ? parseFloat(value.replace(',', '').substring(1))
         : NaN;
 }
 exports.getPriceFromString = getPriceFromString;
@@ -148,7 +148,7 @@ RETURN
   regex = ^\$\d+\.\d{2}$
 */
 function isPriceString(value) {
-    var regexp = new RegExp('^\\$\\d+\\.\\d{2}$');
+    var regexp = new RegExp('^\\$\\d+(,?\\d+)*\\.\\d{2}$');
     return regexp.test(value);
 }
 exports.isPriceString = isPriceString;
