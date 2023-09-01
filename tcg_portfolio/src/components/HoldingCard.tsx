@@ -68,11 +68,11 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     `Unable to find latest price for tcgplayerId: ${holding.product.tcgplayerId}`)
   const holdingPercentPnl = getHoldingPercentPnl(holding, price)
 
-  const hasZeroQuantity = getHoldingQuantity(holding) === 0
+  const isInactive = getHoldingQuantity(holding) === 0
 
   const valueSummary: TMetricSummaryItem[] = [
     {
-      title: 'Total Cost:',
+      title: isInactive ? 'Total Cost:' : 'Book Value:',
       value: getHoldingTotalCost(holding),
       formattedPrefix: '$',
       formattedPrecision: 2,
@@ -80,7 +80,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
       titleStyle: {},
     },
     {
-      title: hasZeroQuantity ? 'Total Rev:' : 'Market Value:',
+      title: isInactive ? 'Total Rev:' : 'Market Value:',
       value: getHoldingMarketValue(holding, price),
       formattedPrefix: '$',
       formattedPrecision: 2,
@@ -143,7 +143,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
                   {getProductNameWithLanguage(props.populatedHolding.product)}
                 </Text>
                 <Box display='flex' alignItems='center'>
-                  {hasZeroQuantity
+                  {isInactive
                     ? (
                       <Badge 
                         colorScheme='purple' 
