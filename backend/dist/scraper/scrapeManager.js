@@ -9,13 +9,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.loadPrices = exports.loadPrice = void 0;
 // imports
 const mongoManager_1 = require("../mongo/mongoManager");
 const scraper_1 = require("./scraper");
 const common_1 = require("common");
-// ==============
-// main functions
-// ==============
+// =========
+// functions
+// =========
+/*
+DESC
+  Loads price data for the Product specified by the input tcgplayerId
+INPUT
+  tcgplayerId: The tcgplayerId of the Product
+RETURN
+  TRUE if the price data was successfully loaded, FALSE otherwise
+*/
+function loadPrice(tcgplayerId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // scrape price data
+        const scrapedPrices = yield (0, scraper_1.scrape)([tcgplayerId]);
+        console.log(scrapedPrices);
+        const priceData = scrapedPrices.get(tcgplayerId);
+        // check if data was retrieved
+        if (priceData === undefined) {
+            const errMsg = `Could not scrape price data for tcgplayerId: ${tcgplayerId}`;
+            throw new Error(errMsg);
+        }
+        // set price date
+        let priceDate = new Date();
+        priceDate.setMinutes(0, 0, 0);
+        // create IPrice
+        const price = {
+            tcgplayerId: tcgplayerId,
+            priceDate: priceDate,
+            prices: priceData,
+            granularity: common_1.TimeseriesGranularity.Hours
+        };
+        console.log(price);
+        // load price
+        const numInserted = yield (0, mongoManager_1.insertPrices)([price]);
+        return numInserted === 1;
+    });
+}
+exports.loadPrice = loadPrice;
 /*
 DESC
   Loads price data for all known products
@@ -30,7 +67,7 @@ function loadPrices() {
         // scrape price data
         const tcgplayerIds = productDocs.map(doc => doc.tcgplayerId);
         const scrapedPrices = yield (0, scraper_1.scrape)(tcgplayerIds);
-        // insert price data
+        // set price date
         let priceDate = new Date();
         priceDate.setMinutes(0, 0, 0);
         let priceDocs = [];
@@ -46,16 +83,16 @@ function loadPrices() {
             }
             else if (priceData.marketPrice === undefined) {
                 console.log(`No marketPrice data found for tcgplayerId: ${tcgplayerId}`);
-                // construct IPrice object
+                // create IPrice
             }
             else {
                 let prices = {
                     marketPrice: priceData.marketPrice
                 };
-                if (priceData.buylistMarketPrice !== null) {
+                if (priceData.buylistMarketPrice) {
                     prices.buylistMarketPrice = priceData.buylistMarketPrice;
                 }
-                if (priceData.listedMedianPrice !== null) {
+                if (priceData.listedMedianPrice) {
                     prices.listedMedianPrice = priceData.listedMedianPrice;
                 }
                 const price = {
@@ -71,8 +108,15 @@ function loadPrices() {
         return numInserted;
     });
 }
+exports.loadPrices = loadPrices;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
+        // const tcgplayerId = 224721
+        // const inserted = await loadPrice(tcgplayerId)
+        // const res = inserted
+        //   ? `Inserted price for tcgplayerId: ${tcgplayerId}`
+        //   : `Could not insert price for tcgplayerId: ${tcgplayerId}`
+        // console.log(res)
         const numInserted = yield loadPrices();
         console.log(`Inserted ${numInserted} docs`);
     });

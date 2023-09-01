@@ -4,9 +4,48 @@ import { scrape } from './scraper'
 import { IPrice, IPriceData, TimeseriesGranularity } from 'common'
 
 
-// ==============
-// main functions
-// ==============
+// =========
+// functions
+// =========
+
+/*
+DESC
+  Loads price data for the Product specified by the input tcgplayerId
+INPUT
+  tcgplayerId: The tcgplayerId of the Product
+RETURN
+  TRUE if the price data was successfully loaded, FALSE otherwise
+*/
+export async function loadPrice(tcgplayerId: number): Promise<boolean> {
+
+  // scrape price data
+  const scrapedPrices = await scrape([tcgplayerId])
+  console.log(scrapedPrices)
+  const priceData = scrapedPrices.get(tcgplayerId)
+
+  // check if data was retrieved
+  if (priceData === undefined) {
+    const errMsg = `Could not scrape price data for tcgplayerId: ${tcgplayerId}`
+    throw new Error(errMsg)
+  }
+  
+  // set price date
+  let priceDate = new Date()
+  priceDate.setMinutes(0,0,0)  
+
+  // create IPrice
+  const price: IPrice = {
+    tcgplayerId: tcgplayerId,
+    priceDate: priceDate,
+    prices: priceData,
+    granularity: TimeseriesGranularity.Hours
+  }
+  console.log(price)
+
+  // load price
+  const numInserted = await insertPrices([price])
+  return numInserted === 1
+}
 
 /*
 DESC
@@ -14,7 +53,7 @@ DESC
 RETURN
   The number of Price documents inserted
 */
-async function loadPrices(): Promise<number> {
+export async function loadPrices(): Promise<number> {
 
   // get all Products
   const productDocs = await getProductDocs()
@@ -24,7 +63,7 @@ async function loadPrices(): Promise<number> {
   const tcgplayerIds = productDocs.map( doc => doc.tcgplayerId )
   const scrapedPrices = await scrape(tcgplayerIds)
 
-  // insert price data
+  // set price date
   let priceDate = new Date()
   priceDate.setMinutes(0,0,0)
 
@@ -48,18 +87,18 @@ async function loadPrices(): Promise<number> {
 
       console.log(`No marketPrice data found for tcgplayerId: ${tcgplayerId}`)
 
-    // construct IPrice object
+    // create IPrice
     } else {
 
       let prices: IPriceData = {
         marketPrice: priceData.marketPrice
       }
 
-      if (priceData.buylistMarketPrice !== null) {
+      if (priceData.buylistMarketPrice) {
         prices.buylistMarketPrice = priceData.buylistMarketPrice
       }
 
-      if (priceData.listedMedianPrice !== null) {
+      if (priceData.listedMedianPrice) {
         prices.listedMedianPrice = priceData.listedMedianPrice
       }
 
@@ -68,9 +107,9 @@ async function loadPrices(): Promise<number> {
         tcgplayerId: tcgplayerId,
         granularity: TimeseriesGranularity.Hours,
         prices: prices
-      }; 
+      }
 
-      priceDocs.push(price);
+      priceDocs.push(price)
     }    
   }
 
@@ -79,6 +118,14 @@ async function loadPrices(): Promise<number> {
 }
 
 async function main() {
+
+  // const tcgplayerId = 224721
+  // const inserted = await loadPrice(tcgplayerId)
+  // const res = inserted
+  //   ? `Inserted price for tcgplayerId: ${tcgplayerId}`
+  //   : `Could not insert price for tcgplayerId: ${tcgplayerId}`
+  // console.log(res)
+
   const numInserted = await loadPrices()
   console.log(`Inserted ${numInserted} docs`)
 }

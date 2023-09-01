@@ -13,14 +13,6 @@ exports.scrape = void 0;
 // imports
 const browser_1 = require("./browser");
 const common_1 = require("common");
-/*
-DESC
-  Scrapes price data for the input tcgplayerIds
-INPUT
-  Array of tcgplayerIds
-RETURN
-  Array of IProductPriceData objects
-*/
 function scrape(ids) {
     return __awaiter(this, void 0, void 0, function* () {
         // create browser instance and page
@@ -46,7 +38,7 @@ function scrape(ids) {
             }
             // wait for price guide to load
             yield page.waitForSelector('.price-guide__points');
-            // const validText: string[] = Object.values(TCGPriceType);
+            // const validText: string[] = Object.values(TCGPriceType)
             const headerPath = '.price-guide__points > table > tr:not(.price-points__header)';
             // create price object
             try {
@@ -63,19 +55,24 @@ function scrape(ids) {
                     }
                     return scrapedText;
                 });
+                console.log(scrapedTexts);
                 // parse scraped text
                 let data = {};
-                for (const st of scrapedTexts) {
+                scrapedTexts.forEach((st) => {
                     if ((0, common_1.isTCGPriceTypeValue)(st.text) && (0, common_1.isPriceString)(st.price)) {
                         data[st.text] = (0, common_1.getPriceFromString)(st.price);
                     }
-                }
+                });
                 // create IPriceData
                 let priceData = {
-                    marketPrice: data[common_1.TCGPriceType.MarketPrice] || null,
-                    buylistMarketPrice: data[common_1.TCGPriceType.BuylistMarketPrice] || null,
-                    listedMedianPrice: data[common_1.TCGPriceType.ListedMedianPrice] || null,
+                    marketPrice: data[common_1.TCGPriceType.MarketPrice]
                 };
+                if (data[common_1.TCGPriceType.BuylistMarketPrice]) {
+                    priceData.buylistMarketPrice = data[common_1.TCGPriceType.BuylistMarketPrice];
+                }
+                if (data[common_1.TCGPriceType.ListedMedianPrice]) {
+                    priceData.listedMedianPrice = data[common_1.TCGPriceType.ListedMedianPrice];
+                }
                 scrapeData.set(id, priceData);
             }
             catch (err) {
