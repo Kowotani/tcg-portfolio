@@ -6,7 +6,6 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Input,
   Spacer,
   Text,
@@ -22,7 +21,7 @@ import {
   
   TPutPortfolioReqBody,
 
-  assert, isASCII, isIPopulatedHolding, isIPortfolio, isTResBody, getHoldingTotalCost
+  assert, isASCII, isIPopulatedHolding, isIPortfolio, isTResBody
 } from 'common'
 import { FilterInput } from './FilterInput'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
@@ -33,7 +32,7 @@ import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
 import { SideBarNavContext } from '../state/SideBarNavContext'
 import { 
-  ISideBarNavContext, SideBarNav, 
+  ISideBarNavContext, 
 
   filterFnHoldingCard, filterFnProductSearchResult, sortFnPopulatedHoldingAsc, 
   sortFnProductSearchResults
@@ -47,11 +46,6 @@ type TEditPortfolioProps = {
 export const EditPortfolioForm = (
   props: PropsWithChildren<TEditPortfolioProps>
 ) => {
-
-  // contexts
-  const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
-  const isEditPortfolioForm = sideBarNav === SideBarNav.PORTFOLIO
-
 
   // ======
   // states
@@ -114,6 +108,116 @@ export const EditPortfolioForm = (
     if (error) {
       form.setFieldError('portfolioName', error)
     }
+  }
+
+  // -----------
+  // form submit
+  // -----------
+  
+  function handleFormOnSubmit(
+    values: IInputValues, 
+    actions: FormikHelpers<IInputValues>
+  ): void {
+
+    // check if all Holdings have Transactions
+    const emptyHolding 
+      = getHoldingWithoutTransactions(portfolio.populatedHoldings)
+    if (emptyHolding) {
+      actions.setSubmitting(false)
+      toast({
+        title: `Error: ${emptyHolding.product.name}`,
+        description: `Holding has no Transactions`,
+        status: 'error',
+        variant: 'subtle',
+        isClosable: true,
+      })                 
+      return     
+    }
+
+    // create existingPortfolio IPortfolio
+    const existingPortfolio 
+      = _.head(getIPortfoliosFromIPopulatedPortfolios([props.portfolio]))
+    assert(isIPortfolio(existingPortfolio),
+      'Error converting existing Portfolio to IPortfolio')
+
+    // create newPortfolio IPortfolio
+    let portfolioTemplate: IPopulatedPortfolio = {
+      userId: props.portfolio.userId,
+      portfolioName: values.portfolioName,
+      populatedHoldings: portfolio.populatedHoldings
+    }
+    if (values.description.length > 0) {
+      portfolioTemplate['description'] = values.description
+    }
+    const newPortfolio 
+      = _.head(getIPortfoliosFromIPopulatedPortfolios([portfolioTemplate]))
+    assert(isIPortfolio(newPortfolio),
+      'Error converting new Portfolio to IPortfolio')              
+
+    // create request body
+    const body: TPutPortfolioReqBody = {
+      existingPortfolio: existingPortfolio,
+      newPortfolio: newPortfolio
+    }
+
+    // submit
+    axios({
+      method: 'put',
+      url: UPDATE_PORTFOLIO_URL,
+      data: body,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+
+    // success
+    .then(res => {
+      actions.setSubmitting(false)
+
+      const resData = res.data
+      assert(isTResBody(resData),
+        'Unexpected response from UPDATE_PORTFOLIO_URL')
+
+      // Portoflio was updated
+      if (res.status === 200) {
+        toast({
+          title: 'Portfolio Updated',
+          description: `${existingPortfolio.portfolioName} was updated`,
+          duration: 3000,
+          status: 'success',
+          isClosable: true,
+        })        
+
+      // exit Edit Mode
+      props.onExitEditMode()
+
+      // Portoflio was not updated
+      } else if (res.status === 500) {
+        toast({
+          title: 'Error',
+          description: `${resData.message}`,
+          duration: 3000,
+          status: 'error',
+          isClosable: true,
+        })    
+      }
+
+    })
+
+    // error
+    .catch(res => {
+      actions.setSubmitting(false)
+
+      // TODO: type check
+      const resData = res.data  
+
+      toast({
+        title: 'Error',
+        description: 'Please try again later',
+        status: 'error',
+        isClosable: true,
+      })                        
+    })            
   }
 
   // ---------------
@@ -325,107 +429,7 @@ export const EditPortfolioForm = (
         }}
         onSubmit={
           (values: IInputValues, actions: FormikHelpers<IInputValues>) => {
-
-            // check if all Holdings have Transactions
-            const emptyHolding 
-              = getHoldingWithoutTransactions(portfolio.populatedHoldings)
-            if (emptyHolding) {
-              actions.setSubmitting(false)
-              toast({
-                title: `Error: ${emptyHolding.product.name}`,
-                description: `Holding has no Transactions`,
-                status: 'error',
-                variant: 'subtle',
-                isClosable: true,
-              })                 
-              return     
-            }
-
-            // create existingPortfolio IPortfolio
-            const existingPortfolio 
-              = _.head(getIPortfoliosFromIPopulatedPortfolios([props.portfolio]))
-            assert(isIPortfolio(existingPortfolio),
-              'Error converting existing Portfolio to IPortfolio')
-              
-            // create newPortfolio IPortfolio
-            let portfolioTemplate: IPopulatedPortfolio = {
-              userId: props.portfolio.userId,
-              portfolioName: values.portfolioName,
-              populatedHoldings: portfolio.populatedHoldings
-            }
-            if (values.description.length > 0) {
-              portfolioTemplate['description'] = values.description
-            }
-            const newPortfolio 
-              = _.head(getIPortfoliosFromIPopulatedPortfolios([portfolioTemplate]))
-            assert(isIPortfolio(newPortfolio),
-              'Error converting new Portfolio to IPortfolio')              
-
-            // create request body
-            const body: TPutPortfolioReqBody = {
-              existingPortfolio: existingPortfolio,
-              newPortfolio: newPortfolio
-            }
-
-            // submit
-            axios({
-              method: 'put',
-              url: UPDATE_PORTFOLIO_URL,
-              data: body,
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
-            })
-
-            // success
-            .then(res => {
-              actions.setSubmitting(false)
-
-              const resData = res.data
-              assert(isTResBody(resData),
-                'Unexpected response from UPDATE_PORTFOLIO_URL')
-    
-              // Portoflio was updated
-              if (res.status === 200) {
-                toast({
-                  title: 'Portfolio Updated',
-                  description: `${existingPortfolio.portfolioName} was updated`,
-                  duration: 3000,
-                  status: 'success',
-                  isClosable: true,
-                })        
-
-              // exit Edit Mode
-              props.onExitEditMode()
-
-              // Portoflio was not updated
-              } else if (res.status === 500) {
-                toast({
-                  title: 'Error',
-                  description: `${resData.message}`,
-                  duration: 3000,
-                  status: 'error',
-                  isClosable: true,
-                })    
-              }
-    
-            })
-
-            // error
-            .catch(res => {
-              actions.setSubmitting(false)
-
-              // TODO: type check
-              const resData = res.data  
-              
-              toast({
-                title: 'Error',
-                description: 'Please try again later',
-                status: 'error',
-                isClosable: true,
-              })                        
-            })            
-
+            handleFormOnSubmit(values, actions)
         }}
         validateOnBlur={false}  // disable validation which overwrites setError
       >
