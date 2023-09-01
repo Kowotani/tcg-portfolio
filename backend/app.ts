@@ -1,26 +1,25 @@
 // imports
 import { 
-  IDatedPriceData, IProduct,
+  IDatedPriceData, IPrice, IPriceData, IProduct, TimeseriesGranularity,
 
-  GetPortfoliosStatus, GetPricesStatus, GetProductsStatus, PostProductStatus,
-  PutPortfoliosStatus,
+  GetPortfoliosStatus, GetPricesStatus, GetProductsStatus, PostPriceStatus, 
+  PostProductStatus, PutPortfoliosStatus,
   
   
-  TDataResBody, TPutPortfolioReqBody, TProductPostReqBody, TProductPostResBody, 
-  TResBody, 
+  TDataResBody, TPostPriceReqBody, TPutPortfolioReqBody, TProductPostReqBody, 
+  TProductPostResBody, TResBody, 
 
-  ADD_PRODUCT_URL, GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL,
-  UPDATE_PORTFOLIO_URL
+  ADD_PRICE_URL, ADD_PRODUCT_URL, GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, 
+  GET_PRODUCTS_URL, UPDATE_PORTFOLIO_URL
 } from 'common'
 import express from 'express'
 import { 
-  getLatestPrices, getPortfolios, getProductDoc, getProductDocs, insertProducts,
-  setPortfolio,
-
-  Product
+  getLatestPrices, getPortfolios, getProductDoc, getProductDocs, insertPrices, insertProducts,
+  setPortfolio
 } from './mongo/mongoManager'
 import multer from 'multer'
 import { loadImageToS3 } from './aws/s3Manager'
+import { isProductDoc } from './utils'
 
 const upload = multer()
 const app = express()
@@ -127,9 +126,80 @@ app.put(UPDATE_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
   
 })
 
-// =======
+
+// ======
 // prices
-// =======
+// ======
+
+/*
+DESC
+  Handle POST request to add a Price
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    201: The Price Was added successfully
+    500: An error occurred
+*/
+app.post(ADD_PRICE_URL, upload.none(), async (req: any, res: any) => {
+
+  try {
+
+    // create IPrice
+    const body: TPostPriceReqBody = req.body
+    let priceData: IPriceData = {
+      marketPrice: body.marketPrice
+    }
+    if (body.buylistMarketPrice) {
+      priceData['buylistMarketPrice'] = body.buylistMarketPrice
+    }
+    if (body.listedMedianPrice) {
+      priceData['listedMedianPrice'] = body.listedMedianPrice
+    }
+    const price: IPrice = {
+      tcgplayerId: body.tcgplayerId,
+      priceDate: body.priceDate,
+      prices: priceData,
+      granularity: TimeseriesGranularity.Hours
+    }
+
+    // check if Product exists
+    const productDoc = await getProductDoc({tcgplayerId: price.tcgplayerId})
+    if (!isProductDoc(productDoc)) {
+      const errMsg = `Product not found for tcgplayerId: ${price.tcgplayerId}`
+      throw new Error(errMsg)
+    }
+
+    // add Price
+    const numInserted = await insertPrices([price])
+
+    // success
+    if (numInserted === 1) {
+      res.status(201)
+      const body: TDataResBody<IPrice> = {
+        data: price,
+        message: PostPriceStatus.Success
+      }
+      res.send(body)
+
+    // error
+    } else {
+      res.status(500)
+      const body: TResBody = {
+        message: PostPriceStatus.Error
+      }
+      res.send(body)
+    }
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: `${PostPriceStatus.Error}: ${err}`
+    }
+    res.send(body)
+  }
+})
 
 /*
 DESC
@@ -146,12 +216,12 @@ app.get(GET_LATEST_PRICES_URL, async (req: any, res: any) => {
   try {
 
     // query Prices
-    const data = await getLatestPrices()
+    const latestPrices = await getLatestPrices()
 
     // return Prices
     res.status(200)
     const body: TDataResBody<{[tcgplayerId: number]: IDatedPriceData}> = {
-      data: Object.fromEntries(data),
+      data: Object.fromEntries(latestPrices),
       message: GetPricesStatus.Success
     }
     res.send(body)
@@ -170,41 +240,6 @@ app.get(GET_LATEST_PRICES_URL, async (req: any, res: any) => {
 // =======
 // product
 // =======
-
-/*
-DESC
-  Handle GET request for all Product documents
-RETURN
-  Response body with status codes and messages
-
-  Status Code
-    200: The Product documents were returned successfully
-    500: An error occurred
-*/
-app.get(GET_PRODUCTS_URL, async (req: any, res: any) => {
-
-  try {
-
-    // query Products
-    const data = await getProductDocs()
-
-    // return Products
-    res.status(200)
-    const body: TDataResBody<IProduct[]> = {
-      data: data,
-      message: GetProductsStatus.Success
-    }
-    res.send(body)
-
-  // error
-  } catch (err) {
-    res.status(500)
-    const body: TResBody = {
-      message: `${GetProductsStatus.Error}: ${err}`
-    }
-    res.send(body)
-  }
-})
 
 /*
 DESC
@@ -234,8 +269,8 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
   const tcgplayerId = data.tcgplayerId
 
   // check if product already exists (via tcgplayerId)
-  const query = await getProductDoc({tcgplayerId: tcgplayerId})
-  if (query instanceof Product) { 
+  const productDoc = await getProductDoc({tcgplayerId: tcgplayerId})
+  if (isProductDoc(productDoc)) { 
     res.status(202)
     const body: TProductPostResBody<undefined> = {
       tcgplayerId: data.tcgplayerId,
@@ -290,6 +325,41 @@ app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
     }
   }
   
+})
+
+/*
+DESC
+  Handle GET request for all Product documents
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The Product documents were returned successfully
+    500: An error occurred
+*/
+app.get(GET_PRODUCTS_URL, async (req: any, res: any) => {
+
+  try {
+
+    // query Products
+    const data = await getProductDocs()
+
+    // return Products
+    res.status(200)
+    const body: TDataResBody<IProduct[]> = {
+      data: data,
+      message: GetProductsStatus.Success
+    }
+    res.send(body)
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: `${GetProductsStatus.Error}: ${err}`
+    }
+    res.send(body)
+  }
 })
 
 

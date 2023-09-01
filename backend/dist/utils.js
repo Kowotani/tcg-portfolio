@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -123,7 +127,7 @@ function getIMHoldingsFromIHoldings(holdings) {
             const productDoc = productDocs.find((product) => {
                 return product.tcgplayerId === Number(holding.tcgplayerId);
             });
-            (0, common_1.assert)(productDoc instanceof Product, 'Product not found in getIMHoldingsFromIHoldings()');
+            (0, common_1.assert)(isProductDoc(productDoc), 'Product not found in getIMHoldingsFromIHoldings()');
             // create IMHolding
             return Object.assign(Object.assign({}, holding), { product: productDoc._id });
         });
@@ -146,9 +150,9 @@ function getIMPricesFromIPrices(prices) {
         const newPrices = prices.map((price) => {
             // find Product
             const productDoc = productDocs.find((product) => {
-                return product.tcgplayerId === price.tcgplayerId;
+                return product.tcgplayerId === Number(price.tcgplayerId);
             });
-            (0, common_1.assert)(productDoc instanceof Product, 'Product not found in getIMPricesFromIPrices()');
+            (0, common_1.assert)(isProductDoc(productDoc), 'Product not found in getIMPricesFromIPrices()');
             // create IMPrice
             return Object.assign(Object.assign({}, price), { product: productDoc._id });
         });

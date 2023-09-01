@@ -11,6 +11,10 @@ export declare enum GetPricesStatus {
     Success = "Successfully retrieved latest Prices",
     Error = "Error retrieving latest Prices"
 }
+export declare enum PostPriceStatus {
+    Success = "Successfully added Price",
+    Error = "Error adding Price"
+}
 export declare enum PostProductStatus {
     Added = "tcgplayerId added",
     AddedWithoutImage = "tcgplayerId added (without image)",
@@ -25,6 +29,7 @@ export declare const GET_PORTFOLIOS_URL = "/portfolios";
 export declare const UPDATE_PORTFOLIO_URL = "/portfolio";
 export declare const ADD_PRODUCT_URL = "/product";
 export declare const GET_PRODUCTS_URL = "/products";
+export declare const ADD_PRICE_URL = "/price";
 export declare const GET_LATEST_PRICES_URL = "/prices/latest";
 export declare type TResBody = {
     message: string;
@@ -38,6 +43,13 @@ export declare type TProductPostResBody<Type> = TDataResBody<Type> & {
 export declare type TPutPortfolioReqBody = {
     existingPortfolio: IPortfolio;
     newPortfolio: IPortfolio;
+};
+export declare type TPostPriceReqBody = {
+    marketPrice: number;
+    priceDate: Date;
+    tcgplayerId: number;
+    buylistMarketPrice?: number;
+    listedMedianPrice?: number;
 };
 export declare type TProductPostReqBody = {
     formData: IProduct;

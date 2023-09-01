@@ -110,7 +110,7 @@ export async function getIMHoldingsFromIHoldings(
       return product.tcgplayerId === Number(holding.tcgplayerId)
     })
     assert(
-      productDoc instanceof Product, 
+      isProductDoc(productDoc),
       'Product not found in getIMHoldingsFromIHoldings()'
     )
 
@@ -142,10 +142,10 @@ export async function getIMPricesFromIPrices(
 
     // find Product
     const productDoc = productDocs.find((product: IMProduct) => {
-      return product.tcgplayerId === price.tcgplayerId
+      return product.tcgplayerId === Number(price.tcgplayerId)
     })
     assert(
-      productDoc instanceof Product, 
+      isProductDoc(productDoc), 
       'Product not found in getIMPricesFromIPrices()'
     )
 

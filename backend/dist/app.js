@@ -18,6 +18,7 @@ const express_1 = __importDefault(require("express"));
 const mongoManager_1 = require("./mongo/mongoManager");
 const multer_1 = __importDefault(require("multer"));
 const s3Manager_1 = require("./aws/s3Manager");
+const utils_1 = require("./utils");
 const upload = (0, multer_1.default)();
 const app = (0, express_1.default)();
 const port = 3030;
@@ -108,9 +109,73 @@ app.put(common_1.UPDATE_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(vo
         res.send(body);
     }
 }));
-// =======
+// ======
 // prices
-// =======
+// ======
+/*
+DESC
+  Handle POST request to add a Price
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    201: The Price Was added successfully
+    500: An error occurred
+*/
+app.post(common_1.ADD_PRICE_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // create IPrice
+        const body = req.body;
+        let priceData = {
+            marketPrice: body.marketPrice
+        };
+        if (body.buylistMarketPrice) {
+            priceData['buylistMarketPrice'] = body.buylistMarketPrice;
+        }
+        if (body.listedMedianPrice) {
+            priceData['listedMedianPrice'] = body.listedMedianPrice;
+        }
+        const price = {
+            tcgplayerId: body.tcgplayerId,
+            priceDate: body.priceDate,
+            prices: priceData,
+            granularity: common_1.TimeseriesGranularity.Hours
+        };
+        // check if Product exists
+        const productDoc = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: price.tcgplayerId });
+        if (!(0, utils_1.isProductDoc)(productDoc)) {
+            const errMsg = `Product not found for tcgplayerId: ${price.tcgplayerId}`;
+            throw new Error(errMsg);
+        }
+        // add Price
+        const numInserted = yield (0, mongoManager_1.insertPrices)([price]);
+        // success
+        if (numInserted === 1) {
+            res.status(201);
+            const body = {
+                data: price,
+                message: common_1.PostPriceStatus.Success
+            };
+            res.send(body);
+            // error
+        }
+        else {
+            res.status(500);
+            const body = {
+                message: common_1.PostPriceStatus.Error
+            };
+            res.send(body);
+        }
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: `${common_1.PostPriceStatus.Error}: ${err}`
+        };
+        res.send(body);
+    }
+}));
 /*
 DESC
   Handle GET request for latest Prices of all Products
@@ -147,37 +212,6 @@ app.get(common_1.GET_LATEST_PRICES_URL, (req, res) => __awaiter(void 0, void 0, 
 // =======
 /*
 DESC
-  Handle GET request for all Product documents
-RETURN
-  Response body with status codes and messages
-
-  Status Code
-    200: The Product documents were returned successfully
-    500: An error occurred
-*/
-app.get(common_1.GET_PRODUCTS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // query Products
-        const data = yield (0, mongoManager_1.getProductDocs)();
-        // return Products
-        res.status(200);
-        const body = {
-            data: data,
-            message: common_1.GetProductsStatus.Success
-        };
-        res.send(body);
-        // error
-    }
-    catch (err) {
-        res.status(500);
-        const body = {
-            message: `${common_1.GetProductsStatus.Error}: ${err}`
-        };
-        res.send(body);
-    }
-}));
-/*
-DESC
   Handle POST request to add a Product
 INPUT
   Request body in multipart/form-data containing
@@ -202,8 +236,8 @@ app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0
     const data = body.formData;
     const tcgplayerId = data.tcgplayerId;
     // check if product already exists (via tcgplayerId)
-    const query = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: tcgplayerId });
-    if (query instanceof mongoManager_1.Product) {
+    const productDoc = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: tcgplayerId });
+    if ((0, utils_1.isProductDoc)(productDoc)) {
         res.status(202);
         const body = {
             tcgplayerId: data.tcgplayerId,
@@ -253,6 +287,37 @@ app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0
             };
             res.send(body);
         }
+    }
+}));
+/*
+DESC
+  Handle GET request for all Product documents
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The Product documents were returned successfully
+    500: An error occurred
+*/
+app.get(common_1.GET_PRODUCTS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // query Products
+        const data = yield (0, mongoManager_1.getProductDocs)();
+        // return Products
+        res.status(200);
+        const body = {
+            data: data,
+            message: common_1.GetProductsStatus.Success
+        };
+        res.send(body);
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: `${common_1.GetProductsStatus.Error}: ${err}`
+        };
+        res.send(body);
     }
 }));
 app.listen(port, () => {

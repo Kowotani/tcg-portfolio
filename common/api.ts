@@ -36,6 +36,15 @@ export enum GetPricesStatus {
   Error = 'Error retrieving latest Prices',
 }
 
+/*
+  Endpoint:   ADD_PRICE_URL
+  Type:       POST
+*/
+export enum PostPriceStatus {
+  Success = 'Successfully added Price',
+  Error = 'Error adding Price',
+}
+
 // -- product
 
 /*
@@ -72,7 +81,9 @@ export const ADD_PRODUCT_URL = '/product'
 export const GET_PRODUCTS_URL = '/products'
 
 // -- prices
+export const ADD_PRICE_URL = '/price'
 export const GET_LATEST_PRICES_URL = '/prices/latest'
+
 
 // =====
 // types
@@ -119,6 +130,21 @@ export type TProductPostResBody<Type> = TDataResBody<Type> & {
 export type TPutPortfolioReqBody = {
   existingPortfolio: IPortfolio,
   newPortfolio: IPortfolio
+}
+
+// -- price
+
+/*
+  Endpoint:   ADD_PRICE_URL
+  Type:       POST
+  Req / Res:  Request
+*/
+export type TPostPriceReqBody = {
+  marketPrice: number,
+  priceDate: Date,
+  tcgplayerId: number,
+  buylistMarketPrice?: number,
+  listedMedianPrice?: number
 }
 
 // -- product

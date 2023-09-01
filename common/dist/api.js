@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.GET_LATEST_PRICES_URL = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.UPDATE_PORTFOLIO_URL = exports.GET_PORTFOLIOS_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.GetPricesStatus = exports.PutPortfoliosStatus = exports.GetPortfoliosStatus = void 0;
+exports.GET_LATEST_PRICES_URL = exports.ADD_PRICE_URL = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.UPDATE_PORTFOLIO_URL = exports.GET_PORTFOLIOS_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PutPortfoliosStatus = exports.GetPortfoliosStatus = void 0;
 // =====
 // enums
 // =====
@@ -33,6 +33,15 @@ var GetPricesStatus;
     GetPricesStatus["Success"] = "Successfully retrieved latest Prices";
     GetPricesStatus["Error"] = "Error retrieving latest Prices";
 })(GetPricesStatus = exports.GetPricesStatus || (exports.GetPricesStatus = {}));
+/*
+  Endpoint:   ADD_PRICE_URL
+  Type:       POST
+*/
+var PostPriceStatus;
+(function (PostPriceStatus) {
+    PostPriceStatus["Success"] = "Successfully added Price";
+    PostPriceStatus["Error"] = "Error adding Price";
+})(PostPriceStatus = exports.PostPriceStatus || (exports.PostPriceStatus = {}));
 // -- product
 /*
   Endpoint:   ADD_PRODUCT_URL
@@ -64,4 +73,5 @@ exports.UPDATE_PORTFOLIO_URL = '/portfolio';
 exports.ADD_PRODUCT_URL = '/product';
 exports.GET_PRODUCTS_URL = '/products';
 // -- prices
+exports.ADD_PRICE_URL = '/price';
 exports.GET_LATEST_PRICES_URL = '/prices/latest';
