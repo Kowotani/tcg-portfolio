@@ -267,8 +267,10 @@ export async function setPortfolio(
   try {
 
     // check that userIds match
-    assert(existingPortfolio.userId === newPortfolio.userId,
-      `Mismatched userIds provided to setPortfolio(${existingPortfolio.userId}, ${newPortfolio.userId})`)
+    assert(
+      existingPortfolio.userId === newPortfolio.userId,
+      `Mismatched userIds provided to setPortfolio(${existingPortfolio.userId}, ${newPortfolio.userId})`
+    )
 
     // check that new Portfolio Holdings are valid
     const hasValidHoldings = await areValidHoldings(newPortfolio.holdings)
@@ -283,7 +285,10 @@ export async function setPortfolio(
       const errMsg = `Portfolio not found (${existingPortfolio.userId}, ${existingPortfolio.portfolioName})`
       throw new Error(errMsg)
     }
-    assert(isPortfolioDoc(portfolioDoc))
+    assert(
+      isPortfolioDoc(portfolioDoc),
+      'Existing portfolio not found in setPortfolio()'
+    )
 
     // create IMPortfolio for new Portfolio
     const newIMPortfolio = {
@@ -525,7 +530,10 @@ export async function setProductProperty(
       const errMsg = `Product not found for tcgplayerId: ${tcgplayerId}`
       throw new Error(errMsg)
     }
-    assert(isProductDoc(productDoc))
+    assert(
+      isProductDoc(productDoc),
+      'Product not found in setProductProperty'
+    )
 
     // update Product
     productDoc.set(key, value)

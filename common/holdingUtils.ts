@@ -143,7 +143,10 @@ export function getHoldingPurchaseQuantity(
   const value = _.sumBy(getHoldingPurchases(holding), (txn: ITransaction) => {
     return txn.quantity
   })
-  assert(value >= 0, 'getHoldingPurchaseQuantity() is not at least 0')
+  assert(
+    value >= 0, 
+    'getHoldingPurchaseQuantity() value is not at least 0'
+  )
   return value
 }
 
@@ -160,7 +163,10 @@ export function getHoldingQuantity(
 ): number {
   const value = getHoldingPurchaseQuantity(holding) 
     - getHoldingSaleQuantity(holding)
-  assert(value >= 0, 'getHoldingQuantity() is not at least 0')
+  assert(
+    value >= 0, 
+    'getHoldingQuantity() value is not at least 0'
+  )
   return value
 }
 
@@ -214,7 +220,10 @@ export function getHoldingSaleQuantity(
   const value = _.sumBy(getHoldingSales(holding), (txn: ITransaction) => {
     return txn.quantity
   })
-  assert(value >= 0, 'getHoldingSaleQuantity() is not at least 0')
+  assert(
+    value >= 0, 
+    'getHoldingSaleQuantity() value is not at least 0'
+  )
   return value
 }
 
@@ -238,7 +247,10 @@ export function getHoldingTotalCost(
   const value = _.sumBy(purchases, (txn: ITransaction) => {
     return txn.quantity * txn.price
   })
-  assert(value >= 0, 'getHoldingTotalCost() is not at least 0')
+  assert(
+    value >= 0, 
+    'getHoldingTotalCost() is not at least 0'
+  )
   return value
 }
 
@@ -279,7 +291,10 @@ export function getHoldingTotalRevenue(
   const value = _.sumBy(getHoldingSales(holding), (txn: ITransaction) => {
     return txn.quantity * txn.price
   })
-  assert(value >= 0, 'getHoldingTotalRev() is not at least 0')
+  assert(
+    value >= 0, 
+    'getHoldingTotalRev() is not at least 0'
+  )
   return value
 }
 

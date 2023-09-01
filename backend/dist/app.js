@@ -189,11 +189,11 @@ RETURN
 app.get(common_1.GET_LATEST_PRICES_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // query Prices
-        const data = yield (0, mongoManager_1.getLatestPrices)();
+        const latestPrices = yield (0, mongoManager_1.getLatestPrices)();
         // return Prices
         res.status(200);
         const body = {
-            data: Object.fromEntries(data),
+            data: Object.fromEntries(latestPrices),
             message: common_1.GetPricesStatus.Success
         };
         res.send(body);

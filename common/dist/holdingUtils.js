@@ -123,7 +123,7 @@ function getHoldingPurchaseQuantity(holding) {
     var value = _.sumBy(getHoldingPurchases(holding), function (txn) {
         return txn.quantity;
     });
-    (0, utils_1.assert)(value >= 0, 'getHoldingPurchaseQuantity() is not at least 0');
+    (0, utils_1.assert)(value >= 0, 'getHoldingPurchaseQuantity() value is not at least 0');
     return value;
 }
 exports.getHoldingPurchaseQuantity = getHoldingPurchaseQuantity;
@@ -138,7 +138,7 @@ RETURN
 function getHoldingQuantity(holding) {
     var value = getHoldingPurchaseQuantity(holding)
         - getHoldingSaleQuantity(holding);
-    (0, utils_1.assert)(value >= 0, 'getHoldingQuantity() is not at least 0');
+    (0, utils_1.assert)(value >= 0, 'getHoldingQuantity() value is not at least 0');
     return value;
 }
 exports.getHoldingQuantity = getHoldingQuantity;
@@ -187,7 +187,7 @@ function getHoldingSaleQuantity(holding) {
     var value = _.sumBy(getHoldingSales(holding), function (txn) {
         return txn.quantity;
     });
-    (0, utils_1.assert)(value >= 0, 'getHoldingSaleQuantity() is not at least 0');
+    (0, utils_1.assert)(value >= 0, 'getHoldingSaleQuantity() value is not at least 0');
     return value;
 }
 exports.getHoldingSaleQuantity = getHoldingSaleQuantity;

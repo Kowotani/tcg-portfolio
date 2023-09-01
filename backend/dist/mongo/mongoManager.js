@@ -241,7 +241,7 @@ function setPortfolio(existingPortfolio, newPortfolio) {
                 const errMsg = `Portfolio not found (${existingPortfolio.userId}, ${existingPortfolio.portfolioName})`;
                 throw new Error(errMsg);
             }
-            (0, common_1.assert)((0, utils_1.isPortfolioDoc)(portfolioDoc));
+            (0, common_1.assert)((0, utils_1.isPortfolioDoc)(portfolioDoc), 'Existing portfolio not found in setPortfolio()');
             // create IMPortfolio for new Portfolio
             const newIMPortfolio = Object.assign(Object.assign({}, newPortfolio), { holdings: yield (0, utils_1.getIMHoldingsFromIHoldings)(newPortfolio.holdings) });
             // overwrite existing Portfolio with new Portfolio
@@ -437,7 +437,7 @@ function setProductProperty(tcgplayerId, key, value) {
                 const errMsg = `Product not found for tcgplayerId: ${tcgplayerId}`;
                 throw new Error(errMsg);
             }
-            (0, common_1.assert)((0, utils_1.isProductDoc)(productDoc));
+            (0, common_1.assert)((0, utils_1.isProductDoc)(productDoc), 'Product not found in setProductProperty');
             // update Product
             productDoc.set(key, value);
             yield productDoc.save();
