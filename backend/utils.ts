@@ -6,13 +6,18 @@ import {
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
 import { IMHolding } from './mongo/models/holdingSchema'
-import { IMPrice } from './mongo/models/priceSchema'
+import { IMPortfolio, portfolioSchema } from './mongo/models/portfolioSchema'
+import { IMPrice, priceSchema } from './mongo/models/priceSchema'
 import { IMProduct, productSchema } from './mongo/models/productSchema'
 import { getProductDocs } from './mongo/mongoManager'
 
 
+
 // models
+const Portfolio = mongoose.model('Portfolio', portfolioSchema)
+const Price = mongoose.model('Price', priceSchema)
 const Product = mongoose.model('Product', productSchema)
+
 
 
 // ==========
@@ -152,4 +157,48 @@ export async function getIMPricesFromIPrices(
   })
 
   return newPrices
+}
+
+
+// ===========
+// type guards
+// ===========
+
+/*
+DESC
+  Returns whether or not the input is a Portfolio doc
+INPUT
+  arg: An object that might be a Portfolio doc
+RETURN
+  TRUE if the input is a Portfolio doc, FALSE otherwise
+*/
+export function isPortfolioDoc(arg: any): arg is IMPortfolio {
+  return arg
+    && arg instanceof Portfolio
+}
+
+/*
+DESC
+  Returns whether or not the input is a Price doc
+INPUT
+  arg: An object that might be a Price doc
+RETURN
+  TRUE if the input is a Price doc, FALSE otherwise
+*/
+export function isPriceDoc(arg: any): arg is IMPrice {
+  return arg
+    && arg instanceof Price
+}
+
+/*
+DESC
+  Returns whether or not the input is a Product doc
+INPUT
+  arg: An object that might be a Product doc
+RETURN
+  TRUE if the input is a Product doc, FALSE otherwise
+*/
+export function isProductDoc(arg: any): arg is IMProduct {
+  return arg
+    && arg instanceof Product
 }

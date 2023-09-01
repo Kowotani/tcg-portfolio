@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -35,13 +31,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getIMPricesFromIPrices = exports.getIMHoldingsFromIHoldings = exports.hasValidTransactions = exports.areValidHoldings = void 0;
+exports.isProductDoc = exports.isPriceDoc = exports.isPortfolioDoc = exports.getIMPricesFromIPrices = exports.getIMHoldingsFromIHoldings = exports.hasValidTransactions = exports.areValidHoldings = void 0;
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
 const mongoose_1 = __importDefault(require("mongoose"));
+const portfolioSchema_1 = require("./mongo/models/portfolioSchema");
+const priceSchema_1 = require("./mongo/models/priceSchema");
 const productSchema_1 = require("./mongo/models/productSchema");
 const mongoManager_1 = require("./mongo/mongoManager");
 // models
+const Portfolio = mongoose_1.default.model('Portfolio', portfolioSchema_1.portfolioSchema);
+const Price = mongoose_1.default.model('Price', priceSchema_1.priceSchema);
 const Product = mongoose_1.default.model('Product', productSchema_1.productSchema);
 // ==========
 // validators
@@ -156,3 +156,45 @@ function getIMPricesFromIPrices(prices) {
     });
 }
 exports.getIMPricesFromIPrices = getIMPricesFromIPrices;
+// ===========
+// type guards
+// ===========
+/*
+DESC
+  Returns whether or not the input is a Portfolio doc
+INPUT
+  arg: An object that might be a Portfolio doc
+RETURN
+  TRUE if the input is a Portfolio doc, FALSE otherwise
+*/
+function isPortfolioDoc(arg) {
+    return arg
+        && arg instanceof Portfolio;
+}
+exports.isPortfolioDoc = isPortfolioDoc;
+/*
+DESC
+  Returns whether or not the input is a Price doc
+INPUT
+  arg: An object that might be a Price doc
+RETURN
+  TRUE if the input is a Price doc, FALSE otherwise
+*/
+function isPriceDoc(arg) {
+    return arg
+        && arg instanceof Price;
+}
+exports.isPriceDoc = isPriceDoc;
+/*
+DESC
+  Returns whether or not the input is a Product doc
+INPUT
+  arg: An object that might be a Product doc
+RETURN
+  TRUE if the input is a Product doc, FALSE otherwise
+*/
+function isProductDoc(arg) {
+    return arg
+        && arg instanceof Product;
+}
+exports.isProductDoc = isProductDoc;
