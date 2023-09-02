@@ -11,12 +11,14 @@ import {
   VStack, 
 } from '@chakra-ui/react';
 import { 
-  IProduct, ProductLanguage, 
-  ProductType, ProductSubtype, TCG, TCGToProductType, 
+  IProduct, ProductLanguage, ProductType, ProductSubtype, TCG, 
+  TCGToProductType, 
   
   getProductSubtypes, isASCII,
 
-  ADD_PRODUCT_URL, PostProductStatus, TProductPostReqBody
+  PostPriceStatus, PostProductStatus, TPostPriceReqBody, TProductPostReqBody, 
+
+  ADD_PRICE_URL, ADD_PRODUCT_URL
 } from 'common';
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField';
@@ -247,6 +249,7 @@ export const AddProductForm = () => {
         'Content-Type': 'multipart/form-data',
       },
     })
+
     // success
     .then(res => {
 
@@ -259,7 +262,7 @@ export const AddProductForm = () => {
         // added with image
         if (resData.message === PostProductStatus.Added) {
           toast({
-            title: 'Success!',
+            title: 'Product Added with Image',
             description: `${PostProductStatus.Added}: ${resData.tcgplayerId}`,
             status: 'success',
             isClosable: true,
@@ -268,17 +271,66 @@ export const AddProductForm = () => {
         // added without image
         } else if (resData.message === PostProductStatus.AddedWithoutImage) {
           toast({
-            title: 'Partial Success',
+            title: 'Product Added without Image',
             description: `${PostProductStatus.AddedWithoutImage}: ${resData.tcgplayerId}`,
             status: 'info',
             isClosable: true,
           })        
         }
 
+        // insert MSRP into Prices if it exists
+        if (body.formData.msrp) {
+
+          // create POST body
+          const priceBody: TPostPriceReqBody = {
+            tcgplayerId: body.formData.tcgplayerId,
+            priceDate: body.formData.releaseDate,
+            marketPrice: body.formData.msrp
+          }
+
+          // submit
+          axios({
+            method: 'post',
+            url: ADD_PRICE_URL,
+            data: priceBody,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+
+          // success
+          .then(res => {
+
+            // TODO: type check
+            const resData = res.data.data
+            
+            toast({
+              title: 'MSRP Price Loaded',
+              description: `${PostPriceStatus.Success}: ${resData.prices.marketPrice}`,
+              status: 'success',
+              isClosable: true,
+            })
+          })
+
+          // error
+          .catch(res => {
+
+            // TODO: type check
+            const resData = res.data
+
+            toast({
+              title: 'Error Loading MSRP',
+              description: `${res.statusText}: ${resData}`,
+              status: 'error',
+              isClosable: true,
+            })
+          })
+        }
+
       // product already exists
       } else if (res.status === 202) {
         toast({
-          title: 'Notice',
+          title: 'Product Already Exists',
           description: `${PostProductStatus.AlreadyExists}: ${resData.tcgplayerId}`,
           status: 'warning',
           isClosable: true,
@@ -293,7 +345,7 @@ export const AddProductForm = () => {
       const resData = res.data
                 
       toast({
-        title: 'Error!',
+        title: 'Error Adding Product',
         description: `${res.statusText}: ${resData}`,
         status: 'error',
         isClosable: true,
