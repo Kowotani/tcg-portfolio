@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext } from 'react';
+import { PropsWithChildren, useContext } from 'react'
 import { 
   Tab,
   TabList,
@@ -6,13 +6,13 @@ import {
   TabPanels,
   Tabs,
 } from '@chakra-ui/react';
-import { AddProductForm } from './AddProductForm';
-import { SideBarNavContext } from '../state/SideBarNavContext';
-import { ISideBarNav, SideBarNav } from '../utils';
-
+import { AddProductForm } from './AddProductForm'
+import { PortfolioPanelManager } from './PortfolioPanelManager'
+import { SideBarNavContext } from '../state/SideBarNavContext'
+import { ISideBarNav, ISideBarNavContext, SideBarNav } from '../utils'
 
 // ==============
-// sub-components
+// Sub Components
 // ==============
 
 type TNavTabProps = {
@@ -21,7 +21,7 @@ type TNavTabProps = {
 
 const NavTab = (props: PropsWithChildren<TNavTabProps>) => {
 
-  const { setSideBarNav } = useContext(SideBarNavContext)
+  const { setSideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
 
   return (
     <Tab
@@ -34,7 +34,7 @@ const NavTab = (props: PropsWithChildren<TNavTabProps>) => {
 
 
 // ==============
-// main component
+// Main Component
 // ==============
 
 export const SideBar = () => {
@@ -54,7 +54,9 @@ export const SideBar = () => {
 
         <TabPanels>
           <TabPanel>Home</TabPanel>
-          <TabPanel>Portfolio</TabPanel>          
+          <TabPanel>
+            <PortfolioPanelManager />
+          </TabPanel>          
           <TabPanel>
             <AddProductForm />
           </TabPanel>
