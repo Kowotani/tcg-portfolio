@@ -6,7 +6,7 @@ import {
   PostProductStatus, PutPortfoliosStatus,
   
   
-  TDataResBody, TPostPriceReqBody, TPutPortfolioReqBody, TProductPostReqBody, 
+  TDataResBody, TPostPriceReqBody, TPutPortfolioReqBody, TPostProductReqBody, 
   TProductPostResBody, TResBody, 
 
   ADD_PRICE_URL, ADD_PRODUCT_URL, GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, 
@@ -264,7 +264,7 @@ RETURN
 app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
 
   // variables
-  const body: TProductPostReqBody = req.body
+  const body: TPostProductReqBody = req.body
   const data = body.formData
   const tcgplayerId = data.tcgplayerId
 

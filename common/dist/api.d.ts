@@ -51,7 +51,7 @@ export declare type TPostPriceReqBody = {
     buylistMarketPrice?: number;
     listedMedianPrice?: number;
 };
-export declare type TProductPostReqBody = {
+export declare type TPostProductReqBody = {
     formData: IProduct;
     imageUrl?: string;
 };

@@ -154,7 +154,7 @@ export type TPostPriceReqBody = {
   Type:       POST
   Req / Res:  Request
 */
-export type TProductPostReqBody = {
+export type TPostProductReqBody = {
   formData: IProduct,
   imageUrl?: string
 }
