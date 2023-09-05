@@ -12,12 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// imports
+const s3Manager_1 = require("./aws/s3Manager");
 const common_1 = require("common");
 const express_1 = __importDefault(require("express"));
 const mongoManager_1 = require("./mongo/mongoManager");
 const multer_1 = __importDefault(require("multer"));
-const s3Manager_1 = require("./aws/s3Manager");
+const scrapeManager_1 = require("./scraper/scrapeManager");
 const utils_1 = require("./utils");
 const upload = (0, multer_1.default)();
 const app = (0, express_1.default)();
@@ -114,12 +114,60 @@ app.put(common_1.UPDATE_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(vo
 // ======
 /*
 DESC
+  Handle POST request to load the latest Price for a tcgplayerId
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    201: The Price was loaded successfully
+    500: An error occurred
+*/
+app.post(common_1.ADD_LATEST_PRICE_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // get tcgplayerId
+        const body = req.body;
+        const tcgplayerId = body.tcgplayerId;
+        // check if Product exists
+        const productDoc = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: tcgplayerId });
+        if (!(0, utils_1.isProductDoc)(productDoc)) {
+            const errMsg = `Product not found for tcgplayerId: ${tcgplayerId}`;
+            throw new Error(errMsg);
+        }
+        // load latest Price
+        const isLoaded = yield (0, scrapeManager_1.loadPrice)(tcgplayerId);
+        if (isLoaded) {
+            res.status(201);
+            const body = {
+                message: common_1.PostLatestPriceStatus.Success
+            };
+            res.send(body);
+            // error
+        }
+        else {
+            res.status(500);
+            const body = {
+                message: common_1.PostLatestPriceStatus.Error
+            };
+            res.send(body);
+        }
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: `${common_1.PostPriceStatus.Error}: ${err}`
+        };
+        res.send(body);
+    }
+}));
+/*
+DESC
   Handle POST request to add a Price
 RETURN
   Response body with status codes and messages
 
   Status Code
-    201: The Price Was added successfully
+    201: The Price was added successfully
     500: An error occurred
 */
 app.post(common_1.ADD_PRICE_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {

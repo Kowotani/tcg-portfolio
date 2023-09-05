@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState, } from 'react';
-import axios from 'axios';
+import { useContext, useEffect, useState, } from 'react'
+import axios from 'axios'
 import { 
   Button,
   Image,
@@ -9,21 +9,22 @@ import {
   Select,
   useToast,
   VStack, 
-} from '@chakra-ui/react';
+} from '@chakra-ui/react'
 import { 
   IProduct, ProductLanguage, ProductType, ProductSubtype, TCG, 
   TCGToProductType, 
   
   getProductSubtypes, isASCII,
 
-  PostPriceStatus, PostProductStatus, TPostPriceReqBody, TProductPostReqBody, 
+  PostLatestPriceStatus, PostPriceStatus, PostProductStatus, 
+  TPostLatestPriceReqBody, TPostPriceReqBody, TPostProductReqBody, 
 
-  ADD_PRICE_URL, ADD_PRODUCT_URL
+  ADD_LATEST_PRICE_URL, ADD_PRICE_URL, ADD_PRODUCT_URL
 } from 'common';
 import { Form, Formik } from 'formik'
-import { InputErrorWrapper } from './InputField';
-import { SideBarNavContext } from '../state/SideBarNavContext';
-import { ISideBarNavContext, SideBarNav } from '../utils';
+import { InputErrorWrapper } from './InputField'
+import { SideBarNavContext } from '../state/SideBarNavContext'
+import { ISideBarNavContext, SideBarNav } from '../utils'
 
 
 // ==============
@@ -56,7 +57,7 @@ export const AddProductForm = () => {
     errorMessage?: string,
   }>({
     tcgPlayerId: undefined,
-  });
+  })
 
   // Name state
   const [ nameState, setNameState ] = useState<{
@@ -65,7 +66,7 @@ export const AddProductForm = () => {
     errorMessage?: string,
   }>({
     name: '',
-  });
+  })
 
   // TCG state
   const [ TCGState, setTCGState ] = useState<{
@@ -74,7 +75,7 @@ export const AddProductForm = () => {
     errorMessage?: string,
   }>({
     tcg: '',
-  });
+  })
 
   // ProductType state
   const [ productTypeState, setProductTypeState ] = useState<{
@@ -85,7 +86,7 @@ export const AddProductForm = () => {
     productType: '',
     isDisabled: true,
     values: [],
-  });
+  })
 
   // ProductSubtype state
   const [ productSubtypeState, setProductSubtypeState ] = useState<{
@@ -96,7 +97,7 @@ export const AddProductForm = () => {
     productSubtype: '',
     isDisabled: true,
     values: [],
-  });
+  })
 
   // Release Date state
   const [ releaseDateState, setReleaseDateState ] = useState<{
@@ -105,7 +106,7 @@ export const AddProductForm = () => {
     errorMessage?: string,
   }>({
     releaseDate: undefined,
-  });
+  })
 
   // Set Code state
   const [ setCodeState, setSetCodeState ] = useState<{
@@ -115,19 +116,19 @@ export const AddProductForm = () => {
   }>({
     setCode: '',
     isInvalid: false,
-  });
+  })
 
   // Language state
   const [ languageState, setLanguageState ] = useState<{
     language: ProductLanguage,
   }>({
     language: LANGUAGE_SELECT_DEFAULT,
-  });
+  })
 
   // MSRP state
   const [ msrpState, setMsrpState ] = useState<{
     msrp?: number,
-  }>({});
+  }>({})
 
   // Image URL state
   const [ imageUrlState, setImageURLState ] = useState<{
@@ -137,7 +138,10 @@ export const AddProductForm = () => {
   }>({
     imageUrl: '',
     isInvalid: false,
-  });
+  })
+
+  // load latest price loading state
+  const [ isLoadingLatestPrice, setIsLoadingLatestPrice] = useState(false)
 
   // SideBar context
   const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
@@ -231,7 +235,7 @@ export const AddProductForm = () => {
   function handleFormOnSubmit(): void {
 
     // create POST body         
-    let body: TProductPostReqBody = {
+    let body: TPostProductReqBody = {
       formData: getPostFormData(),
     }
 
@@ -501,6 +505,59 @@ export const AddProductForm = () => {
         isInvalid: false 
       })
     }
+  }
+
+  // -----------------
+  // load latest price
+  // -----------------
+
+  function handleLoadLatestPriceOnClick(tcgplayerId: number) {
+
+    // set loading state
+    setIsLoadingLatestPrice(true)
+
+    // create body
+    const body: TPostLatestPriceReqBody = {
+      tcgplayerId: tcgplayerId
+    }
+
+    // submit
+    axios({
+      method: 'post',
+      url: ADD_LATEST_PRICE_URL,
+      data: body,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+
+    // success
+    .then(res => {
+      
+      toast({
+        title: 'Latest Price Loaded',
+        description: `${PostLatestPriceStatus.Success}`,
+        status: 'success',
+        isClosable: true,
+      })
+    })
+
+    // error
+    .catch(res => {
+
+      // TODO: type check
+      const resData = res.data
+
+      toast({
+        title: 'Error Loading Latest Price',
+        description: `${res.statusText}: ${resData}`,
+        status: 'error',
+        isClosable: true,
+      })
+    })
+
+    // unset loading state
+    setIsLoadingLatestPrice(false)
   }
 
   /*
@@ -796,21 +853,33 @@ export const AddProductForm = () => {
           }
 
         </VStack>
-
-        <Button
-          colorScheme='teal'
-          type='submit'
-          isDisabled={
-            (TCGPlayerIdState.isInvalid ?? true)
-            || (nameState.isInvalid ?? true)
-            || (TCGState.isInvalid ?? true)
-            || (releaseDateState.isInvalid ?? true)
-            || (setCodeState.isInvalid ?? true)
-            || (imageUrlState.isInvalid ?? true)
-          }
-        >
-          Submit
-        </Button>
+        
+        <VStack spacing={4}>
+          <Button
+            colorScheme='teal'
+            type='submit'
+            isDisabled={
+              (TCGPlayerIdState.isInvalid ?? true)
+              || (nameState.isInvalid ?? true)
+              || (TCGState.isInvalid ?? true)
+              || (releaseDateState.isInvalid ?? true)
+              || (setCodeState.isInvalid ?? true)
+              || (imageUrlState.isInvalid ?? true)
+            }
+          >
+            Submit
+          </Button>
+          <Button
+            colorScheme='purple'
+            onClick={() => handleLoadLatestPriceOnClick(
+              Number(TCGPlayerIdState.tcgPlayerId)
+            )}
+            isDisabled={TCGPlayerIdState.isInvalid ?? true}
+            isLoading={isLoadingLatestPrice}
+          >
+            Load Latest Price
+          </Button>        
+        </VStack>
       </Form>
     </Formik>
   )

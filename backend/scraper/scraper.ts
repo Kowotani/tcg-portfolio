@@ -70,7 +70,6 @@ export async function scrape(ids: number[]): Promise<Map<number, IPriceData>> {
 
         return scrapedText
       })
-      console.log(scrapedTexts)
       
       // parse scraped text
       let data: {[text: string]: number} = {}

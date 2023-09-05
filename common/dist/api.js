@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.GET_LATEST_PRICES_URL = exports.ADD_PRICE_URL = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.UPDATE_PORTFOLIO_URL = exports.GET_PORTFOLIOS_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PutPortfoliosStatus = exports.GetPortfoliosStatus = void 0;
+exports.GET_LATEST_PRICES_URL = exports.ADD_PRICE_URL = exports.ADD_LATEST_PRICE_URL = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.UPDATE_PORTFOLIO_URL = exports.GET_PORTFOLIOS_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.PostLatestPriceStatus = exports.GetPricesStatus = exports.PutPortfoliosStatus = exports.GetPortfoliosStatus = void 0;
 // =====
 // enums
 // =====
@@ -33,6 +33,15 @@ var GetPricesStatus;
     GetPricesStatus["Success"] = "Successfully retrieved latest Prices";
     GetPricesStatus["Error"] = "Error retrieving latest Prices";
 })(GetPricesStatus = exports.GetPricesStatus || (exports.GetPricesStatus = {}));
+/*
+  Endpoint:   ADD_LATEST_PRICE_URL
+  Type:       POST
+*/
+var PostLatestPriceStatus;
+(function (PostLatestPriceStatus) {
+    PostLatestPriceStatus["Success"] = "Successfully loaded latest Price";
+    PostLatestPriceStatus["Error"] = "Error loading latest Price";
+})(PostLatestPriceStatus = exports.PostLatestPriceStatus || (exports.PostLatestPriceStatus = {}));
 /*
   Endpoint:   ADD_PRICE_URL
   Type:       POST
@@ -73,5 +82,6 @@ exports.UPDATE_PORTFOLIO_URL = '/portfolio';
 exports.ADD_PRODUCT_URL = '/product';
 exports.GET_PRODUCTS_URL = '/products';
 // -- prices
+exports.ADD_LATEST_PRICE_URL = '/price/latest';
 exports.ADD_PRICE_URL = '/price';
 exports.GET_LATEST_PRICES_URL = '/prices/latest';

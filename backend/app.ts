@@ -1,24 +1,25 @@
-// imports
+import { loadImageToS3 } from './aws/s3Manager'
 import { 
   IDatedPriceData, IPrice, IPriceData, IProduct, TimeseriesGranularity,
 
-  GetPortfoliosStatus, GetPricesStatus, GetProductsStatus, PostPriceStatus, 
-  PostProductStatus, PutPortfoliosStatus,
+  GetPortfoliosStatus, GetPricesStatus, GetProductsStatus, 
+  PostLatestPriceStatus, PostPriceStatus, PostProductStatus, 
+  PutPortfoliosStatus,
   
   
-  TDataResBody, TPostPriceReqBody, TPutPortfolioReqBody, TPostProductReqBody, 
-  TProductPostResBody, TResBody, 
+  TDataResBody, TPostLatestPriceReqBody, TPostPriceReqBody, 
+  TPutPortfolioReqBody, TPostProductReqBody, TProductPostResBody, TResBody, 
 
-  ADD_PRICE_URL, ADD_PRODUCT_URL, GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, 
-  GET_PRODUCTS_URL, UPDATE_PORTFOLIO_URL
+  ADD_LATEST_PRICE_URL, ADD_PRICE_URL, ADD_PRODUCT_URL, GET_LATEST_PRICES_URL, 
+  GET_PORTFOLIOS_URL, GET_PRODUCTS_URL, UPDATE_PORTFOLIO_URL
 } from 'common'
 import express from 'express'
 import { 
-  getLatestPrices, getPortfolios, getProductDoc, getProductDocs, insertPrices, insertProducts,
-  setPortfolio
+  getLatestPrices, getPortfolios, getProductDoc, getProductDocs, insertPrices, 
+  insertProducts, setPortfolio
 } from './mongo/mongoManager'
 import multer from 'multer'
-import { loadImageToS3 } from './aws/s3Manager'
+import { loadPrice } from './scraper/scrapeManager'
 import { isProductDoc } from './utils'
 
 const upload = multer()
@@ -133,12 +134,67 @@ app.put(UPDATE_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
 
 /*
 DESC
+  Handle POST request to load the latest Price for a tcgplayerId
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    201: The Price was loaded successfully
+    500: An error occurred
+*/
+app.post(ADD_LATEST_PRICE_URL, upload.none(), async (req: any, res: any) => {
+
+  try {
+
+    // get tcgplayerId
+    const body: TPostLatestPriceReqBody = req.body
+    const tcgplayerId = body.tcgplayerId
+
+    // check if Product exists
+    const productDoc = await getProductDoc({tcgplayerId: tcgplayerId})
+    if (!isProductDoc(productDoc)) {
+      const errMsg = `Product not found for tcgplayerId: ${tcgplayerId}`
+      throw new Error(errMsg)
+    }
+
+    // load latest Price
+    const isLoaded = await loadPrice(tcgplayerId)
+    if (isLoaded) {
+      res.status(201)
+      const body: TResBody = {
+        message: PostLatestPriceStatus.Success
+      }
+      res.send(body)
+
+    // error
+    } else {
+      res.status(500)
+      const body: TResBody = {
+        message: PostLatestPriceStatus.Error
+      }
+      res.send(body)
+    }
+
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: `${PostPriceStatus.Error}: ${err}`
+    }
+    res.send(body)
+  }
+
+})
+
+/*
+DESC
   Handle POST request to add a Price
 RETURN
   Response body with status codes and messages
 
   Status Code
-    201: The Price Was added successfully
+    201: The Price was added successfully
     500: An error occurred
 */
 app.post(ADD_PRICE_URL, upload.none(), async (req: any, res: any) => {

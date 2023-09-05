@@ -37,6 +37,15 @@ export enum GetPricesStatus {
 }
 
 /*
+  Endpoint:   ADD_LATEST_PRICE_URL
+  Type:       POST
+*/
+export enum PostLatestPriceStatus {
+  Success = 'Successfully loaded latest Price',
+  Error = 'Error loading latest Price',
+}
+
+/*
   Endpoint:   ADD_PRICE_URL
   Type:       POST
 */
@@ -81,6 +90,7 @@ export const ADD_PRODUCT_URL = '/product'
 export const GET_PRODUCTS_URL = '/products'
 
 // -- prices
+export const ADD_LATEST_PRICE_URL = '/price/latest'
 export const ADD_PRICE_URL = '/price'
 export const GET_LATEST_PRICES_URL = '/prices/latest'
 
@@ -133,6 +143,15 @@ export type TPutPortfolioReqBody = {
 }
 
 // -- price
+
+/*
+  Endpoint:   ADD_LATEST_PRICE_URL
+  Type:       POST
+  Req / Res:  Request
+*/
+export type TPostLatestPriceReqBody = {
+  tcgplayerId: number
+}
 
 /*
   Endpoint:   ADD_PRICE_URL

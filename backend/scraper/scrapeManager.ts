@@ -20,7 +20,6 @@ export async function loadPrice(tcgplayerId: number): Promise<boolean> {
 
   // scrape price data
   const scrapedPrices = await scrape([tcgplayerId])
-  console.log(scrapedPrices)
   const priceData = scrapedPrices.get(tcgplayerId)
 
   // check if data was retrieved
@@ -40,7 +39,6 @@ export async function loadPrice(tcgplayerId: number): Promise<boolean> {
     prices: priceData,
     granularity: TimeseriesGranularity.Hours
   }
-  console.log(price)
 
   // load price
   const numInserted = await insertPrices([price])
@@ -126,8 +124,8 @@ async function main() {
   //   : `Could not insert price for tcgplayerId: ${tcgplayerId}`
   // console.log(res)
 
-  const numInserted = await loadPrices()
-  console.log(`Inserted ${numInserted} docs`)
+  // const numInserted = await loadPrices()
+  // console.log(`Inserted ${numInserted} docs`)
 }
 
 main()

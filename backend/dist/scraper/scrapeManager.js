@@ -46,7 +46,6 @@ function loadPrice(tcgplayerId) {
             prices: priceData,
             granularity: common_1.TimeseriesGranularity.Hours
         };
-        console.log(price);
         // load price
         const numInserted = yield (0, mongoManager_1.insertPrices)([price]);
         return numInserted === 1;
@@ -117,8 +116,8 @@ function main() {
         //   ? `Inserted price for tcgplayerId: ${tcgplayerId}`
         //   : `Could not insert price for tcgplayerId: ${tcgplayerId}`
         // console.log(res)
-        const numInserted = yield loadPrices();
-        console.log(`Inserted ${numInserted} docs`);
+        // const numInserted = await loadPrices()
+        // console.log(`Inserted ${numInserted} docs`)
     });
 }
 main()
