@@ -1,12 +1,14 @@
 import { IHolding, IPopulatedHolding, IPortfolio, IPopulatedPortfolio, IPriceData } from './dataModels';
 export declare function getIPortfoliosFromIPopulatedPortfolios(populatedPortfolios: IPopulatedPortfolio[]): IPortfolio[];
 export declare function getPortfolioHoldings(portfolio: IPortfolio | IPopulatedPortfolio): IHolding[] | IPopulatedHolding[];
+export declare function getAggPortfolioMarketValue(portfolios: IPortfolio[] | IPopulatedPortfolio[], prices: Map<number, IPriceData>): number;
+export declare function getAggPortfolioTotalCost(portfolios: IPortfolio[] | IPopulatedPortfolio[]): number | undefined;
 export declare function getPortfolioMarketValue(portfolio: IPortfolio | IPopulatedPortfolio, prices: Map<number, IPriceData>): number;
 export declare function getPortfolioPercentPnl(portfolio: IPortfolio | IPopulatedPortfolio, prices: Map<number, IPriceData>): number | undefined;
 export declare function getPortfolioPurchaseQuantity(portfolio: IPortfolio | IPopulatedPortfolio): number;
 export declare function getPortfolioRealizedPnl(portfolio: IPortfolio | IPopulatedPortfolio): number | undefined;
 export declare function getPortfolioSaleQuantity(portfolio: IPortfolio | IPopulatedPortfolio): number;
-export declare function getPortfolioTotalCost(portfolio: IPortfolio | IPopulatedPortfolio): number;
+export declare function getPortfolioTotalCost(portfolio: IPortfolio | IPopulatedPortfolio): number | undefined;
 export declare function getPortfolioTotalPnl(portfolio: IPortfolio | IPopulatedPortfolio, prices: Map<number, IPriceData>): number | undefined;
 export declare function getPortfolioTotalRevenue(portfolio: IPortfolio | IPopulatedPortfolio): number;
 export declare function getPortfolioUnrealizedPnl(portfolio: IPortfolio | IPopulatedPortfolio, prices: Map<number, IPriceData>): number | undefined;

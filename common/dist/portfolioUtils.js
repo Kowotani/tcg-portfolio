@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getPortfolioUnrealizedPnl = exports.getPortfolioTotalRevenue = exports.getPortfolioTotalPnl = exports.getPortfolioTotalCost = exports.getPortfolioSaleQuantity = exports.getPortfolioRealizedPnl = exports.getPortfolioPurchaseQuantity = exports.getPortfolioPercentPnl = exports.getPortfolioMarketValue = exports.getPortfolioHoldings = exports.getIPortfoliosFromIPopulatedPortfolios = void 0;
+exports.getPortfolioUnrealizedPnl = exports.getPortfolioTotalRevenue = exports.getPortfolioTotalPnl = exports.getPortfolioTotalCost = exports.getPortfolioSaleQuantity = exports.getPortfolioRealizedPnl = exports.getPortfolioPurchaseQuantity = exports.getPortfolioPercentPnl = exports.getPortfolioMarketValue = exports.getAggPortfolioTotalCost = exports.getAggPortfolioMarketValue = exports.getPortfolioHoldings = exports.getIPortfoliosFromIPopulatedPortfolios = void 0;
 var _ = require("lodash");
 var utils_1 = require("./utils");
 var holdingUtils_1 = require("./holdingUtils");
@@ -52,13 +52,51 @@ exports.getPortfolioHoldings = getPortfolioHoldings;
 // ==================
 /*
 DESC
-  Returns the market value of the input IPortfolio based on the input price
+  Returns the aggregate market value of the input IPortfolio[] based on the
+  input prices
+INPUT
+  portfolios: An IPortfolio[]
+  prices: A Map<number, IPriceData> where the key is a tcgplayerId
+RETURN
+  The aggregate market value of the Portfolios
+*/
+function getAggPortfolioMarketValue(portfolios, prices) {
+    var marketValues = portfolios.map(function (portfolio) {
+        return getPortfolioMarketValue(portfolio, prices);
+    });
+    return _.sum(marketValues);
+}
+exports.getAggPortfolioMarketValue = getAggPortfolioMarketValue;
+/*
+DESC
+  Returns the total purchase cost of the input IPortfolio[]. This value
+  should never be negative
+INPUT
+  portfolios: An IPortfolio[]
+RETURN
+  The total purchase cost from the input IPortfolio, or undefined if every
+  Portfolio as undefined total cost
+*/
+function getAggPortfolioTotalCost(portfolios) {
+    var totalCosts = portfolios.map(function (portfolio) {
+        return getPortfolioTotalCost(portfolio);
+    });
+    if (_.every(totalCosts, function (el) { return el === undefined; })) {
+        return undefined;
+    }
+    var value = _.sum(totalCosts);
+    (0, utils_1.assert)(value >= 0, 'getAggPortfolioTotalCost() is not at least 0');
+    return value;
+}
+exports.getAggPortfolioTotalCost = getAggPortfolioTotalCost;
+/*
+DESC
+  Returns the market value of the input IPortfolio based on the input prices
 INPUT
   portfolio: An IPortfolio
   prices: A Map<number, IPriceData> where the key is a tcgplayerId
 RETURN
-  The market value of the Portfolio, or undefined if both getPortfolioRealizedPnl()
-  and getPortfolioUnrealizedPnl() are undefined
+  The market value of the Portfolio
 */
 function getPortfolioMarketValue(portfolio, prices) {
     var holdings = getPortfolioHoldings(portfolio);

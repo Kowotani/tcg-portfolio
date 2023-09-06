@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import { 
   IHolding, IPopulatedHolding, IPortfolio, IPopulatedPortfolio, IPriceData
 } from './dataModels'
-import { assert, isIHolding, isIPortfolio } from './utils'
+import { assert, isIHolding, isIPopulatedPortfolio, isIPortfolio } from './utils'
 import { 
   getHoldingMarketValue,
   getHoldingPurchaseQuantity, getHoldingRealizedPnl, getHoldingSaleQuantity, 
@@ -71,13 +71,58 @@ export function getPortfolioHoldings(
 
 /*
 DESC
-  Returns the market value of the input IPortfolio based on the input price
+  Returns the aggregate market value of the input IPortfolio[] based on the 
+  input prices
+INPUT
+  portfolios: An IPortfolio[]
+  prices: A Map<number, IPriceData> where the key is a tcgplayerId
+RETURN
+  The aggregate market value of the Portfolios
+*/
+export function getAggPortfolioMarketValue(
+  portfolios: IPortfolio[] | IPopulatedPortfolio[],
+  prices: Map<number, IPriceData>
+): number {
+  const marketValues = portfolios.map(
+    (portfolio: IPortfolio | IPopulatedPortfolio) => {
+      return getPortfolioMarketValue(portfolio, prices)
+  })
+  return _.sum(marketValues)
+}
+
+/*
+DESC
+  Returns the total purchase cost of the input IPortfolio[]. This value
+  should never be negative
+INPUT
+  portfolios: An IPortfolio[]
+RETURN
+  The total purchase cost from the input IPortfolio, or undefined if every
+  Portfolio as undefined total cost
+*/
+export function getAggPortfolioTotalCost(
+  portfolios: IPortfolio[] | IPopulatedPortfolio[]
+): number | undefined {
+  const totalCosts = portfolios.map(
+    (portfolio: IPortfolio | IPopulatedPortfolio) => {
+      return getPortfolioTotalCost(portfolio)
+  }) 
+  if (_.every(totalCosts, (el: any) => el === undefined)) {
+    return undefined
+  }
+  const value = _.sum(totalCosts)
+  assert(value >= 0, 'getAggPortfolioTotalCost() is not at least 0')
+  return value
+}
+
+/*
+DESC
+  Returns the market value of the input IPortfolio based on the input prices
 INPUT
   portfolio: An IPortfolio
   prices: A Map<number, IPriceData> where the key is a tcgplayerId
 RETURN
-  The market value of the Portfolio, or undefined if both getPortfolioRealizedPnl() 
-  and getPortfolioUnrealizedPnl() are undefined
+  The market value of the Portfolio
 */
 export function getPortfolioMarketValue(
   portfolio: IPortfolio | IPopulatedPortfolio,
@@ -188,7 +233,7 @@ RETURN
 */
 export function getPortfolioTotalCost(
   portfolio: IPortfolio | IPopulatedPortfolio
-): number {
+): number | undefined {
   const holdings = getPortfolioHoldings(portfolio)
   const totalCosts = holdings.map((holding: IHolding | IPopulatedHolding) => {
     return getHoldingTotalCost(holding)
