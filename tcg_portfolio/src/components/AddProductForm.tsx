@@ -19,7 +19,7 @@ import {
   PostLatestPriceStatus, PostPriceStatus, PostProductStatus, 
   TPostLatestPriceReqBody, TPostPriceReqBody, TPostProductReqBody, 
 
-  ADD_LATEST_PRICE_URL, ADD_PRICE_URL, ADD_PRODUCT_URL
+  ADD_LATEST_PRICE_URL, ADD_PRICE_URL, CRUD_PRODUCT_URL
 } from 'common';
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField'
@@ -247,7 +247,7 @@ export const AddProductForm = () => {
     // submit
     axios({
       method: 'post',
-      url: ADD_PRODUCT_URL,
+      url: CRUD_PRODUCT_URL,
       data: body,
       headers: {
         'Content-Type': 'multipart/form-data',

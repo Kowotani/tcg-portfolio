@@ -17,7 +17,7 @@ import {
 
   getIPortfoliosFromIPopulatedPortfolios,
 
-  GET_PRODUCTS_URL, UPDATE_PORTFOLIO_URL, 
+  GET_PRODUCTS_URL, CRUD_PORTFOLIO_URL, 
   
   TPutPortfolioReqBody,
 
@@ -161,7 +161,7 @@ export const EditPortfolioForm = (
     // submit
     axios({
       method: 'put',
-      url: UPDATE_PORTFOLIO_URL,
+      url: CRUD_PORTFOLIO_URL,
       data: body,
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -174,7 +174,7 @@ export const EditPortfolioForm = (
 
       const resData = res.data
       assert(isTResBody(resData),
-        'Unexpected response from UPDATE_PORTFOLIO_URL')
+        'Unexpected response from CRUD_PORTFOLIO_URL')
 
       // Portoflio was updated
       if (res.status === 200) {

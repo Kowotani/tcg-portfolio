@@ -77,7 +77,7 @@ RETURN
     200: The Portfolio was successfully updated
     500: An error occurred
 */
-app.put(common_1.UPDATE_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.put(common_1.CRUD_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // variables
     const body = req.body;
     try {
@@ -278,7 +278,7 @@ RETURN
     202: The Product already exists
     500: An error occurred
 */
-app.post(common_1.ADD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post(common_1.CRUD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // variables
     const body = req.body;
     const data = body.formData;

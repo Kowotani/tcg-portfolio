@@ -7,11 +7,12 @@ import {
   PutPortfoliosStatus,
   
   
-  TDataResBody, TPostLatestPriceReqBody, TPostPriceReqBody, 
-  TPutPortfolioReqBody, TPostProductReqBody, TProductPostResBody, TResBody, 
+  TDataResBody, TPostLatestPriceReqBody, 
+  TPostPriceReqBody, TPutPortfolioReqBody, TPostProductReqBody, 
+  TProductPostResBody, TResBody, 
 
-  ADD_LATEST_PRICE_URL, ADD_PRICE_URL, ADD_PRODUCT_URL, GET_LATEST_PRICES_URL, 
-  GET_PORTFOLIOS_URL, GET_PRODUCTS_URL, UPDATE_PORTFOLIO_URL
+  ADD_LATEST_PRICE_URL, ADD_PRICE_URL, CRUD_PORTFOLIO_URL, CRUD_PRODUCT_URL,
+  GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL, 
 } from 'common'
 import express from 'express'
 import { 
@@ -88,7 +89,7 @@ RETURN
     200: The Portfolio was successfully updated
     500: An error occurred
 */
-app.put(UPDATE_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
+app.put(CRUD_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
 
   // variables
   const body: TPutPortfolioReqBody = req.body
@@ -317,7 +318,7 @@ RETURN
     202: The Product already exists
     500: An error occurred
 */
-app.post(ADD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
+app.post(CRUD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
 
   // variables
   const body: TPostProductReqBody = req.body

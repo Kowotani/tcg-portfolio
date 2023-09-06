@@ -1,10 +1,19 @@
 "use strict";
 exports.__esModule = true;
-exports.GET_LATEST_PRICES_URL = exports.ADD_PRICE_URL = exports.ADD_LATEST_PRICE_URL = exports.GET_PRODUCTS_URL = exports.ADD_PRODUCT_URL = exports.UPDATE_PORTFOLIO_URL = exports.GET_PORTFOLIOS_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.PostLatestPriceStatus = exports.GetPricesStatus = exports.PutPortfoliosStatus = exports.GetPortfoliosStatus = void 0;
+exports.GET_LATEST_PRICES_URL = exports.ADD_PRICE_URL = exports.ADD_LATEST_PRICE_URL = exports.GET_PRODUCTS_URL = exports.CRUD_PRODUCT_URL = exports.GET_PORTFOLIOS_URL = exports.CRUD_PORTFOLIO_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.PostLatestPriceStatus = exports.GetPricesStatus = exports.PutPortfoliosStatus = exports.GetPortfoliosStatus = exports.DeletePortfoliosStatus = void 0;
 // =====
 // enums
 // =====
 // -- portfolio
+/*
+  Endpoint:   DELETE_PORTFOLIOS_URL
+  Type:       DELETE
+*/
+var DeletePortfoliosStatus;
+(function (DeletePortfoliosStatus) {
+    DeletePortfoliosStatus["Success"] = "Successfully deleted Portfolio";
+    DeletePortfoliosStatus["Error"] = "Error deleting Portfolio";
+})(DeletePortfoliosStatus = exports.DeletePortfoliosStatus || (exports.DeletePortfoliosStatus = {}));
 /*
   Endpoint:   GET_PORTFOLIOS_URL
   Type:       GET
@@ -76,10 +85,10 @@ var GetProductsStatus;
 // routes
 // ======
 // -- portfolio
+exports.CRUD_PORTFOLIO_URL = '/portfolio';
 exports.GET_PORTFOLIOS_URL = '/portfolios';
-exports.UPDATE_PORTFOLIO_URL = '/portfolio';
 // -- product
-exports.ADD_PRODUCT_URL = '/product';
+exports.CRUD_PRODUCT_URL = '/product';
 exports.GET_PRODUCTS_URL = '/products';
 // -- prices
 exports.ADD_LATEST_PRICE_URL = '/price/latest';
