@@ -1,6 +1,7 @@
 import { IPortfolio, IProduct } from "./dataModels";
-export declare enum DeletePortfoliosStatus {
+export declare enum DeletePortfolioStatus {
     Success = "Successfully deleted Portfolio",
+    DoesNotExist = "Portfolio does not exist",
     Error = "Error deleting Portfolio"
 }
 export declare enum GetPortfoliosStatus {

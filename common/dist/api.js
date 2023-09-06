@@ -1,19 +1,20 @@
 "use strict";
 exports.__esModule = true;
-exports.GET_LATEST_PRICES_URL = exports.ADD_PRICE_URL = exports.ADD_LATEST_PRICE_URL = exports.GET_PRODUCTS_URL = exports.CRUD_PRODUCT_URL = exports.GET_PORTFOLIOS_URL = exports.CRUD_PORTFOLIO_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.PostLatestPriceStatus = exports.GetPricesStatus = exports.PutPortfoliosStatus = exports.GetPortfoliosStatus = exports.DeletePortfoliosStatus = void 0;
+exports.GET_LATEST_PRICES_URL = exports.ADD_PRICE_URL = exports.ADD_LATEST_PRICE_URL = exports.GET_PRODUCTS_URL = exports.CRUD_PRODUCT_URL = exports.GET_PORTFOLIOS_URL = exports.CRUD_PORTFOLIO_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.PostLatestPriceStatus = exports.GetPricesStatus = exports.PutPortfoliosStatus = exports.GetPortfoliosStatus = exports.DeletePortfolioStatus = void 0;
 // =====
 // enums
 // =====
 // -- portfolio
 /*
-  Endpoint:   DELETE_PORTFOLIOS_URL
+  Endpoint:   DELETE_PORTFOLIO_URL
   Type:       DELETE
 */
-var DeletePortfoliosStatus;
-(function (DeletePortfoliosStatus) {
-    DeletePortfoliosStatus["Success"] = "Successfully deleted Portfolio";
-    DeletePortfoliosStatus["Error"] = "Error deleting Portfolio";
-})(DeletePortfoliosStatus = exports.DeletePortfoliosStatus || (exports.DeletePortfoliosStatus = {}));
+var DeletePortfolioStatus;
+(function (DeletePortfolioStatus) {
+    DeletePortfolioStatus["Success"] = "Successfully deleted Portfolio";
+    DeletePortfolioStatus["DoesNotExist"] = "Portfolio does not exist";
+    DeletePortfolioStatus["Error"] = "Error deleting Portfolio";
+})(DeletePortfolioStatus = exports.DeletePortfolioStatus || (exports.DeletePortfolioStatus = {}));
 /*
   Endpoint:   GET_PORTFOLIOS_URL
   Type:       GET

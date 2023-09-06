@@ -1,27 +1,27 @@
 import { loadImageToS3 } from './aws/s3Manager'
 import { 
-  IDatedPriceData, IPrice, IPriceData, IProduct, TimeseriesGranularity,
+  IDatedPriceData, IPopulatedPortfolio, IPrice, IPriceData, IProduct, 
+  TimeseriesGranularity,
 
-  GetPortfoliosStatus, GetPricesStatus, GetProductsStatus, 
-  PostLatestPriceStatus, PostPriceStatus, PostProductStatus, 
+  DeletePortfolioStatus, GetPortfoliosStatus, GetPricesStatus, 
+  GetProductsStatus, PostLatestPriceStatus, PostPriceStatus, PostProductStatus, 
   PutPortfoliosStatus,
   
-  
-  TDataResBody, TPostLatestPriceReqBody, 
+  TDataResBody, TDeletePortfolioReqBody, TPostLatestPriceReqBody, 
   TPostPriceReqBody, TPutPortfolioReqBody, TPostProductReqBody, 
   TProductPostResBody, TResBody, 
 
   ADD_LATEST_PRICE_URL, ADD_PRICE_URL, CRUD_PORTFOLIO_URL, CRUD_PRODUCT_URL,
-  GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL, 
+  GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL, IPortfolio, 
 } from 'common'
 import express from 'express'
 import { 
-  getLatestPrices, getPortfolios, getProductDoc, getProductDocs, insertPrices, 
-  insertProducts, setPortfolio
+  deletePortfolio, getLatestPrices, getPortfolioDoc, getPortfolios, 
+  getProductDoc, getProductDocs, insertPrices, insertProducts, setPortfolio
 } from './mongo/mongoManager'
 import multer from 'multer'
 import { loadPrice } from './scraper/scrapeManager'
-import { isProductDoc } from './utils'
+import { isPortfolioDoc, isProductDoc } from './utils'
 
 const upload = multer()
 const app = express()
@@ -35,39 +35,67 @@ const port = 3030
 
 /*
 DESC
-  Handle GET request for all IPopulatedPortfolios for the input userId
+  Handle DELETE request to delete a Portfolio
 INPUT
-  userId: The userId who owns the Portfolios
+  Request body in multipart/form-data containing a TDeletePortfolioReqBody
 RETURN
-  Response body with status codes and messages
+  TResBody response with status codes
 
   Status Code
-    200: The Portfolio documents were returned successfully
+    200: The Portfolio was successfully deleted
+    204: The Portfolio does not exist
     500: An error occurred
 */
-app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
+app.delete(CRUD_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
 
+  // variables
+  const body: TDeletePortfolioReqBody = req.body
+  const portfolio: IPortfolio = {
+    userId: body.userId,
+    portfolioName: body.portfolioName,
+    holdings: []
+  }
+  
   try {
 
-    // query Portfolios
-    const userId = req.query.userId
-    const data = await getPortfolios(userId)
+    // check if Portfolio exists
+    const portfolioDoc = await getPortfolioDoc(portfolio)
+    if (!isPortfolioDoc(portfolioDoc)) {
+      res.status(204)
+      const body: TResBody = {
+        message: DeletePortfolioStatus.DoesNotExist
+      }
+      res.send(body)
 
-    // return Portfolios
-    res.status(200)
-    // TODO: Add a type inference for this
-    const body = {
-      data: data,
-      message: GetPortfoliosStatus.Success
+    } else {
+
+      // delete portfolio
+      const isDeleted = await deletePortfolio(portfolio)
+
+      // success
+      if (isDeleted) {
+        res.status(200)
+        const body: TResBody = {
+          message: DeletePortfolioStatus.Success
+        }
+        res.send(body)
+      
+      // error
+      } else {
+        res.status(500)
+        const body: TResBody = {
+          message: DeletePortfolioStatus.Error
+        }        
+        res.send(body)
+      }
     }
-    res.send(body)
 
   // error
   } catch (err) {
     res.status(500)
     const body: TResBody = {
-      message: `${GetPortfoliosStatus.Error}: ${err}`
-    }
+      message: `${DeletePortfolioStatus.Error}: ${err}`
+    }        
     res.send(body)
   }
 })
@@ -76,12 +104,7 @@ app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
 DESC
   Handle PUT request to update a Portfolio
 INPUT
-  Request body in multipart/form-data containing the following structure
-  for both existingPortfolio and newPortfolio objects:
-    userId: The Portfolio userId
-    portfolioName: The Portfolio name
-    holdings: An IHolding[]
-    description?: The Portfolio description
+  Request body in multipart/form-data containing a TPutPortfolioReqBody
 RETURN
   TResBody response with status codes
 
@@ -125,7 +148,46 @@ app.put(CRUD_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
     }        
     res.send(body)
   }
-  
+})
+
+/*
+DESC
+  Handle GET request for all IPopulatedPortfolios for the input userId
+INPUT
+  Request query parameters:
+    userId: The userId who owns the Portfolios
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The Portfolio documents were returned successfully
+    500: An error occurred
+*/
+app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
+
+  try {
+
+    // query Portfolios
+    const userId = req.query.userId
+    const data = await getPortfolios(userId)
+
+    // return Portfolios
+    res.status(200)
+    
+    const body: TDataResBody<IPopulatedPortfolio[]> = {
+      data: data,
+      message: GetPortfoliosStatus.Success
+    }
+    res.send(body)
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: `${GetPortfoliosStatus.Error}: ${err}`
+    }
+    res.send(body)
+  }
 })
 
 
@@ -136,6 +198,8 @@ app.put(CRUD_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
 /*
 DESC
   Handle POST request to load the latest Price for a tcgplayerId
+INPUT
+  Request body in multipart/form-data containing a TPostLatestPriceReqBody
 RETURN
   Response body with status codes and messages
 
@@ -191,6 +255,8 @@ app.post(ADD_LATEST_PRICE_URL, upload.none(), async (req: any, res: any) => {
 /*
 DESC
   Handle POST request to add a Price
+INPUT
+  Request body in multipart/form-data containing a TPostPriceReqBody  
 RETURN
   Response body with status codes and messages
 
@@ -302,14 +368,7 @@ app.get(GET_LATEST_PRICES_URL, async (req: any, res: any) => {
 DESC
   Handle POST request to add a Product
 INPUT
-  Request body in multipart/form-data containing
-    tcgplayerId: The TCGplayer product id
-    releaseDate: Product release date in YYYY-MM-DD format
-    name: Product name
-    type: ProductType enum
-    language: ProductLanguage enum
-    subtype?: ProductSubType enum
-    setCode?: Product set code
+    Request body in multipart/form-data containing a TPostProductReqBody 
 RETURN
   TProductPostResBody response with status codes
 

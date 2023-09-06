@@ -27,35 +27,61 @@ const port = 3030;
 // =========
 /*
 DESC
-  Handle GET request for all IPopulatedPortfolios for the input userId
+  Handle DELETE request to delete a Portfolio
 INPUT
-  userId: The userId who owns the Portfolios
+  Request body in multipart/form-data containing a TDeletePortfolioReqBody
 RETURN
-  Response body with status codes and messages
+  TResBody response with status codes
 
   Status Code
-    200: The Portfolio documents were returned successfully
+    200: The Portfolio was successfully deleted
+    204: The Portfolio does not exist
     500: An error occurred
 */
-app.get(common_1.GET_PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.delete(common_1.CRUD_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // variables
+    const body = req.body;
+    const portfolio = {
+        userId: body.userId,
+        portfolioName: body.portfolioName,
+        holdings: []
+    };
     try {
-        // query Portfolios
-        const userId = req.query.userId;
-        const data = yield (0, mongoManager_1.getPortfolios)(userId);
-        // return Portfolios
-        res.status(200);
-        // TODO: Add a type inference for this
-        const body = {
-            data: data,
-            message: common_1.GetPortfoliosStatus.Success
-        };
-        res.send(body);
+        // check if Portfolio exists
+        const portfolioDoc = yield (0, mongoManager_1.getPortfolioDoc)(portfolio);
+        if (!(0, utils_1.isPortfolioDoc)(portfolioDoc)) {
+            res.status(204);
+            const body = {
+                message: common_1.DeletePortfolioStatus.DoesNotExist
+            };
+            res.send(body);
+        }
+        else {
+            // delete portfolio
+            const isDeleted = yield (0, mongoManager_1.deletePortfolio)(portfolio);
+            // success
+            if (isDeleted) {
+                res.status(200);
+                const body = {
+                    message: common_1.DeletePortfolioStatus.Success
+                };
+                res.send(body);
+                // error
+            }
+            else {
+                res.status(500);
+                const body = {
+                    message: common_1.DeletePortfolioStatus.Error
+                };
+                res.send(body);
+            }
+        }
         // error
     }
     catch (err) {
         res.status(500);
         const body = {
-            message: `${common_1.GetPortfoliosStatus.Error}: ${err}`
+            message: `${common_1.DeletePortfolioStatus.Error}: ${err}`
         };
         res.send(body);
     }
@@ -64,12 +90,7 @@ app.get(common_1.GET_PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, voi
 DESC
   Handle PUT request to update a Portfolio
 INPUT
-  Request body in multipart/form-data containing the following structure
-  for both existingPortfolio and newPortfolio objects:
-    userId: The Portfolio userId
-    portfolioName: The Portfolio name
-    holdings: An IHolding[]
-    description?: The Portfolio description
+  Request body in multipart/form-data containing a TPutPortfolioReqBody
 RETURN
   TResBody response with status codes
 
@@ -109,12 +130,49 @@ app.put(common_1.CRUD_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void
         res.send(body);
     }
 }));
+/*
+DESC
+  Handle GET request for all IPopulatedPortfolios for the input userId
+INPUT
+  Request query parameters:
+    userId: The userId who owns the Portfolios
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The Portfolio documents were returned successfully
+    500: An error occurred
+*/
+app.get(common_1.GET_PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // query Portfolios
+        const userId = req.query.userId;
+        const data = yield (0, mongoManager_1.getPortfolios)(userId);
+        // return Portfolios
+        res.status(200);
+        const body = {
+            data: data,
+            message: common_1.GetPortfoliosStatus.Success
+        };
+        res.send(body);
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: `${common_1.GetPortfoliosStatus.Error}: ${err}`
+        };
+        res.send(body);
+    }
+}));
 // ======
 // prices
 // ======
 /*
 DESC
   Handle POST request to load the latest Price for a tcgplayerId
+INPUT
+  Request body in multipart/form-data containing a TPostLatestPriceReqBody
 RETURN
   Response body with status codes and messages
 
@@ -163,6 +221,8 @@ app.post(common_1.ADD_LATEST_PRICE_URL, upload.none(), (req, res) => __awaiter(v
 /*
 DESC
   Handle POST request to add a Price
+INPUT
+  Request body in multipart/form-data containing a TPostPriceReqBody
 RETURN
   Response body with status codes and messages
 
@@ -262,14 +322,7 @@ app.get(common_1.GET_LATEST_PRICES_URL, (req, res) => __awaiter(void 0, void 0, 
 DESC
   Handle POST request to add a Product
 INPUT
-  Request body in multipart/form-data containing
-    tcgplayerId: The TCGplayer product id
-    releaseDate: Product release date in YYYY-MM-DD format
-    name: Product name
-    type: ProductType enum
-    language: ProductLanguage enum
-    subtype?: ProductSubType enum
-    setCode?: Product set code
+    Request body in multipart/form-data containing a TPostProductReqBody
 RETURN
   TProductPostResBody response with status codes
 

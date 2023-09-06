@@ -8,11 +8,12 @@ import { IPortfolio, IProduct } from "./dataModels"
 // -- portfolio
 
 /*
-  Endpoint:   DELETE_PORTFOLIOS_URL
+  Endpoint:   DELETE_PORTFOLIO_URL
   Type:       DELETE
 */
-export enum DeletePortfoliosStatus {
+export enum DeletePortfolioStatus {
   Success = 'Successfully deleted Portfolio',
+  DoesNotExist = 'Portfolio does not exist',
   Error = 'Error deleting Portfolio',
 }
 
