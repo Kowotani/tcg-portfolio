@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext, useEffect, useState, } from 'react'
+import { PropsWithChildren, useEffect, useState, } from 'react'
 import axios from 'axios'
 import { 
   Box,
@@ -27,13 +27,11 @@ import { FilterInput } from './FilterInput'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
 import { HoldingCard } from './HoldingCard'
+import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
-import { SideBarNavContext } from '../state/SideBarNavContext'
 import { 
-  ISideBarNavContext, 
-
   filterFnHoldingCard, filterFnProductSearchResult, sortFnPopulatedHoldingAsc, 
   sortFnProductSearchResults
 } from '../utils' 
@@ -207,9 +205,6 @@ export const EditPortfolioForm = (
     // error
     .catch(res => {
       actions.setSubmitting(false)
-
-      // TODO: type check
-      const resData = res.data  
 
       toast({
         title: 'Error',
@@ -417,9 +412,7 @@ export const EditPortfolioForm = (
   return (
     <>
       {/* Portfolio Header */}
-      <Box bg='teal.500' color='white' fontWeight='medium' p='8px' m='16px 0px'>
-        Portfolio Details
-      </Box>
+      <SectionHeader header={'Details'} />
 
       {/* Portfolio Details Form */}
       <Formik
@@ -528,9 +521,7 @@ export const EditPortfolioForm = (
 
 
       {/* Holdings Header */}
-      <Box bg='teal.500' color='white' fontWeight='medium' p='8px' m='16px 0px'>
-        Holdings
-      </Box>      
+      <SectionHeader header={'Holdings'}/>
 
       {/* Search Product to Add */}
       <SearchInput 

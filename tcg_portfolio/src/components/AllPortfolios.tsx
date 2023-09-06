@@ -13,10 +13,10 @@ import {
   assert
 } from 'common'
 import { PortfolioCard } from './PortfolioCard'
+import { SectionHeader } from './Layout'
 import { UserContext } from '../state/UserContext'
 import { IUserContext } from '../utils' 
 import { isIPopulatedPortfolioArray } from 'common'
-import * as _ from 'lodash'
 
 type TAllPortfoliosProps = {
   onEditClick: (portfolio: IPopulatedPortfolio) => void
@@ -55,7 +55,7 @@ export const AllPortfolios = (
     .catch(err => {
       console.log('Error fetching Portfolios: ' + err)
     })
-  }, [])
+  }, [user.userId])
 
 
   // ==============
@@ -64,40 +64,32 @@ export const AllPortfolios = (
 
   return (
     <>
-      {/* Header */}
-      <Box 
-        bg='teal.500' 
-        color='white' 
-        fontWeight='medium' 
-        p='8px'
-        m='16px 0px'
-      >
-        Portfolios
-      </Box>
-      {isLoadingPortfolios
-        ? (
-          <Progress 
-            height='24px'
-            m='8px 0px'
-            isIndeterminate
-          />
-        ) : (
-          <>
-            {/* Portfolios */}
-            {portfolios.map((portfolio: IPopulatedPortfolio) => {
-              return (
-                <Box key={portfolio.portfolioName}>
-                  <PortfolioCard 
-                    populatedPortfolio={portfolio}
-                    onPortfolioDelete={() => console.log('deleted portfolio')}
-                    onEditClick={props.onEditClick}
-                  />
-                  <Spacer h='16px' />
-                </Box>
-              )
-            })}
-          </>
-      )}
+      {/* Portfolios Header */}
+      <SectionHeader header={'Portfolios'}/>
+        {isLoadingPortfolios
+          ? (
+            <Progress 
+              height='24px'
+              m='8px 0px'
+              isIndeterminate
+            />
+          ) : (
+            <>
+              {/* Portfolios */}
+              {portfolios.map((portfolio: IPopulatedPortfolio) => {
+                return (
+                  <Box key={portfolio.portfolioName}>
+                    <PortfolioCard 
+                      populatedPortfolio={portfolio}
+                      onPortfolioDelete={() => console.log('deleted portfolio')}
+                      onEditClick={props.onEditClick}
+                    />
+                    <Spacer h='16px' />
+                  </Box>
+                )
+              })}
+            </>
+        )}
     </>
   )
 }
