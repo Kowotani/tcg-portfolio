@@ -24,7 +24,7 @@ import {
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField'
 import { SideBarNavContext } from '../state/SideBarNavContext'
-import { ISideBarNavContext, SideBarNav } from '../utils'
+import { isHttpUrl, ISideBarNavContext, SideBarNav } from '../utils'
 
 
 // ==============
@@ -559,28 +559,6 @@ export const AddProductForm = () => {
     // unset loading state
     setIsLoadingLatestPrice(false)
   }
-
-  /*
-  DESC
-    Checks if the input is a valid HTTP URL
-  INPUT
-    input: a string that may be a URL
-  RETURN
-    TRUE if the input is a valid HTTP URL, FALSE otherwise
-  REF
-    https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
-  */
-  function isHttpUrl(input: string): boolean {
-    let url;
-    
-    try {
-      url = new URL(input);
-    } catch (_) {
-      return false;  
-    }
-    
-    return url.protocol === "http:" || url.protocol === "https:";
-    }
 
   /*
   DESC
