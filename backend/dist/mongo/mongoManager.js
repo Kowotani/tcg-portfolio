@@ -57,7 +57,7 @@ function addPortfolio(portfolio) {
         try {
             // check if portfolioName exists for this userId
             const portfolioDoc = yield getPortfolioDoc(portfolio);
-            if (!(0, utils_1.isPortfolioDoc)(portfolioDoc)) {
+            if ((0, utils_1.isPortfolioDoc)(portfolioDoc)) {
                 throw (0, utils_1.genPortfolioAlreadyExistsError)(userId, portfolioName, 'addPortfolio()');
             }
             // get IMHolding[]
@@ -596,9 +596,9 @@ function main() {
         // }
         // const p233232 = await getProductDoc({'tcgplayerId': 233232})
         // const p449558 = await getProductDoc({'tcgplayerId': 449558})
-        // const userId = 456
-        // const portfolioName = 'Delta Investments'
-        // const description = 'Washer dryer mechanic'
+        const userId = 456;
+        const portfolioName = 'Gamma Investments';
+        const description = 'Washer dryer mechanic';
         // let holdings: IHolding[] = [
         //   {
         //     tcgplayerId: 233232,
@@ -619,11 +619,11 @@ function main() {
         //   },
         // ]
         // // // -- Set Portfolio
-        // const portfolio: IPortfolio = {
-        //   userId: userId, 
-        //   portfolioName: portfolioName,
-        //   holdings: holdings,
-        // }
+        const portfolio = {
+            userId: userId,
+            portfolioName: portfolioName,
+            holdings: [],
+        };
         // const newPortfolio: IPortfolio = {
         //   userId: userId, 
         //   portfolioName: portfolioName,
@@ -663,12 +663,13 @@ function main() {
         //   console.log('Portfolios not retrieved')
         // }
         // -- Add portfolio
-        // res = await addPortfolio(portfolio)
-        // if (res) {
-        //   console.log('Portfolio successfully created')
-        // } else {
-        //   console.log('Portfolio not created')
-        // }
+        res = yield addPortfolio(portfolio);
+        if (res) {
+            console.log('Portfolio successfully created');
+        }
+        else {
+            console.log('Portfolio not created');
+        }
         // // -- Delete portfolio
         // res = await deletePortfolio(userId, portfolioName)
         // if (res) {

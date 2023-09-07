@@ -29,7 +29,6 @@ function loadPrice(tcgplayerId) {
     return __awaiter(this, void 0, void 0, function* () {
         // scrape price data
         const scrapedPrices = yield (0, scraper_1.scrape)([tcgplayerId]);
-        console.log(scrapedPrices);
         const priceData = scrapedPrices.get(tcgplayerId);
         // check if data was retrieved
         if (priceData === undefined) {

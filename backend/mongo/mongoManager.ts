@@ -67,7 +67,7 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
 
     // check if portfolioName exists for this userId
     const portfolioDoc = await getPortfolioDoc(portfolio)
-    if (!isPortfolioDoc(portfolioDoc)) {
+    if (isPortfolioDoc(portfolioDoc)) {
       throw genPortfolioAlreadyExistsError(userId, portfolioName, 
         'addPortfolio()')
     } 
@@ -721,7 +721,7 @@ async function main(): Promise<number> {
   // const p449558 = await getProductDoc({'tcgplayerId': 449558})
 
   // const userId = 456
-  // const portfolioName = 'Delta Investments'
+  // const portfolioName = 'Gamma Investments'
   // const description = 'Washer dryer mechanic'
   // let holdings: IHolding[] = [
   //   {
@@ -747,7 +747,7 @@ async function main(): Promise<number> {
   // const portfolio: IPortfolio = {
   //   userId: userId, 
   //   portfolioName: portfolioName,
-  //   holdings: holdings,
+  //   holdings: [],
   // }
   // const newPortfolio: IPortfolio = {
   //   userId: userId, 

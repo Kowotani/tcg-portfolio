@@ -55,7 +55,6 @@ function scrape(ids) {
                     }
                     return scrapedText;
                 });
-                console.log(scrapedTexts);
                 // parse scraped text
                 let data = {};
                 scrapedTexts.forEach((st) => {
