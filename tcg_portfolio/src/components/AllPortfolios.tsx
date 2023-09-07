@@ -38,6 +38,7 @@ export const AllPortfolios = (
   props: PropsWithChildren<TAllPortfoliosProps>
 ) => {
 
+
   // =====
   // state
   // =====
@@ -49,6 +50,25 @@ export const AllPortfolios = (
 
   const { latestPrices } 
   = useContext(LatestPricesContext) as ILatestPricesContext
+
+
+  // =========
+  // functions
+  // =========
+
+  /*
+  DESC
+    Removes the input Portfolio from the portfolios state
+  INPUT
+    portfolio: An IPopulatedPortfolio
+  */
+  function onDeleteClick(portfolio: IPopulatedPortfolio): void {
+    const newPortfolios = portfolios.filter((p: IPopulatedPortfolio) => {
+      return p.portfolioName !== portfolio.portfolioName
+    })
+    setPortfolios(newPortfolios)
+  }
+
 
   // ===============
   // summary metrics
@@ -133,7 +153,7 @@ export const AllPortfolios = (
     .catch(err => {
       console.log('Error fetching Portfolios: ' + err)
     })
-  }, [user.userId])
+  }, [])
 
 
   // ==============
@@ -207,7 +227,7 @@ export const AllPortfolios = (
                 <Box key={portfolio.portfolioName}>
                   <PortfolioCard 
                     populatedPortfolio={portfolio}
-                    onPortfolioDelete={() => console.log('deleted portfolio')}
+                    onDeleteClick={onDeleteClick}
                     onEditClick={props.onEditClick}
                   />
                   <Spacer h='16px' />

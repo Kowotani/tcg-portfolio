@@ -6,12 +6,25 @@ import {
   CardBody,
   CloseButton,
   HStack,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   StackDivider,
   Text,
+  useDisclosure,
+  useToast,
   VStack
 } from '@chakra-ui/react'
+import axios from 'axios'
 import { 
   IPopulatedPortfolio, 
+
+  TDeletePortfolioReqBody,
+
+  CRUD_PORTFOLIO_URL,
   
   getPortfolioMarketValue, getPortfolioPercentPnl, getPortfolioTotalCost, 
   getPortfolioTotalPnl
@@ -28,18 +41,23 @@ import {
 
 type TPortfolioCardProps = {
   populatedPortfolio: IPopulatedPortfolio,
-  onPortfolioDelete: (portfolio: IPopulatedPortfolio) => void,
+  onDeleteClick: (portfolio: IPopulatedPortfolio) => void,
   onEditClick: (portfolio: IPopulatedPortfolio) => void,
 }
 export const PortfolioCard = (
   props: PropsWithChildren<TPortfolioCardProps>
 ) => {
 
+  // modal
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
+
   // =====
   // state
   // =====
 
-  const [ portfolio, setPortfolio ] = useState(props.populatedPortfolio)
+  const [ portfolio ] = useState(props.populatedPortfolio)
+  const [ isDeleting, setIsDeleting ] = useState(false)
   const { latestPrices } 
     = useContext(LatestPricesContext) as ILatestPricesContext
 
@@ -48,6 +66,88 @@ export const PortfolioCard = (
   // functions
   // =========
   
+  /*
+  DESC
+    Calls the DELETE Portfolio endpoint for the input Portfolio and updates 
+    portfolios state on successful deletion
+  INPUT
+    portfolio: An IPopulatedPortfolio to delete
+  */
+  function handleOnConfirmDeleteClick(portfolio: IPopulatedPortfolio): void {
+
+    // set isDeleting state
+    setIsDeleting(true)
+
+    // create DELETE body
+    const body: TDeletePortfolioReqBody = {
+      userId: portfolio.userId,
+      portfolioName: portfolio.portfolioName
+    }
+
+    // call endpoint
+    axios({
+      method: 'delete',
+      url: CRUD_PORTFOLIO_URL,
+      data: body,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },      
+    })
+    .then(res => {
+
+      // TODO: type check
+      const resData = res.data
+
+      // portfolio deleted
+      if (res.status === 200) {
+
+        // update AllPortfolios state
+        props.onDeleteClick(portfolio)
+
+        // display toast
+        toast({
+          title: 'Portfolio Deleted',
+          description: `${portfolio.portfolioName} was deleted`,
+          status: 'success',
+          isClosable: true,
+        })
+
+        // close modal
+        onClose()
+
+      // portfolio not found
+      } else if (res.status === 204) {
+        toast({
+          title: 'Portfolio Not Found',
+          description: `${portfolio.portfolioName} was not found`,
+          status: 'warning',
+          isClosable: true,
+        })
+      }
+    })
+
+    // error
+    .catch(res => {
+
+      // TODO: type check
+      const resData = res.data
+
+      toast({
+        title: 'Error Deleting Portfolio',
+        description: `${res.statusText}: ${resData}`,
+        status: 'error',
+        isClosable: true,
+      })
+    })
+
+    // unset isDeleting
+    setIsDeleting(false)
+  }
+
+
+  // ===============
+  // summary metrics
+  // ===============
 
   // PortfolioSummary
 
@@ -98,6 +198,9 @@ export const PortfolioCard = (
   // hooks
   // =====
 
+  // Axios response toast
+  const toast = useToast()
+
 
   // ==============
   // Main Component
@@ -105,6 +208,7 @@ export const PortfolioCard = (
 
   return (
     <>
+      {/* Portfolio Card */}
       <Card>
         <CardBody>
           <HStack
@@ -117,9 +221,7 @@ export const PortfolioCard = (
                   {props.populatedPortfolio.portfolioName}
                 </Text>
                 <CloseButton 
-                  onClick={
-                    () => props.onPortfolioDelete(props.populatedPortfolio)
-                  }
+                  onClick={onOpen}
                 />
               </Box>
 
@@ -163,6 +265,49 @@ export const PortfolioCard = (
           </HStack>
         </CardBody>
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      <Modal 
+        closeOnOverlayClick={false}
+        isOpen={isOpen} 
+        onClose={onClose}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader textAlign='center'>
+            Confirm Deletion
+          </ModalHeader>
+          <ModalBody>
+            <Text align='center'>
+              Are you sure you want to delete the following Portfolio?
+              This action cannot be undone.
+            </Text>
+            <Text 
+              fontSize='large' 
+              fontWeight='bold' 
+              align='center' 
+              m='16px 0px 8px'
+            >
+              {portfolio.portfolioName}
+            </Text>
+          </ModalBody>
+          <ModalFooter display='flex' justifyContent='space-evenly'>
+            <Button 
+              variant='ghost' 
+              onClick={onClose}
+            >
+              Keep It
+            </Button>
+            <Button 
+              colorScheme='red'
+              isLoading={isDeleting}
+              onClick={() => handleOnConfirmDeleteClick(portfolio)}
+            >
+              Delete It
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   )
 
