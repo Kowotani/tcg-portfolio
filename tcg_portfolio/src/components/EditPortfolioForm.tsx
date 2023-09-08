@@ -117,6 +117,19 @@ export const EditPortfolioForm = (
     actions: FormikHelpers<IInputValues>
   ): void {
 
+    // check if there are Holdings
+    if (portfolio.populatedHoldings.length === 0) {
+      actions.setSubmitting(false)
+      toast({
+        title: `No Holdings Found`,
+        description: `Please add non-empty Holdings`,
+        status: 'error',
+        variant: 'subtle',
+        isClosable: true,
+      })                 
+      return   
+    }
+
     // check if all Holdings have Transactions
     const emptyHolding 
       = getHoldingWithoutTransactions(portfolio.populatedHoldings)
@@ -124,7 +137,7 @@ export const EditPortfolioForm = (
       actions.setSubmitting(false)
       toast({
         title: `Error: ${emptyHolding.product.name}`,
-        description: `Holding has no Transactions`,
+        description: `Please add Transactions to this Holding`,
         status: 'error',
         variant: 'subtle',
         isClosable: true,
