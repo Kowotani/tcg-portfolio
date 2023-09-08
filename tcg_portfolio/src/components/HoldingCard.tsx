@@ -68,6 +68,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     `Unable to find latest price for tcgplayerId: ${holding.product.tcgplayerId}`)
   const holdingPercentPnl = getHoldingPercentPnl(holding, price)
 
+  const isEmpty = holding.transactions.length === 0
   const isInactive = getHoldingQuantity(holding) === 0
 
   const valueSummary: TMetricSummaryItem[] = [
@@ -139,24 +140,42 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
             />
             <VStack spacing={0} width='100%'>
               <Box display='flex' justifyContent='space-between' width='100%'>
+
+                {/* Product Name */}
                 <Text align='left' fontWeight='bold'>
                   {getProductNameWithLanguage(props.populatedHolding.product)}
                 </Text>
+
+                {/* Tag and Close Button */}
                 <Box display='flex' alignItems='center'>
-                  {isInactive
-                    ? (
-                      <Badge 
-                        colorScheme='purple' 
-                        variant='subtle' 
-                        borderRadius={10}
-                        fontSize='sm'
-                        m='0px 8px'                     
-                      >
-                        Inactive Holding
-                      </Badge>
-                    )
-                    : undefined
-                  }
+
+                  {/* Empty Holding */}
+                  {isEmpty && (
+                    <Badge 
+                      colorScheme='red' 
+                      variant='subtle' 
+                      borderRadius={10}
+                      fontSize='sm'
+                      m='0px 8px'                     
+                    >
+                      Empty Holding
+                    </Badge>
+                  )} 
+
+                  {/* Inactive Holding */}
+                  {!isEmpty && isInactive && (
+                    <Badge 
+                      colorScheme='purple' 
+                      variant='subtle' 
+                      borderRadius={10}
+                      fontSize='sm'
+                      m='0px 8px'                     
+                    >
+                      Inactive Holding
+                    </Badge>   
+                  )}
+
+                  {/* Close Button */}
                   <CloseButton 
                     onClick={
                       () => props.onHoldingDelete(props.populatedHolding)
