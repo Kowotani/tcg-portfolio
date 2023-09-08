@@ -1,23 +1,24 @@
 import { loadImageToS3 } from './aws/s3Manager'
 import { 
-  IDatedPriceData, IPopulatedPortfolio, IPrice, IPriceData, IProduct, 
-  TimeseriesGranularity,
+  IDatedPriceData, IPopulatedPortfolio, IPortfolio, IPrice, IPriceData, 
+  IProduct, TimeseriesGranularity,
 
   DeletePortfolioStatus, GetPortfoliosStatus, GetPricesStatus, 
-  GetProductsStatus, PostLatestPriceStatus, PostPriceStatus, PostProductStatus, 
-  PutPortfoliosStatus,
+  GetProductsStatus, PostLatestPriceStatus, PostPortfolioStatus, 
+  PostPriceStatus, PostProductStatus, PutPortfolioStatus,
   
   TDataResBody, TDeletePortfolioReqBody, TPostLatestPriceReqBody, 
-  TPostPriceReqBody, TPutPortfolioReqBody, TPostProductReqBody, 
-  TProductPostResBody, TResBody, 
+  TPostPortfolioReqBody, TPostPriceReqBody, TPutPortfolioReqBody, 
+  TPostProductReqBody, TProductPostResBody, TResBody, 
 
   ADD_LATEST_PRICE_URL, ADD_PRICE_URL, CRUD_PORTFOLIO_URL, CRUD_PRODUCT_URL,
-  GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL, IPortfolio, 
+  GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL, 
 } from 'common'
 import express from 'express'
 import { 
-  deletePortfolio, getLatestPrices, getPortfolioDoc, getPortfolios, 
-  getProductDoc, getProductDocs, insertPrices, insertProducts, setPortfolio
+  addPortfolio, deletePortfolio, getLatestPrices, getPortfolioDoc, 
+  getPortfolios, getProductDoc, getProductDocs, insertPrices, insertProducts, 
+  setPortfolio
 } from './mongo/mongoManager'
 import multer from 'multer'
 import { loadPrice } from './scraper/scrapeManager'
@@ -102,6 +103,56 @@ app.delete(CRUD_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
 
 /*
 DESC
+  Handle POST request to add a Portfolio
+INPUT
+  Request body in multipart/form-data containing a TPostPortfolioReqBody
+RETURN
+  TResBody response with status codes
+
+  Status Code
+    200: The Portfolio was successfully created
+    500: An error occurred
+*/
+app.post(CRUD_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
+
+  // variables
+  const body: TPostPortfolioReqBody = req.body
+  const portfolio = body.portfolio
+  
+  try {
+
+    // create Portfolio
+    const isCreated = await addPortfolio(portfolio)
+
+    // success
+    if (isCreated) {
+      res.status(200)
+      const body: TResBody = {
+        message: PostPortfolioStatus.Success
+      }
+      res.send(body)
+    
+    // error
+    } else {
+      res.status(500)
+      const body: TResBody = {
+        message: PostPortfolioStatus.Error
+      }        
+      res.send(body)
+    }
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: `${PostPortfolioStatus.Error}: ${err}`
+    }        
+    res.send(body)
+  }
+})
+
+/*
+DESC
   Handle PUT request to update a Portfolio
 INPUT
   Request body in multipart/form-data containing a TPutPortfolioReqBody
@@ -127,7 +178,7 @@ app.put(CRUD_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
     if (isUpdated) {
       res.status(200)
       const body: TResBody = {
-        message: PutPortfoliosStatus.Success
+        message: PutPortfolioStatus.Success
       }
       res.send(body)
     
@@ -135,7 +186,7 @@ app.put(CRUD_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
     } else {
       res.status(500)
       const body: TResBody = {
-        message: PutPortfoliosStatus.Error
+        message: PutPortfolioStatus.Error
       }        
       res.send(body)
     }
@@ -144,7 +195,7 @@ app.put(CRUD_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
   } catch (err) {
     res.status(500)
     const body: TResBody = {
-      message: `${PutPortfoliosStatus.Error}: ${err}`
+      message: `${PutPortfolioStatus.Error}: ${err}`
     }        
     res.send(body)
   }

@@ -1,12 +1,12 @@
 "use strict";
 exports.__esModule = true;
-exports.GET_LATEST_PRICES_URL = exports.ADD_PRICE_URL = exports.ADD_LATEST_PRICE_URL = exports.GET_PRODUCTS_URL = exports.CRUD_PRODUCT_URL = exports.GET_PORTFOLIOS_URL = exports.CRUD_PORTFOLIO_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.PostLatestPriceStatus = exports.GetPricesStatus = exports.PutPortfoliosStatus = exports.GetPortfoliosStatus = exports.DeletePortfolioStatus = void 0;
+exports.GET_LATEST_PRICES_URL = exports.ADD_PRICE_URL = exports.ADD_LATEST_PRICE_URL = exports.GET_PRODUCTS_URL = exports.CRUD_PRODUCT_URL = exports.GET_PORTFOLIOS_URL = exports.CRUD_PORTFOLIO_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.PostLatestPriceStatus = exports.GetPricesStatus = exports.GetPortfoliosStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
 // =====
 // enums
 // =====
 // -- portfolio
 /*
-  Endpoint:   DELETE_PORTFOLIO_URL
+  Endpoint:   CRUD_PORTFOLIO_URL
   Type:       DELETE
 */
 var DeletePortfolioStatus;
@@ -16,6 +16,24 @@ var DeletePortfolioStatus;
     DeletePortfolioStatus["Error"] = "Error deleting Portfolio";
 })(DeletePortfolioStatus = exports.DeletePortfolioStatus || (exports.DeletePortfolioStatus = {}));
 /*
+  Endpoint:   CRUD_PORTFOLIO_URL
+  Type:       POST
+*/
+var PostPortfolioStatus;
+(function (PostPortfolioStatus) {
+    PostPortfolioStatus["Success"] = "Successfully created Portfolio";
+    PostPortfolioStatus["Error"] = "Error creating Portfolio";
+})(PostPortfolioStatus = exports.PostPortfolioStatus || (exports.PostPortfolioStatus = {}));
+/*
+  Endpoint:   CRUD_PORTFOLIO_URL
+  Type:       PUT
+*/
+var PutPortfolioStatus;
+(function (PutPortfolioStatus) {
+    PutPortfolioStatus["Success"] = "Successfully updated Portfolio";
+    PutPortfolioStatus["Error"] = "Error updating Portfolio";
+})(PutPortfolioStatus = exports.PutPortfolioStatus || (exports.PutPortfolioStatus = {}));
+/*
   Endpoint:   GET_PORTFOLIOS_URL
   Type:       GET
 */
@@ -24,15 +42,6 @@ var GetPortfoliosStatus;
     GetPortfoliosStatus["Success"] = "Successfully retrieved Portfolios";
     GetPortfoliosStatus["Error"] = "Error retrieving Portfolios";
 })(GetPortfoliosStatus = exports.GetPortfoliosStatus || (exports.GetPortfoliosStatus = {}));
-/*
-  Endpoint:   UPDATE_PORTFOLIO_URL
-  Type:       PUT
-*/
-var PutPortfoliosStatus;
-(function (PutPortfoliosStatus) {
-    PutPortfoliosStatus["Success"] = "Successfully updated Portfolio";
-    PutPortfoliosStatus["Error"] = "Error updating Portfolio";
-})(PutPortfoliosStatus = exports.PutPortfoliosStatus || (exports.PutPortfoliosStatus = {}));
 // -- prices
 /*
   Endpoint:   GET_LATEST_PRICES_URL

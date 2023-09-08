@@ -88,6 +88,51 @@ app.delete(common_1.CRUD_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(v
 }));
 /*
 DESC
+  Handle POST request to add a Portfolio
+INPUT
+  Request body in multipart/form-data containing a TPostPortfolioReqBody
+RETURN
+  TResBody response with status codes
+
+  Status Code
+    200: The Portfolio was successfully created
+    500: An error occurred
+*/
+app.post(common_1.CRUD_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // variables
+    const body = req.body;
+    const portfolio = body.portfolio;
+    try {
+        // create Portfolio
+        const isCreated = yield (0, mongoManager_1.addPortfolio)(portfolio);
+        // success
+        if (isCreated) {
+            res.status(200);
+            const body = {
+                message: common_1.PostPortfolioStatus.Success
+            };
+            res.send(body);
+            // error
+        }
+        else {
+            res.status(500);
+            const body = {
+                message: common_1.PostPortfolioStatus.Error
+            };
+            res.send(body);
+        }
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: `${common_1.PostPortfolioStatus.Error}: ${err}`
+        };
+        res.send(body);
+    }
+}));
+/*
+DESC
   Handle PUT request to update a Portfolio
 INPUT
   Request body in multipart/form-data containing a TPutPortfolioReqBody
@@ -108,7 +153,7 @@ app.put(common_1.CRUD_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void
         if (isUpdated) {
             res.status(200);
             const body = {
-                message: common_1.PutPortfoliosStatus.Success
+                message: common_1.PutPortfolioStatus.Success
             };
             res.send(body);
             // error
@@ -116,7 +161,7 @@ app.put(common_1.CRUD_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void
         else {
             res.status(500);
             const body = {
-                message: common_1.PutPortfoliosStatus.Error
+                message: common_1.PutPortfolioStatus.Error
             };
             res.send(body);
         }
@@ -125,7 +170,7 @@ app.put(common_1.CRUD_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void
     catch (err) {
         res.status(500);
         const body = {
-            message: `${common_1.PutPortfoliosStatus.Error}: ${err}`
+            message: `${common_1.PutPortfolioStatus.Error}: ${err}`
         };
         res.send(body);
     }

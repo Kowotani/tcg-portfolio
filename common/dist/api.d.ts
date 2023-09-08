@@ -4,13 +4,17 @@ export declare enum DeletePortfolioStatus {
     DoesNotExist = "Portfolio does not exist",
     Error = "Error deleting Portfolio"
 }
+export declare enum PostPortfolioStatus {
+    Success = "Successfully created Portfolio",
+    Error = "Error creating Portfolio"
+}
+export declare enum PutPortfolioStatus {
+    Success = "Successfully updated Portfolio",
+    Error = "Error updating Portfolio"
+}
 export declare enum GetPortfoliosStatus {
     Success = "Successfully retrieved Portfolios",
     Error = "Error retrieving Portfolios"
-}
-export declare enum PutPortfoliosStatus {
-    Success = "Successfully updated Portfolio",
-    Error = "Error updating Portfolio"
 }
 export declare enum GetPricesStatus {
     Success = "Successfully retrieved latest Prices",
@@ -53,6 +57,9 @@ export declare type TProductPostResBody<Type> = TDataResBody<Type> & {
 export declare type TDeletePortfolioReqBody = {
     userId: number;
     portfolioName: string;
+};
+export declare type TPostPortfolioReqBody = {
+    portfolio: IPortfolio;
 };
 export declare type TPutPortfolioReqBody = {
     existingPortfolio: IPortfolio;

@@ -8,7 +8,7 @@ import { IPortfolio, IProduct } from "./dataModels"
 // -- portfolio
 
 /*
-  Endpoint:   DELETE_PORTFOLIO_URL
+  Endpoint:   CRUD_PORTFOLIO_URL
   Type:       DELETE
 */
 export enum DeletePortfolioStatus {
@@ -18,21 +18,30 @@ export enum DeletePortfolioStatus {
 }
 
 /*
+  Endpoint:   CRUD_PORTFOLIO_URL
+  Type:       POST
+*/
+export enum PostPortfolioStatus {
+  Success = 'Successfully created Portfolio',
+  Error = 'Error creating Portfolio',
+}
+
+/*
+  Endpoint:   CRUD_PORTFOLIO_URL
+  Type:       PUT
+*/
+export enum PutPortfolioStatus {
+  Success = 'Successfully updated Portfolio',
+  Error = 'Error updating Portfolio',
+}
+
+/*
   Endpoint:   GET_PORTFOLIOS_URL
   Type:       GET
 */
 export enum GetPortfoliosStatus {
   Success = 'Successfully retrieved Portfolios',
   Error = 'Error retrieving Portfolios',
-}
-
-/*
-  Endpoint:   UPDATE_PORTFOLIO_URL
-  Type:       PUT
-*/
-export enum PutPortfoliosStatus {
-  Success = 'Successfully updated Portfolio',
-  Error = 'Error updating Portfolio',
 }
 
 // -- prices
@@ -150,6 +159,15 @@ export type TProductPostResBody<Type> = TDataResBody<Type> & {
 export type TDeletePortfolioReqBody = {
   userId: number,
   portfolioName: string
+}
+
+/*
+  Endpoint:   CRUD_PORTFOLIO_URL
+  Type:       POST
+  Req / Res:  Request
+*/
+export type TPostPortfolioReqBody = {
+  portfolio: IPortfolio
 }
 
 /*
