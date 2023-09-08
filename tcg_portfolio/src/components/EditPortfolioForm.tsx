@@ -21,7 +21,7 @@ import {
   
   TPutPortfolioReqBody,
 
-  assert, isASCII, isIPopulatedHolding, isIPortfolio, isTResBody
+  assert, isASCII, isIPopulatedHolding, isIPortfolio, isTResBody, TPostPortfolioReqBody
 } from 'common'
 import { FilterInput } from './FilterInput'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
@@ -32,6 +32,9 @@ import * as _ from 'lodash'
 import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
 import { 
+
+  PortfolioPanelNav,
+
   filterFnHoldingCard, filterFnProductSearchResult, sortFnPopulatedHoldingAsc, 
   sortFnProductSearchResults
 } from '../utils' 
@@ -39,7 +42,8 @@ import {
 
 type TEditPortfolioProps = {
   portfolio: IPopulatedPortfolio,
-  onExitEditMode: () => void,
+  mode: PortfolioPanelNav,
+  onExit: () => void,
 }
 export const EditPortfolioForm = (
   props: PropsWithChildren<TEditPortfolioProps>
@@ -145,12 +149,6 @@ export const EditPortfolioForm = (
       return     
     }
 
-    // create existingPortfolio IPortfolio
-    const existingPortfolio 
-      = _.head(getIPortfoliosFromIPopulatedPortfolios([props.portfolio]))
-    assert(isIPortfolio(existingPortfolio),
-      'Error converting existing Portfolio to IPortfolio')
-
     // create newPortfolio IPortfolio
     let portfolioTemplate: IPopulatedPortfolio = {
       userId: props.portfolio.userId,
@@ -163,69 +161,148 @@ export const EditPortfolioForm = (
     const newPortfolio 
       = _.head(getIPortfoliosFromIPopulatedPortfolios([portfolioTemplate]))
     assert(isIPortfolio(newPortfolio),
-      'Error converting new Portfolio to IPortfolio')              
+      'Error converting new Portfolio to IPortfolio')  
 
-    // create request body
-    const body: TPutPortfolioReqBody = {
-      existingPortfolio: existingPortfolio,
-      newPortfolio: newPortfolio
-    }
+    // -----------------
+    // add new Portfolio
+    // -----------------
 
-    // submit
-    axios({
-      method: 'put',
-      url: CRUD_PORTFOLIO_URL,
-      data: body,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
+    if (props.mode === PortfolioPanelNav.Add) {
 
-    // success
-    .then(res => {
-      actions.setSubmitting(false)
-
-      const resData = res.data
-      assert(isTResBody(resData),
-        'Unexpected response from CRUD_PORTFOLIO_URL')
-
-      // Portoflio was updated
-      if (res.status === 200) {
-        toast({
-          title: 'Portfolio Updated',
-          description: `${existingPortfolio.portfolioName} was updated`,
-          duration: 3000,
-          status: 'success',
-          isClosable: true,
-        })        
-
-      // exit Edit Mode
-      props.onExitEditMode()
-
-      // Portoflio was not updated
-      } else if (res.status === 500) {
-        toast({
-          title: 'Error',
-          description: `${resData.message}`,
-          duration: 3000,
-          status: 'error',
-          isClosable: true,
-        })    
+      // create request body
+      const body: TPostPortfolioReqBody = {
+        portfolio: newPortfolio
       }
 
-    })
+      // submit
+      axios({
+        method: 'post',
+        url: CRUD_PORTFOLIO_URL,
+        data: body,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
 
-    // error
-    .catch(res => {
-      actions.setSubmitting(false)
+      // success
+      .then(res => {
+        actions.setSubmitting(false)
 
-      toast({
-        title: 'Error',
-        description: 'Please try again later',
-        status: 'error',
-        isClosable: true,
-      })                        
-    })            
+        const resData = res.data
+        assert(isTResBody(resData),
+          'Unexpected response from CRUD_PORTFOLIO_URL')
+
+        // Portoflio was updated
+        if (res.status === 200) {
+          toast({
+            title: 'Portfolio Created',
+            description: `${newPortfolio.portfolioName} was created`,
+            duration: 3000,
+            status: 'success',
+            isClosable: true,
+          })        
+
+        // exit Edit Mode
+        props.onExit()
+
+        // Portoflio was not updated
+        } else if (res.status === 500) {
+          toast({
+            title: 'Could Not Create Portfolio',
+            description: `${resData.message}`,
+            duration: 3000,
+            status: 'error',
+            isClosable: true,
+          })    
+        }
+      })
+
+      // error
+      .catch(res => {
+        actions.setSubmitting(false)
+
+        toast({
+          title: 'Could Not Create Portfolio',
+          description: 'Please try again later',
+          status: 'error',
+          isClosable: true,
+        })                        
+      })     
+
+    // --------------------------
+    // updated existing Portfolio
+    // --------------------------
+
+    } else if (props.mode === PortfolioPanelNav.Edit) {
+
+      // create existingPortfolio IPortfolio
+      const existingPortfolio 
+        = _.head(getIPortfoliosFromIPopulatedPortfolios([props.portfolio]))
+      assert(isIPortfolio(existingPortfolio),
+        'Error converting existing Portfolio to IPortfolio')
+
+      // create request body
+      const body: TPutPortfolioReqBody = {
+        existingPortfolio: existingPortfolio,
+        newPortfolio: newPortfolio
+      }
+
+      // submit
+      axios({
+        method: 'put',
+        url: CRUD_PORTFOLIO_URL,
+        data: body,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      // success
+      .then(res => {
+        actions.setSubmitting(false)
+
+        const resData = res.data
+        assert(isTResBody(resData),
+          'Unexpected response from CRUD_PORTFOLIO_URL')
+
+        // Portoflio was updated
+        if (res.status === 200) {
+          toast({
+            title: 'Portfolio Updated',
+            description: `${existingPortfolio.portfolioName} was updated`,
+            duration: 3000,
+            status: 'success',
+            isClosable: true,
+          })        
+
+        // exit Edit Mode
+        props.onExit()
+
+        // Portoflio was not updated
+        } else if (res.status === 500) {
+          toast({
+            title: 'Could not update Portfolio',
+            description: `${resData.message}`,
+            duration: 3000,
+            status: 'error',
+            isClosable: true,
+          })    
+        }
+      })
+
+      // error
+      .catch(res => {
+        actions.setSubmitting(false)
+
+        toast({
+          title: 'Could not update Portfolio',
+          description: 'Please try again later',
+          status: 'error',
+          isClosable: true,
+        })                        
+      })     
+
+    }       
   }
 
   // ---------------
@@ -404,6 +481,7 @@ export const EditPortfolioForm = (
   // Axios response toast
   const toast = useToast()
 
+
   // ====================
   // PortfolioDetailsForm
   // ====================
@@ -417,6 +495,7 @@ export const EditPortfolioForm = (
   // defaults
   const DEFAULT_PORTFOLIO_NAME = props.portfolio.portfolioName
   const DEFAULT_DESCRIPTION = props.portfolio.description ?? ''
+
 
   // ==============
   // main component
@@ -447,9 +526,9 @@ export const EditPortfolioForm = (
             <Box display='flex' justifyContent='flex-end'>
               <Button 
                 variant='ghost' 
-                onClick={props.onExitEditMode}
+                onClick={props.onExit}
               >
-                  Exit Edit Mode
+                Back to All Portfolios
               </Button>
               <Box w='16px' />
               <Button 
@@ -473,8 +552,10 @@ export const EditPortfolioForm = (
                           && form.touched?.portfolioName as boolean}
                         isRequired={true}
                       >
-                        <Box display='flex' alignItems='end'>
-                          <FormLabel>Portfolio Name</FormLabel>
+                        <Box display='flex' alignItems='flex-start'>
+                          <FormLabel m='8px 16px 8px 0px'>
+                            Portfolio Name
+                          </FormLabel>
                           <Box flexGrow={10}>
                             <Input
                               {...field}
@@ -504,8 +585,10 @@ export const EditPortfolioForm = (
                         isInvalid={form.errors?.description !== undefined
                           && form.touched?.description as boolean}
                       >
-                        <Box display='flex' alignItems='end'>
-                          <FormLabel>Description</FormLabel>
+                        <Box display='flex' alignItems='flex-start'>
+                          <FormLabel m='8px 16px 8px 0px'>
+                            Description
+                          </FormLabel>
                           <Box flexGrow={10}>
                             <Input
                               {...field}
@@ -592,8 +675,6 @@ export const EditPortfolioForm = (
           )
         })
       }
-      
-      {/* Footer */}
     </>
   )
 }

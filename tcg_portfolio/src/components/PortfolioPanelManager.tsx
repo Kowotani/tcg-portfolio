@@ -45,18 +45,33 @@ export const PortfolioPanelManager = () => {
   // breadcrumb
   // ----------
 
-  const breadcrumbTrail = 
-    nav === PortfolioPanelNav.All
-      ? ['Portfolio', 'All Portfolios']
+  const breadcrumbBase = ['Portfolio']
 
-      : nav === PortfolioPanelNav.Edit
-        ? ['Portfolio', 'Edit']
-        : ['Portfolio']
+  const breadcrumbTrailMap: Map<PortfolioPanelNav, string[]> = new Map([
+    [ PortfolioPanelNav.Add, breadcrumbBase.concat(['Add']) ],
+    [ PortfolioPanelNav.All, breadcrumbBase.concat(['All']) ],
+    [ PortfolioPanelNav.Edit, breadcrumbBase.concat(['Edit']) ],
+  ])
+
+  const breadcrumbTrail = breadcrumbTrailMap.get(nav) ?? breadcrumbBase
 
 
   // =========
   // functions
   // =========
+
+  /*
+  DESC
+    Function to pass to children to enter Add Mode of a Portfolio
+  */
+    function handleOnEnterAddMode(): void {
+      setActivePortfolio({
+        userId: user.userId,
+        portfolioName: '',
+        populatedHoldings: []
+      } as IPopulatedPortfolio)
+      setNav(PortfolioPanelNav.Add)
+    }
 
   /*
   DESC
@@ -67,7 +82,7 @@ export const PortfolioPanelManager = () => {
     setNav(PortfolioPanelNav.All)
   }
 
-/*
+  /*
   DESC
     Function to pass to children to enter edit mode of a Portfolio
   INPUT
@@ -147,19 +162,19 @@ export const PortfolioPanelManager = () => {
             {nav === PortfolioPanelNav.All 
               && (
                 <AllPortfolios 
+                  onAddClick={handleOnEnterAddMode}
                   onEditClick={handleOnEnterEditMode}
                 />
               )
             }
 
-            {/* Add Portfolio */}
-
-            {/* Edit Portfolio */}
-            {nav === PortfolioPanelNav.Edit 
+            {/* Add / Edit Portfolio */}
+            {_.includes([PortfolioPanelNav.Add, PortfolioPanelNav.Edit], nav)
               && (
                 <EditPortfolioForm 
                   portfolio={activePortfolio}
-                  onExitEditMode={handleOnEnterAllPortfolios}
+                  mode={nav}
+                  onExit={handleOnEnterAllPortfolios}
                 />
               )
             }

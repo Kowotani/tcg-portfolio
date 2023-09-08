@@ -33,6 +33,7 @@ import {
 import { isIPopulatedPortfolioArray } from 'common'
 
 type TAllPortfoliosProps = {
+  onAddClick: () => void,
   onEditClick: (portfolio: IPopulatedPortfolio) => void
 }
 export const AllPortfolios = (
@@ -217,7 +218,7 @@ export const AllPortfolios = (
         <Button 
           colorScheme='green'
           leftIcon={<Icon as={FiPlus} />}
-          onClick={() => console.log('add portfolio')}
+          onClick={() => props.onAddClick()}
         >
           Add Portfolio
         </Button>
