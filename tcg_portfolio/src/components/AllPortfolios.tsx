@@ -7,7 +7,6 @@ import {
   CardBody,
   HStack,
   Progress,
-  Spacer,
   StackDivider
 } from '@chakra-ui/react'
 import { 
@@ -44,10 +43,9 @@ export const AllPortfolios = (
   // =====
 
   const [ portfolios, setPortfolios ] = useState([] as IPopulatedPortfolio[])
+  const [ isLoading, setIsLoading ] = useState(false)
+
   const { user } = useContext(UserContext) as IUserContext
-
-  const isLoadingPortfolios = portfolios.length === 0
-
   const { latestPrices } 
   = useContext(LatestPricesContext) as ILatestPricesContext
 
@@ -138,6 +136,11 @@ export const AllPortfolios = (
 
   // initial load of user Portfolios
   useEffect(() => {
+
+    // set isLoading
+    setIsLoading(true)
+
+    // call endpoint
     axios({
       method: 'get',
       url: GET_PORTFOLIOS_URL,
@@ -153,6 +156,9 @@ export const AllPortfolios = (
     .catch(err => {
       console.log('Error fetching Portfolios: ' + err)
     })
+
+    // unset isLoading
+    setIsLoading(false)
   }, [])
 
 
@@ -203,34 +209,35 @@ export const AllPortfolios = (
 
       {/* Portfolios Header */}
       <SectionHeader header={'Portfolios'}/>
-      {isLoadingPortfolios
+
+      {/* Add Portfolio Button */}
+      <Box display='flex' alignContent='flex-start' m='16px 0px'>
+        <Button 
+          colorScheme='blue'
+          onClick={() => console.log('add portfolio')}
+        >
+          Add Portfolio
+        </Button>
+      </Box>
+
+      {isLoading
         ? (
           <Progress 
             height='24px'
-            m='8px 0px'
+            m='16px 0px'
             isIndeterminate
           />
         ) : (
           <>
-            <Box display='flex' alignContent='flex-start' m='16px 0px'>
-              <Button 
-                colorScheme='blue'
-                onClick={() => console.log('add portfolio')}
-              >
-                Add Portfolio
-              </Button>
-            </Box>
-
             {/* Portfolios */}
             {portfolios.map((portfolio: IPopulatedPortfolio) => {
               return (
-                <Box key={portfolio.portfolioName}>
+                <Box key={portfolio.portfolioName} m='16px 0px'>
                   <PortfolioCard 
                     populatedPortfolio={portfolio}
                     onDeleteClick={onDeleteClick}
                     onEditClick={props.onEditClick}
                   />
-                  <Spacer h='16px' />
                 </Box>
               )
             })}
