@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardBody,
+  CloseButton,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -503,19 +504,13 @@ export const EditTransactionsModal = (
     columnHelper.accessor('delete', {
       cell: (info) => {
         return (
-          <IconButton 
-            aria-label='Delete transaction'
-            colorScheme='red'
-            fontSize='24px'
-            icon={<FiMinusCircle />}
-            isRound={true}
+          <CloseButton 
             onClick={() => handleDeleteTransaction({
               date: info.row.getValue('date'),
               price: info.row.getValue('price'),
               quantity: info.row.getValue('quantity'),              
               type: info.row.getValue('type')
             })}
-            variant='ghost'
           />
         )
       },
