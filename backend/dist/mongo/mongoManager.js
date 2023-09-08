@@ -40,10 +40,7 @@ exports.Price = mongoose_1.default.model('Price', priceSchema_1.priceSchema);
 DESC
   Adds a Portfolio based on the given inputs
 INPUT
-  userId: The associated userId
-  portfolioName: The portfolio's name
-  holdings: An array of Holdings
-  description?: A description of the portfolio
+  portfolio: An IPortfolio
 RETURN
   TRUE if the Portfolio was successfully created, FALSE otherwise
 */
@@ -71,7 +68,6 @@ function addPortfolio(portfolio) {
             if (description) {
                 newPortfolio['description'] = portfolio.description;
             }
-            (0, common_1.assert)((0, common_1.isIPortfolio)(newPortfolio), 'newPortfolio object is not an IPortfolio in addPortfolio()');
             // create the portfolio  
             yield exports.Portfolio.create(newPortfolio);
             return true;
@@ -596,9 +592,9 @@ function main() {
         // }
         // const p233232 = await getProductDoc({'tcgplayerId': 233232})
         // const p449558 = await getProductDoc({'tcgplayerId': 449558})
-        const userId = 456;
-        const portfolioName = 'Gamma Investments';
-        const description = 'Washer dryer mechanic';
+        // const userId = 456
+        // const portfolioName = 'Gamma Investments'
+        // const description = 'Washer dryer mechanic'
         // let holdings: IHolding[] = [
         //   {
         //     tcgplayerId: 233232,
@@ -619,11 +615,11 @@ function main() {
         //   },
         // ]
         // // // -- Set Portfolio
-        const portfolio = {
-            userId: userId,
-            portfolioName: portfolioName,
-            holdings: [],
-        };
+        // const portfolio: IPortfolio = {
+        //   userId: userId, 
+        //   portfolioName: portfolioName,
+        //   holdings: [],
+        // }
         // const newPortfolio: IPortfolio = {
         //   userId: userId, 
         //   portfolioName: portfolioName,
@@ -663,13 +659,12 @@ function main() {
         //   console.log('Portfolios not retrieved')
         // }
         // -- Add portfolio
-        res = yield addPortfolio(portfolio);
-        if (res) {
-            console.log('Portfolio successfully created');
-        }
-        else {
-            console.log('Portfolio not created');
-        }
+        // res = await addPortfolio(portfolio)
+        // if (res) {
+        //   console.log('Portfolio successfully created')
+        // } else {
+        //   console.log('Portfolio not created')
+        // }
         // // -- Delete portfolio
         // res = await deletePortfolio(userId, portfolioName)
         // if (res) {

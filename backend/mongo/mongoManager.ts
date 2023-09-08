@@ -47,10 +47,7 @@ export const Price = mongoose.model('Price', priceSchema)
 DESC
   Adds a Portfolio based on the given inputs
 INPUT
-  userId: The associated userId
-  portfolioName: The portfolio's name
-  holdings: An array of Holdings
-  description?: A description of the portfolio
+  portfolio: An IPortfolio
 RETURN
   TRUE if the Portfolio was successfully created, FALSE otherwise
 */
@@ -76,7 +73,7 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
     const holdings = await getIMHoldingsFromIHoldings(portfolio.holdings)
 
     // create IPortfolio
-    let newPortfolio: any = {
+    let newPortfolio: IPortfolio = {
       userId: userId,
       portfolioName: portfolioName,
       holdings: holdings
@@ -84,9 +81,6 @@ export async function addPortfolio(portfolio: IPortfolio): Promise<boolean> {
     if (description) {
       newPortfolio['description'] = portfolio.description
     }
-    assert(
-      isIPortfolio(newPortfolio),
-      'newPortfolio object is not an IPortfolio in addPortfolio()')
 
     // create the portfolio  
     await Portfolio.create(newPortfolio)
