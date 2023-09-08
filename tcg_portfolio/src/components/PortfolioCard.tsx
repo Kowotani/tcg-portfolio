@@ -231,11 +231,13 @@ export const PortfolioCard = (
                 spacing={4}
               >
                 {/* Description */}
-                <Box fontSize='large' maxW='20%'>
-                  <Text as='em' align='left' noOfLines={2}>
-                    {props.populatedPortfolio.description}
-                  </Text>
-                </Box>
+                {props.populatedPortfolio.description && 
+                  <Box fontSize='large' maxW='20%'>
+                    <Text as='em' align='left' noOfLines={2}>
+                      {props.populatedPortfolio.description}
+                    </Text>
+                  </Box>
+                }
 
                 {/* Value */}
                 <Box fontSize='large'>
