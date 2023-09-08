@@ -6,6 +6,7 @@ import {
   Card,
   CardBody,
   HStack,
+  Icon,
   Progress,
   StackDivider
 } from '@chakra-ui/react'
@@ -18,6 +19,7 @@ import {
 
   assert
 } from 'common'
+import { FiPlus } from 'react-icons/fi'
 import { PortfolioCard } from './PortfolioCard'
 import { SectionHeader } from './Layout'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
@@ -213,7 +215,8 @@ export const AllPortfolios = (
       {/* Add Portfolio Button */}
       <Box display='flex' alignContent='flex-start' m='16px 0px'>
         <Button 
-          colorScheme='blue'
+          colorScheme='green'
+          leftIcon={<Icon as={FiPlus} />}
           onClick={() => console.log('add portfolio')}
         >
           Add Portfolio

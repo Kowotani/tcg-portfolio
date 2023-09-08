@@ -8,6 +8,7 @@ import {
   FormErrorMessage,
   FormLabel,
   HStack,
+  Icon,
   IconButton,
   Input,
   InputGroup,
@@ -38,7 +39,7 @@ import { Field, FieldInputProps, Form, Formik, FormikHelpers,
   FormikProps } from 'formik'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
-import { FiMinusCircle } from 'react-icons/fi'
+import { FiMinusCircle, FiPlus } from 'react-icons/fi'
 import { createColumnHelper } from '@tanstack/react-table'
 import { MetricSummary, TMetricSummaryItem 
   } from './MetricSummary'
@@ -309,6 +310,7 @@ const AddTransactionForm = (
                   colorScheme='green' 
                   isDisabled={!form.isValid}
                   isLoading={form.isSubmitting}
+                  leftIcon={<Icon as={FiPlus} />}
                   type='submit'
                 >
                   Add Transaction
