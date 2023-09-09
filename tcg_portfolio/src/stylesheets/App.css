@@ -1,0 +1,26 @@
+/* -- Button */
+btn {
+  /* modifiers */
+}
+btn--add {
+  color-scheme: "green";
+}
+
+btn--delete {
+  color-scheme: "red";
+}
+
+btn--primary {
+  color-scheme: "blue";
+}
+
+/* -- Section Header */
+section-header {
+  background: teal;
+  color: white;
+  font-weight: 500;
+  margin: 16px 0px;
+  padding: 8px;
+}
+
+/*# sourceMappingURL=App.css.map */

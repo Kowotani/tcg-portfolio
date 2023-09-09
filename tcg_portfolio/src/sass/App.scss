@@ -1,0 +1,34 @@
+/* -- Button */
+
+$primary-color: 'blue';
+$add-color: 'green';
+$delete-color: 'red';
+
+btn {
+
+  /* modifiers */
+
+  @at-root #{&}--add {
+    color-scheme: $add-color;
+  }
+
+  @at-root #{&}--delete {
+    color-scheme: $delete-color;
+  }
+
+  @at-root #{&}--primary {
+    color-scheme: $primary-color;
+  }
+}
+
+
+/* -- Section Header */
+
+section-header {
+  background: teal;
+  color: white;
+  font-weight: 500;
+  margin: 16px 0px;
+  padding: 8px;
+
+}
