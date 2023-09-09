@@ -31,6 +31,7 @@ import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
+import { CascadingSlideFade } from './Transitions'
 import { 
 
   PortfolioPanelNav,
@@ -661,17 +662,23 @@ export const EditPortfolioForm = (
       {/* Holding Cards */}
       {portfolio.populatedHoldings
         .filter(filterFnHoldingCard(holdingFilter))
-        .map((holding: IPopulatedHolding) => {
+        .map((holding: IPopulatedHolding, ix: number) => {
           return (
-            <Box key={holding.product.tcgplayerId}>
-              <HoldingCard 
-                
-                populatedHolding={holding}
-                onHoldingDelete={onHoldingDelete}
-                onHoldingUpdate={onHoldingUpdate}
-              />
-              <Spacer h='16px'/>
-            </Box>
+            <CascadingSlideFade
+              key={holding.product.tcgplayerId}
+              index={ix}
+              initialDelay={0.1}
+              delay={0.1}
+              duration={0.5}
+            >
+              <Box m='16px 0px'>
+                <HoldingCard    
+                  populatedHolding={holding}
+                  onHoldingDelete={onHoldingDelete}
+                  onHoldingUpdate={onHoldingUpdate}
+                />
+              </Box>
+            </CascadingSlideFade>
           )
         })
       }

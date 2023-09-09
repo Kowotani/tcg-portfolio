@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext, useEffect, useState, } from 'react'
+import { PropsWithChildren, useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { 
   Box,
@@ -25,6 +25,7 @@ import { SectionHeader } from './Layout'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { UserContext } from '../state/UserContext'
+import { CascadingSlideFade } from './Transitions'
 import { 
   ILatestPricesContext, IUserContext, 
   
@@ -234,15 +235,23 @@ export const AllPortfolios = (
         ) : (
           <>
             {/* Portfolios */}
-            {portfolios.map((portfolio: IPopulatedPortfolio) => {
+            {portfolios.map((portfolio: IPopulatedPortfolio, ix: number) => {
               return (
-                <Box key={portfolio.portfolioName} m='16px 0px'>
-                  <PortfolioCard 
-                    populatedPortfolio={portfolio}
-                    onDeleteClick={onDeleteClick}
-                    onEditClick={props.onEditClick}
-                  />
-                </Box>
+                <CascadingSlideFade
+                  key={portfolio.portfolioName}
+                  index={ix}
+                  initialDelay={0.1}
+                  delay={0.075}
+                  duration={0.5}
+                >
+                  <Box m='16px 0px'>
+                    <PortfolioCard 
+                      populatedPortfolio={portfolio}
+                      onDeleteClick={onDeleteClick}
+                      onEditClick={props.onEditClick}
+                    />
+                  </Box>
+                </CascadingSlideFade>
               )
             })}
           </>
