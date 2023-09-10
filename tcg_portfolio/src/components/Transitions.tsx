@@ -9,7 +9,6 @@ import {
     are rendered before later elements
 */
 type TCascadingSlideFade = {
-  key: number | string,
   index: number,
   delay: number,
   duration: number
@@ -28,7 +27,6 @@ export const CascadingSlideFade = (
 
   return (
     <SlideFade
-      key={props.key}
       in={true}
       transition={transition}
     >
