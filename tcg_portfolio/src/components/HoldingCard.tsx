@@ -231,6 +231,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
       </Card>
       <EditTransactionsModal 
         isOpen={isOpen} 
+        marketPrice={props.marketPrice}
         onClose={onClose} 
         product={props.populatedHolding.product}
         setTransactions={handleSetTransactions}

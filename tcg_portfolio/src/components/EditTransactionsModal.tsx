@@ -10,7 +10,6 @@ import {
   FormLabel,
   HStack,
   Icon,
-  IconButton,
   Input,
   InputGroup,
   InputLeftAddon,
@@ -24,6 +23,7 @@ import {
   NumberInputField,
   Radio,
   RadioGroup,
+  Text,
   useToast,
   VStack
 } from '@chakra-ui/react'
@@ -40,12 +40,13 @@ import { Field, FieldInputProps, Form, Formik, FormikHelpers,
   FormikProps } from 'formik'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
-import { FiMinusCircle, FiPlus } from 'react-icons/fi'
+import { FiPlus } from 'react-icons/fi'
 import { createColumnHelper } from '@tanstack/react-table'
 import { MetricSummary, TMetricSummaryItem 
   } from './MetricSummary'
 import { TransactionTable } from './TransactionTable'
-import { getBrowserLocale, getFormattedPrice, getProductNameWithLanguage 
+import { 
+  getBrowserLocale, getFormattedPrice, getProductNameWithLanguage 
 } from '../utils'
 
 
@@ -333,21 +334,26 @@ const AddTransactionForm = (
 
 type TEditTransactionsModalProps = {
   isOpen: boolean,
-  onClose: () => void,
+  marketPrice: number,
   product: IProduct,
-  setTransactions: (txns: ITransaction[]) => void,
   transactions: ITransaction[],
+  onClose: () => void,
+  setTransactions: (txns: ITransaction[]) => void
 }
 export const EditTransactionsModal = (
   props: PropsWithChildren<TEditTransactionsModalProps>
 ) => {
 
-  // state
+  // =====
+  // State
+  // =====
+
   const [ transactions, setTransactions ] = useState(props.transactions)
 
-  // -------------------------
-  // transaction summary items
-  // -------------------------
+
+  // ===================
+  // Transaction Summary
+  // ===================
 
   const holding: IHolding = {
     tcgplayerId: 0,
@@ -398,9 +404,10 @@ export const EditTransactionsModal = (
     },
   ]
 
-  // ---------
-  // functions
-  // ---------
+
+  // =========
+  // Functions
+  // =========
 
   // add transaction to local state only
   function handleAddTransaction(txn: ITransaction): void {
@@ -443,9 +450,10 @@ export const EditTransactionsModal = (
       >= getHoldingSaleQuantity(holding)
   }
 
-  // ----------------
+
+  // ================
   // TransactionTable
-  // ----------------
+  // ================
 
   function handleDeleteTransaction(txn: ITransaction): void {
     const ix = transactions.findIndex((t: ITransaction) => (
@@ -554,7 +562,14 @@ export const EditTransactionsModal = (
                 fontSize='large' 
                 textAlign='center'
               />
+
+              {/* Product Image */}
               <ProductImage boxSize='200px' product={props.product} />
+
+              {/* Market price */}
+              <Text fontSize='large'>
+                {getFormattedPrice(props.marketPrice, getBrowserLocale(), '$', 2)}
+              </Text>
 
               {/* Purchases */}
               <Card>
@@ -601,7 +616,7 @@ export const EditTransactionsModal = (
               variant='ghost' 
               onClick={handleOnExit}
             >
-                Exit Without Saving
+              Exit Without Saving
             </Button>
             <Button 
               colorScheme='blue'
