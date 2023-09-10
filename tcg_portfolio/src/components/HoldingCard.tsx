@@ -16,9 +16,7 @@ import {
   IPopulatedHolding, ITransaction,
 
   getHoldingMarketValue, getHoldingPercentPnl, getHoldingQuantity, 
-  getHoldingTotalCost, getHoldingTotalPnl,
-  
-  assert
+  getHoldingTotalCost, getHoldingTotalPnl
 } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
@@ -28,10 +26,11 @@ import { LatestPricesContext } from '../state/LatestPricesContext'
 import { 
   ILatestPricesContext, 
 
-  getIPriceDataMapFromIDatedPriceDataMap, getProductNameWithLanguage
+  getBrowserLocale, getFormattedPrice, getProductNameWithLanguage
 } from '../utils'
 
 type THoldingCardProps = {
+  marketPrice: number,
   populatedHolding: IPopulatedHolding,
   onHoldingDelete: (holding: IPopulatedHolding) => void,
   onHoldingUpdate: (holding: IPopulatedHolding) => void,
@@ -51,6 +50,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
   const { latestPrices } 
     = useContext(LatestPricesContext) as ILatestPricesContext
 
+    
   // =========
   // functions
   // =========
@@ -61,12 +61,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
   }
 
   // Holding Summary
-
-  const prices = getIPriceDataMapFromIDatedPriceDataMap(latestPrices)
-  const price = prices.get(holding.product.tcgplayerId)?.marketPrice
-  assert(typeof price === 'number',
-    `Unable to find latest price for tcgplayerId: ${holding.product.tcgplayerId}`)
-  const holdingPercentPnl = getHoldingPercentPnl(holding, price)
+  const holdingPercentPnl = getHoldingPercentPnl(holding, props.marketPrice)
 
   const isEmpty = holding.transactions.length === 0
   const isInactive = getHoldingQuantity(holding) === 0
@@ -82,7 +77,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
     },
     {
       title: isInactive ? 'Total Rev:' : 'Market Value:',
-      value: getHoldingMarketValue(holding, price),
+      value: getHoldingMarketValue(holding, props.marketPrice),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
@@ -93,7 +88,7 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
   const profitSummary: TMetricSummaryItem[] = [
     {
       title: 'Profit:',
-      value: getHoldingTotalPnl(holding, price),
+      value: getHoldingTotalPnl(holding, props.marketPrice),
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
@@ -133,11 +128,19 @@ export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
             divider={<StackDivider color='gray.200'/>}
             spacing={4}
           >
-            {/* Product Image */}
-            <ProductImage 
-              product={props.populatedHolding.product} 
-              boxSize='100px'
-            />
+            <VStack minWidth='100px'>
+
+              {/* Product Image */}
+              <ProductImage 
+                product={props.populatedHolding.product} 
+                boxSize='100px'
+              />
+
+              {/* Market Price */}
+              <Text>
+                {getFormattedPrice(props.marketPrice, getBrowserLocale(), '$', 2)}
+              </Text>
+            </VStack>
             <VStack spacing={0} width='100%'>
               <Box display='flex' justifyContent='space-between' width='100%'>
 

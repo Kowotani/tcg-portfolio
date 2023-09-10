@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState, } from 'react'
+import { PropsWithChildren, useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { 
   Box,
@@ -7,7 +7,6 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Spacer,
   Text,
   useToast,
   VStack
@@ -31,12 +30,13 @@ import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
+import { LatestPricesContext } from '../state/LatestPricesContext'
 import { CascadingSlideFade } from './Transitions'
 import { 
+  ILatestPricesContext, PortfolioPanelNav,
 
-  PortfolioPanelNav,
-
-  filterFnHoldingCard, filterFnProductSearchResult, sortFnPopulatedHoldingAsc, 
+  getIPriceDataMapFromIDatedPriceDataMap, filterFnHoldingCard, 
+  filterFnProductSearchResult, sortFnPopulatedHoldingAsc, 
   sortFnProductSearchResults
 } from '../utils' 
 
@@ -49,6 +49,7 @@ type TEditPortfolioProps = {
 export const EditPortfolioForm = (
   props: PropsWithChildren<TEditPortfolioProps>
 ) => {
+
 
   // ======
   // states
@@ -79,6 +80,14 @@ export const EditPortfolioForm = (
 
   // Search results
   const [ searchResults, setSearchResults ] = useState([] as IProduct[])
+
+  // -----
+  // Price
+  // -----
+
+  const { latestPrices } 
+  = useContext(LatestPricesContext) as ILatestPricesContext
+  const prices = getIPriceDataMapFromIDatedPriceDataMap(latestPrices)
 
 
   // =========
@@ -663,6 +672,10 @@ export const EditPortfolioForm = (
       {portfolio.populatedHoldings
         .filter(filterFnHoldingCard(holdingFilter))
         .map((holding: IPopulatedHolding, ix: number) => {
+
+          const marketPrice 
+            = Number(prices.get(holding.product.tcgplayerId)?.marketPrice)
+
           return (
             <CascadingSlideFade
               key={holding.product.tcgplayerId}
@@ -672,7 +685,8 @@ export const EditPortfolioForm = (
               duration={0.5}
             >
               <Box m='16px 0px'>
-                <HoldingCard    
+                <HoldingCard
+                  marketPrice={marketPrice}    
                   populatedHolding={holding}
                   onHoldingDelete={onHoldingDelete}
                   onHoldingUpdate={onHoldingUpdate}
