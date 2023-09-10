@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getPortfolioUnrealizedPnl = exports.getPortfolioTotalRevenue = exports.getPortfolioTotalPnl = exports.getPortfolioTotalCost = exports.getPortfolioSaleQuantity = exports.getPortfolioRealizedPnl = exports.getPortfolioPurchaseQuantity = exports.getPortfolioPercentPnl = exports.getPortfolioMarketValue = exports.getAggPortfolioTotalCost = exports.getAggPortfolioMarketValue = exports.getPortfolioHoldings = exports.getIPortfoliosFromIPopulatedPortfolios = void 0;
+exports.getPortfolioUnrealizedPnl = exports.getPortfolioTotalRevenue = exports.getPortfolioTotalPnl = exports.getPortfolioTotalCost = exports.getPortfolioSaleQuantity = exports.getPortfolioRealizedPnl = exports.getPortfolioPurchaseQuantity = exports.getPortfolioPercentPnl = exports.getPortfolioMarketValue = exports.getAggPortfolioTotalCost = exports.getAggPortfolioMarketValue = exports.getPortfolioNames = exports.getPortfolioHoldings = exports.getIPortfoliosFromIPopulatedPortfolios = void 0;
 var _ = require("lodash");
 var utils_1 = require("./utils");
 var holdingUtils_1 = require("./holdingUtils");
@@ -47,6 +47,20 @@ function getPortfolioHoldings(portfolio) {
         : portfolio.populatedHoldings;
 }
 exports.getPortfolioHoldings = getPortfolioHoldings;
+/*
+DESC
+  Returns the portfolioNames from an input IPortfolio[]
+INPUT
+  portfolios: An IPortfolio[]
+RETURN
+  An array of portfolioNames from the IPortfolio[]
+*/
+function getPortfolioNames(portfolios) {
+    return portfolios.map(function (portfolio) {
+        return portfolio.portfolioName;
+    });
+}
+exports.getPortfolioNames = getPortfolioNames;
 // ==================
 // metric calculators
 // ==================

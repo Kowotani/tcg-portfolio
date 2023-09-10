@@ -87,7 +87,7 @@ export interface ITransaction {
 export interface IReactTableTransaction extends ITransaction {
     delete?: boolean;
 }
-interface IHoldingBase {
+export interface IHoldingBase {
     transactions: ITransaction[];
 }
 export interface IHolding extends IHoldingBase {
@@ -121,7 +121,7 @@ export interface IHoldingMethods {
 export interface IPopulatedHolding extends IHoldingBase {
     product: IProduct;
 }
-interface IPortfolioBase {
+export interface IPortfolioBase {
     userId: number;
     portfolioName: string;
     description?: string;
@@ -160,4 +160,3 @@ export declare const ProductTypeToProductSubtype: {
 export declare const TCGToProductSubtype: {
     [key in TCG]?: ProductSubtype[];
 };
-export {};

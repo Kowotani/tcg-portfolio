@@ -9,7 +9,7 @@ export enum TimeseriesGranularity {
   Seconds = 'seconds',
   Minutes = 'minutes',
   Hours = 'hours',
-};
+}
 
 // -- product features
 
@@ -17,7 +17,7 @@ export enum TimeseriesGranularity {
 export enum ProductLanguage {
   English = 'ENG',
   Japanese = 'JPN',
-};
+}
 
 // product subtype
 export enum ProductSubtype {
@@ -35,7 +35,7 @@ export enum ProductSubtype {
   TexturedFoil = 'Textured Foil',
   UltraPremiumCollection = 'Ultra Premium Collection',
   Unlimited = 'Unlimited',
-};
+}
 
 // product type
 export enum ProductType {
@@ -44,7 +44,7 @@ export enum ProductType {
   CommanderDeck = 'Commander Deck',
   CommanderDeckSet = 'Commander Deck Set',
   SecretLair = 'Secret Lair',
-};
+}
 
 // TCG
 export enum TCG {
@@ -54,7 +54,7 @@ export enum TCG {
   MetaZoo = 'MetaZoo',
   Pokemon = 'Pokemon',
   Sorcery = 'Sorcery',
-};
+}
 
 
 // -- scraper 
@@ -141,7 +141,7 @@ export interface IReactTableTransaction extends ITransaction {
 
 // holding
 
-interface IHoldingBase {
+export interface IHoldingBase {
   transactions: ITransaction[],
 }
 
@@ -192,7 +192,7 @@ export interface IPopulatedHolding extends IHoldingBase {
 
 // portfolio
 
-interface IPortfolioBase {
+export interface IPortfolioBase {
   userId: number,
   portfolioName: string,
   description?: string,

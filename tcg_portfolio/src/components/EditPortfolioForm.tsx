@@ -42,8 +42,9 @@ import {
 
 
 type TEditPortfolioProps = {
-  portfolio: IPopulatedPortfolio,
+  existingPortfolioNames: string[],
   mode: PortfolioPanelNav,
+  portfolio: IPopulatedPortfolio,
   onExit: () => void,
 }
 export const EditPortfolioForm = (
@@ -335,6 +336,9 @@ export const EditPortfolioForm = (
       error = 'Portfolio Name is required'
     } else if (!isASCII(value)) {
       error = 'Portfolio Name must only contain ASCII characters'
+    } else if (props.portfolio.portfolioName !== value 
+        &&_.includes(props.existingPortfolioNames, value)) {
+      error = 'Portfolio Name already exists'
     }
     return error
   }

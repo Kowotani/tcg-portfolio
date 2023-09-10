@@ -15,13 +15,14 @@ import {
 
   GET_PORTFOLIOS_URL,
 
-  getAggPortfolioMarketValue, getAggPortfolioTotalCost,
+  getAggPortfolioMarketValue, getAggPortfolioTotalCost, getPortfolioNames,
 
   assert
 } from 'common'
 import { FiPlus } from 'react-icons/fi'
 import { PortfolioCard } from './PortfolioCard'
 import { SectionHeader } from './Layout'
+import * as _ from 'lodash'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { UserContext } from '../state/UserContext'
@@ -35,7 +36,8 @@ import { isIPopulatedPortfolioArray } from 'common'
 
 type TAllPortfoliosProps = {
   onAddClick: () => void,
-  onEditClick: (portfolio: IPopulatedPortfolio) => void
+  // onEditClick2: (portfolioNames: string[], portfolio: IPopulatedPortfolio) => void,
+  onEditClick: _.CurriedFunction2<string[], IPopulatedPortfolio, void>
 }
 export const AllPortfolios = (
   props: PropsWithChildren<TAllPortfoliosProps>
@@ -70,6 +72,19 @@ export const AllPortfolios = (
     })
     setPortfolios(newPortfolios)
   }
+
+  // /*
+  // DESC
+  //   Sets
+  // INPUT
+  //   portfolio: An IPopulatedPortfolio
+  // */
+  // function onEditClick(portfolio: IPopulatedPortfolio): void {
+  //   props.onEditClick(
+  //     portfolio,
+  //     getPortfolioNames(portfolios)
+  //   )
+  // }
 
 
   // ===============
@@ -248,7 +263,7 @@ export const AllPortfolios = (
                     <PortfolioCard 
                       populatedPortfolio={portfolio}
                       onDeleteClick={onDeleteClick}
-                      onEditClick={props.onEditClick}
+                      onEditClick={props.onEditClick(getPortfolioNames(portfolios))}
                     />
                   </Box>
                 </CascadingSlideFade>

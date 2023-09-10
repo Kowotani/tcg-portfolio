@@ -1,8 +1,9 @@
 import * as _ from 'lodash'
 import { 
-  IHolding, IPopulatedHolding, IPortfolio, IPopulatedPortfolio, IPriceData
+  IHolding, IPopulatedHolding, IPortfolio, IPortfolioBase, IPopulatedPortfolio, 
+  IPriceData
 } from './dataModels'
-import { assert, isIHolding, isIPopulatedPortfolio, isIPortfolio } from './utils'
+import { assert, isIHolding, isIPortfolio } from './utils'
 import { 
   getHoldingMarketValue,
   getHoldingPurchaseQuantity, getHoldingRealizedPnl, getHoldingSaleQuantity, 
@@ -62,6 +63,22 @@ export function getPortfolioHoldings(
   return isIPortfolio(portfolio)
     ? portfolio.holdings
     : portfolio.populatedHoldings
+}
+
+/*
+DESC
+  Returns the portfolioNames from an input IPortfolio[]
+INPUT
+  portfolios: An IPortfolio[]
+RETURN
+  An array of portfolioNames from the IPortfolio[]
+*/
+export function getPortfolioNames(
+  portfolios: IPortfolio[] | IPopulatedPortfolio[]
+) : string[] {
+  return portfolios.map((portfolio: IPortfolioBase) => {
+    return portfolio.portfolioName
+  })
 }
 
 

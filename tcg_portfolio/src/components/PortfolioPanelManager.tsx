@@ -31,19 +31,39 @@ export const PortfolioPanelManager = () => {
   // state
   // =====
 
-  const { latestPrices, setLatestPrices } 
-    = useContext(LatestPricesContext) as ILatestPricesContext
-  const { user } = useContext(UserContext) as IUserContext
+  // ---
+  // nav
+  // ---
 
   const [ nav, setNav ] = useState(PortfolioPanelNav.All)
+
+  // ---------
+  // Portfolio
+  // ---------
+
   const [ activePortfolio, setActivePortfolio ] 
     = useState({} as IPopulatedPortfolio)
+  const [ portfolioNames, setPortfolioNames ] = useState([] as string[])
+
+  // -----
+  // Price
+  // -----
+
+  const { latestPrices, setLatestPrices } 
+    = useContext(LatestPricesContext) as ILatestPricesContext
 
   const isLoadingLatestPrices = latestPrices.size === 0 
 
-  // ----------
+  // ----
+  // User
+  // ----
+
+  const { user } = useContext(UserContext) as IUserContext
+
+  
+  // ==========
   // breadcrumb
-  // ----------
+  // ==========
 
   const breadcrumbBase = ['Portfolio']
 
@@ -88,8 +108,12 @@ export const PortfolioPanelManager = () => {
   INPUT
     portfolio: An IPopulatedPortfolio
   */
-  function handleOnEnterEditMode(portfolio: IPopulatedPortfolio): void {
+  function handleOnEnterEditMode(
+    portfolioNames: string[],
+    portfolio: IPopulatedPortfolio
+  ): void {
     setActivePortfolio(portfolio)
+    setPortfolioNames(portfolioNames)
     setNav(PortfolioPanelNav.Edit)
   }
 
@@ -136,6 +160,8 @@ export const PortfolioPanelManager = () => {
   // main component
   // ==============
 
+  const curriedHandleOnEnterEditMode = _.curry(handleOnEnterEditMode)
+
   return (
     <>
       {isLoadingLatestPrices
@@ -163,7 +189,7 @@ export const PortfolioPanelManager = () => {
               && (
                 <AllPortfolios 
                   onAddClick={handleOnEnterAddMode}
-                  onEditClick={handleOnEnterEditMode}
+                  onEditClick={curriedHandleOnEnterEditMode}
                 />
               )
             }
@@ -171,9 +197,10 @@ export const PortfolioPanelManager = () => {
             {/* Add / Edit Portfolio */}
             {_.includes([PortfolioPanelNav.Add, PortfolioPanelNav.Edit], nav)
               && (
-                <EditPortfolioForm 
-                  portfolio={activePortfolio}
+                <EditPortfolioForm
+                  existingPortfolioNames={portfolioNames}
                   mode={nav}
+                  portfolio={activePortfolio}
                   onExit={handleOnEnterAllPortfolios}
                 />
               )
