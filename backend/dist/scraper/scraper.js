@@ -9,11 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.scrape = void 0;
+exports.scrapeCurrent = void 0;
 // imports
 const browser_1 = require("./browser");
 const common_1 = require("common");
-function scrape(ids) {
+function scrapeCurrent(ids) {
     return __awaiter(this, void 0, void 0, function* () {
         // create browser instance and page
         const browser = yield (0, browser_1.getBrowser)();
@@ -81,4 +81,4 @@ function scrape(ids) {
         return scrapeData;
     });
 }
-exports.scrape = scrape;
+exports.scrapeCurrent = scrapeCurrent;

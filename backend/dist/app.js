@@ -215,7 +215,7 @@ app.get(common_1.GET_PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, voi
 // ======
 /*
 DESC
-  Handle POST request to load the latest Price for a tcgplayerId
+  Handle POST request to load the current Price for a tcgplayerId
 INPUT
   Request body in multipart/form-data containing a TPostLatestPriceReqBody
 RETURN
@@ -237,7 +237,7 @@ app.post(common_1.ADD_LATEST_PRICE_URL, upload.none(), (req, res) => __awaiter(v
             throw new Error(errMsg);
         }
         // load latest Price
-        const isLoaded = yield (0, scrapeManager_1.loadPrice)(tcgplayerId);
+        const isLoaded = yield (0, scrapeManager_1.loadCurrentPrice)(tcgplayerId);
         if (isLoaded) {
             res.status(201);
             const body = {

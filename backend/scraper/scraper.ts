@@ -9,7 +9,7 @@ import {
 
 /*
 DESC
-  Scrapes price data for the input tcgplayerIds
+  Scrapes current price data for the input tcgplayerIds
 INPUT
   Array of tcgplayerIds
 RETURN
@@ -19,7 +19,9 @@ type TScrapedText = {
   text: string,
   price: string
 }
-export async function scrape(ids: number[]): Promise<Map<number, IPriceData>> {
+export async function scrapeCurrent(
+  ids: number[]
+): Promise<Map<number, IPriceData>> {
 
   // create browser instance and page
   const browser = await getBrowser()

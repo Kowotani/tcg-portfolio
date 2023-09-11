@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadPrices = exports.loadPrice = void 0;
+exports.loadCurrentPrices = exports.loadCurrentPrice = void 0;
 // imports
 const mongoManager_1 = require("../mongo/mongoManager");
 const scraper_1 = require("./scraper");
@@ -19,16 +19,16 @@ const common_1 = require("common");
 // =========
 /*
 DESC
-  Loads price data for the Product specified by the input tcgplayerId
+  Loads current price data for the Product specified by the input tcgplayerId
 INPUT
   tcgplayerId: The tcgplayerId of the Product
 RETURN
   TRUE if the price data was successfully loaded, FALSE otherwise
 */
-function loadPrice(tcgplayerId) {
+function loadCurrentPrice(tcgplayerId) {
     return __awaiter(this, void 0, void 0, function* () {
         // scrape price data
-        const scrapedPrices = yield (0, scraper_1.scrape)([tcgplayerId]);
+        const scrapedPrices = yield (0, scraper_1.scrapeCurrent)([tcgplayerId]);
         const priceData = scrapedPrices.get(tcgplayerId);
         // check if data was retrieved
         if (priceData === undefined) {
@@ -50,21 +50,21 @@ function loadPrice(tcgplayerId) {
         return numInserted === 1;
     });
 }
-exports.loadPrice = loadPrice;
+exports.loadCurrentPrice = loadCurrentPrice;
 /*
 DESC
-  Loads price data for all known products
+  Loads current price data for all known products
 RETURN
   The number of Price documents inserted
 */
-function loadPrices() {
+function loadCurrentPrices() {
     return __awaiter(this, void 0, void 0, function* () {
         // get all Products
         const productDocs = yield (0, mongoManager_1.getProductDocs)();
         console.log(`Retrieved prods: ${JSON.stringify(productDocs, null, 4)}`);
         // scrape price data
         const tcgplayerIds = productDocs.map(doc => doc.tcgplayerId);
-        const scrapedPrices = yield (0, scraper_1.scrape)(tcgplayerIds);
+        const scrapedPrices = yield (0, scraper_1.scrapeCurrent)(tcgplayerIds);
         // set price date
         let priceDate = new Date();
         priceDate.setMinutes(0, 0, 0);
@@ -106,7 +106,7 @@ function loadPrices() {
         return numInserted;
     });
 }
-exports.loadPrices = loadPrices;
+exports.loadCurrentPrices = loadCurrentPrices;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         // const tcgplayerId = 224721

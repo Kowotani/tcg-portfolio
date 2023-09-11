@@ -21,7 +21,7 @@ import {
   setPortfolio
 } from './mongo/mongoManager'
 import multer from 'multer'
-import { loadPrice } from './scraper/scrapeManager'
+import { loadCurrentPrice } from './scraper/scrapeManager'
 import { isPortfolioDoc, isProductDoc } from './utils'
 
 const upload = multer()
@@ -248,7 +248,7 @@ app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
 
 /*
 DESC
-  Handle POST request to load the latest Price for a tcgplayerId
+  Handle POST request to load the current Price for a tcgplayerId
 INPUT
   Request body in multipart/form-data containing a TPostLatestPriceReqBody
 RETURN
@@ -274,7 +274,7 @@ app.post(ADD_LATEST_PRICE_URL, upload.none(), async (req: any, res: any) => {
     }
 
     // load latest Price
-    const isLoaded = await loadPrice(tcgplayerId)
+    const isLoaded = await loadCurrentPrice(tcgplayerId)
     if (isLoaded) {
       res.status(201)
       const body: TResBody = {

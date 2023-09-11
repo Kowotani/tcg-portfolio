@@ -1,6 +1,6 @@
 // imports
 import { getProductDocs, insertPrices } from '../mongo/mongoManager'
-import { scrape } from './scraper'
+import { scrapeCurrent } from './scraper'
 import { IPrice, IPriceData, TimeseriesGranularity } from 'common'
 
 
@@ -10,16 +10,16 @@ import { IPrice, IPriceData, TimeseriesGranularity } from 'common'
 
 /*
 DESC
-  Loads price data for the Product specified by the input tcgplayerId
+  Loads current price data for the Product specified by the input tcgplayerId
 INPUT
   tcgplayerId: The tcgplayerId of the Product
 RETURN
   TRUE if the price data was successfully loaded, FALSE otherwise
 */
-export async function loadPrice(tcgplayerId: number): Promise<boolean> {
+export async function loadCurrentPrice(tcgplayerId: number): Promise<boolean> {
 
   // scrape price data
-  const scrapedPrices = await scrape([tcgplayerId])
+  const scrapedPrices = await scrapeCurrent([tcgplayerId])
   const priceData = scrapedPrices.get(tcgplayerId)
 
   // check if data was retrieved
@@ -47,11 +47,11 @@ export async function loadPrice(tcgplayerId: number): Promise<boolean> {
 
 /*
 DESC
-  Loads price data for all known products
+  Loads current price data for all known products
 RETURN
   The number of Price documents inserted
 */
-export async function loadPrices(): Promise<number> {
+export async function loadCurrentPrices(): Promise<number> {
 
   // get all Products
   const productDocs = await getProductDocs()
@@ -59,7 +59,7 @@ export async function loadPrices(): Promise<number> {
 
   // scrape price data
   const tcgplayerIds = productDocs.map( doc => doc.tcgplayerId )
-  const scrapedPrices = await scrape(tcgplayerIds)
+  const scrapedPrices = await scrapeCurrent(tcgplayerIds)
 
   // set price date
   let priceDate = new Date()
