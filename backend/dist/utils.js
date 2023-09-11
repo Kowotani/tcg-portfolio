@@ -31,7 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hasValidTransactions = exports.areValidHoldings = exports.isProductDoc = exports.isPriceDoc = exports.isPortfolioDoc = exports.genProductNotFoundError = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = exports.getIMPricesFromIPrices = exports.getIMHoldingsFromIHoldings = void 0;
+exports.hasValidTransactions = exports.areValidHoldings = exports.isProductDoc = exports.isPriceDoc = exports.isPortfolioDoc = exports.genProductNotFoundError = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = exports.isTCGPlayerDateRange = exports.getIMPricesFromIPrices = exports.getIMHoldingsFromIHoldings = void 0;
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -96,6 +96,24 @@ function getIMPricesFromIPrices(prices) {
     });
 }
 exports.getIMPricesFromIPrices = getIMPricesFromIPrices;
+// =======
+// generic
+// =======
+/*
+DESC
+  Determines if the input is a valid price date range from TCGPlayer
+  The expected regex format is:
+    \d{1,2}\/\d{1,2} to \d{1,2}\/\d{1,2}
+INPUT
+  value: The string to validate
+RETURN
+  TRUE if the input is a valid price date range from TCGPlayer, FALSE otherwise
+*/
+function isTCGPlayerDateRange(value) {
+    const regexp = new RegExp('^\\d{1,2}\\/\\d{1,2} to \\d{1,2}\\/\\d{1,2}$');
+    return regexp.test(value);
+}
+exports.isTCGPlayerDateRange = isTCGPlayerDateRange;
 // ======
 // errors
 // ======

@@ -94,6 +94,26 @@ export async function getIMPricesFromIPrices(
 }
 
 
+// =======
+// generic
+// =======
+
+/*
+DESC
+  Determines if the input is a valid price date range from TCGPlayer
+  The expected regex format is: 
+    \d{1,2}\/\d{1,2} to \d{1,2}\/\d{1,2}
+INPUT
+  value: The string to validate
+RETURN
+  TRUE if the input is a valid price date range from TCGPlayer, FALSE otherwise
+*/
+export function isTCGPlayerDateRange(value: string) {
+  const regexp = new RegExp('^\\d{1,2}\\/\\d{1,2} to \\d{1,2}\\/\\d{1,2}$');
+  return regexp.test(value);
+}
+
+
 // ======
 // errors
 // ======
