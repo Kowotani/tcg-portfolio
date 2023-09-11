@@ -1,7 +1,9 @@
-// imports
+import { 
+  IDatedPriceData, IPrice, IPriceData, TimeseriesGranularity
+} from 'common'
+import { IMProduct } from '../mongo/models/productSchema'
 import { getProductDocs, insertPrices } from '../mongo/mongoManager'
-import { scrapeCurrent } from './scraper'
-import { IPrice, IPriceData, TimeseriesGranularity } from 'common'
+import { scrapeCurrent, scrapeHistorical } from './scraper'
 
 
 // =========
@@ -55,10 +57,11 @@ export async function loadCurrentPrices(): Promise<number> {
 
   // get all Products
   const productDocs = await getProductDocs()
-  console.log(`Retrieved prods: ${JSON.stringify(productDocs, null, 4)}`)
 
   // scrape price data
-  const tcgplayerIds = productDocs.map( doc => doc.tcgplayerId )
+  const tcgplayerIds = productDocs.map((productDoc: IMProduct) => {
+    return productDoc.tcgplayerId
+  })
   const scrapedPrices = await scrapeCurrent(tcgplayerIds)
 
   // set price date
@@ -68,25 +71,15 @@ export async function loadCurrentPrices(): Promise<number> {
   let priceDocs: IPrice[] = []
 
   // iterate through each Product
-  for (const productDoc of productDocs) {
+  productDocs.forEach((productDoc: IMProduct) => {
 
     const tcgplayerId = productDoc.tcgplayerId
 
     // get price data
     const priceData = scrapedPrices.get(tcgplayerId)
 
-    // handle products without price data
-    if (priceData === undefined) {
-
-      console.log(`No price data found for tcgplayerId: ${tcgplayerId}`)
-
-    // exclude products with missing marketPrice
-    } else if (priceData.marketPrice === undefined) {
-
-      console.log(`No marketPrice data found for tcgplayerId: ${tcgplayerId}`)
-
     // create IPrice
-    } else {
+    if (priceData?.marketPrice) {
 
       let prices: IPriceData = {
         marketPrice: priceData.marketPrice
@@ -108,8 +101,66 @@ export async function loadCurrentPrices(): Promise<number> {
       }
 
       priceDocs.push(price)
-    }    
-  }
+
+    // exclude products with missing data
+    } else {
+
+      console.log(`No price data found for tcgplayerId: ${tcgplayerId}`)
+    } 
+  })
+
+  const numInserted = await insertPrices(priceDocs)
+  return numInserted
+}
+
+/*
+DESC
+  Loads historical price data for all known products
+RETURN
+  The number of Price documents inserted
+*/
+export async function loadHistoricalPrices(): Promise<number> {
+
+    // get all Products
+    const productDocs = await getProductDocs()
+
+    // scrape price data
+    const tcgplayerIds = productDocs.map((productDoc: IMProduct) => {
+      return productDoc.tcgplayerId
+    })
+    const scrapedPrices = await scrapeHistorical(tcgplayerIds)
+
+    let priceDocs: IPrice[] = []
+
+    // iterate through each Product
+    productDocs.forEach(productDoc => {
+
+      const tcgplayerId = productDoc.tcgplayerId
+
+      // get price data
+      const datedPriceData = scrapedPrices.get(tcgplayerId)
+
+      // create IPrices
+      if (datedPriceData) {
+
+        datedPriceData.forEach((priceData: IDatedPriceData) => {
+
+          const price: IPrice = {
+            priceDate: priceData.priceDate,
+            tcgplayerId: tcgplayerId,
+            granularity: TimeseriesGranularity.Hours,
+            prices: priceData.prices
+          }
+  
+          priceDocs.push(price)
+        })
+
+      // exclude products with missing data
+      } else {
+
+        console.log(`No price data found for tcgplayerId: ${tcgplayerId}`)
+      } 
+    })
 
   const numInserted = await insertPrices(priceDocs)
   return numInserted
@@ -124,8 +175,8 @@ async function main() {
   //   : `Could not insert price for tcgplayerId: ${tcgplayerId}`
   // console.log(res)
 
-  const numInserted = await loadCurrentPrices()
-  console.log(`Inserted ${numInserted} docs`)
+  // const numInserted = await loadHistoricalPrices()
+  // console.log(`Inserted ${numInserted} docs`)
 }
 
 main()

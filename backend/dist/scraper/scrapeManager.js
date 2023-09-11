@@ -9,11 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadCurrentPrices = exports.loadCurrentPrice = void 0;
-// imports
+exports.loadHistoricalPrices = exports.loadCurrentPrices = exports.loadCurrentPrice = void 0;
+const common_1 = require("common");
 const mongoManager_1 = require("../mongo/mongoManager");
 const scraper_1 = require("./scraper");
-const common_1 = require("common");
 // =========
 // functions
 // =========
@@ -61,29 +60,22 @@ function loadCurrentPrices() {
     return __awaiter(this, void 0, void 0, function* () {
         // get all Products
         const productDocs = yield (0, mongoManager_1.getProductDocs)();
-        console.log(`Retrieved prods: ${JSON.stringify(productDocs, null, 4)}`);
         // scrape price data
-        const tcgplayerIds = productDocs.map(doc => doc.tcgplayerId);
+        const tcgplayerIds = productDocs.map((productDoc) => {
+            return productDoc.tcgplayerId;
+        });
         const scrapedPrices = yield (0, scraper_1.scrapeCurrent)(tcgplayerIds);
         // set price date
         let priceDate = new Date();
         priceDate.setMinutes(0, 0, 0);
         let priceDocs = [];
         // iterate through each Product
-        for (const productDoc of productDocs) {
+        productDocs.forEach((productDoc) => {
             const tcgplayerId = productDoc.tcgplayerId;
             // get price data
             const priceData = scrapedPrices.get(tcgplayerId);
-            // handle products without price data
-            if (priceData === undefined) {
-                console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
-                // exclude products with missing marketPrice
-            }
-            else if (priceData.marketPrice === undefined) {
-                console.log(`No marketPrice data found for tcgplayerId: ${tcgplayerId}`);
-                // create IPrice
-            }
-            else {
+            // create IPrice
+            if (priceData === null || priceData === void 0 ? void 0 : priceData.marketPrice) {
                 let prices = {
                     marketPrice: priceData.marketPrice
                 };
@@ -100,13 +92,60 @@ function loadCurrentPrices() {
                     prices: prices
                 };
                 priceDocs.push(price);
+                // exclude products with missing data
             }
-        }
+            else {
+                console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
+            }
+        });
         const numInserted = yield (0, mongoManager_1.insertPrices)(priceDocs);
         return numInserted;
     });
 }
 exports.loadCurrentPrices = loadCurrentPrices;
+/*
+DESC
+  Loads historical price data for all known products
+RETURN
+  The number of Price documents inserted
+*/
+function loadHistoricalPrices() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get all Products
+        const productDocs = yield (0, mongoManager_1.getProductDocs)();
+        // scrape price data
+        const tcgplayerIds = productDocs.map((productDoc) => {
+            return productDoc.tcgplayerId;
+        });
+        const scrapedPrices = yield (0, scraper_1.scrapeHistorical)(tcgplayerIds);
+        let priceDocs = [];
+        // iterate through each Product
+        productDocs.forEach(productDoc => {
+            const tcgplayerId = productDoc.tcgplayerId;
+            // get price data
+            const datedPriceData = scrapedPrices.get(tcgplayerId);
+            // create IPrices
+            if (datedPriceData) {
+                datedPriceData.forEach((priceData) => {
+                    const price = {
+                        priceDate: priceData.priceDate,
+                        tcgplayerId: tcgplayerId,
+                        granularity: common_1.TimeseriesGranularity.Hours,
+                        prices: priceData.prices
+                    };
+                    priceDocs.push(price);
+                });
+                // exclude products with missing data
+            }
+            else {
+                console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
+            }
+        });
+        const numInserted = yield (0, mongoManager_1.insertPrices)(priceDocs);
+        return numInserted;
+    });
+}
+exports.loadHistoricalPrices = loadHistoricalPrices;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         // const tcgplayerId = 224721
@@ -115,8 +154,8 @@ function main() {
         //   ? `Inserted price for tcgplayerId: ${tcgplayerId}`
         //   : `Could not insert price for tcgplayerId: ${tcgplayerId}`
         // console.log(res)
-        const numInserted = yield loadCurrentPrices();
-        console.log(`Inserted ${numInserted} docs`);
+        // const numInserted = await loadHistoricalPrices()
+        // console.log(`Inserted ${numInserted} docs`)
     });
 }
 main()
