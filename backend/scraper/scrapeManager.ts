@@ -118,14 +118,14 @@ export async function loadCurrentPrices(): Promise<number> {
 async function main() {
 
   // const tcgplayerId = 224721
-  // const inserted = await loadPrice(tcgplayerId)
+  // const inserted = await loadCurrentPrice(tcgplayerId)
   // const res = inserted
   //   ? `Inserted price for tcgplayerId: ${tcgplayerId}`
   //   : `Could not insert price for tcgplayerId: ${tcgplayerId}`
   // console.log(res)
 
-  // const numInserted = await loadPrices()
-  // console.log(`Inserted ${numInserted} docs`)
+  const numInserted = await loadCurrentPrices()
+  console.log(`Inserted ${numInserted} docs`)
 }
 
 main()

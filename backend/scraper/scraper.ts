@@ -1,11 +1,122 @@
 // imports
-import { getBrowser } from './browser'
 import {
-  IPriceData, TCGPriceType,
+  IDatedPriceData, IPriceData, TCGPriceType,
 
   getPriceFromString, isPriceString, isTCGPriceTypeValue
 } from 'common'
+import puppeteer, { Browser, Page } from 'puppeteer'
 
+// =========
+// constants
+// =========
+
+const URL_BASE = 'https://www.tcgplayer.com/product/'
+
+
+// =========
+// functions
+// =========
+
+// ----------------
+// helper functions
+// ----------------
+
+async function getBrowser(): Promise<Browser>{
+
+  console.log('Opening the browser ...')
+
+	try {
+
+    // initialize browser
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--disable-setuid-sandbox"], 'ignoreHTTPSErrors': true,
+    })
+
+    // success
+    if (browser) {
+      return browser
+
+    // error
+    } else {
+      const msg = 'Could not create a browser instance'
+      throw new Error(msg)
+    }
+
+	} catch (err) {
+
+    const msg = `Error in getBrowser(): ${err}`
+    throw new Error(msg)
+	}
+}
+
+/*
+DESC
+  Returns a new Page from a Puppeteer Browser
+RETURN
+  A Puppeteer Page
+*/
+async function getPage(): Promise<Page> {
+
+  try {
+
+    // get browser
+    const browser = await getBrowser()
+
+    // success
+    if (browser) {
+      return await browser.newPage()
+
+    // error
+    } else {
+      const msg = 'Could not instatiate Browser'
+      throw new Error(msg)
+    }
+
+  } catch (err) {
+
+    const msg = `Error in getNewPage(): ${err}`
+    throw new Error(msg)
+  }
+}
+
+/*
+DESC
+  Returns the input Page after navigating to the input URL
+INPUT
+  page: The Puppeteer Page
+  url: The page URL
+RETURN
+  THe Puppeteer Page after navigating to the URL
+*/
+async function navigatePage(page: Page, url: string): Promise<Page> {
+
+  try {
+
+    // get HTTP response
+    console.log(`Navigating to ${url} ...`)
+    const res = await page.goto(url)
+
+    // success
+    if (res) {
+      return page
+
+    // error
+    } else {
+      const msg = `Could not navigate to ${url}`
+      throw new Error(msg)
+    } 
+
+  } catch (err) {
+
+    const msg = `Error in getPage(): ${err}`
+    throw new Error(msg)
+  }
+}
+
+// --------------
+// main functions
+// --------------
 
 /*
 DESC
@@ -13,62 +124,58 @@ DESC
 INPUT
   Array of tcgplayerIds
 RETURN
-  Array of IProductPriceData objects
+  A Map of tcgplayerId -> IPriceData
 */
 type TScrapedText = {
   text: string,
   price: string
 }
 export async function scrapeCurrent(
-  ids: number[]
+  tcgplayerIds: number[]
 ): Promise<Map<number, IPriceData>> {
 
-  // create browser instance and page
-  const browser = await getBrowser()
-  if (browser === undefined) {
-    console.log('Browser not instantiated. Returning empty map')
-    return new Map<number, IPriceData>()
-  }
-  const page = await browser.newPage()
-
   // store return data
-  let scrapeData: Map<number, IPriceData> = new Map<number, IPriceData>()
+  let scrapeData = new Map<number, IPriceData>()
 
-  // iterate through ids
-  const baseUrl = 'https://www.tcgplayer.com/product/'
-  for (const id of ids) {
-    const url = baseUrl + id + '/'
+  try {
 
-    // navigate to the url
-    console.log(`Navigating to ${url} ...`)
-    try {
-      await page.goto(url)
-    } catch(err) {
-      console.log(`Error navigating to ${url}: ${err}`)
-    }
+    // get empty page
+    const emptyPage = await getPage()
 
-    // wait for price guide to load
-    await page.waitForSelector('.price-guide__points')
+    // iterate through ids
+    for (const tcgplayerId of tcgplayerIds) {
 
-    // const validText: string[] = Object.values(TCGPriceType)
-    const headerPath = '.price-guide__points > table > tr:not(.price-points__header)'
+      // navigate to the url
+      const url = URL_BASE + tcgplayerId + '/'
+      const page = await navigatePage(emptyPage, url)
 
-    // create price object
-    try {
+      // wait for price guide to render
+      const selector = '.price-guide__points'
+      const awaitRender = await page.waitForSelector(selector)
+      if (!awaitRender) {
+        const msg = `Path did not render: ${selector}`
+        throw new Error(msg)
+      }
+
+      // set path for Current Price Points table
+      const headerPath = '.price-guide__points > table > tr:not(.price-points__header)'
 
       // scrape text from divs
       const scrapedTexts = await page.$$eval(headerPath, rows => {
         let scrapedText: TScrapedText[] = []
 
-        for (const row of rows) {
+        rows.forEach((row: HTMLTableRowElement) => {
           
-          const divText = row?.querySelector('.text')?.textContent?.trim() ?? ''
-          const divPrice = row?.querySelector('.price')?.textContent?.trim() ?? ''
+          const divText = row?.querySelector('.text')?.textContent?.trim()
+          const divPrice = row?.querySelector('.price')?.textContent?.trim()
 
-          if (divText.length > 0 && divPrice.length > 0) {
-            scrapedText.push({text: divText, price: divPrice})
+          if (divText && divPrice) {
+            scrapedText.push({
+              text: divText, 
+              price: divPrice
+            })
           }
-        }
+        })
 
         return scrapedText
       })
@@ -92,13 +199,13 @@ export async function scrapeCurrent(
         priceData.listedMedianPrice = data[TCGPriceType.ListedMedianPrice]
       }
 
-      scrapeData.set(id, priceData)         
-
-    } 
-    catch(err) {
-
-      console.log(`Error scraping from ${url}: ${err}`)
+      scrapeData.set(tcgplayerId, priceData)           
     }
+
+  } catch(err) {
+
+    const msg = `Error in scrapeCurrent(): ${err}`
+    throw new Error(msg)
   }
 
   return scrapeData

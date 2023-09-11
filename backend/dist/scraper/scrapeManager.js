@@ -110,13 +110,13 @@ exports.loadCurrentPrices = loadCurrentPrices;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         // const tcgplayerId = 224721
-        // const inserted = await loadPrice(tcgplayerId)
+        // const inserted = await loadCurrentPrice(tcgplayerId)
         // const res = inserted
         //   ? `Inserted price for tcgplayerId: ${tcgplayerId}`
         //   : `Could not insert price for tcgplayerId: ${tcgplayerId}`
         // console.log(res)
-        // const numInserted = await loadPrices()
-        // console.log(`Inserted ${numInserted} docs`)
+        const numInserted = yield loadCurrentPrices();
+        console.log(`Inserted ${numInserted} docs`);
     });
 }
 main()
