@@ -2,7 +2,7 @@
 import {
   IDatedPriceData, IPriceData, TCGPriceType,
 
-  getPriceFromString, isPriceString, isTCGPriceTypeValue
+  getPriceFromString, isPriceString, isTCGPriceTypeValue, sleep
 } from 'common'
 import * as _ from 'lodash'
 import puppeteer, { Browser, ElementHandle, Page } from 'puppeteer'
@@ -14,6 +14,7 @@ import { isTCGPlayerDateRange } from '../utils'
 // =========
 
 const URL_BASE = 'https://www.tcgplayer.com/product/'
+const PRICE_CHART_RENDER_DELAY = 1500
 
 
 // =====
@@ -258,6 +259,7 @@ export async function scrapeHistorical(
       }
 
       // wait for past year to render
+      await sleep(PRICE_CHART_RENDER_DELAY)
       const pastYearPath = "//div[@class='charts-timeframe' and contains(., 'Past Year')]"
       await page.waitForXPath(pastYearPath)
 
@@ -266,7 +268,6 @@ export async function scrapeHistorical(
 
       // scrape text from divs
       const scrapedTexts = await page.$$eval(chartPath, rows => {
-        console.log('found price table')
         let scrapedText: TScrapedText[] = []
 
         rows.forEach((row: HTMLTableRowElement) => {

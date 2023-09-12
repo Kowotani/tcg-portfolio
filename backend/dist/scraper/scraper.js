@@ -41,6 +41,7 @@ const utils_1 = require("../utils");
 // constants
 // =========
 const URL_BASE = 'https://www.tcgplayer.com/product/';
+const PRICE_CHART_RENDER_DELAY = 1500;
 // =========
 // functions
 // =========
@@ -236,13 +237,13 @@ function scrapeHistorical(tcgplayerIds) {
                     throw new Error(msg);
                 }
                 // wait for past year to render
+                yield (0, common_1.sleep)(PRICE_CHART_RENDER_DELAY);
                 const pastYearPath = "//div[@class='charts-timeframe' and contains(., 'Past Year')]";
                 yield page.waitForXPath(pastYearPath);
                 // set path for Price History table
                 const chartPath = '.chart-container table tbody tr';
                 // scrape text from divs
                 const scrapedTexts = yield page.$$eval(chartPath, rows => {
-                    console.log('found price table');
                     let scrapedText = [];
                     rows.forEach((row) => {
                         var _a, _b;
