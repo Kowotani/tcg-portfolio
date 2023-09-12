@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.insertPrices = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = exports.Price = exports.Product = exports.Portfolio = void 0;
+exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = exports.Price = exports.Product = exports.Portfolio = void 0;
 // imports
 const common_1 = require("common");
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -322,7 +322,7 @@ exports.getLatestPrices = getLatestPrices;
 DESC
   Constructs Price documents from the input data and inserts them
 INPUT
-  An array of IPrices
+  docs: An IPrice[]
 RETURN
   The number of documents inserted
 */
@@ -343,6 +343,54 @@ function insertPrices(docs) {
     });
 }
 exports.insertPrices = insertPrices;
+function resetPrices(tcgplayerIds) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        // return value
+        let returnValues = {
+            deleted: 0,
+            inserted: 0
+        };
+        try {
+            // get Products
+            const productDocs = yield getProductDocs();
+            // MSRP prices to load
+            let prices = [];
+            for (const tcgplayerId of tcgplayerIds) {
+                // delete Price documents
+                yield exports.Price.deleteMany({ tcgplayerId: tcgplayerId });
+                returnValues.deleted += 1;
+                // get Product
+                const productDoc = productDocs.find((product) => {
+                    return product.tcgplayerId === tcgplayerId;
+                });
+                // insert MSRP Price document, if MSRP exists
+                if ((0, utils_1.isProductDoc)(productDoc) && productDoc.msrp) {
+                    const price = {
+                        priceDate: productDoc.releaseDate,
+                        tcgplayerId: tcgplayerId,
+                        granularity: common_1.TimeseriesGranularity.Hours,
+                        prices: {
+                            marketPrice: productDoc.msrp
+                        }
+                    };
+                    prices.push(price);
+                }
+            }
+            // insert Prices
+            const priceDocs = yield (0, utils_1.getIMPricesFromIPrices)(prices);
+            const res = yield exports.Price.insertMany(priceDocs);
+            returnValues.inserted = res.length;
+            return returnValues;
+        }
+        catch (err) {
+            const errMsg = `An error occurred in resetPrices(): ${err}`;
+            throw new Error(errMsg);
+        }
+    });
+}
+exports.resetPrices = resetPrices;
 function getProductDoc({ tcgplayerId, hexStringId } = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         // check that tcgplayer_id or id is provided
@@ -581,9 +629,10 @@ function main() {
         // }
         // const res = await insertProducts([product])
         // console.log(res)
-        // // // -- Set Product
+        // // -- Set Product
+        // const tcgplayerId= 121527
         // const key = 'msrp'
-        // const value = 225
+        // const value = 80
         // res = await setProductProperty(tcgplayerId, key, value)
         // if (res) {
         //   console.log(`Product (${tcgplayerId}) updated {${key}: ${value}}`)
@@ -727,6 +776,14 @@ function main() {
         //   console.log('historicalPrices updated')
         // } else {
         //   console.log('historicalPrices not updated')
+        // }
+        // // -- Reset Prices
+        // const tcgplayerIds = [121527]
+        // res = await resetPrices(tcgplayerIds)
+        // if (res) {
+        //   console.log(`${res.deleted} tcgplayerIds were reset, ${res.inserted} were initialized`)
+        // } else {
+        //   console.log('Prices not reset')
         // }
         return 0;
     });

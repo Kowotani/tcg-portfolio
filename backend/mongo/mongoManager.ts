@@ -3,7 +3,9 @@ import {
   IDatedPriceData, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
   IPortfolioMethods, IPrice, IProduct,
 
-  assert, isIPopulatedHolding, isIPortfolio
+  TimeseriesGranularity,
+
+  assert, isIPopulatedHolding
 } from 'common'
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
@@ -384,7 +386,7 @@ export async function getLatestPrices(): Promise<Map<number, IDatedPriceData>> {
 DESC
   Constructs Price documents from the input data and inserts them
 INPUT 
-  An array of IPrices
+  docs: An IPrice[]
 RETURN
   The number of documents inserted
 */
@@ -404,6 +406,78 @@ export async function insertPrices(docs: IPrice[]): Promise<number> {
   } catch(err) {
   
     const errMsg = `An error occurred in insertPrices(): ${err}`
+    throw new Error(errMsg)
+  }
+}
+
+/*
+DESC
+  Removes all Price documents for the input tcgplayerIds, then inserts a Price 
+  document for MSRP if it exists
+INPUT 
+  tcgplayerIds: An array of tcgplayerIds
+RETURN
+  The number of tcgplayerIds with reset Prices
+*/
+type TDeletedPricesRes = {
+  deleted: number,
+  inserted: number
+}
+export async function resetPrices(
+  tcgplayerIds: number[]
+): Promise<TDeletedPricesRes> {
+
+  // connect to db
+  await mongoose.connect(url)
+
+  // return value
+  let returnValues: TDeletedPricesRes = {
+    deleted: 0,
+    inserted: 0
+  }
+
+  try {
+
+    // get Products
+    const productDocs = await getProductDocs()
+
+    // MSRP prices to load
+    let prices: IPrice[] = []
+
+    for (const tcgplayerId of tcgplayerIds) {
+
+      // delete Price documents
+      await Price.deleteMany({tcgplayerId: tcgplayerId})
+      returnValues.deleted += 1
+
+      // get Product
+      const productDoc = productDocs.find((product: IMProduct) => {
+        return product.tcgplayerId === tcgplayerId
+      })
+
+      // insert MSRP Price document, if MSRP exists
+      if (isProductDoc(productDoc) && productDoc.msrp) {
+        const price: IPrice = {
+          priceDate: productDoc.releaseDate,
+          tcgplayerId: tcgplayerId,
+          granularity: TimeseriesGranularity.Hours,
+          prices: {
+            marketPrice: productDoc.msrp
+          }
+        }
+        prices.push(price)
+      }
+    }
+
+    // insert Prices
+    const priceDocs = await getIMPricesFromIPrices(prices)
+    const res = await Price.insertMany(priceDocs)
+    returnValues.inserted = res.length
+    return returnValues
+    
+  } catch(err) {
+  
+    const errMsg = `An error occurred in resetPrices(): ${err}`
     throw new Error(errMsg)
   }
 }
@@ -700,9 +774,10 @@ async function main(): Promise<number> {
   // const res = await insertProducts([product])
   // console.log(res)
 
-  // // // -- Set Product
+  // // -- Set Product
+  // const tcgplayerId= 121527
   // const key = 'msrp'
-  // const value = 225
+  // const value = 80
 
   // res = await setProductProperty(tcgplayerId, key, value)
   // if (res) {
@@ -868,6 +943,15 @@ async function main(): Promise<number> {
   //   console.log('historicalPrices updated')
   // } else {
   //   console.log('historicalPrices not updated')
+  // }
+
+  // // -- Reset Prices
+  // const tcgplayerIds = [121527]
+  // res = await resetPrices(tcgplayerIds)
+  // if (res) {
+  //   console.log(`${res.deleted} tcgplayerIds were reset, ${res.inserted} were initialized`)
+  // } else {
+  //   console.log('Prices not reset')
   // }
 
   return 0
