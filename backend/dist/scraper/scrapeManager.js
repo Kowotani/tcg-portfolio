@@ -154,6 +154,8 @@ function main() {
         //   ? `Inserted price for tcgplayerId: ${tcgplayerId}`
         //   : `Could not insert price for tcgplayerId: ${tcgplayerId}`
         // console.log(res)
+        // const numInserted = await loadCurrentPrices()
+        // console.log(`Inserted ${numInserted} docs`)
         // const numInserted = await loadHistoricalPrices()
         // console.log(`Inserted ${numInserted} docs`)
     });

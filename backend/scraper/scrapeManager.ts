@@ -175,6 +175,9 @@ async function main() {
   //   : `Could not insert price for tcgplayerId: ${tcgplayerId}`
   // console.log(res)
 
+  // const numInserted = await loadCurrentPrices()
+  // console.log(`Inserted ${numInserted} docs`)
+
   // const numInserted = await loadHistoricalPrices()
   // console.log(`Inserted ${numInserted} docs`)
 }

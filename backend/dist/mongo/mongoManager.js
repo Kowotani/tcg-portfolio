@@ -513,10 +513,37 @@ function updateHistoricalPrices() {
         yield mongoose_1.default.connect(url);
         try {
             const res = yield exports.Price.aggregate([
+                // aggregate existing prices for the same priceDate
+                {
+                    $group: {
+                        _id: {
+                            tcgplayerId: '$tcgplayerId',
+                            date: {
+                                $dateTrunc: {
+                                    date: '$priceDate',
+                                    unit: 'day'
+                                }
+                            }
+                        },
+                        marketPrice: {
+                            $avg: '$prices.marketPrice'
+                        }
+                    }
+                },
+                // surface nested fields, append isInterpolated
+                {
+                    $project: {
+                        _id: false,
+                        tcgplayerId: '$_id.tcgplayerId',
+                        date: '$_id.date',
+                        marketPrice: true,
+                        isInterpolated: { $toBool: 0 }
+                    }
+                },
                 // create timeseries of priceDate
                 {
                     $densify: {
-                        field: 'priceDate',
+                        field: 'date',
                         partitionByFields: ['tcgplayerId'],
                         range: {
                             step: 1,
@@ -529,39 +556,11 @@ function updateHistoricalPrices() {
                 {
                     $fill: {
                         partitionByFields: ['tcgplayerId'],
-                        sortBy: { 'priceDate': 1 },
+                        sortBy: { 'date': 1 },
                         output: {
                             'tcgplayerId': { method: 'locf' },
-                            'prices.marketPrice': { method: 'linear' }
-                        }
-                    }
-                },
-                // add isInterpolated and rename priceDate
-                {
-                    $addFields: {
-                        date: {
-                            $dateTrunc: {
-                                date: '$priceDate',
-                                unit: 'day'
-                            }
-                        },
-                        isInterpolated: {
-                            $lte: ['$_id', null]
-                        }
-                    }
-                },
-                // calculate average marketPrice
-                {
-                    $group: {
-                        _id: {
-                            tcgplayerId: '$tcgplayerId',
-                            date: '$date'
-                        },
-                        marketPrice: {
-                            $avg: '$prices.marketPrice'
-                        },
-                        isInterpolated: {
-                            $min: '$isInterpolated'
+                            'marketPrice': { method: 'linear' },
+                            'isInterpolated': { value: true }
                         }
                     }
                 },
@@ -572,16 +571,6 @@ function updateHistoricalPrices() {
                         marketPrice: {
                             $ne: null
                         }
-                    }
-                },
-                // surface nested fields
-                {
-                    $project: {
-                        _id: false,
-                        tcgplayerId: '$_id.tcgplayerId',
-                        date: '$_id.date',
-                        marketPrice: true,
-                        isInterpolated: true
                     }
                 },
                 // sort results
