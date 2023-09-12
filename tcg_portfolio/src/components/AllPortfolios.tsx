@@ -36,8 +36,8 @@ import { isIPopulatedPortfolioArray } from 'common'
 
 type TAllPortfoliosProps = {
   onAddClick: () => void,
-  // onEditClick2: (portfolioNames: string[], portfolio: IPopulatedPortfolio) => void,
-  onEditClick: _.CurriedFunction2<string[], IPopulatedPortfolio, void>
+  onEditClick: _.CurriedFunction2<string[], IPopulatedPortfolio, void>,
+  onViewPerformanceClick: (portfolio: IPopulatedPortfolio) => void
 }
 export const AllPortfolios = (
   props: PropsWithChildren<TAllPortfoliosProps>
@@ -264,6 +264,7 @@ export const AllPortfolios = (
                       populatedPortfolio={portfolio}
                       onDeleteClick={onDeleteClick}
                       onEditClick={props.onEditClick(getPortfolioNames(portfolios))}
+                      onViewPerformanceClick={props.onViewPerformanceClick}
                     />
                   </Box>
                 </CascadingSlideFade>

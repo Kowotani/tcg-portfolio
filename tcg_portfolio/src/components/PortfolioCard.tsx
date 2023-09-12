@@ -43,6 +43,7 @@ type TPortfolioCardProps = {
   populatedPortfolio: IPopulatedPortfolio,
   onDeleteClick: (portfolio: IPopulatedPortfolio) => void,
   onEditClick: (portfolio: IPopulatedPortfolio) => void,
+  onViewPerformanceClick: (portfolio: IPopulatedPortfolio) => void
 }
 export const PortfolioCard = (
   props: PropsWithChildren<TPortfolioCardProps>
@@ -262,6 +263,16 @@ export const PortfolioCard = (
                 >
                   Edit
                 </Button>
+
+
+                {/* View Performance */}
+                <Button 
+                  colorScheme='blue' 
+                  onClick={() => props.onViewPerformanceClick(portfolio)}
+                >
+                  View
+                </Button>
+
               </HStack>
             </VStack>
           </HStack>

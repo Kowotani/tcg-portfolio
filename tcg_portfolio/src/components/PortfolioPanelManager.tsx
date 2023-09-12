@@ -6,6 +6,7 @@ import {
   Progress,
   Text
 } from '@chakra-ui/react'
+import * as _ from 'lodash'
 import { AllPortfolios } from './AllPortfolios'
 import { 
   IPopulatedPortfolio,
@@ -15,7 +16,7 @@ import {
   assert
 } from 'common'
 import { EditPortfolioForm } from './EditPortfolioForm'
-import * as _ from 'lodash'
+import { PortfolioPerformance } from './PortfolioPerformance'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { UserContext } from '../state/UserContext'
 import { 
@@ -71,6 +72,7 @@ export const PortfolioPanelManager = () => {
     [ PortfolioPanelNav.Add, breadcrumbBase.concat(['Add']) ],
     [ PortfolioPanelNav.All, breadcrumbBase.concat(['All']) ],
     [ PortfolioPanelNav.Edit, breadcrumbBase.concat(['Edit']) ],
+    [ PortfolioPanelNav.Performance, breadcrumbBase.concat(['Performance']) ],
   ])
 
   const breadcrumbTrail = breadcrumbTrailMap.get(nav) ?? breadcrumbBase
@@ -117,6 +119,22 @@ export const PortfolioPanelManager = () => {
     setNav(PortfolioPanelNav.Edit)
   }
 
+  /*
+  DESC
+    Function to pass to children to view performance of a Portfolio
+  INPUT
+    portfolio: An IPopulatedPortfolio
+  */
+  function handleOnEnterViewPerformance(
+    portfolio: IPopulatedPortfolio
+  ): void {
+    setActivePortfolio(portfolio)
+    setNav(PortfolioPanelNav.Performance)
+  }
+
+  const curriedHandleOnEnterEditMode = _.curry(handleOnEnterEditMode)
+
+
   // =====
   // hooks
   // =====
@@ -160,8 +178,6 @@ export const PortfolioPanelManager = () => {
   // main component
   // ==============
 
-  const curriedHandleOnEnterEditMode = _.curry(handleOnEnterEditMode)
-
   return (
     <>
       {isLoadingLatestPrices
@@ -190,6 +206,7 @@ export const PortfolioPanelManager = () => {
                 <AllPortfolios 
                   onAddClick={handleOnEnterAddMode}
                   onEditClick={curriedHandleOnEnterEditMode}
+                  onViewPerformanceClick={handleOnEnterViewPerformance}
                 />
               )
             }
@@ -207,6 +224,14 @@ export const PortfolioPanelManager = () => {
             }
 
             {/* Portfolio Performance */}
+            {nav === PortfolioPanelNav.Performance
+              && (
+                <PortfolioPerformance 
+                  portfolio={activePortfolio}
+                  onExit={handleOnEnterAllPortfolios}
+                />
+              )
+            }
           </>
       )}
     </>
