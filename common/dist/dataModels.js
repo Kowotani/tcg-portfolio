@@ -13,7 +13,6 @@ var TimeseriesGranularity;
     TimeseriesGranularity["Minutes"] = "minutes";
     TimeseriesGranularity["Hours"] = "hours";
 })(TimeseriesGranularity = exports.TimeseriesGranularity || (exports.TimeseriesGranularity = {}));
-;
 // -- product features
 // product language
 var ProductLanguage;
@@ -21,7 +20,6 @@ var ProductLanguage;
     ProductLanguage["English"] = "ENG";
     ProductLanguage["Japanese"] = "JPN";
 })(ProductLanguage = exports.ProductLanguage || (exports.ProductLanguage = {}));
-;
 // product subtype
 var ProductSubtype;
 (function (ProductSubtype) {
@@ -40,7 +38,6 @@ var ProductSubtype;
     ProductSubtype["UltraPremiumCollection"] = "Ultra Premium Collection";
     ProductSubtype["Unlimited"] = "Unlimited";
 })(ProductSubtype = exports.ProductSubtype || (exports.ProductSubtype = {}));
-;
 // product type
 var ProductType;
 (function (ProductType) {
@@ -50,7 +47,6 @@ var ProductType;
     ProductType["CommanderDeckSet"] = "Commander Deck Set";
     ProductType["SecretLair"] = "Secret Lair";
 })(ProductType = exports.ProductType || (exports.ProductType = {}));
-;
 // TCG
 var TCG;
 (function (TCG) {
@@ -61,7 +57,6 @@ var TCG;
     TCG["Pokemon"] = "Pokemon";
     TCG["Sorcery"] = "Sorcery";
 })(TCG = exports.TCG || (exports.TCG = {}));
-;
 // -- scraper 
 // TCG price types
 var TCGPriceType;

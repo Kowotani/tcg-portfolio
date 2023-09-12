@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.getISOStringFromDate = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.getISOStringFromDate = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 var util_1 = require("util");
@@ -140,12 +140,13 @@ exports.isNumeric = isNumeric;
 /*
 DESC
   Returns whether the input is a valid price string
+  The expected unescaped regex format is:
+    ^\$\d+\.\d{2}$
 INPUT
   A string to check
 RETURN
   TRUE if the input follows the following regex (which roughtly corresponds
     to numbers like $123.45), FALSE otherwise
-  regex = ^\$\d+\.\d{2}$
 */
 function isPriceString(value) {
     var regexp = new RegExp('^\\$\\d+(,?\\d+)*\\.\\d{2}$');
@@ -175,6 +176,16 @@ function logObject(arg) {
     console.log((0, util_1.inspect)(arg, false, null, true));
 }
 exports.logObject = logObject;
+/*
+DESC
+  Pauses execution for the input ms
+INPUT
+  ms: The milliseconds to sleep
+*/
+function sleep(ms) {
+    return new Promise(function (resolve) { return setTimeout(resolve, ms); });
+}
+exports.sleep = sleep;
 // -------
 // sorting
 // -------

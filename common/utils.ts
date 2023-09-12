@@ -156,12 +156,13 @@ export function isNumeric(value: any): boolean {
 /*
 DESC
   Returns whether the input is a valid price string
+  The expected unescaped regex format is:
+    ^\$\d+\.\d{2}$
 INPUT
   A string to check
 RETURN
   TRUE if the input follows the following regex (which roughtly corresponds
     to numbers like $123.45), FALSE otherwise
-  regex = ^\$\d+\.\d{2}$
 */
 export function isPriceString(value: string): boolean {
   const regexp = new RegExp('^\\$\\d+(,?\\d+)*\\.\\d{2}$');
@@ -189,6 +190,16 @@ INPUT
 */
 export function logObject(arg: Object): void {
   console.log(inspect(arg, false, null, true))
+}
+
+/*
+DESC
+  Pauses execution for the input ms
+INPUT
+  ms: The milliseconds to sleep
+*/
+export function sleep(ms: number): Promise<any> {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 // -------

@@ -12,6 +12,7 @@ export declare function isNumeric(value: any): boolean;
 export declare function isPriceString(value: string): boolean;
 export declare function isTCGPriceTypeValue(value: string): boolean;
 export declare function logObject(arg: Object): void;
+export declare function sleep(ms: number): Promise<any>;
 export declare function sortFnDateAsc(a: Date, b: Date): number;
 export declare function sortFnDateDesc(a: Date, b: Date): number;
 export declare function isDate(arg: any): arg is Date;
