@@ -261,8 +261,8 @@ function scrapeHistorical(tcgplayerIds) {
                 });
                 // parse scraped text
                 let priceData = [];
-                const curYear = (new Date()).getFullYear();
-                let isPrevYear = false;
+                const today = new Date();
+                const [curMonth, curDay] = [today.getMonth() + 1, today.getDate()];
                 scrapedTexts.forEach((st) => {
                     var _a;
                     if ((0, utils_1.isTCGPlayerDateRange)(st.text) && (0, common_1.isPriceString)(st.price)) {
@@ -270,9 +270,10 @@ function scrapeHistorical(tcgplayerIds) {
                         const monthDay = st.text.split(' ')[2].trim();
                         const [strMonth, strDay] = monthDay.split('/')
                             .map(el => el.padStart(2, '0'));
-                        // flip the isPrevYear flag
-                        isPrevYear = !isPrevYear && strMonth === '01';
-                        const year = isPrevYear ? curYear - 1 : curYear;
+                        const [month, day] = [Number(strMonth), Number(strDay)];
+                        const year = (month > curMonth) || (month === curMonth && day > curDay)
+                            ? today.getFullYear() - 1
+                            : today.getFullYear();
                         // create IDatedPriceData
                         const datedPriceData = {
                             priceDate: new Date(Date.parse(`${year}-${strMonth}-${strDay}`)),
