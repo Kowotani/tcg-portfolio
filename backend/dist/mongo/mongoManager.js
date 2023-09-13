@@ -12,13 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = exports.Price = exports.Product = exports.Portfolio = void 0;
+exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
 // imports
 const common_1 = require("common");
 const mongoose_1 = __importDefault(require("mongoose"));
-const portfolioSchema_1 = require("./models/portfolioSchema");
-const priceSchema_1 = require("./models/priceSchema");
-const productSchema_1 = require("./models/productSchema");
 const utils_1 = require("../utils");
 // import { logObject, TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
 // =======
@@ -26,10 +23,6 @@ const utils_1 = require("../utils");
 // =======
 // get mongo client
 const url = 'mongodb://localhost:27017/tcgPortfolio';
-// mongoose models
-exports.Portfolio = mongoose_1.default.model('Portfolio', portfolioSchema_1.portfolioSchema);
-exports.Product = mongoose_1.default.model('Product', productSchema_1.productSchema);
-exports.Price = mongoose_1.default.model('Price', priceSchema_1.priceSchema);
 // =========
 // functions
 // =========
@@ -69,7 +62,7 @@ function addPortfolio(portfolio) {
                 newPortfolio['description'] = portfolio.description;
             }
             // create the portfolio  
-            yield exports.Portfolio.create(newPortfolio);
+            yield utils_1.Portfolio.create(newPortfolio);
             return true;
         }
         catch (err) {
@@ -101,7 +94,7 @@ function deletePortfolio(portfolio) {
                 throw (0, utils_1.genPortfolioNotFoundError)(userId, portfolioName, 'deletePortfolio()');
             }
             // delete the portfolio  
-            const res = yield exports.Portfolio.deleteOne({
+            const res = yield utils_1.Portfolio.deleteOne({
                 'userId': userId,
                 'portfolioName': portfolioName,
             });
@@ -128,7 +121,7 @@ function getPortfolioDoc(portfolio) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const portfolioDoc = yield exports.Portfolio.findOne({
+            const portfolioDoc = yield utils_1.Portfolio.findOne({
                 'userId': portfolio.userId,
                 'portfolioName': portfolio.portfolioName,
             });
@@ -154,7 +147,7 @@ function getPortfolioDocs(userId) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const docs = yield exports.Portfolio.find({ 'userId': userId });
+            const docs = yield utils_1.Portfolio.find({ 'userId': userId });
             return docs;
         }
         catch (err) {
@@ -177,7 +170,7 @@ function getPortfolios(userId) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const docs = yield exports.Portfolio
+            const docs = yield utils_1.Portfolio
                 .find({ 'userId': userId })
                 .populate({
                 path: 'holdings',
@@ -271,7 +264,7 @@ function getLatestPrices() {
                 data: [[ datestring, number ]]
               }
             */
-            const priceData = yield exports.Price.aggregate()
+            const priceData = yield utils_1.Price.aggregate()
                 .group({
                 _id: {
                     tcgplayerId: '$tcgplayerId',
@@ -333,7 +326,7 @@ function insertPrices(docs) {
         try {
             // create IMPrice[]
             const priceDocs = yield (0, utils_1.getIMPricesFromIPrices)(docs);
-            const res = yield exports.Price.insertMany(priceDocs);
+            const res = yield utils_1.Price.insertMany(priceDocs);
             return res.length;
         }
         catch (err) {
@@ -359,7 +352,7 @@ function resetPrices(tcgplayerIds) {
             let prices = [];
             for (const tcgplayerId of tcgplayerIds) {
                 // delete Price documents
-                yield exports.Price.deleteMany({ tcgplayerId: tcgplayerId });
+                yield utils_1.Price.deleteMany({ tcgplayerId: tcgplayerId });
                 returnValues.deleted += 1;
                 // get Product
                 const productDoc = productDocs.find((product) => {
@@ -380,7 +373,7 @@ function resetPrices(tcgplayerIds) {
             }
             // insert Prices
             const priceDocs = yield (0, utils_1.getIMPricesFromIPrices)(prices);
-            const res = yield exports.Price.insertMany(priceDocs);
+            const res = yield utils_1.Price.insertMany(priceDocs);
             returnValues.inserted = res.length;
             return returnValues;
         }
@@ -402,8 +395,8 @@ function getProductDoc({ tcgplayerId, hexStringId } = {}) {
         yield mongoose_1.default.connect(url);
         try {
             const productDoc = tcgplayerId
-                ? yield exports.Product.findOne({ 'tcgplayerId': tcgplayerId })
-                : yield exports.Product.findById(hexStringId);
+                ? yield utils_1.Product.findOne({ 'tcgplayerId': tcgplayerId })
+                : yield utils_1.Product.findById(hexStringId);
             return productDoc;
         }
         catch (err) {
@@ -424,7 +417,7 @@ function getProductDocs() {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const docs = yield exports.Product.find({});
+            const docs = yield utils_1.Product.find({});
             return docs;
         }
         catch (err) {
@@ -447,7 +440,7 @@ function insertProducts(docs) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const res = yield exports.Product.insertMany(docs);
+            const res = yield utils_1.Product.insertMany(docs);
             return res.length;
         }
         catch (err) {
@@ -512,7 +505,7 @@ function updateHistoricalPrices() {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const res = yield exports.Price.aggregate([
+            const res = yield utils_1.Price.aggregate([
                 // aggregate existing prices for the same priceDate
                 {
                     $group: {

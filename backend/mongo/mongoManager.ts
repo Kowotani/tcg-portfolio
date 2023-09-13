@@ -10,10 +10,11 @@ import {
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
 import { HydratedDocument} from 'mongoose'
-import { IMPortfolio, portfolioSchema } from './models/portfolioSchema'
-import { priceSchema } from './models/priceSchema'
-import { IMProduct, productSchema } from './models/productSchema'
+import { IMPortfolio } from './models/portfolioSchema'
+import { IMProduct } from './models/productSchema'
 import { 
+  Portfolio, Product, Price,
+
   getIMHoldingsFromIHoldings, getIMPricesFromIPrices,
   
   genPortfolioAlreadyExistsError, genPortfolioNotFoundError, 
@@ -29,12 +30,7 @@ import {
 // =======
 
 // get mongo client
-const url = 'mongodb://localhost:27017/tcgPortfolio';
-
-// mongoose models
-export const Portfolio = mongoose.model('Portfolio', portfolioSchema)
-export const Product = mongoose.model('Product', productSchema)
-export const Price = mongoose.model('Price', priceSchema)
+const url = 'mongodb://localhost:27017/tcgPortfolio'
 
 
 // =========

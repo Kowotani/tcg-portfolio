@@ -31,7 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hasValidTransactions = exports.areValidHoldings = exports.isProductDoc = exports.isPriceDoc = exports.isPortfolioDoc = exports.genProductNotFoundError = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = exports.isTCGPlayerDateRange = exports.getIMPricesFromIPrices = exports.getIMHoldingsFromIHoldings = void 0;
+exports.hasValidTransactions = exports.areValidHoldings = exports.isProductDoc = exports.isPriceDoc = exports.isPortfolioDoc = exports.genProductNotFoundError = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = exports.isTCGPlayerDateRange = exports.getIMPricesFromIPrices = exports.getIMHoldingsFromIHoldings = exports.Product = exports.Price = exports.Portfolio = void 0;
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -40,9 +40,9 @@ const priceSchema_1 = require("./mongo/models/priceSchema");
 const productSchema_1 = require("./mongo/models/productSchema");
 const mongoManager_1 = require("./mongo/mongoManager");
 // models
-const Portfolio = mongoose_1.default.model('Portfolio', portfolioSchema_1.portfolioSchema);
-const Price = mongoose_1.default.model('Price', priceSchema_1.priceSchema);
-const Product = mongoose_1.default.model('Product', productSchema_1.productSchema);
+exports.Portfolio = mongoose_1.default.model('Portfolio', portfolioSchema_1.portfolioSchema);
+exports.Price = mongoose_1.default.model('Price', priceSchema_1.priceSchema);
+exports.Product = mongoose_1.default.model('Product', productSchema_1.productSchema);
 // ==========
 // converters
 // ==========
@@ -181,7 +181,7 @@ RETURN
 */
 function isPortfolioDoc(arg) {
     return arg
-        && arg instanceof Portfolio;
+        && arg instanceof exports.Portfolio;
 }
 exports.isPortfolioDoc = isPortfolioDoc;
 /*
@@ -194,7 +194,7 @@ RETURN
 */
 function isPriceDoc(arg) {
     return arg
-        && arg instanceof Price;
+        && arg instanceof exports.Price;
 }
 exports.isPriceDoc = isPriceDoc;
 /*
@@ -207,7 +207,7 @@ RETURN
 */
 function isProductDoc(arg) {
     return arg
-        && arg instanceof Product;
+        && arg instanceof exports.Product;
 }
 exports.isProductDoc = isProductDoc;
 // ==========

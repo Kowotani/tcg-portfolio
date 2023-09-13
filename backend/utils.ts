@@ -14,9 +14,9 @@ import { getProductDocs } from './mongo/mongoManager'
 
 
 // models
-const Portfolio = mongoose.model('Portfolio', portfolioSchema)
-const Price = mongoose.model('Price', priceSchema)
-const Product = mongoose.model('Product', productSchema)
+export const Portfolio = mongoose.model('Portfolio', portfolioSchema)
+export const Price = mongoose.model('Price', priceSchema)
+export const Product = mongoose.model('Product', productSchema)
 
 
 // ==========
@@ -222,6 +222,23 @@ RETURN
 export function isProductDoc(arg: any): arg is IMProduct {
   return arg
     && arg instanceof Product
+}
+
+
+// =====
+// types
+// =====
+
+// used for storing timeseries data in FE
+export type TDatedValue = {
+  date: Date,
+  value: number
+}
+
+// used for storing timeseries data in FE
+export type TValueSeries = {
+  tcgplayerId: number,
+  values: TDatedValue[]
 }
 
 
