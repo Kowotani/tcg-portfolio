@@ -347,3 +347,20 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
 
   // Sorcery
 }
+
+
+// =====
+// types
+// =====
+
+// used for storing timeseries data
+export type TDatedValue = {
+  date: Date,
+  value: number
+}
+
+// used for storing timeseries data
+export type TValueSeries = {
+  tcgplayerId: number,
+  values: TDatedValue[]
+}

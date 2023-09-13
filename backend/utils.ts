@@ -5,6 +5,7 @@ import {
 } from 'common'
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
+import { historicalPriceSchema } from './mongo/models/historicalPriceSchema'
 import { IMHolding } from './mongo/models/holdingSchema'
 import { IMPortfolio, portfolioSchema } from './mongo/models/portfolioSchema'
 import { IMPrice, priceSchema } from './mongo/models/priceSchema'
@@ -12,8 +13,9 @@ import { IMProduct, productSchema } from './mongo/models/productSchema'
 import { getProductDocs } from './mongo/mongoManager'
 
 
-
 // models
+export const HistoricalPrice 
+  = mongoose.model('HistoricalPrice', historicalPriceSchema)
 export const Portfolio = mongoose.model('Portfolio', portfolioSchema)
 export const Price = mongoose.model('Price', priceSchema)
 export const Product = mongoose.model('Product', productSchema)
@@ -181,6 +183,18 @@ export function genProductNotFoundError(
 }
 
 
+// ==========
+// interfaces
+// ==========
+
+export interface IHistoricalPrice {
+  tcgplayerId: number,
+  date: Date,
+  marketPrice: number,
+  isInterpolated: boolean
+}
+
+
 // ===========
 // type guards
 // ===========
@@ -222,23 +236,6 @@ RETURN
 export function isProductDoc(arg: any): arg is IMProduct {
   return arg
     && arg instanceof Product
-}
-
-
-// =====
-// types
-// =====
-
-// used for storing timeseries data in FE
-export type TDatedValue = {
-  date: Date,
-  value: number
-}
-
-// used for storing timeseries data in FE
-export type TValueSeries = {
-  tcgplayerId: number,
-  values: TDatedValue[]
 }
 
 

@@ -31,15 +31,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hasValidTransactions = exports.areValidHoldings = exports.isProductDoc = exports.isPriceDoc = exports.isPortfolioDoc = exports.genProductNotFoundError = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = exports.isTCGPlayerDateRange = exports.getIMPricesFromIPrices = exports.getIMHoldingsFromIHoldings = exports.Product = exports.Price = exports.Portfolio = void 0;
+exports.hasValidTransactions = exports.areValidHoldings = exports.isProductDoc = exports.isPriceDoc = exports.isPortfolioDoc = exports.genProductNotFoundError = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = exports.isTCGPlayerDateRange = exports.getIMPricesFromIPrices = exports.getIMHoldingsFromIHoldings = exports.Product = exports.Price = exports.Portfolio = exports.HistoricalPrice = void 0;
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
 const mongoose_1 = __importDefault(require("mongoose"));
+const historicalPriceSchema_1 = require("./mongo/models/historicalPriceSchema");
 const portfolioSchema_1 = require("./mongo/models/portfolioSchema");
 const priceSchema_1 = require("./mongo/models/priceSchema");
 const productSchema_1 = require("./mongo/models/productSchema");
 const mongoManager_1 = require("./mongo/mongoManager");
 // models
+exports.HistoricalPrice = mongoose_1.default.model('HistoricalPrice', historicalPriceSchema_1.historicalPriceSchema);
 exports.Portfolio = mongoose_1.default.model('Portfolio', portfolioSchema_1.portfolioSchema);
 exports.Price = mongoose_1.default.model('Price', priceSchema_1.priceSchema);
 exports.Product = mongoose_1.default.model('Product', productSchema_1.productSchema);

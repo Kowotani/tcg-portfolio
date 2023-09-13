@@ -160,3 +160,11 @@ export declare const ProductTypeToProductSubtype: {
 export declare const TCGToProductSubtype: {
     [key in TCG]?: ProductSubtype[];
 };
+export declare type TDatedValue = {
+    date: Date;
+    value: number;
+};
+export declare type TValueSeries = {
+    tcgplayerId: number;
+    values: TDatedValue[];
+};

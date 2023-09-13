@@ -1,7 +1,7 @@
 // imports
 import { 
   IDatedPriceData, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
-  IPortfolioMethods, IPrice, IProduct, TimeseriesGranularity,
+  IPortfolioMethods, IPrice, IProduct, TDatedValue, TimeseriesGranularity,
 
   assert, isIPopulatedHolding
 } from 'common'
@@ -12,7 +12,7 @@ import { IMHistoricalPrice } from './models/historicalPriceSchema'
 import { IMPortfolio } from './models/portfolioSchema'
 import { IMProduct } from './models/productSchema'
 import { 
-  HistoricalPrice, Portfolio, Product, Price, TDatedValue,
+  HistoricalPrice, Portfolio, Product, Price,
 
   getIMHoldingsFromIHoldings, getIMPricesFromIPrices,
   
