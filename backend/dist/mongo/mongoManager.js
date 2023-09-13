@@ -12,12 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
+exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getPriceSeries = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
 // imports
 const common_1 = require("common");
 const mongoose_1 = __importDefault(require("mongoose"));
 const utils_1 = require("../utils");
-// import { logObject, TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
 // =======
 // globals
 // =======
@@ -313,6 +312,54 @@ function getLatestPrices() {
 exports.getLatestPrices = getLatestPrices;
 /*
 DESC
+  Retrieves the Prices for the input tcgplayerId as a TValueSeries. The series
+  can be sliced by the optional startDate and endDate, otherwise it will return
+  all data found
+INPUT
+  tcgplayerId: The tcgplayerId
+  startDate?: The starting date for the Price series
+  endDate?: The ending date for the Price series
+RETURN
+  A TValueSeries
+*/
+function getPriceSeries(tcgplayerId, startDate, endDate) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // if dates input, verify that startDate <= endDate
+        if (startDate && endDate) {
+            (0, common_1.assert)(startDate.getTime() <= endDate.getTime(), 'startDate must be less than or equal to endDate');
+        }
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            // create filter
+            let filter = { tcgplayerId: tcgplayerId };
+            if (startDate) {
+                filter['date'] = { $gte: startDate };
+            }
+            if (endDate) {
+                filter['date'] = { $lte: endDate };
+            }
+            console.log(filter);
+            // query data
+            const priceDocs = yield utils_1.HistoricalPrice.find(filter).sort({ 'date': 1 });
+            // create TDatedValue[]
+            const datedValues = priceDocs.map((price) => {
+                return {
+                    date: price.date,
+                    value: price.marketPrice
+                };
+            });
+            return datedValues;
+        }
+        catch (err) {
+            const errMsg = `An error occurred in getPriceSeries(): ${err}`;
+            throw new Error(errMsg);
+        }
+    });
+}
+exports.getPriceSeries = getPriceSeries;
+/*
+DESC
   Constructs Price documents from the input data and inserts them
 INPUT
   docs: An IPrice[]
@@ -492,13 +539,7 @@ DESC
   This pipeline creates a price summary for all Products that is designed to
   be used when calculating historical returns
 OUTPUT
-  historicalPrices collection with documents of the form
-  {
-    date: Date,
-    tcgplayerId: number,
-    marketPrice: number,
-    isInterpolated: boolean,
-  }
+  historicalPrices collection of IHistoricalPrice documents
 */
 function updateHistoricalPrices() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -577,7 +618,7 @@ function updateHistoricalPrices() {
                 {
                     $merge: {
                         on: ['tcgplayerId', 'date'],
-                        into: 'historicalPrices',
+                        into: 'historicalprices',
                         whenMatched: 'replace'
                     }
                 }
@@ -767,6 +808,13 @@ function main() {
         // } else {
         //   console.log('Prices not reset')
         // }
+        // // -- Get Price DatedValues
+        // const tcgplayerId = 121527
+        // res = await getPriceSeries(tcgplayerId, 
+        //   new Date(Date.parse('2016-10-08')),
+        //   new Date(Date.parse('2016-10-07')),
+        // )
+        // console.log(res)
         return 0;
     });
 }

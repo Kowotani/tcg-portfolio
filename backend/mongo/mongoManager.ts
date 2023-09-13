@@ -1,19 +1,18 @@
 // imports
 import { 
   IDatedPriceData, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
-  IPortfolioMethods, IPrice, IProduct,
-
-  TimeseriesGranularity,
+  IPortfolioMethods, IPrice, IProduct, TimeseriesGranularity,
 
   assert, isIPopulatedHolding
 } from 'common'
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
 import { HydratedDocument} from 'mongoose'
+import { IMHistoricalPrice } from './models/historicalPriceSchema'
 import { IMPortfolio } from './models/portfolioSchema'
 import { IMProduct } from './models/productSchema'
 import { 
-  Portfolio, Product, Price,
+  HistoricalPrice, Portfolio, Product, Price, TDatedValue,
 
   getIMHoldingsFromIHoldings, getIMPricesFromIPrices,
   
@@ -22,7 +21,6 @@ import {
 
   areValidHoldings, isPortfolioDoc, isProductDoc
 } from '../utils'
-// import { logObject, TCG, ProductType, ProductSubtype, ProductLanguage, TransactionType } from 'common'
 
 
 // =======
@@ -380,6 +378,67 @@ export async function getLatestPrices(): Promise<Map<number, IDatedPriceData>> {
 
 /*
 DESC
+  Retrieves the Prices for the input tcgplayerId as a TValueSeries. The series
+  can be sliced by the optional startDate and endDate, otherwise it will return
+  all data found
+INPUT
+  tcgplayerId: The tcgplayerId
+  startDate?: The starting date for the Price series
+  endDate?: The ending date for the Price series
+RETURN
+  A TValueSeries
+*/
+export async function getPriceSeries(
+  tcgplayerId: number,
+  startDate?: Date,
+  endDate?: Date
+): Promise<TDatedValue[]> {
+
+  // if dates input, verify that startDate <= endDate
+  if (startDate && endDate) {
+    assert(
+      startDate.getTime() <= endDate.getTime(),
+      'startDate must be less than or equal to endDate'
+    )
+  }
+
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    // create filter
+    let filter: any = {tcgplayerId: tcgplayerId}
+    if (startDate) {
+      filter['date'] = {$gte: startDate}
+    }
+    if (endDate) {
+      filter['date'] = {$lte: endDate}
+    }
+    console.log(filter)
+
+    // query data
+    const priceDocs = await HistoricalPrice.find(filter).sort({'date': 1})
+
+    // create TDatedValue[]
+    const datedValues = priceDocs.map((price: IMHistoricalPrice) => {
+      return {
+        date: price.date,
+        value: price.marketPrice
+      } as TDatedValue
+    })
+
+    return datedValues
+    
+  } catch(err) {
+  
+    const errMsg = `An error occurred in getPriceSeries(): ${err}`
+    throw new Error(errMsg)
+  }
+}
+
+/*
+DESC
   Constructs Price documents from the input data and inserts them
 INPUT 
   docs: An IPrice[]
@@ -625,13 +684,7 @@ DESC
   This pipeline creates a price summary for all Products that is designed to
   be used when calculating historical returns
 OUTPUT
-  historicalPrices collection with documents of the form
-  {
-    date: Date,
-    tcgplayerId: number,
-    marketPrice: number,
-    isInterpolated: boolean,
-  }
+  historicalPrices collection of IHistoricalPrice documents
 */
 export async function updateHistoricalPrices(): Promise<boolean> {
 
@@ -719,7 +772,7 @@ export async function updateHistoricalPrices(): Promise<boolean> {
       {
         $merge: {
           on: ['tcgplayerId', 'date'], 
-          into: 'historicalPrices',
+          into: 'historicalprices',
           whenMatched: 'replace'
         }
       }
@@ -937,6 +990,14 @@ async function main(): Promise<number> {
   // } else {
   //   console.log('Prices not reset')
   // }
+
+  // // -- Get Price DatedValues
+  // const tcgplayerId = 121527
+  // res = await getPriceSeries(tcgplayerId, 
+  //   new Date(Date.parse('2016-10-08')),
+  //   new Date(Date.parse('2016-10-07')),
+  // )
+  // console.log(res)
 
   return 0
 }
