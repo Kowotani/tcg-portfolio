@@ -82,6 +82,36 @@ REF
 //   return Object.fromEntries(entries) as { [K in T[number] as K[0]]: K[1] }
 // }
 
+// ----------
+// generators
+// ----------
+
+/*
+DESC
+  Generates an array of dates between the input startDate and endDate inclusive
+INPUT
+  startDate: The starting date
+  endDate: The ending date
+RETURN
+  A Date[]
+*/
+export function genDateRange(startDate: Date, endDate: Date): Date[] {
+
+  startDate.setUTCHours(0, 0, 0, 0)
+  endDate.setUTCHours(0, 0, 0, 0)
+  
+  const date = new Date(startDate.getTime())
+
+  const dates = []
+
+  while (date <= endDate) {
+    dates.push(new Date(date))
+    date.setUTCDate(date.getUTCDate() + 1)
+  }
+
+  return dates
+}
+
 // -------
 // generic
 // -------
