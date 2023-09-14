@@ -27,7 +27,7 @@ exports.SECONDS_PER_DAY = 86400;
 function getISOStringFromDate(date) {
     var newDate = new Date(date);
     var year = newDate.getFullYear().toString();
-    var month = newDate.getMonth().toString().padStart(2, '0');
+    var month = (newDate.getMonth() + 1).toString().padStart(2, '0');
     var day = (newDate.getDate() + 1).toString().padStart(2, '0');
     return "".concat(year, "-").concat(month, "-").concat(day);
 }
