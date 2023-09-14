@@ -39,9 +39,9 @@ export const SECONDS_PER_DAY = 86400
 */
 export function getISOStringFromDate(date: Date): string {
   const newDate = new Date(date)
-  const year = newDate.getFullYear().toString()
-  const month = (newDate.getMonth() + 1).toString().padStart(2, '0')
-  const day = (newDate.getDate() + 1).toString().padStart(2, '0')
+  const year = newDate.getUTCFullYear().toString()
+  const month = (newDate.getUTCMonth() + 1).toString().padStart(2, '0')
+  const day = (newDate.getUTCDate()).toString().padStart(2, '0')
   
   return `${year}-${month}-${day}`
 }
