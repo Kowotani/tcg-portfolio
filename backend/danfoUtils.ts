@@ -1,8 +1,12 @@
-import * as df from 'danfojs-node'
+
 import { 
-  TDatedValue, TValueSeries 
+  IHolding, IPopulatedHolding, ITransaction, TDatedValue,
+
+  genDateRange,
+  getHoldingSales
 } from 'common'
-import { genDateRange } from 'common'
+import * as df from 'danfojs-node'
+
 
 // =======
 // generic
@@ -121,6 +125,29 @@ export function getSeriesFromDatedValues(
 // holding
 // =======
 
+/*
+DESC
+  Returns a series of daily revenue for the input IHolding
+INPUT
+  holding: An IHolding
+RETURN
+  A danfo Series
+*/
+export function getHoldingRevenueSeries(
+  holding: IHolding | IPopulatedHolding
+): df.Series {
+
+  const sales = getHoldingSales(holding)
+
+  const datedValues: TDatedValue[] = sales.map((txn: ITransaction) => {
+    return {
+      date: txn.date,
+      value: txn.price * txn.quantity
+    }
+  })
+
+  return getSeriesFromDatedValues(datedValues)
+}
 
 
 // =========

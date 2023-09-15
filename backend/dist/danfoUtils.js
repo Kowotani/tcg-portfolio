@@ -23,9 +23,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
-const df = __importStar(require("danfojs-node"));
+exports.getHoldingRevenueSeries = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
 const common_1 = require("common");
+const df = __importStar(require("danfojs-node"));
 // =======
 // generic
 // =======
@@ -119,6 +119,25 @@ exports.getSeriesFromDatedValues = getSeriesFromDatedValues;
 // =======
 // holding
 // =======
+/*
+DESC
+  Returns a series of daily revenue for the input IHolding
+INPUT
+  holding: An IHolding
+RETURN
+  A danfo Series
+*/
+function getHoldingRevenueSeries(holding) {
+    const sales = (0, common_1.getHoldingSales)(holding);
+    const datedValues = sales.map((txn) => {
+        return {
+            date: txn.date,
+            value: txn.price * txn.quantity
+        };
+    });
+    return getSeriesFromDatedValues(datedValues);
+}
+exports.getHoldingRevenueSeries = getHoldingRevenueSeries;
 // =========
 // portfolio
 // =========
