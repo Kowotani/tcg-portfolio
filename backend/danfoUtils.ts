@@ -7,6 +7,7 @@ import {
   getHoldingSales
 } from 'common'
 import * as df from 'danfojs-node'
+import * as _ from 'lodash'
 
 
 // =======
@@ -118,6 +119,31 @@ export function getSeriesFromDatedValues(
     return dv.value
   })
 
+  return new df.Series(values, {index})
+}
+
+/*
+DESC
+  Returns the input Series sorted by the index
+INPUT
+  series: A danfo Series
+RETURN
+  A danfo Series
+*/
+export function sortSeriesByIndex(
+  series: df.Series
+): df.Series {
+
+  const index = _.sortBy(series.index, el => el)
+
+  const values = index.map((ix: string | number) => {
+    console.log(`${ix} => ${series.at(String(ix))}`)
+
+    return typeof ix === 'string'
+      ? series.at(ix)
+      : series.iat(ix)
+  })
+  
   return new df.Series(values, {index})
 }
 

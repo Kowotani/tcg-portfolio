@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -19,9 +23,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
+exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
 const common_1 = require("common");
 const df = __importStar(require("danfojs-node"));
+const _ = __importStar(require("lodash"));
 // =======
 // generic
 // =======
@@ -112,6 +117,25 @@ function getSeriesFromDatedValues(datedValues) {
     return new df.Series(values, { index });
 }
 exports.getSeriesFromDatedValues = getSeriesFromDatedValues;
+/*
+DESC
+  Returns the input Series sorted by the index
+INPUT
+  series: A danfo Series
+RETURN
+  A danfo Series
+*/
+function sortSeriesByIndex(series) {
+    const index = _.sortBy(series.index, el => el);
+    const values = index.map((ix) => {
+        console.log(`${ix} => ${series.at(String(ix))}`);
+        return typeof ix === 'string'
+            ? series.at(ix)
+            : series.iat(ix);
+    });
+    return new df.Series(values, { index });
+}
+exports.sortSeriesByIndex = sortSeriesByIndex;
 // =======
 // holding
 // =======
