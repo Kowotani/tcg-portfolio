@@ -75,6 +75,30 @@ export function getHoldingAverageRevenue(
 
 /*
 DESC
+  Returns the date of the first transaction for the input IHolding
+INPUT
+  holding: An IHolding
+RETURN
+  The Date of the first transaction
+*/
+export function getHoldingFirstTransactionDate(
+  holding: IHolding | IPopulatedHolding
+): Date | undefined {
+
+  // no transactions
+  if (holding.transactions.length === 0) {
+    return undefined
+
+  } else {
+    const firstTxn = _.minBy(holding.transactions, (txn: ITransaction) => {
+      return txn.date.getTime()
+    })
+    return firstTxn.date
+  }
+}
+
+/*
+DESC
   Returns the market value of the Holding based on the input price
 INPUT
   holding: An IHolding

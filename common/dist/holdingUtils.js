@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingMarketValue = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = exports.getIHoldingsFromIPopulatedHoldings = void 0;
+exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingMarketValue = exports.getHoldingFirstTransactionDate = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = exports.getIHoldingsFromIPopulatedHoldings = void 0;
 var _ = require("lodash");
 var dataModels_1 = require("./dataModels");
 var utils_1 = require("./utils");
@@ -62,6 +62,27 @@ function getHoldingAverageRevenue(holding) {
         : getHoldingTotalRevenue(holding) / saleQuantity;
 }
 exports.getHoldingAverageRevenue = getHoldingAverageRevenue;
+/*
+DESC
+  Returns the date of the first transaction for the input IHolding
+INPUT
+  holding: An IHolding
+RETURN
+  The Date of the first transaction
+*/
+function getHoldingFirstTransactionDate(holding) {
+    // no transactions
+    if (holding.transactions.length === 0) {
+        return undefined;
+    }
+    else {
+        var firstTxn = _.minBy(holding.transactions, function (txn) {
+            return txn.date.getTime();
+        });
+        return firstTxn.date;
+    }
+}
+exports.getHoldingFirstTransactionDate = getHoldingFirstTransactionDate;
 /*
 DESC
   Returns the market value of the Holding based on the input price
