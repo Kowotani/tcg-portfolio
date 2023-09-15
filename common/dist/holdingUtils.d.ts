@@ -1,8 +1,8 @@
 import { IHolding, IPopulatedHolding, ITransaction } from './dataModels';
 export declare function getIHoldingsFromIPopulatedHoldings(populatedHoldings: IPopulatedHolding[]): IHolding[];
+export declare function getHoldingFirstTransactionDate(holding: IHolding | IPopulatedHolding): Date | undefined;
 export declare function getHoldingAverageCost(holding: IHolding | IPopulatedHolding): number | undefined;
 export declare function getHoldingAverageRevenue(holding: IHolding | IPopulatedHolding): number | undefined;
-export declare function getHoldingFirstTransactionDate(holding: IHolding | IPopulatedHolding): Date | undefined;
 export declare function getHoldingMarketValue(holding: IHolding | IPopulatedHolding, price: number): number;
 export declare function getHoldingPercentPnl(holding: IHolding | IPopulatedHolding, price: number): number | undefined;
 export declare function getHoldingPurchases(holding: IHolding | IPopulatedHolding): ITransaction[];

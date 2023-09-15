@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getPortfolioUnrealizedPnl = exports.getPortfolioTotalRevenue = exports.getPortfolioTotalPnl = exports.getPortfolioTotalCost = exports.getPortfolioSaleQuantity = exports.getPortfolioRealizedPnl = exports.getPortfolioPurchaseQuantity = exports.getPortfolioPercentPnl = exports.getPortfolioMarketValue = exports.getAggPortfolioTotalCost = exports.getAggPortfolioMarketValue = exports.getPortfolioNames = exports.getPortfolioHoldings = exports.getIPortfoliosFromIPopulatedPortfolios = void 0;
+exports.getPortfolioUnrealizedPnl = exports.getPortfolioTotalRevenue = exports.getPortfolioTotalPnl = exports.getPortfolioTotalCost = exports.getPortfolioSaleQuantity = exports.getPortfolioRealizedPnl = exports.getPortfolioPurchaseQuantity = exports.getPortfolioPercentPnl = exports.getPortfolioMarketValue = exports.getAggPortfolioTotalCost = exports.getAggPortfolioMarketValue = exports.getPortfolioNames = exports.getPortfolioHoldings = exports.getPortfolioFirstTransactionDate = exports.getIPortfoliosFromIPopulatedPortfolios = void 0;
 var _ = require("lodash");
 var utils_1 = require("./utils");
 var holdingUtils_1 = require("./holdingUtils");
@@ -33,6 +33,26 @@ exports.getIPortfoliosFromIPopulatedPortfolios = getIPortfoliosFromIPopulatedPor
 // =======
 // getters
 // =======
+/*
+DESC
+  Returns the date of the first transaction for the input IPortfolio
+INPUT
+   portfolio: An IPortfolio
+RETURN
+  The Date of the first transaction in the Portfolio
+*/
+function getPortfolioFirstTransactionDate(portfolio) {
+    // get holdings
+    var holdings = (0, utils_1.isIPortfolio)(portfolio)
+        ? portfolio.holdings
+        : portfolio.populatedHoldings;
+    // first transaction dates for holdings
+    var txnDates = holdings.map(function (holding) {
+        return (0, holdingUtils_1.getHoldingFirstTransactionDate)(holding);
+    });
+    return _.min(txnDates);
+}
+exports.getPortfolioFirstTransactionDate = getPortfolioFirstTransactionDate;
 /*
 DESC
   Returns the Holdings for the input IPortfolio

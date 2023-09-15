@@ -31,6 +31,35 @@ export function getIHoldingsFromIPopulatedHoldings(
 }
 
 
+// =======
+// getters
+// =======
+
+/*
+DESC
+  Returns the date of the first transaction for the input IHolding
+INPUT
+  holding: An IHolding
+RETURN
+  The Date of the first transaction
+*/
+export function getHoldingFirstTransactionDate(
+  holding: IHolding | IPopulatedHolding
+): Date | undefined {
+
+  // no transactions
+  if (holding.transactions.length === 0) {
+    return undefined
+
+  } else {
+    const firstTxn = _.minBy(holding.transactions, (txn: ITransaction) => {
+      return txn.date.getTime()
+    })
+    return firstTxn.date
+  }
+}
+
+
 // ==================
 // metric calculators
 // ==================
@@ -71,30 +100,6 @@ export function getHoldingAverageRevenue(
   return saleQuantity === 0 
     ? undefined
     : getHoldingTotalRevenue(holding) / saleQuantity
-}
-
-/*
-DESC
-  Returns the date of the first transaction for the input IHolding
-INPUT
-  holding: An IHolding
-RETURN
-  The Date of the first transaction
-*/
-export function getHoldingFirstTransactionDate(
-  holding: IHolding | IPopulatedHolding
-): Date | undefined {
-
-  // no transactions
-  if (holding.transactions.length === 0) {
-    return undefined
-
-  } else {
-    const firstTxn = _.minBy(holding.transactions, (txn: ITransaction) => {
-      return txn.date.getTime()
-    })
-    return firstTxn.date
-  }
 }
 
 /*

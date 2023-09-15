@@ -5,7 +5,7 @@ import {
 } from './dataModels'
 import { assert, isIHolding, isIPortfolio } from './utils'
 import { 
-  getHoldingMarketValue,
+  getHoldingFirstTransactionDate, getHoldingMarketValue,
   getHoldingPurchaseQuantity, getHoldingRealizedPnl, getHoldingSaleQuantity, 
   getHoldingTotalCost, getHoldingTotalRevenue, getHoldingUnrealizedPnl,
   getIHoldingsFromIPopulatedHoldings
@@ -48,6 +48,31 @@ export function getIPortfoliosFromIPopulatedPortfolios(
 // =======
 // getters
 // =======
+
+/*
+DESC
+  Returns the date of the first transaction for the input IPortfolio
+INPUT
+   portfolio: An IPortfolio
+RETURN
+  The Date of the first transaction in the Portfolio
+*/
+export function getPortfolioFirstTransactionDate(
+  portfolio: IPortfolio | IPopulatedPortfolio
+): Date | undefined {
+
+  // get holdings
+  const holdings = isIPortfolio(portfolio)
+    ? portfolio.holdings
+    : portfolio.populatedHoldings
+
+  // first transaction dates for holdings
+  const txnDates = holdings.map((holding: IHolding | IPopulatedHolding) => {
+    return getHoldingFirstTransactionDate(holding)
+  })
+
+  return _.min(txnDates)
+}
 
 /*
 DESC
