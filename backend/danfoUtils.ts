@@ -2,9 +2,9 @@
 import { 
   IHolding, IPopulatedHolding, ITransaction, TDatedValue,
 
-  genDateRange,
-  getHoldingPurchases,
-  getHoldingSales
+  genDateRange, getHoldingPurchases, getHoldingSales,
+
+  assert
 } from 'common'
 import * as df from 'danfojs-node'
 import * as _ from 'lodash'
@@ -49,27 +49,27 @@ export function densifyAndFillSeries(
   index.forEach((date: string, ix: number) => {
 
     // get value from series, if available
-    const seriesValue = series.at(date) 
+    const seriesValue = series.at(date)
 
     // matched
-    if (seriesValue) {
-      values[ix] = Number(seriesValue)
+    if (seriesValue !== undefined) {
+      values.push(Number(seriesValue))
     
     // unmatched, initial value
     } else if (ix === 0 && initialValue) {
-      values[0] = initialValue
+      values.push(initialValue)
 
     // unmatched, fill value
     } else if (fillMode === 'value' && fillValue) {
-      values[ix] = fillValue
+      values.push(fillValue)
 
     // unmatched, locf
     } else if (fillMode === 'locf' && ix > 0) {
-      values[ix] = values[ix - 1]
+      values.push(values[ix - 1])
     
     // default to 0
     } else {
-      values[ix] = 0
+      values.push(0)
     }
   })
 
@@ -137,7 +137,6 @@ export function sortSeriesByIndex(
   const index = _.sortBy(series.index, el => el)
 
   const values = index.map((ix: string | number) => {
-    console.log(`${ix} => ${series.at(String(ix))}`)
 
     return typeof ix === 'string'
       ? series.at(ix)
@@ -193,7 +192,7 @@ export function getHoldingTransactionQuantitySeries(
     }
   })
 
-  return getSeriesFromDatedValues(datedValues)
+  return sortSeriesByIndex(getSeriesFromDatedValues(datedValues))
 }
 
 /*
@@ -217,7 +216,7 @@ export function getHoldingRevenueSeries(
     }
   })
 
-  return getSeriesFromDatedValues(datedValues)
+  return sortSeriesByIndex(getSeriesFromDatedValues(datedValues))
 }
 
 

@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -57,24 +53,24 @@ function densifyAndFillSeries(series, startDate, endDate, fillMode, fillValue, i
         // get value from series, if available
         const seriesValue = series.at(date);
         // matched
-        if (seriesValue) {
-            values[ix] = Number(seriesValue);
+        if (seriesValue !== undefined) {
+            values.push(Number(seriesValue));
             // unmatched, initial value
         }
         else if (ix === 0 && initialValue) {
-            values[0] = initialValue;
+            values.push(initialValue);
             // unmatched, fill value
         }
         else if (fillMode === 'value' && fillValue) {
-            values[ix] = fillValue;
+            values.push(fillValue);
             // unmatched, locf
         }
         else if (fillMode === 'locf' && ix > 0) {
-            values[ix] = values[ix - 1];
+            values.push(values[ix - 1]);
             // default to 0
         }
         else {
-            values[ix] = 0;
+            values.push(0);
         }
     });
     return new df.Series(values, { index });
@@ -128,7 +124,6 @@ RETURN
 function sortSeriesByIndex(series) {
     const index = _.sortBy(series.index, el => el);
     const values = index.map((ix) => {
-        console.log(`${ix} => ${series.at(String(ix))}`);
         return typeof ix === 'string'
             ? series.at(ix)
             : series.iat(ix);
@@ -170,7 +165,7 @@ function getHoldingTransactionQuantitySeries(holding) {
             });
         }
     });
-    return getSeriesFromDatedValues(datedValues);
+    return sortSeriesByIndex(getSeriesFromDatedValues(datedValues));
 }
 exports.getHoldingTransactionQuantitySeries = getHoldingTransactionQuantitySeries;
 /*
@@ -189,7 +184,7 @@ function getHoldingRevenueSeries(holding) {
             value: txn.price * txn.quantity
         };
     });
-    return getSeriesFromDatedValues(datedValues);
+    return sortSeriesByIndex(getSeriesFromDatedValues(datedValues));
 }
 exports.getHoldingRevenueSeries = getHoldingRevenueSeries;
 // =========
