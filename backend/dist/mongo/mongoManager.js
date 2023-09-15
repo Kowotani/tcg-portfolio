@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getPriceSeries = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
+exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getPricesAsDatedValues = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
 // imports
 const common_1 = require("common");
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -312,7 +312,7 @@ function getLatestPrices() {
 exports.getLatestPrices = getLatestPrices;
 /*
 DESC
-  Retrieves the Prices for the input tcgplayerId as a TValueSeries. The series
+  Retrieves the Prices for the input tcgplayerId as a TDatedValue[]. The series
   can be sliced by the optional startDate and endDate, otherwise it will return
   all data found
 INPUT
@@ -320,9 +320,9 @@ INPUT
   startDate?: The starting date for the Price series
   endDate?: The ending date for the Price series
 RETURN
-  A TValueSeries
+  A TDatedValue[]
 */
-function getPriceSeries(tcgplayerId, startDate, endDate) {
+function getPricesAsDatedValues(tcgplayerId, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
         // if dates input, verify that startDate <= endDate
         if (startDate && endDate) {
@@ -339,7 +339,6 @@ function getPriceSeries(tcgplayerId, startDate, endDate) {
             if (endDate) {
                 filter['date'] = { $lte: endDate };
             }
-            console.log(filter);
             // query data
             const priceDocs = yield utils_1.HistoricalPrice.find(filter).sort({ 'date': 1 });
             // create TDatedValue[]
@@ -357,7 +356,7 @@ function getPriceSeries(tcgplayerId, startDate, endDate) {
         }
     });
 }
-exports.getPriceSeries = getPriceSeries;
+exports.getPricesAsDatedValues = getPricesAsDatedValues;
 /*
 DESC
   Constructs Price documents from the input data and inserts them
@@ -745,15 +744,53 @@ function main() {
         //   console.log('Portfolio not deleted')
         // }
         // // -- Add portfolio holding
+        // const tcgplayerId = 233232
         // const holding: IHolding = {
-        //   tcgplayerId: 233232,
-        //   transactions: [{
-        //     type: TransactionType.Purchase,
-        //     date: new Date(),
-        //     price: 1.23,
-        //     quantity: 1
-        //   }]
-        // }
+        //   tcgplayerId: tcgplayerId,
+        //   transactions: [
+        //     {
+        //       type: TransactionType.Purchase,
+        //       date: new Date('2023-09-01'),
+        //       price: 240,
+        //       quantity: 2
+        //     },
+        //     {
+        //       type: TransactionType.Sale,
+        //       date: new Date('2023-09-02'),
+        //       price: 245,
+        //       quantity: 1
+        //     },
+        //     {
+        //       type: TransactionType.Purchase,
+        //       date: new Date('2023-09-04'),
+        //       price: 250,
+        //       quantity: 1
+        //     },
+        //     {
+        //       type: TransactionType.Purchase,
+        //       date: new Date('2023-09-05'),
+        //       price: 250,
+        //       quantity: 1
+        //     },
+        //     {
+        //       type: TransactionType.Sale,
+        //       date: new Date('2023-09-06'),
+        //       price: 255,
+        //       quantity: 3
+        //     }
+        //   ]
+        // } 
+        // const startDate = new Date('2023-09-01')
+        // const endDate = new Date('2023-09-06')
+        // const prices = getSeriesFromDatedValues(await getPricesAsDatedValues(tcgplayerId))
+        // const series = getHoldingMarketValueSeries(
+        //   holding,
+        //   prices,
+        //   startDate,
+        //   endDate
+        //   )
+        // console.log('-- market value series')  
+        // console.log(series.print())
         // holdings = [
         //   holding,
         //   {
@@ -810,11 +847,24 @@ function main() {
         // }
         // // -- Get Price DatedValues
         // const tcgplayerId = 121527
-        // res = await getPriceSeries(tcgplayerId, 
-        //   new Date(Date.parse('2016-10-08')),
-        //   new Date(Date.parse('2016-10-07')),
+        // const priceSeries = await getPriceSeries(tcgplayerId, 
+        //   new Date(Date.parse('2023-09-01'))
+        // )
+        // // console.log('-- price series')
+        // // console.log(priceSeries)
+        // // console.log('-- danfo series')
+        // const series = getSeriesFromDatedValues(priceSeries)
+        // res = densifyAndFillSeries(
+        //   series, 
+        //   new Date('2023-08-31'), 
+        //   new Date('2023-09-14'),
+        //   'locf',
+        //   undefined,
+        //   123
         // )
         // console.log(res)
+        // console.log('-- dated values')
+        // console.log(getDatedValuesFromSeries(series))
         return 0;
     });
 }
