@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
+exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingMarketValueSeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
 const common_1 = require("common");
 const df = __importStar(require("danfojs-node"));
 const _ = __importStar(require("lodash"));
@@ -134,6 +134,39 @@ exports.sortSeriesByIndex = sortSeriesByIndex;
 // =======
 // holding
 // =======
+/*
+DESC
+  Returns a series of daily market values for the input IHolding between the
+  input startDate and endDate
+INPUT
+  holding: An IHolding
+  startDate: The start date of the Series
+  endDate: The end date of the Series
+RETURN
+  A danfo Series
+*/
+function getHoldingMarketValueSeries(holding, prices, startDate, endDate) {
+    // verify that priceSeries has sufficient data
+    (0, common_1.assert)(String(_.head(prices.index)) <= startDate.toISOString(), 'priceSeries does not have data on or before startDate');
+    (0, common_1.assert)(String(_.last(prices.index)) >= endDate.toISOString(), 'priceSeries does not have data on or after endDate');
+    // -- get holding value series
+    const transactionSeries = getHoldingTransactionQuantitySeries(holding);
+    const cumTransactionSeries = transactionSeries.cumSum();
+    const quantitySeries = densifyAndFillSeries(cumTransactionSeries, startDate, endDate, 'locf', undefined, 0);
+    const pricesIx = prices.index.map((ix) => {
+        return String(ix) >= startDate.toISOString()
+            && String(ix) <= endDate.toISOString();
+    });
+    const priceSeries = prices.loc(pricesIx);
+    const holdingValueSeries = quantitySeries.mul(priceSeries);
+    // -- get revenue series
+    const dailyRevenueSeries = getHoldingRevenueSeries(holding);
+    const cumRevenueSeries = dailyRevenueSeries.cumSum();
+    const revenueSeries = densifyAndFillSeries(cumRevenueSeries, startDate, endDate, 'locf', undefined, 0);
+    // -- get market value series
+    return holdingValueSeries.add(revenueSeries);
+}
+exports.getHoldingMarketValueSeries = getHoldingMarketValueSeries;
 /*
 DESC
   Returns a series of daily transaction quantities for the input IHolding

@@ -153,6 +153,66 @@ export function sortSeriesByIndex(
 
 /*
 DESC
+  Returns a series of daily market values for the input IHolding between the
+  input startDate and endDate
+INPUT
+  holding: An IHolding
+  startDate: The start date of the Series
+  endDate: The end date of the Series
+RETURN
+  A danfo Series
+*/
+export function getHoldingMarketValueSeries(
+  holding: IHolding | IPopulatedHolding,
+  prices: df.Series,
+  startDate: Date,
+  endDate: Date
+): df.Series {
+
+  // verify that priceSeries has sufficient data
+  assert(
+    String(_.head(prices.index)) <= startDate.toISOString(),
+    'priceSeries does not have data on or before startDate')
+  assert(
+    String(_.last(prices.index)) >= endDate.toISOString(),
+    'priceSeries does not have data on or after endDate')
+
+  // -- get holding value series
+  const transactionSeries = getHoldingTransactionQuantitySeries(holding)
+  const cumTransactionSeries = transactionSeries.cumSum() as df.Series
+  const quantitySeries = densifyAndFillSeries(
+    cumTransactionSeries,
+    startDate,
+    endDate,
+    'locf',
+    undefined,
+    0
+  )
+  const pricesIx = prices.index.map((ix: string | number) => {
+    return String(ix) >= startDate.toISOString()
+      && String(ix) <= endDate.toISOString()
+  })
+  const priceSeries = prices.loc(pricesIx)
+  const holdingValueSeries = quantitySeries.mul(priceSeries)
+
+  // -- get revenue series
+  const dailyRevenueSeries = getHoldingRevenueSeries(holding)
+  const cumRevenueSeries = dailyRevenueSeries.cumSum() as df.Series
+  const revenueSeries = densifyAndFillSeries(
+    cumRevenueSeries,
+    startDate,
+    endDate,
+    'locf',
+    undefined,
+    0
+  )
+
+  // -- get market value series
+  return holdingValueSeries.add(revenueSeries) as df.Series
+}
+
+/*
+DESC
   Returns a series of daily transaction quantities for the input IHolding
 INPUT
   holding: An IHolding
