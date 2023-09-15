@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -23,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getHoldingRevenueSeries = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
+exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
 const common_1 = require("common");
 const df = __importStar(require("danfojs-node"));
 // =======
@@ -119,6 +115,40 @@ exports.getSeriesFromDatedValues = getSeriesFromDatedValues;
 // =======
 // holding
 // =======
+/*
+DESC
+  Returns a series of daily transaction quantities for the input IHolding
+INPUT
+  holding: An IHolding
+RETURN
+  A danfo Series
+*/
+function getHoldingTransactionQuantitySeries(holding) {
+    // get purchase and sales
+    const purchases = (0, common_1.getHoldingPurchases)(holding);
+    const sales = (0, common_1.getHoldingSales)(holding);
+    // summarize transaction quantities in a map
+    const quantityMap = new Map();
+    purchases.forEach((txn) => {
+        var _a;
+        quantityMap.set(txn.date.toISOString(), ((_a = quantityMap.get(txn.date.toISOString())) !== null && _a !== void 0 ? _a : 0) + txn.quantity);
+    });
+    sales.forEach((txn) => {
+        var _a;
+        quantityMap.set(txn.date.toISOString(), ((_a = quantityMap.get(txn.date.toISOString())) !== null && _a !== void 0 ? _a : 0) - txn.quantity);
+    });
+    const datedValues = [];
+    quantityMap.forEach((value, key) => {
+        if (value !== 0) {
+            datedValues.push({
+                date: new Date(Date.parse(key)),
+                value: value
+            });
+        }
+    });
+    return getSeriesFromDatedValues(datedValues);
+}
+exports.getHoldingTransactionQuantitySeries = getHoldingTransactionQuantitySeries;
 /*
 DESC
   Returns a series of daily revenue for the input IHolding

@@ -3,6 +3,7 @@ import {
   IHolding, IPopulatedHolding, ITransaction, TDatedValue,
 
   genDateRange,
+  getHoldingPurchases,
   getHoldingSales
 } from 'common'
 import * as df from 'danfojs-node'
@@ -124,6 +125,50 @@ export function getSeriesFromDatedValues(
 // =======
 // holding
 // =======
+
+/*
+DESC
+  Returns a series of daily transaction quantities for the input IHolding
+INPUT
+  holding: An IHolding
+RETURN
+  A danfo Series
+*/
+export function getHoldingTransactionQuantitySeries(
+  holding: IHolding | IPopulatedHolding
+): df.Series {
+
+  // get purchase and sales
+  const purchases = getHoldingPurchases(holding)
+  const sales = getHoldingSales(holding)
+
+  // summarize transaction quantities in a map
+  const quantityMap: Map<string, number> = new Map<string, number>()
+  purchases.forEach((txn: ITransaction) => {
+    quantityMap.set(
+      txn.date.toISOString(), 
+      (quantityMap.get(txn.date.toISOString()) ?? 0) + txn.quantity
+    )
+  })
+  sales.forEach((txn: ITransaction) => {
+    quantityMap.set(
+      txn.date.toISOString(), 
+      (quantityMap.get(txn.date.toISOString()) ?? 0) - txn.quantity
+    )
+  })
+
+  const datedValues: TDatedValue[] = []
+  quantityMap.forEach((value: number, key: string) => {
+    if (value !== 0) {
+      datedValues.push({
+        date: new Date(Date.parse(key)),
+        value: value
+      })
+    }
+  })
+
+  return getSeriesFromDatedValues(datedValues)
+}
 
 /*
 DESC
