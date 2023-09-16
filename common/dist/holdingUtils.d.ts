@@ -1,6 +1,7 @@
 import { IHolding, IPopulatedHolding, ITransaction } from './dataModels';
 export declare function getIHoldingsFromIPopulatedHoldings(populatedHoldings: IPopulatedHolding[]): IHolding[];
 export declare function getHoldingFirstTransactionDate(holding: IHolding | IPopulatedHolding): Date | undefined;
+export declare function getHoldingTcgplayerId(holding: IHolding | IPopulatedHolding): number;
 export declare function getHoldingAverageCost(holding: IHolding | IPopulatedHolding): number | undefined;
 export declare function getHoldingAverageRevenue(holding: IHolding | IPopulatedHolding): number | undefined;
 export declare function getHoldingMarketValue(holding: IHolding | IPopulatedHolding, price: number): number;

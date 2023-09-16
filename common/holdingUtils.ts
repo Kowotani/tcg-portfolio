@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import { 
   IHolding, IPopulatedHolding, ITransaction, TransactionType 
 } from './dataModels'
-import { assert } from './utils'
+import { assert, isIHolding } from './utils'
 
 
 // ==========
@@ -57,6 +57,22 @@ export function getHoldingFirstTransactionDate(
     })
     return firstTxn.date
   }
+}
+
+/*
+DESC
+  Returns the tcgplayerId for the input IHolding | IPopulatedHolding
+INPUT
+  holding: An IHolding | IPopulatedHolding
+RETURN
+  The Holding's tcgplayerId
+*/
+export function getHoldingTcgplayerId(
+  holding: IHolding | IPopulatedHolding
+): number {
+  return isIHolding(holding)
+  ? holding.tcgplayerId
+  : holding.product.tcgplayerId
 }
 
 

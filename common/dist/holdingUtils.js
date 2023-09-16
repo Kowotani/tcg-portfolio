@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingMarketValue = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = exports.getHoldingFirstTransactionDate = exports.getIHoldingsFromIPopulatedHoldings = void 0;
+exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingMarketValue = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = exports.getHoldingTcgplayerId = exports.getHoldingFirstTransactionDate = exports.getIHoldingsFromIPopulatedHoldings = void 0;
 var _ = require("lodash");
 var dataModels_1 = require("./dataModels");
 var utils_1 = require("./utils");
@@ -49,6 +49,20 @@ function getHoldingFirstTransactionDate(holding) {
     }
 }
 exports.getHoldingFirstTransactionDate = getHoldingFirstTransactionDate;
+/*
+DESC
+  Returns the tcgplayerId for the input IHolding | IPopulatedHolding
+INPUT
+  holding: An IHolding | IPopulatedHolding
+RETURN
+  The Holding's tcgplayerId
+*/
+function getHoldingTcgplayerId(holding) {
+    return (0, utils_1.isIHolding)(holding)
+        ? holding.tcgplayerId
+        : holding.product.tcgplayerId;
+}
+exports.getHoldingTcgplayerId = getHoldingTcgplayerId;
 // ==================
 // metric calculators
 // ==================
