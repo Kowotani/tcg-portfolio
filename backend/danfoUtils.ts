@@ -1,8 +1,10 @@
 
 import { 
-  IHolding, IPopulatedHolding, ITransaction, TDatedValue,
+  IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, ITransaction, 
+  TDatedValue,
 
-  genDateRange, getHoldingPurchases, getHoldingSales,
+  genDateRange, getHoldingPurchases, getHoldingSales, getHoldingTcgplayerId, 
+  getPortfolioHoldings,
 
   assert
 } from 'common'
@@ -154,9 +156,10 @@ export function sortSeriesByIndex(
 /*
 DESC
   Returns a series of daily market values for the input IHolding between the
-  input startDate and endDate
+  input startDate and endDate using the input priceSeries
 INPUT
   holding: An IHolding
+  priceSeries: A danfo Series of prices
   startDate: The start date of the Series
   endDate: The end date of the Series
 RETURN
@@ -164,17 +167,17 @@ RETURN
 */
 export function getHoldingMarketValueSeries(
   holding: IHolding | IPopulatedHolding,
-  prices: df.Series,
+  priceSeries: df.Series,
   startDate: Date,
   endDate: Date
 ): df.Series {
 
   // verify that priceSeries has sufficient data
   assert(
-    String(_.head(prices.index)) <= startDate.toISOString(),
+    String(_.head(priceSeries.index)) <= startDate.toISOString(),
     'priceSeries does not have data on or before startDate')
   assert(
-    String(_.last(prices.index)) >= endDate.toISOString(),
+    String(_.last(priceSeries.index)) >= endDate.toISOString(),
     'priceSeries does not have data on or after endDate')
 
   // -- get holding value series
@@ -188,12 +191,11 @@ export function getHoldingMarketValueSeries(
     undefined,
     0
   )
-  const pricesIx = prices.index.map((ix: string | number) => {
+  const pricesIx = priceSeries.index.map((ix: string | number) => {
     return String(ix) >= startDate.toISOString()
       && String(ix) <= endDate.toISOString()
   })
-  const priceSeries = prices.loc(pricesIx)
-  const holdingValueSeries = quantitySeries.mul(priceSeries)
+  const holdingValueSeries = quantitySeries.mul(priceSeries.loc(pricesIx))
 
   // -- get revenue series
   const dailyRevenueSeries = getHoldingRevenueSeries(holding)
@@ -283,3 +285,53 @@ export function getHoldingRevenueSeries(
 // =========
 // portfolio
 // =========
+
+/*
+DESC
+  Returns a series of daily market values for the input IPortfolio between the
+  input startDate and endDate using prices in the input priceSeriesMap
+INPUT
+  portfolio: An IPortfolio
+  priceSeriesMap: A Map of tcgplayerId => danfo Series of Prices
+  startDate: The start date of the Series
+  endDate: The end date of the Series
+RETURN
+  A danfo Series
+*/
+export function getPortfolioMarketValueSeries(
+  portfolio: IPortfolio | IPopulatedPortfolio,
+  priceSeriesMap: Map<number, df.Series>,
+  startDate: Date,
+  endDate: Date
+): df.Series {
+
+  const holdings = getPortfolioHoldings(portfolio)
+
+  // get market value series of holdings
+  const marketValues = holdings.map((holding: IHolding | IPopulatedHolding) => {
+    const tcgplayerId = getHoldingTcgplayerId(holding)
+    const priceSeries = priceSeriesMap.get(tcgplayerId)
+    assert(
+      priceSeries instanceof df.Series,
+      `could not find prices for tcgplayerId: ${tcgplayerId}`)
+    return getHoldingMarketValueSeries(
+      holding,
+      priceSeries,
+      startDate,
+      endDate
+    )
+  })
+
+  // get market value series of portfolio
+  const emptySeries = densifyAndFillSeries(
+    new df.Series([0], {index: [startDate.toISOString()]}),
+    startDate,
+    endDate,
+    'value',
+    0,
+    0
+  )
+  return marketValues.reduce((acc: df.Series, cur: df.Series) => {
+    return acc = acc.add(cur) as df.Series
+  }, emptySeries)
+}

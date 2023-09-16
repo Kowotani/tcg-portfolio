@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -19,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingMarketValueSeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
+exports.getPortfolioMarketValueSeries = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingMarketValueSeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
 const common_1 = require("common");
 const df = __importStar(require("danfojs-node"));
 const _ = __importStar(require("lodash"));
@@ -137,28 +141,28 @@ exports.sortSeriesByIndex = sortSeriesByIndex;
 /*
 DESC
   Returns a series of daily market values for the input IHolding between the
-  input startDate and endDate
+  input startDate and endDate using the input priceSeries
 INPUT
   holding: An IHolding
+  priceSeries: A danfo Series of prices
   startDate: The start date of the Series
   endDate: The end date of the Series
 RETURN
   A danfo Series
 */
-function getHoldingMarketValueSeries(holding, prices, startDate, endDate) {
+function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
     // verify that priceSeries has sufficient data
-    (0, common_1.assert)(String(_.head(prices.index)) <= startDate.toISOString(), 'priceSeries does not have data on or before startDate');
-    (0, common_1.assert)(String(_.last(prices.index)) >= endDate.toISOString(), 'priceSeries does not have data on or after endDate');
+    (0, common_1.assert)(String(_.head(priceSeries.index)) <= startDate.toISOString(), 'priceSeries does not have data on or before startDate');
+    (0, common_1.assert)(String(_.last(priceSeries.index)) >= endDate.toISOString(), 'priceSeries does not have data on or after endDate');
     // -- get holding value series
     const transactionSeries = getHoldingTransactionQuantitySeries(holding);
     const cumTransactionSeries = transactionSeries.cumSum();
     const quantitySeries = densifyAndFillSeries(cumTransactionSeries, startDate, endDate, 'locf', undefined, 0);
-    const pricesIx = prices.index.map((ix) => {
+    const pricesIx = priceSeries.index.map((ix) => {
         return String(ix) >= startDate.toISOString()
             && String(ix) <= endDate.toISOString();
     });
-    const priceSeries = prices.loc(pricesIx);
-    const holdingValueSeries = quantitySeries.mul(priceSeries);
+    const holdingValueSeries = quantitySeries.mul(priceSeries.loc(pricesIx));
     // -- get revenue series
     const dailyRevenueSeries = getHoldingRevenueSeries(holding);
     const cumRevenueSeries = dailyRevenueSeries.cumSum();
@@ -223,3 +227,31 @@ exports.getHoldingRevenueSeries = getHoldingRevenueSeries;
 // =========
 // portfolio
 // =========
+/*
+DESC
+  Returns a series of daily market values for the input IPortfolio between the
+  input startDate and endDate using prices in the input priceSeriesMap
+INPUT
+  portfolio: An IPortfolio
+  priceSeriesMap: A Map of tcgplayerId => danfo Series of Prices
+  startDate: The start date of the Series
+  endDate: The end date of the Series
+RETURN
+  A danfo Series
+*/
+function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, endDate) {
+    const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
+    // get market value series of holdings
+    const marketValues = holdings.map((holding) => {
+        const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
+        const priceSeries = priceSeriesMap.get(tcgplayerId);
+        (0, common_1.assert)(priceSeries instanceof df.Series, `could not find prices for tcgplayerId: ${tcgplayerId}`);
+        return getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate);
+    });
+    // get market value series of portfolio
+    const emptySeries = densifyAndFillSeries(new df.Series([0], { index: [startDate.toISOString()] }), startDate, endDate, 'value', 0, 0);
+    return marketValues.reduce((acc, cur) => {
+        return acc = acc.add(cur);
+    }, emptySeries);
+}
+exports.getPortfolioMarketValueSeries = getPortfolioMarketValueSeries;
