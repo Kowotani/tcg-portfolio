@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -245,11 +241,13 @@ function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, end
     const marketValues = holdings.map((holding) => {
         const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
         const priceSeries = priceSeriesMap.get(tcgplayerId);
-        (0, common_1.assert)(priceSeries instanceof df.Series, `could not find prices for tcgplayerId: ${tcgplayerId}`);
+        // verify that prices exist for this tcgplayerId
+        (0, common_1.assert)(priceSeries instanceof df.Series, `Could not find prices for tcgplayerId: ${tcgplayerId}`);
         return getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate);
     });
-    // get market value series of portfolio
+    // create empty Series used for summation
     const emptySeries = densifyAndFillSeries(new df.Series([0], { index: [startDate.toISOString()] }), startDate, endDate, 'value', 0, 0);
+    // get market value series of portfolio
     return marketValues.reduce((acc, cur) => {
         return acc = acc.add(cur);
     }, emptySeries);

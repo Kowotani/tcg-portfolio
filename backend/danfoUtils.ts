@@ -309,11 +309,15 @@ export function getPortfolioMarketValueSeries(
 
   // get market value series of holdings
   const marketValues = holdings.map((holding: IHolding | IPopulatedHolding) => {
+
     const tcgplayerId = getHoldingTcgplayerId(holding)
     const priceSeries = priceSeriesMap.get(tcgplayerId)
+
+    // verify that prices exist for this tcgplayerId
     assert(
       priceSeries instanceof df.Series,
-      `could not find prices for tcgplayerId: ${tcgplayerId}`)
+      `Could not find prices for tcgplayerId: ${tcgplayerId}`)
+
     return getHoldingMarketValueSeries(
       holding,
       priceSeries,
@@ -322,7 +326,7 @@ export function getPortfolioMarketValueSeries(
     )
   })
 
-  // get market value series of portfolio
+  // create empty Series used for summation
   const emptySeries = densifyAndFillSeries(
     new df.Series([0], {index: [startDate.toISOString()]}),
     startDate,
@@ -331,6 +335,8 @@ export function getPortfolioMarketValueSeries(
     0,
     0
   )
+
+  // get market value series of portfolio
   return marketValues.reduce((acc: df.Series, cur: df.Series) => {
     return acc = acc.add(cur) as df.Series
   }, emptySeries)
