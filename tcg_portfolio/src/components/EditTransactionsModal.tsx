@@ -1,4 +1,4 @@
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useState } from 'react'
 import { 
   Box,
   Button,
@@ -30,9 +30,9 @@ import {
 import { 
   IHolding, IReactTableTransaction, IProduct, ITransaction, TransactionType,
 
-  getHoldingAverageCost, getHoldingAverageRevenue, getHoldingPurchaseQuantity, 
-  getHoldingSaleQuantity, getHoldingTotalCost, getHoldingTotalRevenue,
-  getISOStringFromDate,
+  getClampedDate, getHoldingAverageCost, getHoldingAverageRevenue, 
+  getHoldingPurchaseQuantity, getHoldingSaleQuantity, getHoldingTotalCost, 
+  getHoldingTotalRevenue, getISOStringFromDate,
 
   assert, isNumeric
 } from 'common'
@@ -65,7 +65,8 @@ interface IInputValues {
   type: TransactionType.Purchase | TransactionType.Sale
 }
 type TAddTransactionFormProps = {
-  handleAddTransaction: (txn: ITransaction) => void;
+  releaseDate: Date,
+  handleAddTransaction: (txn: ITransaction) => void
 }
 const AddTransactionForm = (
   props: PropsWithChildren<TAddTransactionFormProps>
@@ -77,7 +78,16 @@ const AddTransactionForm = (
 
   function validateDate(value: Date): string | undefined {
     let error
-    if (!value) { error = 'Required' }
+    const clampedDate = getClampedDate(
+      new Date(value),
+      new Date(props.releaseDate),
+      new Date(DEFAULT_DATE)
+    )
+    if (!value) {
+      error = 'Required'
+    } else if ((new Date(value)).getTime() !== clampedDate.getTime()) (
+      error = 'Invalid date'
+    )
     return error
   }
 
@@ -112,7 +122,14 @@ const AddTransactionForm = (
     e: React.FocusEvent<HTMLInputElement, Element>,
     form: FormikProps<IInputValues>
   ): void {
-    form.setFieldValue('date', e.target.value)
+    const valueDate = new Date(Date.parse(e.target.value))
+    const error = validateDate(valueDate)
+    if (error) {
+      form.setFieldError('date', error)
+      form.setFieldTouched('date')
+    } else {
+      form.setFieldValue('date', e.target.value)
+    }
   }
 
   function handlePriceOnBlur(
@@ -150,6 +167,7 @@ const AddTransactionForm = (
 
   // defaults
   const DEFAULT_DATE = new Date()
+  const DEFAULT_PRICE = 0
   const DEFAULT_QUANTITY = 1
   const DEFAULT_TYPE = TransactionType.Purchase
 
@@ -159,7 +177,7 @@ const AddTransactionForm = (
         <Formik
           initialValues={{
             date: DEFAULT_DATE,
-            price: 0,
+            price: DEFAULT_PRICE,
             quantity: DEFAULT_QUANTITY,
             type: DEFAULT_TYPE
           }}
@@ -173,6 +191,7 @@ const AddTransactionForm = (
                 : values.date
             } as ITransaction)
           }}
+          validateOnBlur={false}  // disable validation which overwrites setError
         >
           {(form: FormikProps<IInputValues>) => (
 
@@ -214,8 +233,10 @@ const AddTransactionForm = (
                             {...field}
                             type='date'
                             defaultValue={
-                              DEFAULT_DATE.toISOString().substring(0,10)}
-                            onBlur={(e) => handleDateOnBlur(e, form)}
+                              getISOStringFromDate(DEFAULT_DATE)}
+                            min={getISOStringFromDate(props.releaseDate)}
+                            max={getISOStringFromDate(DEFAULT_DATE)}
+                            onBlur={(e) => handleDateOnBlur(e, form)}                            
                           />
                           {form.errors?.date 
                             ? (
@@ -310,7 +331,8 @@ const AddTransactionForm = (
 
                 <Button 
                   colorScheme='green' 
-                  isDisabled={!form.isValid}
+                  isDisabled={!form.isValid 
+                    || form.values.price === DEFAULT_PRICE}
                   isLoading={form.isSubmitting}
                   leftIcon={<Icon as={FiPlus} />}
                   type='submit'
@@ -597,7 +619,8 @@ export const EditTransactionsModal = (
               }
 
               {/* Add Transaction Form */}
-              <AddTransactionForm 
+              <AddTransactionForm
+                releaseDate={props.product.releaseDate} 
                 handleAddTransaction={handleAddTransaction}
               />
               <Card>
