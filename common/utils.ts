@@ -131,6 +131,28 @@ export function assert(condition: any, msg?: string): asserts condition {
 
 /*
 DESC
+  Returns the input Date clamped between the startDate and endDate inclusive
+INPUT
+  date: A Date
+  startDate: The earliest date
+  endDate: The latest date
+RETURN
+  The date clamped between the startDate and endDate inclusive
+*/
+export function getClampedDate(
+  date: Date,
+  startDate: Date,
+  endDate: Date
+): Date {
+  return date.getTime() < startDate.getTime()
+    ? startDate
+    : date.getTime() > endDate.getTime()
+      ? endDate
+      : date
+}
+
+/*
+DESC
   Converts a price string (determined by isPriceString()) to a number
 INPUT
   A string to convert
