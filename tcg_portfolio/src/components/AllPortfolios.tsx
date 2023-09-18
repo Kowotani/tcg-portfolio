@@ -17,7 +17,7 @@ import {
 
   getAggPortfolioMarketValue, getAggPortfolioTotalCost, getPortfolioNames,
 
-  assert
+  assert, isIPopulatedPortfolioArray
 } from 'common'
 import { FiPlus } from 'react-icons/fi'
 import { PortfolioCard } from './PortfolioCard'
@@ -25,14 +25,15 @@ import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { LatestPricesContext } from '../state/LatestPricesContext'
+import { SideBarNavContext } from '../state/SideBarNavContext'
 import { UserContext } from '../state/UserContext'
 import { CascadingSlideFade } from './Transitions'
 import { 
-  ILatestPricesContext, IUserContext, 
+  ILatestPricesContext, ISideBarNavContext, IUserContext, SideBarNav, 
   
   getIPriceDataMapFromIDatedPriceDataMap 
 } from '../utils' 
-import { isIPopulatedPortfolioArray } from 'common'
+
 
 type TAllPortfoliosProps = {
   onAddClick: () => void,
@@ -43,7 +44,6 @@ export const AllPortfolios = (
   props: PropsWithChildren<TAllPortfoliosProps>
 ) => {
 
-
   // =====
   // state
   // =====
@@ -53,7 +53,8 @@ export const AllPortfolios = (
 
   const { user } = useContext(UserContext) as IUserContext
   const { latestPrices } 
-  = useContext(LatestPricesContext) as ILatestPricesContext
+    = useContext(LatestPricesContext) as ILatestPricesContext
+  const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
 
 
   // =========
@@ -250,25 +251,26 @@ export const AllPortfolios = (
         ) : (
           <>
             {/* Portfolios */}
-            {portfolios.map((portfolio: IPopulatedPortfolio, ix: number) => {
-              return (
-                <CascadingSlideFade
-                  key={portfolio.portfolioName}
-                  index={ix}
-                  initialDelay={0.1}
-                  delay={0.075}
-                  duration={0.5}
-                >
-                  <Box m='16px 0px'>
-                    <PortfolioCard 
-                      populatedPortfolio={portfolio}
-                      onDeleteClick={onDeleteClick}
-                      onEditClick={props.onEditClick(getPortfolioNames(portfolios))}
-                      onViewPerformanceClick={props.onViewPerformanceClick}
-                    />
-                  </Box>
-                </CascadingSlideFade>
-              )
+            {sideBarNav === SideBarNav.PORTFOLIO 
+              && portfolios.map((portfolio: IPopulatedPortfolio, ix: number) => {
+                return (
+                  <CascadingSlideFade
+                    key={portfolio.portfolioName}
+                    index={ix}
+                    initialDelay={0.1}
+                    delay={0.075}
+                    duration={0.5}
+                  >
+                    <Box m='16px 0px'>
+                      <PortfolioCard 
+                        populatedPortfolio={portfolio}
+                        onDeleteClick={onDeleteClick}
+                        onEditClick={props.onEditClick(getPortfolioNames(portfolios))}
+                        onViewPerformanceClick={props.onViewPerformanceClick}
+                      />
+                    </Box>
+                  </CascadingSlideFade>
+                )
             })}
           </>
       )}
