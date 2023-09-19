@@ -453,6 +453,13 @@ export const EditTransactionsModal = (
       props.setTransactions(transactions)
       props.onClose()
 
+      toast({
+        title: `${props.product.name}`,
+        description: 'Transactions were updated',
+        status: 'success',
+        isClosable: true,
+      })   
+
     // alert via toast
     } else {
       
