@@ -19,7 +19,7 @@ import {
   PostLatestPriceStatus, PostPriceStatus, PostProductStatus, 
   TPostLatestPriceReqBody, TPostPriceReqBody, TPostProductReqBody, 
 
-  ADD_LATEST_PRICE_URL, ADD_PRICE_URL, CRUD_PRODUCT_URL
+  ADD_LATEST_PRICE_URL, ADD_PRICE_URL, CRUD_PRODUCT_URL, isNumeric
 } from 'common';
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField'
@@ -127,8 +127,12 @@ export const AddProductForm = () => {
 
   // MSRP state
   const [ msrpState, setMsrpState ] = useState<{
-    msrp?: number,
-  }>({})
+    msrp: number | undefined,
+    isInvalid?: boolean, 
+    errorMessage?: string,
+  }>({
+    msrp: undefined
+  })
 
   // Image URL state
   const [ imageUrlState, setImageURLState ] = useState<{
@@ -282,54 +286,52 @@ export const AddProductForm = () => {
           })        
         }
 
-        // insert MSRP into Prices if it exists
-        if (body.formData.msrp) {
+        // -- insert MSRP into Prices
 
-          // create POST body
-          const priceBody: TPostPriceReqBody = {
-            tcgplayerId: body.formData.tcgplayerId,
-            priceDate: body.formData.releaseDate,
-            marketPrice: body.formData.msrp
-          }
-
-          // submit
-          axios({
-            method: 'post',
-            url: ADD_PRICE_URL,
-            data: priceBody,
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          })
-
-          // success
-          .then(res => {
-
-            // TODO: type check
-            const resData = res.data.data
-            
-            toast({
-              title: 'MSRP Price Loaded',
-              description: `${PostPriceStatus.Success}: ${resData.prices.marketPrice}`,
-              status: 'success',
-              isClosable: true,
-            })
-          })
-
-          // error
-          .catch(res => {
-
-            // TODO: type check
-            const resData = res.data
-
-            toast({
-              title: 'Error Loading MSRP',
-              description: `${res.statusText}: ${resData}`,
-              status: 'error',
-              isClosable: true,
-            })
-          })
+        // create POST body
+        const priceBody: TPostPriceReqBody = {
+          tcgplayerId: body.formData.tcgplayerId,
+          priceDate: body.formData.releaseDate,
+          marketPrice: body.formData.msrp
         }
+
+        // submit
+        axios({
+          method: 'post',
+          url: ADD_PRICE_URL,
+          data: priceBody,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+
+        // success
+        .then(res => {
+
+          // TODO: type check
+          const resData = res.data.data
+          
+          toast({
+            title: 'MSRP Price Loaded',
+            description: `${PostPriceStatus.Success}: ${resData.prices.marketPrice}`,
+            status: 'success',
+            isClosable: true,
+          })
+        })
+
+        // error
+        .catch(res => {
+
+          // TODO: type check
+          const resData = res.data
+
+          toast({
+            title: 'Error Loading MSRP',
+            description: `${res.statusText}: ${resData}`,
+            status: 'error',
+            isClosable: true,
+          })
+        })
 
       // product already exists
       } else if (res.status === 202) {
@@ -479,6 +481,34 @@ export const AddProductForm = () => {
     }
   }
 
+  // validate MSRP
+  function validateMSRP(input: string): void {
+
+    // default
+    if (input.length === 0) {
+      setMsrpState({
+        msrp: undefined, 
+        isInvalid: true, 
+        errorMessage: 'MSRP is required',
+      })
+
+    // numeric format
+    } else if (!isNumeric(Number(input))) {
+      setMsrpState({
+        msrp: undefined, 
+        isInvalid: true, 
+        errorMessage: 'Input is not numeric',
+      })
+    
+    // valid
+    } else {
+      setMsrpState({ 
+        msrp: Number(input), 
+        isInvalid: false 
+      })
+    }
+  }  
+
   // validate Image URL
   function validateImageURL(input: string): void {
 
@@ -575,9 +605,7 @@ export const AddProductForm = () => {
       type: productTypeState.productType as ProductType,
       releaseDate: releaseDateState.releaseDate as Date,
       language: languageState.language,
-    }
-    if (msrpState.msrp !== undefined) {
-      data.msrp = msrpState.msrp
+      msrp: msrpState.msrp as number
     }
     if (productSubtypeState.productSubtype.length > 0) {
       data.subtype = productSubtypeState.productSubtype as ProductSubtype
@@ -796,12 +824,15 @@ export const AddProductForm = () => {
           {/* MSRP */}
           <InputErrorWrapper 
             leftLabel='MSRP'
+            errorMessage={msrpState.errorMessage}
+            isErrorDisplayed={msrpState.isInvalid && isAddProductForm}
           >
             <NumberInput
+              isInvalid={msrpState.isInvalid}
               min={1}
               precision={2}
               width='100%'
-              onBlur={e => setMsrpState({msrp: Number(e.target.value)})}
+              onBlur={e => validateMSRP(e.target.value)}
             >
               <NumberInputField />
             </NumberInput>
