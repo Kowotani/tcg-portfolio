@@ -1,13 +1,16 @@
 // imports
 import { 
   IDatedPriceData, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
-  IPortfolioMethods, IPrice, IProduct, TDatedValue, TimeseriesGranularity,
+  IPortfolioMethods, IPrice, IProduct, TDatedValue, 
+  
+  TimeseriesGranularity,
 
   assert, isIPopulatedHolding
 } from 'common'
+import * as df from 'danfojs-node'
+import * as dfu from '../danfoUtils'
 import * as _ from 'lodash'
-import mongoose from 'mongoose'
-import { HydratedDocument} from 'mongoose'
+import mongoose, { HydratedDocument} from 'mongoose'
 import { IMHistoricalPrice } from './models/historicalPriceSchema'
 import { IMPortfolio } from './models/portfolioSchema'
 import { IMProduct } from './models/productSchema'
@@ -378,21 +381,21 @@ export async function getLatestPrices(): Promise<Map<number, IDatedPriceData>> {
 
 /*
 DESC
-  Retrieves the Prices for the input tcgplayerId as a TDatedValue[]. The series
-  can be sliced by the optional startDate and endDate, otherwise it will return
-  all data found
+  Retrieves the Prices for the input tcgplayerIds as a map of 
+  tcpglayerId => TDatedValue[]. The data can be sliced by the optional 
+  startDate and endDate, otherwise it  will return all data found
 INPUT
-  tcgplayerId: The tcgplayerId
+  tcgplayerId[]: The tcgplayerIds
   startDate?: The starting date for the Price series
   endDate?: The ending date for the Price series
 RETURN
-  A TDatedValue[]
+  A map of tcpglayerId => TDatedValue[]
 */
-export async function getPricesAsDatedValues(
-  tcgplayerId: number,
+export async function getPriceMapOfDatedValues(
+  tcgplayerIds: number[],
   startDate?: Date,
   endDate?: Date
-): Promise<TDatedValue[]> {
+): Promise<Map<number, TDatedValue[]>> {
 
   // if dates input, verify that startDate <= endDate
   if (startDate && endDate) {
@@ -408,7 +411,7 @@ export async function getPricesAsDatedValues(
   try {
 
     // create filter
-    let filter: any = {tcgplayerId: tcgplayerId}
+    let filter: any = {tcgplayerId: {$in: tcgplayerIds}}
     if (startDate) {
       filter['date'] = {$gte: startDate}
     }
@@ -417,23 +420,70 @@ export async function getPricesAsDatedValues(
     }
 
     // query data
-    const priceDocs = await HistoricalPrice.find(filter).sort({'date': 1})
+    const priceDocs = await HistoricalPrice.find(filter)
+      .sort({'tcgplayerId': 1, 'date': 1})
 
-    // create TDatedValue[]
-    const datedValues = priceDocs.map((price: IMHistoricalPrice) => {
-      return {
+    // created dated value map
+    const datedValueMap = new Map<number, TDatedValue[]>()
+    priceDocs.forEach((price: IMHistoricalPrice) => {
+
+      // update map
+      const tcgplayerId = price.tcgplayerId
+      const datedValue: TDatedValue = {
         date: price.date,
         value: price.marketPrice
-      } as TDatedValue
+      }
+      const values = datedValueMap.get(tcgplayerId)
+
+      // key exists
+      if (values) {
+        values.push(datedValue)
+
+      // key does not exist
+      } else {
+        datedValueMap.set(tcgplayerId, [datedValue])
+      }
     })
 
-    return datedValues
+    return datedValueMap
     
   } catch(err) {
   
-    const errMsg = `An error occurred in getPriceSeries(): ${err}`
+    const errMsg = `An error occurred in getPriceMap(): ${err}`
     throw new Error(errMsg)
   }
+}
+
+/*
+DESC
+  Retrieves the Prices for the input tcgplayerIds as a map of 
+  tcpglayerId => Series. The data can be sliced by the optional 
+  startDate and endDate, otherwise it  will return all data found
+INPUT
+  tcgplayerId[]: The tcgplayerIds
+  startDate?: The starting date for the Price series
+  endDate?: The ending date for the Price series
+RETURN
+  A map of tcpglayerId => Series
+*/
+export async function getPriceMapOfSeries(
+  tcgplayerIds: number[],
+  startDate?: Date,
+  endDate?: Date
+): Promise<Map<number, df.Series>> {
+
+  // get dated value map
+  const datedValueMap
+    = await getPriceMapOfDatedValues(tcgplayerIds, startDate, endDate)
+
+  // convert TDatedValue[] to Series
+  const seriesMap = new Map<number, df.Series>()
+    datedValueMap.forEach((value, key) => {
+      const series = dfu.getSeriesFromDatedValues(value)
+      seriesMap.set(key, series)
+    })
+
+  return seriesMap
 }
 
 /*
@@ -919,9 +969,8 @@ async function main(): Promise<number> {
   // }
 
   // // -- Add portfolio holding
-  // const tcgplayerId = 233232
-  // const holding: IHolding = {
-  //   tcgplayerId: tcgplayerId,
+  // const holdingA: IHolding = {
+  //   tcgplayerId: 233232,
   //   transactions: [
   //     {
   //       type: TransactionType.Purchase,
@@ -956,9 +1005,52 @@ async function main(): Promise<number> {
   //   ]
   // } 
 
+  // const holdingB: IHolding = {
+  //   tcgplayerId: 121527,
+  //   transactions: [
+  //     {
+  //       type: TransactionType.Purchase,
+  //       date: new Date('2023-09-07'),
+  //       price: 330,
+  //       quantity: 5
+  //     },
+  //     {
+  //       type: TransactionType.Sale,
+  //       date: new Date('2023-09-08'),
+  //       price: 325,
+  //       quantity: 1
+  //     },
+  //     {
+  //       type: TransactionType.Sale,
+  //       date: new Date('2023-09-10'),
+  //       price: 320,
+  //       quantity: 4
+  //     },
+  //   ]
+  // } 
+
+  // const portfolio = {
+  //   userId: 123,
+  //   portfolioName: 'foo',
+  //   holdings: [holdingA, holdingB]
+  // }
+
   // const startDate = new Date('2023-09-01')
-  // const endDate = new Date('2023-09-06')
-  // const prices = getSeriesFromDatedValues(await getPricesAsDatedValues(tcgplayerId))
+  // const endDate = new Date('2023-09-12')
+  // const pricesMap = await getPriceMapOfSeries(
+  //   [233232, 121527],
+  //   startDate,
+  //   endDate
+  // )
+
+  // const series = dfu.getPortfolioMarketValueSeries(
+  //   portfolio, 
+  //   pricesMap,
+  //   startDate,
+  //   endDate
+  // )
+
+  // console.log(series)
 
   // const series = getHoldingMarketValueSeries(
   //   holding,

@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12,11 +35,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getPricesAsDatedValues = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
+exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getPriceMapOfSeries = exports.getPriceMapOfDatedValues = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
 // imports
 const common_1 = require("common");
+const dfu = __importStar(require("../danfoUtils"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const utils_1 = require("../utils");
+const common_2 = require("common");
 // =======
 // globals
 // =======
@@ -312,17 +337,17 @@ function getLatestPrices() {
 exports.getLatestPrices = getLatestPrices;
 /*
 DESC
-  Retrieves the Prices for the input tcgplayerId as a TDatedValue[]. The series
-  can be sliced by the optional startDate and endDate, otherwise it will return
-  all data found
+  Retrieves the Prices for the input tcgplayerIds as a map of
+  tcpglayerId => TDatedValue[]. The data can be sliced by the optional
+  startDate and endDate, otherwise it  will return all data found
 INPUT
-  tcgplayerId: The tcgplayerId
+  tcgplayerId[]: The tcgplayerIds
   startDate?: The starting date for the Price series
   endDate?: The ending date for the Price series
 RETURN
-  A TDatedValue[]
+  A map of tcpglayerId => TDatedValue[]
 */
-function getPricesAsDatedValues(tcgplayerId, startDate, endDate) {
+function getPriceMapOfDatedValues(tcgplayerIds, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
         // if dates input, verify that startDate <= endDate
         if (startDate && endDate) {
@@ -332,7 +357,7 @@ function getPricesAsDatedValues(tcgplayerId, startDate, endDate) {
         yield mongoose_1.default.connect(url);
         try {
             // create filter
-            let filter = { tcgplayerId: tcgplayerId };
+            let filter = { tcgplayerId: { $in: tcgplayerIds } };
             if (startDate) {
                 filter['date'] = { $gte: startDate };
             }
@@ -340,23 +365,62 @@ function getPricesAsDatedValues(tcgplayerId, startDate, endDate) {
                 filter['date'] = { $lte: endDate };
             }
             // query data
-            const priceDocs = yield utils_1.HistoricalPrice.find(filter).sort({ 'date': 1 });
-            // create TDatedValue[]
-            const datedValues = priceDocs.map((price) => {
-                return {
+            const priceDocs = yield utils_1.HistoricalPrice.find(filter)
+                .sort({ 'tcgplayerId': 1, 'date': 1 });
+            // created dated value map
+            const datedValueMap = new Map();
+            priceDocs.forEach((price) => {
+                // update map
+                const tcgplayerId = price.tcgplayerId;
+                const datedValue = {
                     date: price.date,
                     value: price.marketPrice
                 };
+                const values = datedValueMap.get(tcgplayerId);
+                // key exists
+                if (values) {
+                    values.push(datedValue);
+                    // key does not exist
+                }
+                else {
+                    datedValueMap.set(tcgplayerId, [datedValue]);
+                }
             });
-            return datedValues;
+            return datedValueMap;
         }
         catch (err) {
-            const errMsg = `An error occurred in getPriceSeries(): ${err}`;
+            const errMsg = `An error occurred in getPriceMap(): ${err}`;
             throw new Error(errMsg);
         }
     });
 }
-exports.getPricesAsDatedValues = getPricesAsDatedValues;
+exports.getPriceMapOfDatedValues = getPriceMapOfDatedValues;
+/*
+DESC
+  Retrieves the Prices for the input tcgplayerIds as a map of
+  tcpglayerId => Series. The data can be sliced by the optional
+  startDate and endDate, otherwise it  will return all data found
+INPUT
+  tcgplayerId[]: The tcgplayerIds
+  startDate?: The starting date for the Price series
+  endDate?: The ending date for the Price series
+RETURN
+  A map of tcpglayerId => Series
+*/
+function getPriceMapOfSeries(tcgplayerIds, startDate, endDate) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get dated value map
+        const datedValueMap = yield getPriceMapOfDatedValues(tcgplayerIds, startDate, endDate);
+        // convert TDatedValue[] to Series
+        const seriesMap = new Map();
+        datedValueMap.forEach((value, key) => {
+            const series = dfu.getSeriesFromDatedValues(value);
+            seriesMap.set(key, series);
+        });
+        return seriesMap;
+    });
+}
+exports.getPriceMapOfSeries = getPriceMapOfSeries;
 /*
 DESC
   Constructs Price documents from the input data and inserts them
@@ -743,46 +807,77 @@ function main() {
         // } else {
         //   console.log('Portfolio not deleted')
         // }
-        // // -- Add portfolio holding
-        // const tcgplayerId = 233232
-        // const holding: IHolding = {
-        //   tcgplayerId: tcgplayerId,
-        //   transactions: [
-        //     {
-        //       type: TransactionType.Purchase,
-        //       date: new Date('2023-09-01'),
-        //       price: 240,
-        //       quantity: 2
-        //     },
-        //     {
-        //       type: TransactionType.Sale,
-        //       date: new Date('2023-09-02'),
-        //       price: 245,
-        //       quantity: 1
-        //     },
-        //     {
-        //       type: TransactionType.Purchase,
-        //       date: new Date('2023-09-04'),
-        //       price: 250,
-        //       quantity: 1
-        //     },
-        //     {
-        //       type: TransactionType.Purchase,
-        //       date: new Date('2023-09-05'),
-        //       price: 250,
-        //       quantity: 1
-        //     },
-        //     {
-        //       type: TransactionType.Sale,
-        //       date: new Date('2023-09-06'),
-        //       price: 255,
-        //       quantity: 3
-        //     }
-        //   ]
-        // } 
-        // const startDate = new Date('2023-09-01')
-        // const endDate = new Date('2023-09-06')
-        // const prices = getSeriesFromDatedValues(await getPricesAsDatedValues(tcgplayerId))
+        // -- Add portfolio holding
+        const holdingA = {
+            tcgplayerId: 233232,
+            transactions: [
+                {
+                    type: common_2.TransactionType.Purchase,
+                    date: new Date('2023-09-01'),
+                    price: 240,
+                    quantity: 2
+                },
+                {
+                    type: common_2.TransactionType.Sale,
+                    date: new Date('2023-09-02'),
+                    price: 245,
+                    quantity: 1
+                },
+                {
+                    type: common_2.TransactionType.Purchase,
+                    date: new Date('2023-09-04'),
+                    price: 250,
+                    quantity: 1
+                },
+                {
+                    type: common_2.TransactionType.Purchase,
+                    date: new Date('2023-09-05'),
+                    price: 250,
+                    quantity: 1
+                },
+                {
+                    type: common_2.TransactionType.Sale,
+                    date: new Date('2023-09-06'),
+                    price: 255,
+                    quantity: 3
+                }
+            ]
+        };
+        const holdingB = {
+            tcgplayerId: 121527,
+            transactions: [
+                {
+                    type: common_2.TransactionType.Purchase,
+                    date: new Date('2023-09-07'),
+                    price: 330,
+                    quantity: 5
+                },
+                {
+                    type: common_2.TransactionType.Sale,
+                    date: new Date('2023-09-08'),
+                    price: 325,
+                    quantity: 1
+                },
+                {
+                    type: common_2.TransactionType.Sale,
+                    date: new Date('2023-09-10'),
+                    price: 320,
+                    quantity: 4
+                },
+            ]
+        };
+        const portfolio = {
+            userId: 123,
+            portfolioName: 'foo',
+            holdings: [holdingA, holdingB]
+        };
+        const startDate = new Date('2023-09-01');
+        const endDate = new Date('2023-09-12');
+        // const pricesA = getSeriesFromDatedValues(await getPricesAsDatedValues(233232))
+        // const pricesB = getSeriesFromDatedValues(await getPricesAsDatedValues(121527))
+        const pricesMap = yield getPriceMapOfSeries([233232, 121527], startDate, endDate);
+        const series = dfu.getPortfolioMarketValueSeries(portfolio, pricesMap, startDate, endDate);
+        console.log(series);
         // const series = getHoldingMarketValueSeries(
         //   holding,
         //   prices,
