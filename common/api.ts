@@ -8,7 +8,7 @@ import { IPortfolio, IProduct } from "./dataModels"
 // -- portfolio
 
 /*
-  Endpoint:   CRUD_PORTFOLIO_URL
+  Endpoint:   PORTFOLIO_URL
   Type:       DELETE
 */
 export enum DeletePortfolioStatus {
@@ -18,7 +18,7 @@ export enum DeletePortfolioStatus {
 }
 
 /*
-  Endpoint:   CRUD_PORTFOLIO_URL
+  Endpoint:   PORTFOLIO_URL
   Type:       POST
 */
 export enum PostPortfolioStatus {
@@ -27,7 +27,7 @@ export enum PostPortfolioStatus {
 }
 
 /*
-  Endpoint:   CRUD_PORTFOLIO_URL
+  Endpoint:   PORTFOLIO_URL
   Type:       PUT
 */
 export enum PutPortfolioStatus {
@@ -36,7 +36,7 @@ export enum PutPortfolioStatus {
 }
 
 /*
-  Endpoint:   GET_PORTFOLIOS_URL
+  Endpoint:   PORTFOLIOS_URL
   Type:       GET
 */
 export enum GetPortfoliosStatus {
@@ -47,16 +47,7 @@ export enum GetPortfoliosStatus {
 // -- prices
 
 /*
-  Endpoint:   GET_LATEST_PRICES_URL
-  Type:       GET
-*/
-export enum GetPricesStatus {
-  Success = 'Successfully retrieved latest Prices',
-  Error = 'Error retrieving latest Prices',
-}
-
-/*
-  Endpoint:   ADD_LATEST_PRICE_URL
+  Endpoint:   LATEST_PRICE_URL
   Type:       POST
 */
 export enum PostLatestPriceStatus {
@@ -65,7 +56,16 @@ export enum PostLatestPriceStatus {
 }
 
 /*
-  Endpoint:   ADD_PRICE_URL
+  Endpoint:   LATEST_PRICES_URL
+  Type:       GET
+*/
+export enum GetPricesStatus {
+  Success = 'Successfully retrieved latest Prices',
+  Error = 'Error retrieving latest Prices',
+}
+
+/*
+  Endpoint:   PRICE_URL
   Type:       POST
 */
 export enum PostPriceStatus {
@@ -76,7 +76,7 @@ export enum PostPriceStatus {
 // -- product
 
 /*
-  Endpoint:   ADD_PRODUCT_URL
+  Endpoint:   PRODUCT_URL
   Type:       POST
 */
 export enum PostProductStatus {
@@ -87,7 +87,7 @@ export enum PostProductStatus {
 }
 
 /*
-  Endpoint:   GET_PRODUCTS_URL
+  Endpoint:   PRODUCTS_URL
   Type:       GET
 */
 export enum GetProductsStatus {
@@ -101,17 +101,19 @@ export enum GetProductsStatus {
 // ======
 
 // -- portfolio
-export const CRUD_PORTFOLIO_URL = '/portfolio'
-export const GET_PORTFOLIOS_URL = '/portfolios'
+export const PORTFOLIO_URL = '/portfolio'
+export const PORTFOLIO_PERFORMANCE_URL = PORTFOLIO_URL + '/peformance'
+export const PORTFOLIOS_URL = '/portfolios'
 
 // -- product
-export const CRUD_PRODUCT_URL = '/product'
-export const GET_PRODUCTS_URL = '/products'
+export const PRODUCT_URL = '/product'
+export const PRODUCTS_URL = '/products'
 
 // -- prices
-export const ADD_LATEST_PRICE_URL = '/price/latest'
-export const ADD_PRICE_URL = '/price'
-export const GET_LATEST_PRICES_URL = '/prices/latest'
+export const LATEST_PRICE_URL = '/price/latest'
+export const LATEST_PRICES_URL = '/prices/latest'
+export const PRICE_URL = '/price'
+
 
 
 // =====
@@ -137,7 +139,7 @@ export type TDataResBody<Type> = TResBody & {
 // -- product
 
 /*
-  Endpoint:   CRUD_PRODUCT_URL
+  Endpoint:   PRODUCT_URL
   Type:       POST
   Req / Res:  Response
 */
@@ -152,7 +154,7 @@ export type TProductPostResBody<Type> = TDataResBody<Type> & {
 // -- portfolio
 
 /*
-  Endpoint:   CRUD_PORTFOLIO_URL
+  Endpoint:   PORTFOLIO_URL
   Type:       DELETE
   Req / Res:  Request
 */
@@ -162,7 +164,7 @@ export type TDeletePortfolioReqBody = {
 }
 
 /*
-  Endpoint:   CRUD_PORTFOLIO_URL
+  Endpoint:   PORTFOLIO_URL
   Type:       POST
   Req / Res:  Request
 */
@@ -171,7 +173,7 @@ export type TPostPortfolioReqBody = {
 }
 
 /*
-  Endpoint:   CRUD_PORTFOLIO_URL
+  Endpoint:   PORTFOLIO_URL
   Type:       PUT
   Req / Res:  Request
 */
@@ -183,7 +185,7 @@ export type TPutPortfolioReqBody = {
 // -- price
 
 /*
-  Endpoint:   ADD_LATEST_PRICE_URL
+  Endpoint:   LATEST_PRICE_URL
   Type:       POST
   Req / Res:  Request
 */
@@ -192,7 +194,7 @@ export type TPostLatestPriceReqBody = {
 }
 
 /*
-  Endpoint:   ADD_PRICE_URL
+  Endpoint:   PRICE_URL
   Type:       POST
   Req / Res:  Request
 */
@@ -207,7 +209,7 @@ export type TPostPriceReqBody = {
 // -- product
 
 /*
-  Endpoint:   CRUD_PRODUCT_URL
+  Endpoint:   PRODUCT_URL
   Type:       POST
   Req / Res:  Request
 */

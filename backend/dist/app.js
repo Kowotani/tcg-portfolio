@@ -38,7 +38,7 @@ RETURN
     204: The Portfolio does not exist
     500: An error occurred
 */
-app.delete(common_1.CRUD_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.delete(common_1.PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // variables
     const body = req.body;
     const portfolio = {
@@ -98,7 +98,7 @@ RETURN
     200: The Portfolio was successfully created
     500: An error occurred
 */
-app.post(common_1.CRUD_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post(common_1.PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // variables
     const body = req.body;
     const portfolio = body.portfolio;
@@ -143,7 +143,7 @@ RETURN
     200: The Portfolio was successfully updated
     500: An error occurred
 */
-app.put(common_1.CRUD_PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.put(common_1.PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // variables
     const body = req.body;
     try {
@@ -188,7 +188,7 @@ RETURN
     200: The Portfolio documents were returned successfully
     500: An error occurred
 */
-app.get(common_1.GET_PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get(common_1.PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // query Portfolios
         const userId = req.query.userId;
@@ -225,7 +225,7 @@ RETURN
     201: The Price was loaded successfully
     500: An error occurred
 */
-app.post(common_1.ADD_LATEST_PRICE_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post(common_1.LATEST_PRICES_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // get tcgplayerId
         const body = req.body;
@@ -275,7 +275,7 @@ RETURN
     201: The Price was added successfully
     500: An error occurred
 */
-app.post(common_1.ADD_PRICE_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post(common_1.PRICE_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // create IPrice
         const body = req.body;
@@ -339,7 +339,7 @@ RETURN
     200: The Prices were returned successfully
     500: An error occurred
 */
-app.get(common_1.GET_LATEST_PRICES_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get(common_1.LATEST_PRICES_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // query Prices
         const latestPrices = yield (0, mongoManager_1.getLatestPrices)();
@@ -376,7 +376,7 @@ RETURN
     202: The Product already exists
     500: An error occurred
 */
-app.post(common_1.CRUD_PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post(common_1.PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // variables
     const body = req.body;
     const data = body.formData;
@@ -445,7 +445,7 @@ RETURN
     200: The Product documents were returned successfully
     500: An error occurred
 */
-app.get(common_1.GET_PRODUCTS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get(common_1.PRODUCTS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // query Products
         const data = yield (0, mongoManager_1.getProductDocs)();

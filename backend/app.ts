@@ -11,8 +11,8 @@ import {
   TPostPortfolioReqBody, TPostPriceReqBody, TPutPortfolioReqBody, 
   TPostProductReqBody, TProductPostResBody, TResBody, 
 
-  ADD_LATEST_PRICE_URL, ADD_PRICE_URL, CRUD_PORTFOLIO_URL, CRUD_PRODUCT_URL,
-  GET_LATEST_PRICES_URL, GET_PORTFOLIOS_URL, GET_PRODUCTS_URL, 
+  LATEST_PRICES_URL, PORTFOLIO_URL, PORTFOLIOS_URL, PRICE_URL, PRODUCT_URL,
+  PRODUCTS_URL, 
 } from 'common'
 import express from 'express'
 import { 
@@ -47,7 +47,7 @@ RETURN
     204: The Portfolio does not exist
     500: An error occurred
 */
-app.delete(CRUD_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
+app.delete(PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
 
   // variables
   const body: TDeletePortfolioReqBody = req.body
@@ -113,7 +113,7 @@ RETURN
     200: The Portfolio was successfully created
     500: An error occurred
 */
-app.post(CRUD_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
+app.post(PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
 
   // variables
   const body: TPostPortfolioReqBody = req.body
@@ -163,7 +163,7 @@ RETURN
     200: The Portfolio was successfully updated
     500: An error occurred
 */
-app.put(CRUD_PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
+app.put(PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
 
   // variables
   const body: TPutPortfolioReqBody = req.body
@@ -214,7 +214,7 @@ RETURN
     200: The Portfolio documents were returned successfully
     500: An error occurred
 */
-app.get(GET_PORTFOLIOS_URL, async (req: any, res: any) => {
+app.get(PORTFOLIOS_URL, async (req: any, res: any) => {
 
   try {
 
@@ -258,7 +258,7 @@ RETURN
     201: The Price was loaded successfully
     500: An error occurred
 */
-app.post(ADD_LATEST_PRICE_URL, upload.none(), async (req: any, res: any) => {
+app.post(LATEST_PRICES_URL, upload.none(), async (req: any, res: any) => {
 
   try {
 
@@ -315,7 +315,7 @@ RETURN
     201: The Price was added successfully
     500: An error occurred
 */
-app.post(ADD_PRICE_URL, upload.none(), async (req: any, res: any) => {
+app.post(PRICE_URL, upload.none(), async (req: any, res: any) => {
 
   try {
 
@@ -385,7 +385,7 @@ RETURN
     200: The Prices were returned successfully
     500: An error occurred
 */
-app.get(GET_LATEST_PRICES_URL, async (req: any, res: any) => {
+app.get(LATEST_PRICES_URL, async (req: any, res: any) => {
 
   try {
 
@@ -428,7 +428,7 @@ RETURN
     202: The Product already exists
     500: An error occurred
 */
-app.post(CRUD_PRODUCT_URL, upload.none(), async (req: any, res: any) => {
+app.post(PRODUCT_URL, upload.none(), async (req: any, res: any) => {
 
   // variables
   const body: TPostProductReqBody = req.body
@@ -504,7 +504,7 @@ RETURN
     200: The Product documents were returned successfully
     500: An error occurred
 */
-app.get(GET_PRODUCTS_URL, async (req: any, res: any) => {
+app.get(PRODUCTS_URL, async (req: any, res: any) => {
 
   try {
 

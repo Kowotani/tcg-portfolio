@@ -16,13 +16,13 @@ export declare enum GetPortfoliosStatus {
     Success = "Successfully retrieved Portfolios",
     Error = "Error retrieving Portfolios"
 }
-export declare enum GetPricesStatus {
-    Success = "Successfully retrieved latest Prices",
-    Error = "Error retrieving latest Prices"
-}
 export declare enum PostLatestPriceStatus {
     Success = "Successfully loaded latest Price",
     Error = "Error loading latest Price"
+}
+export declare enum GetPricesStatus {
+    Success = "Successfully retrieved latest Prices",
+    Error = "Error retrieving latest Prices"
 }
 export declare enum PostPriceStatus {
     Success = "Successfully added Price",
@@ -38,13 +38,14 @@ export declare enum GetProductsStatus {
     Success = "Successfully retrieved Products",
     Error = "Error retrieving Products"
 }
-export declare const CRUD_PORTFOLIO_URL = "/portfolio";
-export declare const GET_PORTFOLIOS_URL = "/portfolios";
-export declare const CRUD_PRODUCT_URL = "/product";
-export declare const GET_PRODUCTS_URL = "/products";
-export declare const ADD_LATEST_PRICE_URL = "/price/latest";
-export declare const ADD_PRICE_URL = "/price";
-export declare const GET_LATEST_PRICES_URL = "/prices/latest";
+export declare const PORTFOLIO_URL = "/portfolio";
+export declare const PORTFOLIO_PERFORMANCE_URL: string;
+export declare const PORTFOLIOS_URL = "/portfolios";
+export declare const PRODUCT_URL = "/product";
+export declare const PRODUCTS_URL = "/products";
+export declare const LATEST_PRICE_URL = "/price/latest";
+export declare const LATEST_PRICES_URL = "/prices/latest";
+export declare const PRICE_URL = "/price";
 export declare type TResBody = {
     message: string;
 };

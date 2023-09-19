@@ -24,7 +24,7 @@ import {
 
   TDeletePortfolioReqBody,
 
-  CRUD_PORTFOLIO_URL,
+  PORTFOLIO_URL,
   
   getPortfolioMarketValue, getPortfolioPercentPnl, getPortfolioTotalCost, 
   getPortfolioTotalPnl
@@ -88,7 +88,7 @@ export const PortfolioCard = (
     // call endpoint
     axios({
       method: 'delete',
-      url: CRUD_PORTFOLIO_URL,
+      url: PORTFOLIO_URL,
       data: body,
       headers: {
         'Content-Type': 'multipart/form-data',

@@ -13,7 +13,7 @@ import {
 import { 
   IPopulatedPortfolio, 
 
-  GET_PORTFOLIOS_URL,
+  PORTFOLIOS_URL,
 
   getAggPortfolioMarketValue, getAggPortfolioTotalCost, getPortfolioNames,
 
@@ -163,7 +163,7 @@ export const AllPortfolios = (
     // call endpoint
     axios({
       method: 'get',
-      url: GET_PORTFOLIOS_URL,
+      url: PORTFOLIOS_URL,
       params: {
         userId: user.userId
       }

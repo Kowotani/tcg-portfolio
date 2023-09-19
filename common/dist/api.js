@@ -1,12 +1,12 @@
 "use strict";
 exports.__esModule = true;
-exports.GET_LATEST_PRICES_URL = exports.ADD_PRICE_URL = exports.ADD_LATEST_PRICE_URL = exports.GET_PRODUCTS_URL = exports.CRUD_PRODUCT_URL = exports.GET_PORTFOLIOS_URL = exports.CRUD_PORTFOLIO_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.PostLatestPriceStatus = exports.GetPricesStatus = exports.GetPortfoliosStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
+exports.PRICE_URL = exports.LATEST_PRICES_URL = exports.LATEST_PRICE_URL = exports.PRODUCTS_URL = exports.PRODUCT_URL = exports.PORTFOLIOS_URL = exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PostLatestPriceStatus = exports.GetPortfoliosStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
 // =====
 // enums
 // =====
 // -- portfolio
 /*
-  Endpoint:   CRUD_PORTFOLIO_URL
+  Endpoint:   PORTFOLIO_URL
   Type:       DELETE
 */
 var DeletePortfolioStatus;
@@ -16,7 +16,7 @@ var DeletePortfolioStatus;
     DeletePortfolioStatus["Error"] = "Error deleting Portfolio";
 })(DeletePortfolioStatus = exports.DeletePortfolioStatus || (exports.DeletePortfolioStatus = {}));
 /*
-  Endpoint:   CRUD_PORTFOLIO_URL
+  Endpoint:   PORTFOLIO_URL
   Type:       POST
 */
 var PostPortfolioStatus;
@@ -25,7 +25,7 @@ var PostPortfolioStatus;
     PostPortfolioStatus["Error"] = "Error creating Portfolio";
 })(PostPortfolioStatus = exports.PostPortfolioStatus || (exports.PostPortfolioStatus = {}));
 /*
-  Endpoint:   CRUD_PORTFOLIO_URL
+  Endpoint:   PORTFOLIO_URL
   Type:       PUT
 */
 var PutPortfolioStatus;
@@ -34,7 +34,7 @@ var PutPortfolioStatus;
     PutPortfolioStatus["Error"] = "Error updating Portfolio";
 })(PutPortfolioStatus = exports.PutPortfolioStatus || (exports.PutPortfolioStatus = {}));
 /*
-  Endpoint:   GET_PORTFOLIOS_URL
+  Endpoint:   PORTFOLIOS_URL
   Type:       GET
 */
 var GetPortfoliosStatus;
@@ -44,16 +44,7 @@ var GetPortfoliosStatus;
 })(GetPortfoliosStatus = exports.GetPortfoliosStatus || (exports.GetPortfoliosStatus = {}));
 // -- prices
 /*
-  Endpoint:   GET_LATEST_PRICES_URL
-  Type:       GET
-*/
-var GetPricesStatus;
-(function (GetPricesStatus) {
-    GetPricesStatus["Success"] = "Successfully retrieved latest Prices";
-    GetPricesStatus["Error"] = "Error retrieving latest Prices";
-})(GetPricesStatus = exports.GetPricesStatus || (exports.GetPricesStatus = {}));
-/*
-  Endpoint:   ADD_LATEST_PRICE_URL
+  Endpoint:   LATEST_PRICE_URL
   Type:       POST
 */
 var PostLatestPriceStatus;
@@ -62,7 +53,16 @@ var PostLatestPriceStatus;
     PostLatestPriceStatus["Error"] = "Error loading latest Price";
 })(PostLatestPriceStatus = exports.PostLatestPriceStatus || (exports.PostLatestPriceStatus = {}));
 /*
-  Endpoint:   ADD_PRICE_URL
+  Endpoint:   LATEST_PRICES_URL
+  Type:       GET
+*/
+var GetPricesStatus;
+(function (GetPricesStatus) {
+    GetPricesStatus["Success"] = "Successfully retrieved latest Prices";
+    GetPricesStatus["Error"] = "Error retrieving latest Prices";
+})(GetPricesStatus = exports.GetPricesStatus || (exports.GetPricesStatus = {}));
+/*
+  Endpoint:   PRICE_URL
   Type:       POST
 */
 var PostPriceStatus;
@@ -72,7 +72,7 @@ var PostPriceStatus;
 })(PostPriceStatus = exports.PostPriceStatus || (exports.PostPriceStatus = {}));
 // -- product
 /*
-  Endpoint:   ADD_PRODUCT_URL
+  Endpoint:   PRODUCT_URL
   Type:       POST
 */
 var PostProductStatus;
@@ -83,7 +83,7 @@ var PostProductStatus;
     PostProductStatus["Error"] = "Error creating the Product doc";
 })(PostProductStatus = exports.PostProductStatus || (exports.PostProductStatus = {}));
 /*
-  Endpoint:   GET_PRODUCTS_URL
+  Endpoint:   PRODUCTS_URL
   Type:       GET
 */
 var GetProductsStatus;
@@ -95,12 +95,13 @@ var GetProductsStatus;
 // routes
 // ======
 // -- portfolio
-exports.CRUD_PORTFOLIO_URL = '/portfolio';
-exports.GET_PORTFOLIOS_URL = '/portfolios';
+exports.PORTFOLIO_URL = '/portfolio';
+exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL + '/peformance';
+exports.PORTFOLIOS_URL = '/portfolios';
 // -- product
-exports.CRUD_PRODUCT_URL = '/product';
-exports.GET_PRODUCTS_URL = '/products';
+exports.PRODUCT_URL = '/product';
+exports.PRODUCTS_URL = '/products';
 // -- prices
-exports.ADD_LATEST_PRICE_URL = '/price/latest';
-exports.ADD_PRICE_URL = '/price';
-exports.GET_LATEST_PRICES_URL = '/prices/latest';
+exports.LATEST_PRICE_URL = '/price/latest';
+exports.LATEST_PRICES_URL = '/prices/latest';
+exports.PRICE_URL = '/price';

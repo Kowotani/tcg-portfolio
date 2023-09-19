@@ -14,13 +14,13 @@ import {
   IProduct, ProductLanguage, ProductType, ProductSubtype, TCG, 
   TCGToProductType, 
   
-  getProductSubtypes, isASCII,
+  getProductSubtypes, isASCII, isNumeric,
 
   PostLatestPriceStatus, PostPriceStatus, PostProductStatus, 
   TPostLatestPriceReqBody, TPostPriceReqBody, TPostProductReqBody, 
 
-  ADD_LATEST_PRICE_URL, ADD_PRICE_URL, CRUD_PRODUCT_URL, isNumeric
-} from 'common';
+  LATEST_PRICE_URL, PRICE_URL, PRODUCT_URL
+} from 'common'
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField'
 import { SideBarNavContext } from '../state/SideBarNavContext'
@@ -251,7 +251,7 @@ export const AddProductForm = () => {
     // submit
     axios({
       method: 'post',
-      url: CRUD_PRODUCT_URL,
+      url: PRODUCT_URL,
       data: body,
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -298,7 +298,7 @@ export const AddProductForm = () => {
         // submit
         axios({
           method: 'post',
-          url: ADD_PRICE_URL,
+          url: PRICE_URL,
           data: priceBody,
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -554,7 +554,7 @@ export const AddProductForm = () => {
     // submit
     axios({
       method: 'post',
-      url: ADD_LATEST_PRICE_URL,
+      url: LATEST_PRICE_URL,
       data: body,
       headers: {
         'Content-Type': 'multipart/form-data',

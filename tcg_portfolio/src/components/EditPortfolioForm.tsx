@@ -16,7 +16,7 @@ import {
 
   getIPortfoliosFromIPopulatedPortfolios,
 
-  GET_PRODUCTS_URL, CRUD_PORTFOLIO_URL, 
+  PORTFOLIO_URL, PRODUCTS_URL,
   
   TPutPortfolioReqBody,
 
@@ -188,7 +188,7 @@ export const EditPortfolioForm = (
       // submit
       axios({
         method: 'post',
-        url: CRUD_PORTFOLIO_URL,
+        url: PORTFOLIO_URL,
         data: body,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -201,7 +201,7 @@ export const EditPortfolioForm = (
 
         const resData = res.data
         assert(isTResBody(resData),
-          'Unexpected response from CRUD_PORTFOLIO_URL')
+          'Unexpected response from PORTFOLIO_URL')
 
         // Portoflio was updated
         if (res.status === 200) {
@@ -261,7 +261,7 @@ export const EditPortfolioForm = (
       // submit
       axios({
         method: 'put',
-        url: CRUD_PORTFOLIO_URL,
+        url: PORTFOLIO_URL,
         data: body,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -274,7 +274,7 @@ export const EditPortfolioForm = (
 
         const resData = res.data
         assert(isTResBody(resData),
-          'Unexpected response from CRUD_PORTFOLIO_URL')
+          'Unexpected response from PORTFOLIO_URL')
 
         // Portoflio was updated
         if (res.status === 200) {
@@ -466,7 +466,7 @@ export const EditPortfolioForm = (
   useEffect(() => {
     axios({
       method: 'get',
-      url: GET_PRODUCTS_URL,
+      url: PRODUCTS_URL,
     })
     .then(res => {
       const products: IProduct[] = res.data.data

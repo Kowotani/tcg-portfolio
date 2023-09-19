@@ -11,7 +11,7 @@ import { AllPortfolios } from './AllPortfolios'
 import { 
   IPopulatedPortfolio,
 
-  GET_LATEST_PRICES_URL,
+  LATEST_PRICES_URL,
 
   assert
 } from 'common'
@@ -143,7 +143,7 @@ export const PortfolioPanelManager = () => {
   useEffect(() => {
     axios({
       method: 'get',
-      url: GET_LATEST_PRICES_URL,
+      url: LATEST_PRICES_URL,
     })
     .then(res => {
        // TODO: type check
@@ -156,19 +156,19 @@ export const PortfolioPanelManager = () => {
         const data = resData.data
         assert(
           typeof(data) === 'object',
-          'Unexepcted data type in response body of GET_LATEST_PRICES_URL')
+          'Unexepcted data type in response body of LATEST_PRICES_URL')
         
         const priceMap = getPriceMapFromPriceAPIResponse(data)
         setLatestPrices(priceMap)
     
       // error
       } else {
-        const errMsg = `Error fetching from GET_LATEST_PRICES_URL: ${resData.message}`
+        const errMsg = `Error fetching from LATEST_PRICES_URL: ${resData.message}`
         console.log(errMsg)
       }
     })
     .catch(err => {
-      const errMsg = `Error fetching from GET_LATEST_PRICES_URL: ${err.message}`
+      const errMsg = `Error fetching from LATEST_PRICES_URL: ${err.message}`
       console.log(errMsg)
     })
   }, [])
