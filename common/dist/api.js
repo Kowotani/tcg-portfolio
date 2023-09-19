@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.PRICE_URL = exports.LATEST_PRICES_URL = exports.LATEST_PRICE_URL = exports.PRODUCTS_URL = exports.PRODUCT_URL = exports.PORTFOLIOS_URL = exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PostLatestPriceStatus = exports.GetPortfoliosStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
+exports.PRICE_URL = exports.LATEST_PRICES_URL = exports.LATEST_PRICE_URL = exports.PRODUCTS_URL = exports.PRODUCT_URL = exports.PORTFOLIOS_URL = exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PostLatestPriceStatus = exports.GetPortfoliosStatus = exports.GetPortfolioPerformanceStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
 // =====
 // enums
 // =====
@@ -33,6 +33,15 @@ var PutPortfolioStatus;
     PutPortfolioStatus["Success"] = "Successfully updated Portfolio";
     PutPortfolioStatus["Error"] = "Error updating Portfolio";
 })(PutPortfolioStatus = exports.PutPortfolioStatus || (exports.PutPortfolioStatus = {}));
+/*
+  Endpoint:   PORTFOLIO_PERFORMANCE_URL
+  Type:       GET
+*/
+var GetPortfolioPerformanceStatus;
+(function (GetPortfolioPerformanceStatus) {
+    GetPortfolioPerformanceStatus["Success"] = "Successfully retrieved Portfolio performance";
+    GetPortfolioPerformanceStatus["Error"] = "Error retrieving Portfolio performance";
+})(GetPortfolioPerformanceStatus = exports.GetPortfolioPerformanceStatus || (exports.GetPortfolioPerformanceStatus = {}));
 /*
   Endpoint:   PORTFOLIOS_URL
   Type:       GET

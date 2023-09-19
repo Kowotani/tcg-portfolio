@@ -3,6 +3,11 @@ export declare enum TimeseriesGranularity {
     Minutes = "minutes",
     Hours = "hours"
 }
+export declare enum PerformanceMetric {
+    CumPnL = "Cumulative Profit and Loss",
+    DailyPnL = "Daily Profit and Loss",
+    MarketValue = "Market Value"
+}
 export declare enum ProductLanguage {
     English = "ENG",
     Japanese = "JPN"
@@ -164,7 +169,11 @@ export declare type TDatedValue = {
     date: Date;
     value: number;
 };
-export declare type TValueSeries = {
+export declare type THoldingValueSeries = {
     tcgplayerId: number;
+    values: TDatedValue[];
+};
+export declare type TPortfolioValueSeries = {
+    portfolioName: string;
     values: TDatedValue[];
 };

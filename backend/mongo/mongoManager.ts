@@ -1,9 +1,11 @@
 // imports
 import { 
-  IDatedPriceData, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
+  IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
   IPortfolioMethods, IPrice, IProduct, TDatedValue, 
   
   TimeseriesGranularity,
+
+  getHoldingTcgplayerId, getPortfolioHoldings,
 
   assert, isIPopulatedHolding
 } from 'common'
@@ -24,7 +26,7 @@ import {
 
   areValidHoldings, isPortfolioDoc, isProductDoc
 } from '../utils'
-
+import { TransactionType } from 'common'
 
 // =======
 // globals
@@ -189,6 +191,37 @@ export async function getPortfolioDocs(
     const errMsg = `An error occurred in getPortfolioDocs(): ${err}`
     throw new Error(errMsg)
   } 
+}
+
+/*
+DESC
+  Returns the market value of the input Portfolio between the startDate and
+  endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate: The start date for market value calculation
+  endDate: The end date for market value calculation
+RETURN
+  TRUE if the Portfolio was successfully created, FALSE otherwise
+*/
+export async function getPortfolioMarketValueAsDatedValues(
+  portfolio: IPortfolio,
+  startDate: Date,
+  endDate: Date
+): Promise<TDatedValue[]> {
+
+  // get price map
+  const holdings = getPortfolioHoldings(portfolio)
+  const tcgplayerIds = holdings.map((holding: IHolding | IPopulatedHolding) => {
+    return getHoldingTcgplayerId(holding)
+  })
+  const priceMap = await getPriceMapOfSeries(tcgplayerIds, startDate, endDate)
+
+  // get market value
+  const marketValueSeries = dfu.getPortfolioMarketValueSeries(
+    portfolio, priceMap, startDate, endDate)
+
+  return dfu.getDatedValuesFromSeries(marketValueSeries)
 }
 
 /*
@@ -1037,20 +1070,14 @@ async function main(): Promise<number> {
 
   // const startDate = new Date('2023-09-01')
   // const endDate = new Date('2023-09-12')
-  // const pricesMap = await getPriceMapOfSeries(
-  //   [233232, 121527],
-  //   startDate,
-  //   endDate
-  // )
 
-  // const series = dfu.getPortfolioMarketValueSeries(
+  // const series = await getPortfolioMarketValueAsDatedValues(
   //   portfolio, 
-  //   pricesMap,
   //   startDate,
   //   endDate
   // )
 
-  // console.log(series)
+  // console.log(dfu.getSeriesFromDatedValues(series))
 
   // const series = getHoldingMarketValueSeries(
   //   holding,

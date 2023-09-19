@@ -4,7 +4,7 @@
 // =====
 var _a, _b, _c;
 exports.__esModule = true;
-exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.TimeseriesGranularity = void 0;
+exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.PerformanceMetric = exports.TimeseriesGranularity = void 0;
 // -- mongodb
 // timeseries granularity
 var TimeseriesGranularity;
@@ -13,6 +13,13 @@ var TimeseriesGranularity;
     TimeseriesGranularity["Minutes"] = "minutes";
     TimeseriesGranularity["Hours"] = "hours";
 })(TimeseriesGranularity = exports.TimeseriesGranularity || (exports.TimeseriesGranularity = {}));
+// -- performance metric
+var PerformanceMetric;
+(function (PerformanceMetric) {
+    PerformanceMetric["CumPnL"] = "Cumulative Profit and Loss";
+    PerformanceMetric["DailyPnL"] = "Daily Profit and Loss";
+    PerformanceMetric["MarketValue"] = "Market Value";
+})(PerformanceMetric = exports.PerformanceMetric || (exports.PerformanceMetric = {}));
 // -- product features
 // product language
 var ProductLanguage;

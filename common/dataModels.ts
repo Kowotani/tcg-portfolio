@@ -11,6 +11,13 @@ export enum TimeseriesGranularity {
   Hours = 'hours',
 }
 
+// -- performance metric
+export enum PerformanceMetric {
+  CumPnL = 'Cumulative Profit and Loss',
+  DailyPnL = 'Daily Profit and Loss',
+  MarketValue = 'Market Value',
+}
+
 // -- product features
 
 // product language
@@ -359,8 +366,14 @@ export type TDatedValue = {
   value: number
 }
 
-// used for storing timeseries data
-export type TValueSeries = {
+// used for storing Holding timeseries data
+export type THoldingValueSeries = {
   tcgplayerId: number,
+  values: TDatedValue[]
+}
+
+// used for storing Portfolio timeseries data
+export type TPortfolioValueSeries = {
+  portfolioName: string,
   values: TDatedValue[]
 }

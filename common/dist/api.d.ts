@@ -1,4 +1,4 @@
-import { IPortfolio, IProduct } from "./dataModels";
+import { IPortfolio, IProduct, TPortfolioValueSeries } from "./dataModels";
 export declare enum DeletePortfolioStatus {
     Success = "Successfully deleted Portfolio",
     DoesNotExist = "Portfolio does not exist",
@@ -11,6 +11,10 @@ export declare enum PostPortfolioStatus {
 export declare enum PutPortfolioStatus {
     Success = "Successfully updated Portfolio",
     Error = "Error updating Portfolio"
+}
+export declare enum GetPortfolioPerformanceStatus {
+    Success = "Successfully retrieved Portfolio performance",
+    Error = "Error retrieving Portfolio performance"
 }
 export declare enum GetPortfoliosStatus {
     Success = "Successfully retrieved Portfolios",
@@ -52,6 +56,7 @@ export declare type TResBody = {
 export declare type TDataResBody<Type> = TResBody & {
     data: Type;
 };
+export declare type TGetPortfolioPerformanceResBody = TDataResBody<TPortfolioValueSeries>;
 export declare type TProductPostResBody<Type> = TDataResBody<Type> & {
     tcgplayerId: number;
 };

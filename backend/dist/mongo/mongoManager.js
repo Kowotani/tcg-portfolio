@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -35,13 +31,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getPriceMapOfSeries = exports.getPriceMapOfDatedValues = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
+exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getPriceMapOfSeries = exports.getPriceMapOfDatedValues = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioMarketValueAsDatedValues = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
 // imports
 const common_1 = require("common");
 const dfu = __importStar(require("../danfoUtils"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const utils_1 = require("../utils");
-const common_2 = require("common");
 // =======
 // globals
 // =======
@@ -181,6 +176,31 @@ function getPortfolioDocs(userId) {
     });
 }
 exports.getPortfolioDocs = getPortfolioDocs;
+/*
+DESC
+  Returns the market value of the input Portfolio between the startDate and
+  endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate: The start date for market value calculation
+  endDate: The end date for market value calculation
+RETURN
+  TRUE if the Portfolio was successfully created, FALSE otherwise
+*/
+function getPortfolioMarketValueAsDatedValues(portfolio, startDate, endDate) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get price map
+        const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
+        const tcgplayerIds = holdings.map((holding) => {
+            return (0, common_1.getHoldingTcgplayerId)(holding);
+        });
+        const priceMap = yield getPriceMapOfSeries(tcgplayerIds, startDate, endDate);
+        // get market value
+        const marketValueSeries = dfu.getPortfolioMarketValueSeries(portfolio, priceMap, startDate, endDate);
+        return dfu.getDatedValuesFromSeries(marketValueSeries);
+    });
+}
+exports.getPortfolioMarketValueAsDatedValues = getPortfolioMarketValueAsDatedValues;
 /*
 DESC
   Retrieves all IPopulatedPortfolios for the input userId
@@ -807,77 +827,78 @@ function main() {
         // } else {
         //   console.log('Portfolio not deleted')
         // }
-        // -- Add portfolio holding
-        const holdingA = {
-            tcgplayerId: 233232,
-            transactions: [
-                {
-                    type: common_2.TransactionType.Purchase,
-                    date: new Date('2023-09-01'),
-                    price: 240,
-                    quantity: 2
-                },
-                {
-                    type: common_2.TransactionType.Sale,
-                    date: new Date('2023-09-02'),
-                    price: 245,
-                    quantity: 1
-                },
-                {
-                    type: common_2.TransactionType.Purchase,
-                    date: new Date('2023-09-04'),
-                    price: 250,
-                    quantity: 1
-                },
-                {
-                    type: common_2.TransactionType.Purchase,
-                    date: new Date('2023-09-05'),
-                    price: 250,
-                    quantity: 1
-                },
-                {
-                    type: common_2.TransactionType.Sale,
-                    date: new Date('2023-09-06'),
-                    price: 255,
-                    quantity: 3
-                }
-            ]
-        };
-        const holdingB = {
-            tcgplayerId: 121527,
-            transactions: [
-                {
-                    type: common_2.TransactionType.Purchase,
-                    date: new Date('2023-09-07'),
-                    price: 330,
-                    quantity: 5
-                },
-                {
-                    type: common_2.TransactionType.Sale,
-                    date: new Date('2023-09-08'),
-                    price: 325,
-                    quantity: 1
-                },
-                {
-                    type: common_2.TransactionType.Sale,
-                    date: new Date('2023-09-10'),
-                    price: 320,
-                    quantity: 4
-                },
-            ]
-        };
-        const portfolio = {
-            userId: 123,
-            portfolioName: 'foo',
-            holdings: [holdingA, holdingB]
-        };
-        const startDate = new Date('2023-09-01');
-        const endDate = new Date('2023-09-12');
-        // const pricesA = getSeriesFromDatedValues(await getPricesAsDatedValues(233232))
-        // const pricesB = getSeriesFromDatedValues(await getPricesAsDatedValues(121527))
-        const pricesMap = yield getPriceMapOfSeries([233232, 121527], startDate, endDate);
-        const series = dfu.getPortfolioMarketValueSeries(portfolio, pricesMap, startDate, endDate);
-        console.log(series);
+        // // -- Add portfolio holding
+        // const holdingA: IHolding = {
+        //   tcgplayerId: 233232,
+        //   transactions: [
+        //     {
+        //       type: TransactionType.Purchase,
+        //       date: new Date('2023-09-01'),
+        //       price: 240,
+        //       quantity: 2
+        //     },
+        //     {
+        //       type: TransactionType.Sale,
+        //       date: new Date('2023-09-02'),
+        //       price: 245,
+        //       quantity: 1
+        //     },
+        //     {
+        //       type: TransactionType.Purchase,
+        //       date: new Date('2023-09-04'),
+        //       price: 250,
+        //       quantity: 1
+        //     },
+        //     {
+        //       type: TransactionType.Purchase,
+        //       date: new Date('2023-09-05'),
+        //       price: 250,
+        //       quantity: 1
+        //     },
+        //     {
+        //       type: TransactionType.Sale,
+        //       date: new Date('2023-09-06'),
+        //       price: 255,
+        //       quantity: 3
+        //     }
+        //   ]
+        // } 
+        // const holdingB: IHolding = {
+        //   tcgplayerId: 121527,
+        //   transactions: [
+        //     {
+        //       type: TransactionType.Purchase,
+        //       date: new Date('2023-09-07'),
+        //       price: 330,
+        //       quantity: 5
+        //     },
+        //     {
+        //       type: TransactionType.Sale,
+        //       date: new Date('2023-09-08'),
+        //       price: 325,
+        //       quantity: 1
+        //     },
+        //     {
+        //       type: TransactionType.Sale,
+        //       date: new Date('2023-09-10'),
+        //       price: 320,
+        //       quantity: 4
+        //     },
+        //   ]
+        // } 
+        // const portfolio = {
+        //   userId: 123,
+        //   portfolioName: 'foo',
+        //   holdings: [holdingA, holdingB]
+        // }
+        // const startDate = new Date('2023-09-01')
+        // const endDate = new Date('2023-09-12')
+        // const series = await getPortfolioMarketValueAsDatedValues(
+        //   portfolio, 
+        //   startDate,
+        //   endDate
+        // )
+        // console.log(dfu.getSeriesFromDatedValues(series))
         // const series = getHoldingMarketValueSeries(
         //   holding,
         //   prices,

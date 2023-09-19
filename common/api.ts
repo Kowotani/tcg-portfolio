@@ -1,4 +1,6 @@
-import { IPortfolio, IProduct } from "./dataModels"
+import { 
+  IPortfolio, IProduct, TPortfolioValueSeries 
+} from "./dataModels"
 
 
 // =====
@@ -33,6 +35,15 @@ export enum PostPortfolioStatus {
 export enum PutPortfolioStatus {
   Success = 'Successfully updated Portfolio',
   Error = 'Error updating Portfolio',
+}
+
+/*
+  Endpoint:   PORTFOLIO_PERFORMANCE_URL
+  Type:       GET
+*/
+export enum GetPortfolioPerformanceStatus {
+  Success = 'Successfully retrieved Portfolio performance',
+  Error = 'Error retrieving Portfolio performance',
 }
 
 /*
@@ -135,6 +146,15 @@ export type TResBody = {
 export type TDataResBody<Type> = TResBody & {
   data: Type
 }
+
+// -- portfolio
+/*
+  Endpoint:   PORTFOLIO_PERFORMANCE_URL
+  Type:       GET
+  Req / Res:  Response
+*/
+export type TGetPortfolioPerformanceResBody 
+  = TDataResBody<TPortfolioValueSeries>
 
 // -- product
 
