@@ -91,10 +91,18 @@ export function getDatedValuesFromSeries(
 ): TDatedValue[] {
 
   const datedValues = series.index.map((index: string | number) => {
-    const ix = String(index)
+    
+    const date = _.isNumber(index)
+      ? new Date(index)
+      : new Date(Date.parse(index))
+
+    const value = _.isNumber(index)
+      ? Number(series.iat(index))
+      : Number(series.at(index))
+
     return {
-      date: new Date(Date.parse(ix)),
-      value: Number(series.loc([ix]))
+      date: date,
+      value: value
     }
   })
 
