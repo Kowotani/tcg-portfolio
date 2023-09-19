@@ -1,7 +1,7 @@
 // imports
-import { Schema } from 'mongoose';
+import { Schema } from 'mongoose'
 import { IProduct, ProductLanguage, ProductSubtype, ProductType, 
-  TCG } from 'common';
+  TCG } from 'common'
 
 // ==========
 // interfaces
@@ -47,7 +47,7 @@ export const productSchema = new Schema<IMProduct>({
   msrp: {
     type: Number,
     min: 1,
-    // required: true
+    required: true
   },
   subtype: {
     type: String,

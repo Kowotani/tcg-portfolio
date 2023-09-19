@@ -40,7 +40,7 @@ exports.productSchema = new mongoose_1.Schema({
     msrp: {
         type: Number,
         min: 1,
-        // required: true
+        required: true
     },
     subtype: {
         type: String,
