@@ -414,7 +414,7 @@ export async function getLatestPrices(): Promise<Map<number, IDatedPriceData>> {
           }
         } as IDatedPriceData
     )})
-    console.log(prices)
+
     return prices
 
   } catch(err) {
