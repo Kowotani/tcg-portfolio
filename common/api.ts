@@ -113,7 +113,7 @@ export enum GetProductsStatus {
 
 // -- portfolio
 export const PORTFOLIO_URL = '/portfolio'
-export const PORTFOLIO_PERFORMANCE_URL = PORTFOLIO_URL + '/peformance'
+export const PORTFOLIO_PERFORMANCE_URL = `${PORTFOLIO_URL}/performance`
 export const PORTFOLIOS_URL = '/portfolios'
 
 // -- product

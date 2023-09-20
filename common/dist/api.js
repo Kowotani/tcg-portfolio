@@ -105,7 +105,7 @@ var GetProductsStatus;
 // ======
 // -- portfolio
 exports.PORTFOLIO_URL = '/portfolio';
-exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL + '/peformance';
+exports.PORTFOLIO_PERFORMANCE_URL = "".concat(exports.PORTFOLIO_URL, "/performance");
 exports.PORTFOLIOS_URL = '/portfolios';
 // -- product
 exports.PRODUCT_URL = '/product';

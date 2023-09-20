@@ -174,8 +174,6 @@ RETURN
   The item quantity available from the input IHolding
 */
 function getHoldingQuantity(holding) {
-    console.log("Purchases: ".concat(getHoldingPurchaseQuantity(holding)));
-    console.log("Sales: ".concat(getHoldingSaleQuantity(holding)));
     var value = getHoldingPurchaseQuantity(holding)
         - getHoldingSaleQuantity(holding);
     (0, utils_1.assert)(value >= 0, 'getHoldingQuantity() value is not at least 0');
