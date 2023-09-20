@@ -1,11 +1,10 @@
 const scrapeManager = require('../dist/scraper/scrapeManager')
 
-function main() {
-  return __awaiter(this, void 0, void 0, function* () {
-    const numInserted = yield scrapeManager.loadCurrentPrices()
-    return numInserted
-  });
-}
-main()
-  .then(console.log)
-  .catch(console.error)
+scrapeManager
+  .loadCurrentPrices()
+  .then(res => {
+    console.log(`${numInserted} price documents were loaded`) 
+  })
+  .catch(err => {
+    console.log(err)
+  })
