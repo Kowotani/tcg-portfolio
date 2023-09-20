@@ -177,6 +177,62 @@ app.put(common_1.PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, v
 }));
 /*
 DESC
+  Handle GET request to retrieve performance data for the input Portfolio and
+  date range
+INPUT
+  Request query parameters:
+    userId: The userId who owns the Portfolio
+    portfolioName: The name of the Portfolio
+    startDate: The start date for performance calculation
+    endDate: The end date for performance calculation
+    metric: The performance metric
+RETURN
+  TGetPortfolioPerformanceResBody response with status codes
+
+  Status Code
+    200: The Portfolio performance data was retrieved successfully
+    500: An error occurred
+*/
+app.get(common_1.PORTFOLIO_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // get portfolio
+        const portfolioDoc = yield (0, mongoManager_1.getPortfolioDoc)({
+            userId: req.query.userId,
+            portfolioName: req.query.portfolioName,
+            holdings: []
+        });
+        (0, common_1.assert)((0, utils_1.isPortfolioDoc)(portfolioDoc), 'Could not find Portfolio');
+        const startDate = new Date(Date.parse(req.query.startDate));
+        const endDate = new Date(Date.parse(req.query.endDate));
+        const metric = req.query.metric;
+        let values = [];
+        // market value
+        if (metric === common_1.PerformanceMetric.MarketValue) {
+            values = yield (0, mongoManager_1.getPortfolioMarketValueAsDatedValues)(portfolioDoc, startDate, endDate);
+        }
+        const portfolioValueSeries = {
+            portfolioName: portfolioDoc.portfolioName,
+            values: values
+        };
+        // return performance data
+        res.status(200);
+        const body = {
+            data: portfolioValueSeries,
+            message: common_1.GetPortfolioPerformanceStatus.Success
+        };
+        res.send(body);
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: `${common_1.GetPortfolioPerformanceStatus.Error}: ${err}`
+        };
+        res.send(body);
+    }
+}));
+/*
+DESC
   Handle GET request for all IPopulatedPortfolios for the input userId
 INPUT
   Request query parameters:
@@ -185,7 +241,7 @@ RETURN
   Response body with status codes and messages
 
   Status Code
-    200: The Portfolio documents were returned successfully
+    200: The Portfolio documents were retrieved successfully
     500: An error occurred
 */
 app.get(common_1.PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {

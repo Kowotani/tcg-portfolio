@@ -1,24 +1,28 @@
 import { loadImageToS3 } from './aws/s3Manager'
 import { 
-  IDatedPriceData, IPopulatedPortfolio, IPortfolio, IPrice, IPriceData, 
-  IProduct, TimeseriesGranularity,
+  IDatedPriceData, IPopulatedPortfolio, IPortfolio, 
+  TPortfolioValueSeries, IPrice, IPriceData, IProduct, 
+  
+  PerformanceMetric, TimeseriesGranularity,
 
-  DeletePortfolioStatus, GetPortfoliosStatus, GetPricesStatus, 
-  GetProductsStatus, PostLatestPriceStatus, PostPortfolioStatus, 
+  DeletePortfolioStatus, GetPortfolioPerformanceStatus, GetPortfoliosStatus, 
+  GetPricesStatus, GetProductsStatus, PostLatestPriceStatus, PostPortfolioStatus, 
   PostPriceStatus, PostProductStatus, PutPortfolioStatus,
   
-  TDataResBody, TDeletePortfolioReqBody, TPostLatestPriceReqBody, 
-  TPostPortfolioReqBody, TPostPriceReqBody, TPutPortfolioReqBody, 
-  TPostProductReqBody, TProductPostResBody, TResBody, 
+  TDataResBody, TDeletePortfolioReqBody, TGetPortfolioPerformanceResBody, 
+  TPostLatestPriceReqBody, TPostPortfolioReqBody, TPostPriceReqBody, 
+  TPutPortfolioReqBody, TPostProductReqBody, TProductPostResBody, TResBody, 
 
-  LATEST_PRICES_URL, PORTFOLIO_URL, PORTFOLIOS_URL, PRICE_URL, PRODUCT_URL,
-  PRODUCTS_URL, 
+  LATEST_PRICES_URL, PORTFOLIO_URL, PORTFOLIO_PERFORMANCE_URL, PORTFOLIOS_URL, 
+  PRICE_URL, PRODUCT_URL, PRODUCTS_URL, TDatedValue, 
+
+  assert
 } from 'common'
 import express from 'express'
 import { 
-  addPortfolio, deletePortfolio, getLatestPrices, getPortfolioDoc, 
-  getPortfolios, getProductDoc, getProductDocs, insertPrices, insertProducts, 
-  setPortfolio
+  addPortfolio, deletePortfolio, getLatestPrices, 
+  getPortfolioMarketValueAsDatedValues, getPortfolioDoc, getPortfolios, 
+  getProductDoc, getProductDocs, insertPrices, insertProducts, setPortfolio
 } from './mongo/mongoManager'
 import multer from 'multer'
 import { loadCurrentPrice } from './scraper/scrapeManager'
@@ -203,6 +207,71 @@ app.put(PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
 
 /*
 DESC
+  Handle GET request to retrieve performance data for the input Portfolio and
+  date range
+INPUT
+  Request query parameters:
+    userId: The userId who owns the Portfolio
+    portfolioName: The name of the Portfolio
+    startDate: The start date for performance calculation
+    endDate: The end date for performance calculation
+    metric: The performance metric
+RETURN
+  TGetPortfolioPerformanceResBody response with status codes
+
+  Status Code
+    200: The Portfolio performance data was retrieved successfully
+    500: An error occurred
+*/
+app.get(PORTFOLIO_PERFORMANCE_URL, async (req: any, res: any) => {
+
+  try {
+
+    // get portfolio
+    const portfolioDoc = await getPortfolioDoc({
+      userId: req.query.userId,
+      portfolioName: req.query.portfolioName,
+      holdings: []
+    })
+    assert(isPortfolioDoc(portfolioDoc), 'Could not find Portfolio')
+    const startDate = new Date(Date.parse(req.query.startDate))
+    const endDate = new Date(Date.parse(req.query.endDate))
+    const metric = req.query.metric as PerformanceMetric
+
+    let values = [] as TDatedValue[]
+
+    // market value
+    if (metric === PerformanceMetric.MarketValue) {
+      values = await getPortfolioMarketValueAsDatedValues(
+        portfolioDoc, startDate, endDate)
+    }
+
+    const portfolioValueSeries: TPortfolioValueSeries = {
+      portfolioName: portfolioDoc.portfolioName,
+      values: values
+    }
+
+    // return performance data
+    res.status(200)
+    
+    const body: TGetPortfolioPerformanceResBody = {
+      data: portfolioValueSeries,
+      message: GetPortfolioPerformanceStatus.Success
+    }
+    res.send(body)
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: `${GetPortfolioPerformanceStatus.Error}: ${err}`
+    }
+    res.send(body)
+  }
+})
+
+/*
+DESC
   Handle GET request for all IPopulatedPortfolios for the input userId
 INPUT
   Request query parameters:
@@ -211,7 +280,7 @@ RETURN
   Response body with status codes and messages
 
   Status Code
-    200: The Portfolio documents were returned successfully
+    200: The Portfolio documents were retrieved successfully
     500: An error occurred
 */
 app.get(PORTFOLIOS_URL, async (req: any, res: any) => {
@@ -219,7 +288,7 @@ app.get(PORTFOLIOS_URL, async (req: any, res: any) => {
   try {
 
     // query Portfolios
-    const userId = req.query.userId
+    const userId = req.query.userId as number
     const data = await getPortfolios(userId)
 
     // return Portfolios
