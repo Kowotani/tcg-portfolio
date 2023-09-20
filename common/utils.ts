@@ -8,7 +8,9 @@ import {
 
   ProductTypeToProductSubtype, TCGToProductSubtype, IDatedPriceData, 
 } from './dataModels'
-import { eachDayOfInterval } from 'date-fns'
+import { 
+  clamp, eachDayOfInterval, eachMonthOfInterval, eachWeekOfInterval 
+} from 'date-fns'
 import * as _ from 'lodash'
 import { inspect } from 'util'
 
@@ -50,21 +52,48 @@ export function genDateRange(startDate: Date, endDate: Date): Date[] {
   })
 }
 
-// -------
-// generic
-// -------
+/*
+DESC
+  Generates an array of dates corresponding to the first day of the month 
+  between the input startDate and endDate inclusive
+INPUT
+  startDate: The starting date
+  endDate: The ending date
+RETURN
+  A Date[]
+*/
+export function genFirstOfMonthDateRange(
+  startDate: Date, 
+  endDate: Date
+): Date[] {
+
+  return eachMonthOfInterval({
+    start: startDate,
+    end: endDate
+  })
+}
 
 /*
 DESC
-  Basic assertion function
+  Generates an array of dates corresponding to the first Sunday of each week 
+  between the input startDate and endDate inclusive
 INPUT
-  condition: A condition to assert is true
-  msg: An optional message to display
+  startDate: The starting date
+  endDate: The ending date
+RETURN
+  A Date[]
 */
-export function assert(condition: any, msg?: string): asserts condition {
-  if (!condition) {
-    throw new Error('Assertion Error: ' + msg)
-  }
+export function genSundayOfWeekDateRange(
+  startDate: Date, 
+  endDate: Date
+): Date[] {
+
+  return eachWeekOfInterval({
+      start: startDate,
+      end: endDate
+    },
+    {weekStartsOn: 0}
+  )
 }
 
 /*
@@ -82,11 +111,29 @@ export function getClampedDate(
   startDate: Date,
   endDate: Date
 ): Date {
-  return date.getTime() < startDate.getTime()
-    ? startDate
-    : date.getTime() > endDate.getTime()
-      ? endDate
-      : date
+  return clamp(
+    date, 
+    {
+      start: startDate,
+      end: endDate
+    })
+}
+
+// -------
+// generic
+// -------
+
+/*
+DESC
+  Basic assertion function
+INPUT
+  condition: A condition to assert is true
+  msg: An optional message to display
+*/
+export function assert(condition: any, msg?: string): asserts condition {
+  if (!condition) {
+    throw new Error('Assertion Error: ' + msg)
+  }
 }
 
 /*
