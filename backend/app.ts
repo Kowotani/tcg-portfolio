@@ -244,6 +244,11 @@ app.get(PORTFOLIO_PERFORMANCE_URL, async (req: any, res: any) => {
     if (metric === PerformanceMetric.MarketValue) {
       values = await getPortfolioMarketValueAsDatedValues(
         portfolioDoc, startDate, endDate)
+
+    // unknown
+    } else {
+      const err = `Unknown metric: ${metric}`
+      throw new Error(err)
     }
 
     const portfolioValueSeries: TPortfolioValueSeries = {

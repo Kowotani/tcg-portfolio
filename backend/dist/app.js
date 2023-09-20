@@ -209,6 +209,11 @@ app.get(common_1.PORTFOLIO_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void
         // market value
         if (metric === common_1.PerformanceMetric.MarketValue) {
             values = yield (0, mongoManager_1.getPortfolioMarketValueAsDatedValues)(portfolioDoc, startDate, endDate);
+            // unknown
+        }
+        else {
+            const err = `Unknown metric: ${metric}`;
+            throw new Error(err);
         }
         const portfolioValueSeries = {
             portfolioName: portfolioDoc.portfolioName,
