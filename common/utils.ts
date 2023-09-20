@@ -30,23 +30,6 @@ export const SECONDS_PER_DAY = 86400
 // ----------
 
 /*
-  DESC
-    Returns the input Date as an ISODate (YYYY-MM-DD)
-  INPUT
-    date: A Date 
-  RETURN
-    A YYYY-MM-DD formatted version of the input date
-*/
-export function getISOStringFromDate(date: Date): string {
-  const newDate = new Date(date)
-  const year = newDate.getUTCFullYear().toString()
-  const month = (newDate.getUTCMonth() + 1).toString().padStart(2, '0')
-  const day = (newDate.getUTCDate()).toString().padStart(2, '0')
-  
-  return `${year}-${month}-${day}`
-}
-
-/*
 DESC
   Returns a typed array of properties from the input object
 INPUT

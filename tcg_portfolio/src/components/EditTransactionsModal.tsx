@@ -32,7 +32,7 @@ import {
 
   getClampedDate, getHoldingAverageCost, getHoldingAverageRevenue, 
   getHoldingPurchaseQuantity, getHoldingSaleQuantity, getHoldingTotalCost, 
-  getHoldingTotalRevenue, getISOStringFromDate,
+  getHoldingTotalRevenue,
 
   assert, isNumeric
 } from 'common'
@@ -46,7 +46,8 @@ import { MetricSummary, TMetricSummaryItem
   } from './MetricSummary'
 import { TransactionTable } from './TransactionTable'
 import { 
-  getBrowserLocale, getFormattedPrice, getProductNameWithLanguage 
+  getBrowserLocale, getFormattedPrice, getISOStringFromDate, 
+  getProductNameWithLanguage 
 } from '../utils'
 
 

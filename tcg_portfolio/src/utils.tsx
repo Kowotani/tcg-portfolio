@@ -4,6 +4,7 @@ import {
   
   assert, isIDatedPriceData, isIPopulatedHolding, isIProduct
 } from 'common'
+import { format } from 'date-fns'
 import * as _ from 'lodash'
 
 
@@ -184,6 +185,22 @@ export function getPriceMapFromPriceAPIResponse(
     priceMap.set(tcgplayerId, datedPriceData)
   })
   return priceMap
+}
+
+// ----
+// date
+// ----
+
+/*
+  DESC
+    Returns the input Date as an ISODate (YYYY-MM-DD)
+  INPUT
+    date: A Date 
+  RETURN
+    A YYYY-MM-DD formatted version of the input date
+*/
+export function getISOStringFromDate(date: Date): string {
+  return format(date, 'yyyy-MM-dd')
 }
 
 // ---------
