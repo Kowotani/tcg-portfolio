@@ -322,6 +322,41 @@ app.get(PORTFOLIOS_URL, async (req: any, res: any) => {
 
 /*
 DESC
+  Handle GET request for latest Prices of all Products
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The Prices were returned successfully
+    500: An error occurred
+*/
+app.get(LATEST_PRICES_URL, async (req: any, res: any) => {
+
+  try {
+
+    // query Prices
+    const latestPrices = await getLatestPrices()
+
+    // return Prices
+    res.status(200)
+    const body: TDataResBody<{[tcgplayerId: number]: IDatedPriceData}> = {
+      data: Object.fromEntries(latestPrices),
+      message: GetPricesStatus.Success
+    }
+    res.send(body)
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: `${GetPricesStatus.Error}: ${err}`
+    }
+    res.send(body)
+  }
+})
+
+/*
+DESC
   Handle POST request to load the current Price for a tcgplayerId
 INPUT
   Request body in multipart/form-data containing a TPostLatestPriceReqBody
@@ -444,41 +479,6 @@ app.post(PRICE_URL, upload.none(), async (req: any, res: any) => {
     res.status(500)
     const body: TResBody = {
       message: `${PostPriceStatus.Error}: ${err}`
-    }
-    res.send(body)
-  }
-})
-
-/*
-DESC
-  Handle GET request for latest Prices of all Products
-RETURN
-  Response body with status codes and messages
-
-  Status Code
-    200: The Prices were returned successfully
-    500: An error occurred
-*/
-app.get(LATEST_PRICES_URL, async (req: any, res: any) => {
-
-  try {
-
-    // query Prices
-    const latestPrices = await getLatestPrices()
-
-    // return Prices
-    res.status(200)
-    const body: TDataResBody<{[tcgplayerId: number]: IDatedPriceData}> = {
-      data: Object.fromEntries(latestPrices),
-      message: GetPricesStatus.Success
-    }
-    res.send(body)
-
-  // error
-  } catch (err) {
-    res.status(500)
-    const body: TResBody = {
-      message: `${GetPricesStatus.Error}: ${err}`
     }
     res.send(body)
   }

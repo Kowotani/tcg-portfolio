@@ -26,7 +26,7 @@ import {
 
   areValidHoldings, isPortfolioDoc, isProductDoc
 } from '../utils'
-import { TransactionType } from 'common'
+
 
 // =======
 // globals
@@ -358,18 +358,19 @@ export async function getLatestPrices(): Promise<Map<number, IDatedPriceData>> {
     // get list of Price data with the following shape
     /*
       {
-        _id: { tcgplayerId: number},
-        data: [[ datestring, number ]]
+        tcgplayerId: number,
+        priceDate: Date,
+        marketPrice: number
       }
     */
-    const priceData = await Price.aggregate()
+    const priceData = await HistoricalPrice.aggregate()
       .group({
         _id: {
           tcgplayerId: '$tcgplayerId',
-          priceDate: '$priceDate'
+          priceDate: '$date'
         },
         marketPrice: {
-          $avg: '$prices.marketPrice'
+          $avg: '$marketPrice'
         }
       })
       .group({
@@ -378,15 +379,26 @@ export async function getLatestPrices(): Promise<Map<number, IDatedPriceData>> {
         },
         data: {
           '$topN': {
-            output: [
-              '$_id.priceDate', 
-              '$marketPrice'
-            ], 
+            output: {
+              priceDate: '$_id.priceDate', 
+              marketPrice: '$marketPrice'
+            }, 
             sortBy: {
               '_id.priceDate': -1
             }, 
             n: 1
         }}
+      })
+      .addFields({
+        element: {
+          '$first': '$data'
+        }
+      })
+      .project({
+        _id: false,
+    		tcgplayerId: '$_id.tcgplayerId',
+    		priceDate: '$element.priceDate',
+    		marketPrice: '$element.marketPrice'
       })
       .exec()
     
@@ -394,15 +406,15 @@ export async function getLatestPrices(): Promise<Map<number, IDatedPriceData>> {
     let prices = new Map<number, IDatedPriceData>()
     priceData.forEach((el: any) => {
       prices.set(
-        el._id.tcgplayerId, 
+        el.tcgplayerId, 
         {
-          priceDate: el.data[0][0],
+          priceDate: el.priceDate,
           prices: {
-            marketPrice: el.data[0][1]
+            marketPrice: el.marketPrice
           }
         } as IDatedPriceData
     )})
-    
+    console.log(prices)
     return prices
 
   } catch(err) {

@@ -276,6 +276,37 @@ app.get(common_1.PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, void 0,
 // ======
 /*
 DESC
+  Handle GET request for latest Prices of all Products
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The Prices were returned successfully
+    500: An error occurred
+*/
+app.get(common_1.LATEST_PRICES_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // query Prices
+        const latestPrices = yield (0, mongoManager_1.getLatestPrices)();
+        // return Prices
+        res.status(200);
+        const body = {
+            data: Object.fromEntries(latestPrices),
+            message: common_1.GetPricesStatus.Success
+        };
+        res.send(body);
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: `${common_1.GetPricesStatus.Error}: ${err}`
+        };
+        res.send(body);
+    }
+}));
+/*
+DESC
   Handle POST request to load the current Price for a tcgplayerId
 INPUT
   Request body in multipart/form-data containing a TPostLatestPriceReqBody
@@ -386,37 +417,6 @@ app.post(common_1.PRICE_URL, upload.none(), (req, res) => __awaiter(void 0, void
         res.status(500);
         const body = {
             message: `${common_1.PostPriceStatus.Error}: ${err}`
-        };
-        res.send(body);
-    }
-}));
-/*
-DESC
-  Handle GET request for latest Prices of all Products
-RETURN
-  Response body with status codes and messages
-
-  Status Code
-    200: The Prices were returned successfully
-    500: An error occurred
-*/
-app.get(common_1.LATEST_PRICES_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // query Prices
-        const latestPrices = yield (0, mongoManager_1.getLatestPrices)();
-        // return Prices
-        res.status(200);
-        const body = {
-            data: Object.fromEntries(latestPrices),
-            message: common_1.GetPricesStatus.Success
-        };
-        res.send(body);
-        // error
-    }
-    catch (err) {
-        res.status(500);
-        const body = {
-            message: `${common_1.GetPricesStatus.Error}: ${err}`
         };
         res.send(body);
     }

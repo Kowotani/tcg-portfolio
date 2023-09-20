@@ -308,18 +308,19 @@ function getLatestPrices() {
             // get list of Price data with the following shape
             /*
               {
-                _id: { tcgplayerId: number},
-                data: [[ datestring, number ]]
+                tcgplayerId: number,
+                priceDate: Date,
+                marketPrice: number
               }
             */
-            const priceData = yield utils_1.Price.aggregate()
+            const priceData = yield utils_1.HistoricalPrice.aggregate()
                 .group({
                 _id: {
                     tcgplayerId: '$tcgplayerId',
-                    priceDate: '$priceDate'
+                    priceDate: '$date'
                 },
                 marketPrice: {
-                    $avg: '$prices.marketPrice'
+                    $avg: '$marketPrice'
                 }
             })
                 .group({
@@ -328,10 +329,10 @@ function getLatestPrices() {
                 },
                 data: {
                     '$topN': {
-                        output: [
-                            '$_id.priceDate',
-                            '$marketPrice'
-                        ],
+                        output: {
+                            priceDate: '$_id.priceDate',
+                            marketPrice: '$marketPrice'
+                        },
                         sortBy: {
                             '_id.priceDate': -1
                         },
@@ -339,17 +340,29 @@ function getLatestPrices() {
                     }
                 }
             })
+                .addFields({
+                element: {
+                    '$first': '$data'
+                }
+            })
+                .project({
+                _id: false,
+                tcgplayerId: '$_id.tcgplayerId',
+                priceDate: '$element.priceDate',
+                marketPrice: '$element.marketPrice'
+            })
                 .exec();
             // create the TTcgplayerIdPrices
             let prices = new Map();
             priceData.forEach((el) => {
-                prices.set(el._id.tcgplayerId, {
-                    priceDate: el.data[0][0],
+                prices.set(el.tcgplayerId, {
+                    priceDate: el.priceDate,
                     prices: {
-                        marketPrice: el.data[0][1]
+                        marketPrice: el.marketPrice
                     }
                 });
             });
+            console.log(prices);
             return prices;
         }
         catch (err) {
