@@ -133,7 +133,7 @@ export interface IProduct {
 
 // -- Portfolio, Holding, and Transaction schemas
 
-// transaction
+// Transaction
 export interface ITransaction {
   type: TransactionType,
   date: Date,
@@ -146,7 +146,7 @@ export interface IReactTableTransaction extends ITransaction {
   delete?: boolean,
 }
 
-// holding
+// Holding
 
 export interface IHoldingBase {
   transactions: ITransaction[],
@@ -197,7 +197,7 @@ export interface IPopulatedHolding extends IHoldingBase {
   product: IProduct,
 }
 
-// portfolio
+// Portfolio
 
 export interface IPortfolioBase {
   userId: number,

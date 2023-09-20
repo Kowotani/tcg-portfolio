@@ -8,6 +8,7 @@ import {
 
   ProductTypeToProductSubtype, TCGToProductSubtype, IDatedPriceData, 
 } from './dataModels'
+import { eachDayOfInterval } from 'date-fns'
 import * as _ from 'lodash'
 import { inspect } from 'util'
 
@@ -25,49 +26,9 @@ export const SECONDS_PER_DAY = 86400
 // functions
 // =========
 
-// ----------
-// converters
-// ----------
-
-/*
-DESC
-  Returns a typed array of properties from the input object
-INPUT
-  obj: An object
-RETURN
-  An array of [key, value] items corresponding to typed properties of the input
-REF
-  https://stackoverflow.com/questions/69019873/how-can-i-get-typed-object-entries-and-object-fromentries-in-typescript
-*/
-// export function getTypeSafeObjectEntries<
-//   const T extends Record<PropertyKey, unknown>
-// >(
-//   obj: Tfunction
-// ): { [K in keyof T]: [K, T[K]] }[keyof T][]  {
-//   return Object.entries(obj) as { [K in keyof T]: [K, T[K]] }[keyof T][]
-// }
-
-/*
-DESC
-  Returns an object with typed properties from the input entries
-INPUT
-  entries: An iterable
-RETURN
-  An object whose typed properties correspond to the input iterable entries
-REF
-  https://stackoverflow.com/questions/69019873/how-can-i-get-typed-object-entries-and-object-fromentries-in-typescript
-*/ 
-// export function getTypeSafeObjectFromEntries<
-//   const T extends ReadonlyArray<readonly [PropertyKey, unknown]>
-// > (
-//   entries: T
-// ): { [K in T[number] as K[0]]: K[1] } {
-//   return Object.fromEntries(entries) as { [K in T[number] as K[0]]: K[1] }
-// }
-
-// ----------
-// generators
-// ----------
+// ----
+// date
+// ----
 
 /*
 DESC
@@ -82,17 +43,11 @@ export function genDateRange(startDate: Date, endDate: Date): Date[] {
 
   startDate.setUTCHours(0, 0, 0, 0)
   endDate.setUTCHours(0, 0, 0, 0)
-  
-  const date = new Date(startDate.getTime())
 
-  const dates = []
-
-  while (date <= endDate) {
-    dates.push(new Date(date))
-    date.setUTCDate(date.getUTCDate() + 1)
-  }
-
-  return dates
+  return eachDayOfInterval({
+    start: startDate,
+    end: endDate
+  })
 }
 
 // -------

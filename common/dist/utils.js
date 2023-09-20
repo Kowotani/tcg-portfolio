@@ -2,6 +2,7 @@
 exports.__esModule = true;
 exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.getClampedDate = exports.assert = exports.genDateRange = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
+var date_fns_1 = require("date-fns");
 var _ = require("lodash");
 var util_1 = require("util");
 // =========
@@ -13,46 +14,9 @@ exports.SECONDS_PER_DAY = 86400;
 // =========
 // functions
 // =========
-// ----------
-// converters
-// ----------
-/*
-DESC
-  Returns a typed array of properties from the input object
-INPUT
-  obj: An object
-RETURN
-  An array of [key, value] items corresponding to typed properties of the input
-REF
-  https://stackoverflow.com/questions/69019873/how-can-i-get-typed-object-entries-and-object-fromentries-in-typescript
-*/
-// export function getTypeSafeObjectEntries<
-//   const T extends Record<PropertyKey, unknown>
-// >(
-//   obj: Tfunction
-// ): { [K in keyof T]: [K, T[K]] }[keyof T][]  {
-//   return Object.entries(obj) as { [K in keyof T]: [K, T[K]] }[keyof T][]
-// }
-/*
-DESC
-  Returns an object with typed properties from the input entries
-INPUT
-  entries: An iterable
-RETURN
-  An object whose typed properties correspond to the input iterable entries
-REF
-  https://stackoverflow.com/questions/69019873/how-can-i-get-typed-object-entries-and-object-fromentries-in-typescript
-*/
-// export function getTypeSafeObjectFromEntries<
-//   const T extends ReadonlyArray<readonly [PropertyKey, unknown]>
-// > (
-//   entries: T
-// ): { [K in T[number] as K[0]]: K[1] } {
-//   return Object.fromEntries(entries) as { [K in T[number] as K[0]]: K[1] }
-// }
-// ----------
-// generators
-// ----------
+// ----
+// date
+// ----
 /*
 DESC
   Generates an array of dates between the input startDate and endDate inclusive
@@ -65,13 +29,10 @@ RETURN
 function genDateRange(startDate, endDate) {
     startDate.setUTCHours(0, 0, 0, 0);
     endDate.setUTCHours(0, 0, 0, 0);
-    var date = new Date(startDate.getTime());
-    var dates = [];
-    while (date <= endDate) {
-        dates.push(new Date(date));
-        date.setUTCDate(date.getUTCDate() + 1);
-    }
-    return dates;
+    return (0, date_fns_1.eachDayOfInterval)({
+        start: startDate,
+        end: endDate
+    });
 }
 exports.genDateRange = genDateRange;
 // -------
