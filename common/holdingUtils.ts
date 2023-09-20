@@ -185,9 +185,9 @@ RETURN
 export function getHoldingPurchaseQuantity(
   holding: IHolding | IPopulatedHolding
 ): number {
-  const value = _.sumBy(getHoldingPurchases(holding), (txn: ITransaction) => {
-    return txn.quantity
-  })
+  const value = _.sum(getHoldingPurchases(holding).map((txn: ITransaction) => {
+    return Number(txn.quantity)
+  }))
   assert(
     value >= 0, 
     'getHoldingPurchaseQuantity() value is not at least 0'
@@ -262,9 +262,9 @@ RETURN
 export function getHoldingSaleQuantity(
   holding: IHolding | IPopulatedHolding
 ): number {
-  const value = _.sumBy(getHoldingSales(holding), (txn: ITransaction) => {
-    return txn.quantity
-  })
+  const value = _.sum(getHoldingSales(holding).map((txn: ITransaction) => {
+    return Number(txn.quantity)
+  }))
   assert(
     value >= 0, 
     'getHoldingSaleQuantity() value is not at least 0'
