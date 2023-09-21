@@ -3,10 +3,6 @@ import { IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, IPrice, I
 export declare const DAYS_PER_YEAR = 365;
 export declare const MILLISECONDS_PER_SECOND = 1000;
 export declare const SECONDS_PER_DAY = 86400;
-export declare function genDateRange(startDate: Date, endDate: Date): Date[];
-export declare function genFirstOfMonthDateRange(startDate: Date, endDate: Date): Date[];
-export declare function genSundayOfWeekDateRange(startDate: Date, endDate: Date): Date[];
-export declare function getClampedDate(date: Date, startDate: Date, endDate: Date): Date;
 export declare function assert(condition: any, msg?: string): asserts condition;
 export declare function getPriceFromString(value: string): number;
 export declare function getProductSubtypes(tcg: TCG, productType: ProductType): ProductSubtype[];
