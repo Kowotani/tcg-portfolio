@@ -102,11 +102,9 @@ const CustomTooltip = (
 
 type TPriceChartProps = {
   data: TDatedValue[],
-  fill: string,
   height: number,
-  stroke: string,
   width: number,
-  margin?: TChartMargins
+  dateRange: ChartDateRange
 }
 export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
@@ -119,7 +117,7 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
     return datedValue.date
   })?.date as Date
   const chartData = getChartDataFromDatedValues(props.data)  
-  const ticks = getDateAxisTicks(startDate, endDate, ChartDateRange.OneMonth)
+  const ticks = getDateAxisTicks(startDate, endDate, props.dateRange)
 
 
   // ==============
@@ -133,7 +131,6 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
           height={props.height}
           width={props.width}
           data={chartData}
-          margin={props.margin}
         >
             <XAxis 
               dataKey='date' 
