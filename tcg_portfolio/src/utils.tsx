@@ -235,7 +235,13 @@ export const getDateAxisTicks = (
       break
   }
 
-  return dates.map((date: Date) => {
+  // remove endpoints if they are beyond the startDate or endDate
+  const ticks = dates.filter((date: Date) => {
+    return date.getTime() >= startDate.getTime() 
+      && date.getTime() <= endDate.getTime()
+  })
+
+  return ticks.map((date: Date) => {
     return date.getTime()
   })
 }
