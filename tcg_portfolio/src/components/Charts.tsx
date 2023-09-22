@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { PropsWithChildren } from 'react'
 import { 
   Box,
   Card,
@@ -9,7 +9,10 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react'
-import { TDatedValue, formatAsISO} from 'common'
+import { 
+  TDatedValue, 
+  assert, dateSub, formatInTimeZone, isDate
+} from 'common'
 import * as _ from 'lodash'
 import { 
   Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, TooltipProps,
@@ -19,11 +22,12 @@ import {
   NameType, ValueType 
 } from 'recharts/types/component/DefaultTooltipContent'
 import { 
-  ChartDateRange, TChartDataPoint, TChartMargins, 
+  ChartDateRange, TChartDataPoint, 
 
   dateAxisTickFormatter, getBrowserLocale, getChartDataFromDatedValues, 
   getDateAxisTicks, getFormattedPrice, priceAxisTickFormatter
 } from '../utils'
+
 
 // =========
 // constants
@@ -61,9 +65,14 @@ function getPriceAxisWidth(data: TDatedValue[]): number {
   return 10 + String(longestValue).length * 10
 }
 
-// =============
-// Chart Tooltip
-// =============
+
+// ==========
+// components
+// ==========
+
+// -------------
+// Custom Toolip
+// -------------
 
 const CustomTooltip = (
   {active, payload}: TooltipProps<ValueType, NameType>
@@ -76,7 +85,8 @@ const CustomTooltip = (
     const chartDataPoint = payloadValue as TChartDataPoint
 
     // create variables
-    const date = formatAsISO(new Date(chartDataPoint.date))
+    const date = formatInTimeZone(
+      new Date(chartDataPoint.date), 'MMM d, yyyy', 'UTC')
     const marketValue = getFormattedPrice(
       chartDataPoint.value, getBrowserLocale(), '$', 2
     )
@@ -95,28 +105,56 @@ const CustomTooltip = (
 }
 
 
-// ===========
+// -----------
 // Price Chart
-// ===========
-
+// -----------
 
 type TPriceChartProps = {
   data: TDatedValue[],
+  dateRange: ChartDateRange,
   height: number,
-  width: number,
-  dateRange: ChartDateRange
+  width: number
 }
 export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
+  // get start date and end date
+  let startDate
+  const endDate = new Date()
 
-  // get date axis ticks
-  const startDate = _.minBy(props.data, (datedValue: TDatedValue) => {
-    return datedValue.date
-  })?.date as Date
-  const endDate = _.maxBy(props.data, (datedValue: TDatedValue) => {
-    return datedValue.date
-  })?.date as Date
+  // use input data to find start date
+  if (props.dateRange === ChartDateRange.All) {
+    startDate = _.minBy(props.data, (datedValue: TDatedValue) => {
+      return datedValue.date
+    })?.date
+
+  // use input date range
+  } else {
+
+    // one month
+    if (props.dateRange === ChartDateRange.OneMonth) {
+      startDate = dateSub(endDate, {days: 30})
+
+    // three months
+    } else if (props.dateRange === ChartDateRange.ThreeMonths) {
+      startDate = dateSub(endDate, {months: 3})
+
+    // six months
+    } else if (props.dateRange === ChartDateRange.SixMonths) {
+      startDate = dateSub(endDate, {months: 6})
+
+    // one year
+    } else if (props.dateRange === ChartDateRange.OneYear) {
+      startDate = dateSub(endDate, {years: 1})
+
+    // default to three months
+    } else {
+      startDate = dateSub(endDate, {months: 3})
+    }
+  }
+
+
   const chartData = getChartDataFromDatedValues(props.data)  
+  assert(isDate(startDate), 'startDate is not a Date')
   const ticks = getDateAxisTicks(startDate, endDate, props.dateRange)
 
 
