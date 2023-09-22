@@ -1,6 +1,6 @@
 import { 
-  clamp, differenceInCalendarDays, eachDayOfInterval, eachMonthOfInterval, 
-  eachQuarterOfInterval, eachWeekOfInterval, eachYearOfInterval
+  add, clamp, differenceInCalendarDays, eachDayOfInterval, eachMonthOfInterval, 
+  eachQuarterOfInterval, eachWeekOfInterval, eachYearOfInterval, sub
 } from 'date-fns'
 import { format, utcToZonedTime } from 'date-fns-tz'
 
@@ -122,6 +122,30 @@ export function genSundayOfWeekDateRange(
 
 /*
 DESC
+  Adds the input duration to the input Date
+INPUT
+  date: A Date 
+RETURN
+  The Date after adding the duration
+*/
+export function dateAdd(date: Date, duration: TDateMathDuration): Date {
+  return add(date, duration)
+}
+
+/*
+DESC
+  Subtracts the input duration to the input Date
+INPUT
+  date: A Date 
+RETURN
+  The Date after subtracting the duration
+*/
+export function dateSub(date: Date, duration: TDateMathDuration): Date {
+  return sub(date, duration)
+}
+
+/*
+DESC
   Formats the input date as YYYY-MM-DD in UTC time
 INPUT
   date: A Date 
@@ -193,4 +217,19 @@ export function getDaysBetween(
   endDate: Date
 ): number {
   return differenceInCalendarDays(startDate, endDate)
+}
+
+
+// =====
+// types
+// =====
+
+type TDateMathDuration = {
+  years?: number,
+  months?: number,
+  weeks?: number,
+  days?: number,
+  hours?: number,
+  minutes?: number,
+  seconds?: number
 }

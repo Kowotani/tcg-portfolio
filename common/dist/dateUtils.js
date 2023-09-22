@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getDaysBetween = exports.getClampedDate = exports.formatInTimeZone = exports.formatAsISO = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getDaysBetween = exports.getClampedDate = exports.formatInTimeZone = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 var date_fns_tz_1 = require("date-fns-tz");
 // ==========
@@ -95,6 +95,30 @@ exports.genSundayOfWeekDateRange = genSundayOfWeekDateRange;
 // =======
 // generic
 // =======
+/*
+DESC
+  Adds the input duration to the input Date
+INPUT
+  date: A Date
+RETURN
+  The Date after adding the duration
+*/
+function dateAdd(date, duration) {
+    return (0, date_fns_1.add)(date, duration);
+}
+exports.dateAdd = dateAdd;
+/*
+DESC
+  Subtracts the input duration to the input Date
+INPUT
+  date: A Date
+RETURN
+  The Date after subtracting the duration
+*/
+function dateSub(date, duration) {
+    return (0, date_fns_1.sub)(date, duration);
+}
+exports.dateSub = dateSub;
 /*
 DESC
   Formats the input date as YYYY-MM-DD in UTC time
