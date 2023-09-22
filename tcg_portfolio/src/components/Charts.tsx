@@ -1,20 +1,31 @@
 import { PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { 
   Box,
+  Card,
+  CardBody,
+  CardHeader,
   Button,
   HStack,
   Text,
   VStack
 } from '@chakra-ui/react'
-import { TDatedValue } from 'common'
+import { 
+  TDatedValue,
+
+  getISOStringFromDate
+} from 'common'
 import * as _ from 'lodash'
 import { 
-  Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis 
+  Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, TooltipProps,
+  XAxis, YAxis 
 } from 'recharts'
 import { 
-  ChartDateRange, TChartMargins, 
+  NameType, ValueType 
+} from 'recharts/types/component/DefaultTooltipContent'
+import { 
+  ChartDateRange, TChartDataPoint, TChartMargins, 
 
-  getChartDataFromDatedValues, getDateAxisTicks
+  getBrowserLocale, getChartDataFromDatedValues, getDateAxisTicks, getFormattedPrice, 
 } from '../utils'
 
 
@@ -26,6 +37,35 @@ import {
 // =============
 // Chart Tooltip
 // =============
+
+export const CustomTooltip = (
+  {active, payload}: TooltipProps<ValueType, NameType>
+) => {
+
+  if (active) {
+
+    // parse payload
+    const payloadValue = _.first(payload) ? _.first(payload)?.payload : undefined
+    const chartDataPoint = payloadValue as TChartDataPoint
+
+    // create variables
+    const date = getISOStringFromDate(new Date(chartDataPoint.date))
+    const marketValue = getFormattedPrice(
+      chartDataPoint.value, getBrowserLocale(), '$', 2
+    )
+
+    return (
+      <Card>
+        <CardBody p={2}>
+          <Text as='b' fontSize='large'>{date}</Text>
+          <Text fontSize='large'>{marketValue}</Text>
+        </CardBody>
+      </Card>
+    )
+  }
+
+  return null
+}
 
 
 // ===========
@@ -78,7 +118,9 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
               type='number'
             />
             <YAxis />
-            <Tooltip />
+            <Tooltip 
+              content={<CustomTooltip />}
+            />
             <Area 
               type='monotone' 
               dataKey='value' 
