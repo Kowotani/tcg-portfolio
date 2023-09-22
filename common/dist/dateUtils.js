@@ -1,7 +1,8 @@
 "use strict";
 exports.__esModule = true;
-exports.getISOStringFromDate = exports.getDaysBetween = exports.getClampedDate = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getDaysBetween = exports.getClampedDate = exports.formatInTimeZone = exports.formatAsISO = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
+var date_fns_tz_1 = require("date-fns-tz");
 // ==========
 // generators
 // ==========
@@ -96,6 +97,34 @@ exports.genSundayOfWeekDateRange = genSundayOfWeekDateRange;
 // =======
 /*
 DESC
+  Formats the input date as YYYY-MM-DD in UTC time
+INPUT
+  date: A Date
+RETURN
+  A YYYY-MM-DD formatted version of the input date
+*/
+function formatAsISO(date) {
+    return formatInTimeZone(date, 'yyyy-MM-dd', 'UTC');
+}
+exports.formatAsISO = formatAsISO;
+/*
+DESC
+  Formats the input date in the input time zone as per the input dateFormat
+INPUT
+  date: The date to format
+  dateFormat: The format following date-fns standard
+  timezone: The timezone for the formatted date
+RETURN
+  The formatted date
+REF
+  https://stackoverflow.com/questions/58561169/date-fns-how-do-i-format-to-utc
+*/
+function formatInTimeZone(date, dateFormat, timezone) {
+    return (0, date_fns_tz_1.format)((0, date_fns_tz_1.utcToZonedTime)(date, timezone), dateFormat, { timeZone: timezone });
+}
+exports.formatInTimeZone = formatInTimeZone;
+/*
+DESC
   Returns the input Date clamped between the startDate and endDate inclusive
 INPUT
   date: A Date
@@ -112,27 +141,15 @@ function getClampedDate(date, startDate, endDate) {
 }
 exports.getClampedDate = getClampedDate;
 /*
-  DESC
-    Returns the number of calendar days between two dates
-  INPUT
-    startDate: The start date
-    endDate: The end date
-  RETURN
-    The number of calendar days between the two dates
+DESC
+  Returns the number of calendar days between two dates
+INPUT
+  startDate: The start date
+  endDate: The end date
+RETURN
+  The number of calendar days between the two dates
 */
 function getDaysBetween(startDate, endDate) {
     return (0, date_fns_1.differenceInCalendarDays)(startDate, endDate);
 }
 exports.getDaysBetween = getDaysBetween;
-/*
-  DESC
-    Returns the input Date as an ISODate (YYYY-MM-DD)
-  INPUT
-    date: A Date
-  RETURN
-    A YYYY-MM-DD formatted version of the input date
-*/
-function getISOStringFromDate(date) {
-    return (0, date_fns_1.format)(date, 'yyyy-MM-dd');
-}
-exports.getISOStringFromDate = getISOStringFromDate;

@@ -1,7 +1,8 @@
 import { 
   clamp, differenceInCalendarDays, eachDayOfInterval, eachMonthOfInterval, 
-  eachQuarterOfInterval, eachWeekOfInterval, eachYearOfInterval, format
+  eachQuarterOfInterval, eachWeekOfInterval, eachYearOfInterval
 } from 'date-fns'
+import { format, utcToZonedTime } from 'date-fns-tz'
 
 
 // ==========
@@ -121,6 +122,42 @@ export function genSundayOfWeekDateRange(
 
 /*
 DESC
+  Formats the input date as YYYY-MM-DD in UTC time
+INPUT
+  date: A Date 
+RETURN
+  A YYYY-MM-DD formatted version of the input date
+*/
+export function formatAsISO(date: Date): string {
+  return formatInTimeZone(date, 'yyyy-MM-dd', 'UTC')
+}
+
+/*
+DESC
+  Formats the input date in the input time zone as per the input dateFormat
+INPUT
+  date: The date to format
+  dateFormat: The format following date-fns standard
+  timezone: The timezone for the formatted date
+RETURN
+  The formatted date
+REF
+  https://stackoverflow.com/questions/58561169/date-fns-how-do-i-format-to-utc
+*/
+export function formatInTimeZone(
+  date: Date,
+  dateFormat: string,
+  timezone: string
+): string {
+  return format(
+    utcToZonedTime(date, timezone),
+    dateFormat,
+    {timeZone: timezone}
+  )
+}
+
+/*
+DESC
   Returns the input Date clamped between the startDate and endDate inclusive
 INPUT
   date: A Date
@@ -143,29 +180,17 @@ export function getClampedDate(
 }
 
 /*
-  DESC
-    Returns the number of calendar days between two dates
-  INPUT
-    startDate: The start date
-    endDate: The end date
-  RETURN
-    The number of calendar days between the two dates
+DESC
+  Returns the number of calendar days between two dates
+INPUT
+  startDate: The start date
+  endDate: The end date
+RETURN
+  The number of calendar days between the two dates
 */
 export function getDaysBetween(
   startDate: Date,
   endDate: Date
 ): number {
   return differenceInCalendarDays(startDate, endDate)
-}
-
-/*
-  DESC
-    Returns the input Date as an ISODate (YYYY-MM-DD)
-  INPUT
-    date: A Date 
-  RETURN
-    A YYYY-MM-DD formatted version of the input date
-*/
-export function getISOStringFromDate(date: Date): string {
-  return format(date, 'yyyy-MM-dd')
 }

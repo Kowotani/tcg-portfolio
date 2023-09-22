@@ -30,9 +30,9 @@ import {
 import { 
   IHolding, IReactTableTransaction, IProduct, ITransaction, TransactionType,
 
-  getClampedDate, getHoldingAverageCost, getHoldingAverageRevenue, 
-  getHoldingPurchaseQuantity, getHoldingSaleQuantity, getHoldingTotalCost, 
-  getHoldingTotalRevenue, getISOStringFromDate,
+  formatAsISO, getClampedDate, getHoldingAverageCost, 
+  getHoldingAverageRevenue, getHoldingPurchaseQuantity, getHoldingSaleQuantity, 
+  getHoldingTotalCost, getHoldingTotalRevenue,
 
   assert, isNumeric
 } from 'common'
@@ -233,9 +233,9 @@ const AddTransactionForm = (
                             {...field}
                             type='date'
                             defaultValue={
-                              getISOStringFromDate(DEFAULT_DATE)}
-                            min={getISOStringFromDate(props.releaseDate)}
-                            max={getISOStringFromDate(DEFAULT_DATE)}
+                              formatAsISO(DEFAULT_DATE)}
+                            min={formatAsISO(props.releaseDate)}
+                            max={formatAsISO(DEFAULT_DATE)}
                             onBlur={(e) => handleDateOnBlur(e, form)}                            
                           />
                           {form.errors?.date 
@@ -504,7 +504,7 @@ export const EditTransactionsModal = (
 
   const columns = [
     columnHelper.accessor('date', {
-      cell: (info) => getISOStringFromDate(info.getValue()),
+      cell: (info) => formatAsISO(info.getValue()),
       header: 'Date',
       sortingFn: 'datetime'
     }),
