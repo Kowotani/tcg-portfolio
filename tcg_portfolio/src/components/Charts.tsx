@@ -9,11 +9,7 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react'
-import { 
-  TDatedValue,
-
-  getISOStringFromDate
-} from 'common'
+import { TDatedValue, formatAsISO} from 'common'
 import * as _ from 'lodash'
 import { 
   Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, TooltipProps,
@@ -25,20 +21,51 @@ import {
 import { 
   ChartDateRange, TChartDataPoint, TChartMargins, 
 
-  getBrowserLocale, getChartDataFromDatedValues, getDateAxisTicks, getFormattedPrice, 
+  dateAxisTickFormatter, getBrowserLocale, getChartDataFromDatedValues, 
+  getDateAxisTicks, getFormattedPrice, priceAxisTickFormatter
 } from '../utils'
+
+// =========
+// constants
+// =========
+
+const BLUE = '#3182CE'
 
 
 // =========
 // functions
 // =========
 
+/*
+DESC
+  Get the width of the Price axis based on the longest value in the data
+INPUT
+  data: A TDatedValue[] corresponding to the chart data
+RETURN
+  The desired width of the Price axis
+*/
+function getPriceAxisWidth(data: TDatedValue[]): number {
+
+  // get min value
+  const minValue = _.minBy(data, (datedValue: TDatedValue) => {
+    return datedValue.value
+  })?.value as number
+
+  // get max value
+  const maxValue = _.maxBy(data, (datedValue: TDatedValue) => {
+    return datedValue.value
+  })?.value as number
+
+  const longestValue = _.max([Math.abs(minValue), Math.abs(maxValue)])
+
+  return 10 + String(longestValue).length * 10
+}
 
 // =============
 // Chart Tooltip
 // =============
 
-export const CustomTooltip = (
+const CustomTooltip = (
   {active, payload}: TooltipProps<ValueType, NameType>
 ) => {
 
@@ -49,7 +76,7 @@ export const CustomTooltip = (
     const chartDataPoint = payloadValue as TChartDataPoint
 
     // create variables
-    const date = getISOStringFromDate(new Date(chartDataPoint.date))
+    const date = formatAsISO(new Date(chartDataPoint.date))
     const marketValue = getFormattedPrice(
       chartDataPoint.value, getBrowserLocale(), '$', 2
     )
@@ -108,24 +135,36 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
           data={chartData}
           margin={props.margin}
         >
-            <CartesianGrid strokeDasharray='3 3' />
             <XAxis 
               dataKey='date' 
-              domain={['auto', 'auto']}
+              domain={[startDate.getTime(), endDate.getTime()]}
               interval='preserveStartEnd'
               scale='time'
+              tickFormatter={dateAxisTickFormatter}
               ticks={ticks}
               type='number'
             />
-            <YAxis />
+            <YAxis 
+              tickFormatter={priceAxisTickFormatter}
+              width={getPriceAxisWidth(props.data)}
+            />
+            <CartesianGrid opacity={0.5} vertical={false}/>
             <Tooltip 
               content={<CustomTooltip />}
             />
+            <defs>
+              <linearGradient id='colorPrice' x1={0} y1={0} x2={0} y2={1}>
+                <stop offset='0%' stopColor={BLUE} stopOpacity={0.8}/>
+                <stop offset='95%' stopColor={BLUE} stopOpacity={0}/>
+              </linearGradient>
+            </defs>
             <Area 
               type='monotone' 
-              dataKey='value' 
-              stroke={props.stroke} 
-              fill={props.fill}
+              dataKey='value'
+              stroke={BLUE}
+              strokeWidth={3}
+              fill='url(#colorPrice)'
+              fillOpacity={1}
             />
         </AreaChart>
       </ResponsiveContainer>

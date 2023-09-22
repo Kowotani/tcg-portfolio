@@ -5,7 +5,8 @@ import {
   genFirstOfMonthDateRange, genFirstOfQuarterDateRange, genFirstOfYearDateRange,
   genSundayOfWeekDateRange, getDaysBetween,
   
-  assert, isIDatedPriceData, isIPopulatedHolding, isIProduct, genDateRange
+  assert, formatInTimeZone, genDateRange, isIDatedPriceData, 
+  isIPopulatedHolding, isIProduct,
 } from 'common'
 import * as _ from 'lodash'
 
@@ -135,6 +136,30 @@ export interface IUserContext {
 
 /*
 DESC
+  Converts the input array of number ticks into readable date ticks
+INPUT
+  ticks: A number[] representing dates
+RETURN
+  A string[] with readable dates
+*/
+export function dateAxisTickFormatter(tick: number): string {
+
+  // determine numbers of days
+  // const startDate = new Date(Number(_.first(ticks)))
+  // const endDate = new Date(Number(_.last(ticks)))
+  // const daysBetween = getDaysBetween(startDate, endDate)
+
+  // return ticks.map((tick: number) => {
+  //   return daysBetween <= 360
+  //     ? format(tick, 'MMM d')
+  //     : format(tick, "MMM 'YY")
+  // })
+
+  return formatInTimeZone(new Date(tick), 'MMM d', 'UTC')
+}
+
+/*
+DESC
   Converts the input IDatedPriceData[] into an IPriceData[]
 INPUT
   datedPriceData: An IDatedPriceData[]
@@ -213,6 +238,18 @@ export const getDateAxisTicks = (
   return dates.map((date: Date) => {
     return date.getTime()
   })
+}
+
+/*
+DESC
+  Converts the input array of number ticks into more readable price ticks
+INPUT
+  ticks: A number representing prices
+RETURN
+  A string with readable dates
+*/
+export function priceAxisTickFormatter(tick: number): string {
+  return getFormattedPrice(tick, getBrowserLocale(), '$', 0)
 }
 
 // ----------
