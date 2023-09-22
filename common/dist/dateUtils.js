@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getClampedDate = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getISOStringFromDate = exports.getClampedDate = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 // ==========
 // generators
@@ -111,3 +111,15 @@ function getClampedDate(date, startDate, endDate) {
     });
 }
 exports.getClampedDate = getClampedDate;
+/*
+  DESC
+    Returns the input Date as an ISODate (YYYY-MM-DD)
+  INPUT
+    date: A Date
+  RETURN
+    A YYYY-MM-DD formatted version of the input date
+*/
+function getISOStringFromDate(date) {
+    return (0, date_fns_1.format)(date, 'yyyy-MM-dd');
+}
+exports.getISOStringFromDate = getISOStringFromDate;

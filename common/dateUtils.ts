@@ -1,6 +1,6 @@
 import { 
-  clamp, eachDayOfInterval, eachMonthOfInterval, eachQuarterOfInterval, 
-  eachWeekOfInterval, eachYearOfInterval
+  clamp, differenceInCalendarDays, eachDayOfInterval, eachMonthOfInterval, 
+  eachQuarterOfInterval, eachWeekOfInterval, eachYearOfInterval, format
 } from 'date-fns'
 
 
@@ -140,4 +140,32 @@ export function getClampedDate(
       start: startDate,
       end: endDate
     })
+}
+
+/*
+  DESC
+    Returns the number of calendar days between two dates
+  INPUT
+    startDate: The start date
+    endDate: The end date
+  RETURN
+    The number of calendar days between the two dates
+*/
+export function getDaysBetween(
+  startDate: Date,
+  endDate: Date
+): number {
+  return differenceInCalendarDays(startDate, endDate)
+}
+
+/*
+  DESC
+    Returns the input Date as an ISODate (YYYY-MM-DD)
+  INPUT
+    date: A Date 
+  RETURN
+    A YYYY-MM-DD formatted version of the input date
+*/
+export function getISOStringFromDate(date: Date): string {
+  return format(date, 'yyyy-MM-dd')
 }
