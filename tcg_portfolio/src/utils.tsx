@@ -1,10 +1,12 @@
 import { 
   IDatedPriceData, IPopulatedHolding, IPriceData, IProduct, ProductLanguage, 
-  ProductSubtype, 
+  ProductSubtype, TDatedValue,
+
+  genFirstOfMonthDateRange, genFirstOfQuarterDateRange, genFirstOfYearDateRange,
+  genSundayOfWeekDateRange, getDaysBetween,
   
-  assert, isIDatedPriceData, isIPopulatedHolding, isIProduct
+  assert, isIDatedPriceData, isIPopulatedHolding, isIProduct, genDateRange
 } from 'common'
-import { format } from 'date-fns'
 import * as _ from 'lodash'
 
 
@@ -22,6 +24,19 @@ export const NonVisibileProductSubtypes = [
 // =====
 // enums
 // =====
+
+// -----
+// Chart
+// -----
+
+// date range options for price charts
+export enum ChartDateRange {
+  All = 'All',
+  OneMonth = 'One Month',
+  OneYear = 'One Year',
+  SixMonths = 'Six Months',
+  ThreeMonths = 'Three Months',
+}
 
 // ---------------
 // Portfolio Panel
@@ -114,6 +129,92 @@ export interface IUserContext {
 // functions
 // =========
 
+// ------
+// charts
+// ------
+
+/*
+DESC
+  Converts the input IDatedPriceData[] into an IPriceData[]
+INPUT
+  datedPriceData: An IDatedPriceData[]
+RETURN
+  An IPriceData[]
+*/
+export function getChartDataFromDatedValues(
+  datedValues: TDatedValue[]
+): TChartDataPoint[] {
+  return datedValues.map((datedvalue: TDatedValue) => {
+    return {
+      date: datedvalue.date.getTime(),
+      value: datedvalue.value
+    } as TChartDataPoint
+  })
+}
+
+/*
+  DESC
+    Returns an array of numbers (Dates) representing the ticks for the date axis
+    using either the input dateRange or numTicks
+  INPUT
+    startDate: The starting date
+    endDate: The ending date
+    dateRange: A ChartDateRange
+    number?: The number of ticks
+  RETURN
+    A number[]
+*/
+export const getDateAxisTicks = (
+  startDate: Date, 
+  endDate: Date, 
+  dateRange: ChartDateRange
+): number[] => {
+
+  let dates: Date[] = []
+
+  switch(dateRange) {
+    case ChartDateRange.OneMonth:
+      dates = genSundayOfWeekDateRange(startDate, endDate)
+      break
+    case ChartDateRange.ThreeMonths:
+    case ChartDateRange.SixMonths:
+      dates = genFirstOfMonthDateRange(startDate, endDate)
+      break
+    case ChartDateRange.OneYear:
+      dates = genFirstOfQuarterDateRange(startDate, endDate)
+      break
+    case ChartDateRange.All:
+      const daysBetween = getDaysBetween(startDate, endDate)
+
+      // daily
+      if (daysBetween <= 14) {
+        dates = genDateRange(startDate, endDate)
+
+      // weekly
+      } else if (daysBetween <= 30) {
+        dates = genSundayOfWeekDateRange(startDate, endDate)
+
+      // monthly
+      } else if (daysBetween <= 360) {
+        dates = genFirstOfMonthDateRange(startDate, endDate)
+
+      // quarterly
+      } else if (daysBetween <= 720) {
+        dates = genFirstOfQuarterDateRange(startDate, endDate)
+
+      // yearly
+      } else {
+        dates = genFirstOfYearDateRange(startDate, endDate)
+
+      }
+      break
+  }
+
+  return dates.map((date: Date) => {
+    return date.getTime()
+  })
+}
+
 // ----------
 // converters
 // ----------
@@ -185,22 +286,6 @@ export function getPriceMapFromPriceAPIResponse(
     priceMap.set(tcgplayerId, datedPriceData)
   })
   return priceMap
-}
-
-// ----
-// date
-// ----
-
-/*
-  DESC
-    Returns the input Date as an ISODate (YYYY-MM-DD)
-  INPUT
-    date: A Date 
-  RETURN
-    A YYYY-MM-DD formatted version of the input date
-*/
-export function getISOStringFromDate(date: Date): string {
-  return format(date, 'yyyy-MM-dd')
 }
 
 // ---------
@@ -483,4 +568,26 @@ export function sortFnProductSearchResults(a: any, b: any): number {
   const keyA = genProductSearchResultKey(a)
   const keyB = genProductSearchResultKey(b)
   return keyA < keyB ? -1 : keyB > keyA ? 1 : 0
+}
+
+
+// =====
+// types
+// =====
+
+// -----
+// Chart
+// -----
+
+export type TChartDataPoint = {
+  date: number,
+  value: number,
+  isInterpolated?: boolean
+}
+
+export type TChartMargins = {
+  top: number,
+  right: number,
+  left: number,
+  bottom: number
 }
