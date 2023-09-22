@@ -4,4 +4,5 @@ export declare function genFirstOfQuarterDateRange(startDate: Date, endDate: Dat
 export declare function genFirstOfYearDateRange(startDate: Date, endDate: Date): Date[];
 export declare function genSundayOfWeekDateRange(startDate: Date, endDate: Date): Date[];
 export declare function getClampedDate(date: Date, startDate: Date, endDate: Date): Date;
+export declare function getDaysBetween(startDate: Date, endDate: Date): number;
 export declare function getISOStringFromDate(date: Date): string;

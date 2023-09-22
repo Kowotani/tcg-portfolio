@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getISOStringFromDate = exports.getClampedDate = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getISOStringFromDate = exports.getDaysBetween = exports.getClampedDate = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 // ==========
 // generators
@@ -111,6 +111,19 @@ function getClampedDate(date, startDate, endDate) {
     });
 }
 exports.getClampedDate = getClampedDate;
+/*
+  DESC
+    Returns the number of calendar days between two dates
+  INPUT
+    startDate: The start date
+    endDate: The end date
+  RETURN
+    The number of calendar days between the two dates
+*/
+function getDaysBetween(startDate, endDate) {
+    return (0, date_fns_1.differenceInCalendarDays)(startDate, endDate);
+}
+exports.getDaysBetween = getDaysBetween;
 /*
   DESC
     Returns the input Date as an ISODate (YYYY-MM-DD)
