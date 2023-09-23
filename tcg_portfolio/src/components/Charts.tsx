@@ -1,15 +1,12 @@
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useState } from 'react'
 import { 
   Box,
   Card,
   CardBody,
-  CardHeader,
-  Button,
   HStack,
   Text,
   useRadio,
-  useRadioGroup,
-  VStack
+  useRadioGroup
 } from '@chakra-ui/react'
 import { 
   TDatedValue, 
@@ -152,6 +149,13 @@ type TPriceChartProps = {
 }
 export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
+  // -----
+  // state
+  // -----
+
+  const [dateRange, setDateRange] = useState(props.dateRange)
+
+
   // ----------
   // chart data
   // ----------
@@ -161,7 +165,7 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
   const endDate = new Date()
 
   // use input data to find start date
-  if (props.dateRange === ChartDateRange.All) {
+  if (dateRange === ChartDateRange.All) {
     startDate = _.minBy(props.data, (datedValue: TDatedValue) => {
       return datedValue.date
     })?.date
@@ -170,19 +174,19 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
   } else {
 
     // one month
-    if (props.dateRange === ChartDateRange.OneMonth) {
+    if (dateRange === ChartDateRange.OneMonth) {
       startDate = dateSub(endDate, {days: 30})
 
     // three months
-    } else if (props.dateRange === ChartDateRange.ThreeMonths) {
+    } else if (dateRange === ChartDateRange.ThreeMonths) {
       startDate = dateSub(endDate, {months: 3})
 
     // six months
-    } else if (props.dateRange === ChartDateRange.SixMonths) {
+    } else if (dateRange === ChartDateRange.SixMonths) {
       startDate = dateSub(endDate, {months: 6})
 
     // one year
-    } else if (props.dateRange === ChartDateRange.OneYear) {
+    } else if (dateRange === ChartDateRange.OneYear) {
       startDate = dateSub(endDate, {years: 1})
 
     // default to three months
@@ -193,19 +197,27 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
   const chartData = getChartDataFromDatedValues(props.data)  
   assert(isDate(startDate), 'startDate is not a Date')
-  const ticks = getDateAxisTicks(startDate, endDate, props.dateRange)
+  const ticks = getDateAxisTicks(startDate, endDate, dateRange)
 
 
   // ----------------
   // date range radio
   // ----------------
 
-  const dateRangeOptions = ['1M', '3M', '6M', '1Y', 'All']
+  const dateRangeMap = new Map<string, ChartDateRange>([
+    ['1M', ChartDateRange.OneMonth],
+    ['3M', ChartDateRange.ThreeMonths],
+    ['6M', ChartDateRange.SixMonths],
+    ['1Y', ChartDateRange.OneYear],
+    ['All', ChartDateRange.All]
+  ])
+
+  const dateRangeOptions = [...dateRangeMap.keys()]
 
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: 'dateRange',
     defaultValue: 'All',
-    onChange: console.log,
+    onChange: (value) => setDateRange(dateRangeMap.get(value) as ChartDateRange)
   })
 
   const group = getRootProps()
