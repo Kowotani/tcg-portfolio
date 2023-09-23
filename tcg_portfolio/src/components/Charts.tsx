@@ -7,6 +7,8 @@ import {
   Button,
   HStack,
   Text,
+  useRadio,
+  useRadioGroup,
   VStack
 } from '@chakra-ui/react'
 import { 
@@ -105,6 +107,39 @@ const CustomTooltip = (
 }
 
 
+// ----------------
+// Date Range Radio
+// ----------------
+
+const RadioCard = (props: any) => {
+  const { getInputProps, getRadioProps } = useRadio(props)
+
+  const input = getInputProps()
+  const checkbox = getRadioProps()
+
+  return (
+    <Box as='label'>
+      <input {...input} />
+      <Box
+        {...checkbox}
+        fontSize='medium'
+        cursor='pointer'
+        borderRadius={10}
+        _checked={{
+          bg: 'blue.500',
+          color: 'white',
+          borderColor: 'blue.500',
+        }}
+        px={3}
+        py={2}
+      >
+        {props.children}
+      </Box>
+    </Box>
+  )
+}
+
+
 // -----------
 // Price Chart
 // -----------
@@ -117,6 +152,10 @@ type TPriceChartProps = {
 }
 export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
+  // ----------
+  // chart data
+  // ----------
+
   // get start date and end date
   let startDate
   const endDate = new Date()
@@ -127,7 +166,7 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
       return datedValue.date
     })?.date
 
-  // use input date range
+  // use input date range to find start date
   } else {
 
     // one month
@@ -152,10 +191,24 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
     }
   }
 
-
   const chartData = getChartDataFromDatedValues(props.data)  
   assert(isDate(startDate), 'startDate is not a Date')
   const ticks = getDateAxisTicks(startDate, endDate, props.dateRange)
+
+
+  // ----------------
+  // date range radio
+  // ----------------
+
+  const dateRangeOptions = ['1M', '3M', '6M', '1Y', 'All']
+
+  const { getRootProps, getRadioProps } = useRadioGroup({
+    name: 'dateRange',
+    defaultValue: 'All',
+    onChange: console.log,
+  })
+
+  const group = getRootProps()
 
 
   // ==============
@@ -164,45 +217,60 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
   return (
     <>
-      <ResponsiveContainer width='100%' height='100%'>
-        <AreaChart
-          height={props.height}
-          width={props.width}
-          data={chartData}
-        >
-            <XAxis 
-              dataKey='date' 
-              domain={[startDate.getTime(), endDate.getTime()]}
-              interval='preserveStartEnd'
-              scale='time'
-              tickFormatter={dateAxisTickFormatter}
-              ticks={ticks}
-              type='number'
-            />
-            <YAxis 
-              tickFormatter={priceAxisTickFormatter}
-              width={getPriceAxisWidth(props.data)}
-            />
-            <CartesianGrid opacity={0.5} vertical={false}/>
-            <Tooltip 
-              content={<CustomTooltip />}
-            />
-            <defs>
-              <linearGradient id='colorPrice' x1={0} y1={0} x2={0} y2={1}>
-                <stop offset='0%' stopColor={BLUE} stopOpacity={0.8}/>
-                <stop offset='95%' stopColor={BLUE} stopOpacity={0}/>
-              </linearGradient>
-            </defs>
-            <Area 
-              type='monotone' 
-              dataKey='value'
-              stroke={BLUE}
-              strokeWidth={3}
-              fill='url(#colorPrice)'
-              fillOpacity={1}
-            />
-        </AreaChart>
-      </ResponsiveContainer>
+      <Box height={props.height} width={props.width}>
+        <ResponsiveContainer width='100%' height='100%'>
+          <AreaChart
+            height={props.height}
+            width={props.width}
+            data={chartData}
+          >
+              <XAxis 
+                dataKey='date' 
+                domain={[startDate.getTime(), endDate.getTime()]}
+                scale='time'
+                tickFormatter={dateAxisTickFormatter}
+                tick={{fontSize: 18}}
+                ticks={ticks}
+                type='number'
+              />
+              <YAxis 
+                tick={{fontSize: 18}}
+                tickFormatter={priceAxisTickFormatter}
+                width={getPriceAxisWidth(props.data)}
+              />
+              <CartesianGrid opacity={0.5} vertical={false}/>
+              <Tooltip 
+                content={<CustomTooltip />}
+              />
+              <defs>
+                <linearGradient id='colorPrice' x1={0} y1={0} x2={0} y2={1}>
+                  <stop offset='0%' stopColor={BLUE} stopOpacity={0.8}/>
+                  <stop offset='95%' stopColor={BLUE} stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <Area 
+                type='monotone' 
+                dataKey='value'
+                stroke={BLUE}
+                strokeWidth={3}
+                fill='url(#colorPrice)'
+                fillOpacity={1}
+              />
+          </AreaChart>
+        </ResponsiveContainer>
+      </Box>
+      <Box width={props.width} marginTop={2}>
+        <HStack display='flex' justifyContent='space-evenly' {...group}>
+          {dateRangeOptions.map((value: any) => {
+            const radio = getRadioProps({ value })
+            return (
+              <RadioCard key={value} {...radio}>
+                {value}
+              </RadioCard>
+            )
+          })}
+        </HStack>
+      </Box>
     </>
   )
 }
