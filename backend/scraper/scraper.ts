@@ -293,7 +293,8 @@ export async function scrapeHistorical(
       const [curMonth, curDay] = [today.getMonth() + 1, today.getDate()]
 
       scrapedTexts.forEach((st: TScrapedText) => {
-        if (isTCGPlayerDateRange(st.text) && isPriceString(st.price)) {
+        if (isTCGPlayerDateRange(st.text) && isPriceString(st.price)
+          && getPriceFromString(st.price) > 0) {
 
           // get the end date
           const monthDay = st.text.split(' ')[2].trim()
