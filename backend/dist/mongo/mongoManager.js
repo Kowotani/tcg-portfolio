@@ -642,6 +642,29 @@ function updateHistoricalPrices() {
         yield mongoose_1.default.connect(url);
         try {
             const res = yield utils_1.Price.aggregate([
+                // join to Product
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: 'product',
+                        foreignField: '_id',
+                        as: 'productDoc'
+                    }
+                },
+                {
+                    $unwind: '$productDoc'
+                },
+                // keep prices on or after the release date
+                {
+                    $match: {
+                        $expr: {
+                            $gte: [
+                                '$priceDate',
+                                '$productDoc.releaseDate'
+                            ]
+                        }
+                    }
+                },
                 // aggregate existing prices for the same priceDate
                 {
                     $group: {
@@ -966,7 +989,7 @@ function main() {
         //   console.log('historicalPrices not updated')
         // }
         // // -- Reset Prices
-        // const tcgplayerIds = [121527]
+        // const tcgplayerIds = [496041]
         // res = await resetPrices(tcgplayerIds)
         // if (res) {
         //   console.log(`${res.deleted} tcgplayerIds were reset, ${res.inserted} were initialized`)

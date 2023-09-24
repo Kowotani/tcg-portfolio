@@ -789,6 +789,31 @@ export async function updateHistoricalPrices(): Promise<boolean> {
 
     const res = await Price.aggregate([
 
+      // join to Product
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'product',
+          foreignField: '_id',
+          as: 'productDoc'
+        }
+      },
+      {
+        $unwind: '$productDoc'
+      },
+
+      // keep prices on or after the release date
+      {
+        $match: {
+          $expr: {
+            $gte: [
+              '$priceDate', 
+              '$productDoc.releaseDate'
+            ]
+          }
+        }
+      },
+
       // aggregate existing prices for the same priceDate
       {
         $group: {
@@ -1153,7 +1178,7 @@ async function main(): Promise<number> {
   // }
 
   // // -- Reset Prices
-  // const tcgplayerIds = [121527]
+  // const tcgplayerIds = [496041]
   // res = await resetPrices(tcgplayerIds)
   // if (res) {
   //   console.log(`${res.deleted} tcgplayerIds were reset, ${res.inserted} were initialized`)
@@ -1180,7 +1205,7 @@ async function main(): Promise<number> {
   //   123
   // )
   // console.log(res)
-  
+
   // console.log('-- dated values')
   // console.log(getDatedValuesFromSeries(series))
 
