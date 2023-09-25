@@ -144,8 +144,8 @@ const RadioCard = (props: any) => {
 type TPriceChartProps = {
   data: TDatedValue[],
   dateRange: ChartDateRange,
-  height: number,
-  width: number
+  minHeight: number,
+  minWidth: number
 }
 export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
@@ -229,49 +229,48 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
   return (
     <>
-      <Box height={props.height} width={props.width}>
-        <ResponsiveContainer width='100%' height='100%'>
-          <AreaChart
-            height={props.height}
-            width={props.width}
-            data={chartData}
-          >
-              <XAxis 
-                dataKey='date' 
-                domain={[startDate.getTime(), endDate.getTime()]}
-                scale='time'
-                tickFormatter={dateAxisTickFormatter}
-                tick={{fontSize: 18}}
-                ticks={ticks}
-                type='number'
-              />
-              <YAxis 
-                tick={{fontSize: 18}}
-                tickFormatter={priceAxisTickFormatter}
-                width={getPriceAxisWidth(props.data)}
-              />
-              <CartesianGrid opacity={0.5} vertical={false}/>
-              <Tooltip 
-                content={<CustomTooltip />}
-              />
-              <defs>
-                <linearGradient id='colorPrice' x1={0} y1={0} x2={0} y2={1}>
-                  <stop offset='0%' stopColor={BLUE} stopOpacity={0.8}/>
-                  <stop offset='95%' stopColor={BLUE} stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <Area 
-                type='monotone' 
-                dataKey='value'
-                stroke={BLUE}
-                strokeWidth={3}
-                fill='url(#colorPrice)'
-                fillOpacity={1}
-              />
+      <Box minHeight={props.minHeight} minWidth={props.minWidth}>
+        <ResponsiveContainer 
+          height='100%'
+          width='100%' 
+        >
+          <AreaChart data={chartData}>
+            <XAxis 
+              dataKey='date' 
+              domain={[startDate.getTime(), endDate.getTime()]}
+              scale='time'
+              tickFormatter={dateAxisTickFormatter}
+              tick={{fontSize: 18}}
+              ticks={ticks}
+              type='number'
+            />
+            <YAxis 
+              tick={{fontSize: 18}}
+              tickFormatter={priceAxisTickFormatter}
+              width={getPriceAxisWidth(props.data)}
+            />
+            <CartesianGrid opacity={0.5} vertical={false}/>
+            <Tooltip 
+              content={<CustomTooltip />}
+            />
+            <defs>
+              <linearGradient id='colorPrice' x1={0} y1={0} x2={0} y2={1}>
+                <stop offset='0%' stopColor={BLUE} stopOpacity={0.8}/>
+                <stop offset='95%' stopColor={BLUE} stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <Area 
+              type='monotone' 
+              dataKey='value'
+              stroke={BLUE}
+              strokeWidth={3}
+              fill='url(#colorPrice)'
+              fillOpacity={1}
+            />
           </AreaChart>
         </ResponsiveContainer>
       </Box>
-      <Box width={props.width} marginTop={2}>
+      <Box minWidth={props.minWidth} marginTop={2}>
         <HStack display='flex' justifyContent='space-evenly' {...group}>
           {dateRangeOptions.map((value: any) => {
             const radio = getRadioProps({ value })
