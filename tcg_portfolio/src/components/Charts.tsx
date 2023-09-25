@@ -144,7 +144,7 @@ const RadioCard = (props: any) => {
 type TPriceChartProps = {
   data: TDatedValue[],
   dateRange: ChartDateRange,
-  minHeight: number,
+  height: number,
   minWidth: number
 }
 export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
@@ -229,7 +229,7 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
   return (
     <>
-      <Box minHeight={props.minHeight} minWidth={props.minWidth}>
+      <Box height={props.height} minWidth={props.minWidth}>
         <ResponsiveContainer 
           height='100%'
           width='100%' 
