@@ -66,7 +66,7 @@ function getPriceAxisWidth(
 
   const longestValue = _.max([Math.abs(minValue), Math.abs(maxValue)])
 
-  return 10 + String(longestValue).length * 10
+  return 15 + String(longestValue).length * 13
 }
 
 
