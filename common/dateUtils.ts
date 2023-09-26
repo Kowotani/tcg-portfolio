@@ -1,5 +1,5 @@
 import { 
-  add, clamp, differenceInCalendarDays, eachDayOfInterval, eachMonthOfInterval, 
+  add, clamp, differenceInCalendarDays, eachMonthOfInterval, 
   eachQuarterOfInterval, eachWeekOfInterval, eachYearOfInterval, sub
 } from 'date-fns'
 import { format, utcToZonedTime } from 'date-fns-tz'
@@ -20,13 +20,15 @@ RETURN
 */
 export function genDateRange(startDate: Date, endDate: Date): Date[] {
 
-  startDate.setUTCHours(0, 0, 0, 0)
-  endDate.setUTCHours(0, 0, 0, 0)
+  let accumulator = startDate
+  const days: Date[] = []
 
-  return eachDayOfInterval({
-    start: startDate,
-    end: endDate
-  })
+  while (endDate >= accumulator) {
+    days.push(accumulator)
+    accumulator = add(accumulator, {days: 1})
+  }
+
+  return days
 }
 
 /*

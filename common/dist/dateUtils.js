@@ -16,12 +16,13 @@ RETURN
   A Date[]
 */
 function genDateRange(startDate, endDate) {
-    startDate.setUTCHours(0, 0, 0, 0);
-    endDate.setUTCHours(0, 0, 0, 0);
-    return (0, date_fns_1.eachDayOfInterval)({
-        start: startDate,
-        end: endDate
-    });
+    var accumulator = startDate;
+    var days = [];
+    while (endDate >= accumulator) {
+        days.push(accumulator);
+        accumulator = (0, date_fns_1.add)(accumulator, { days: 1 });
+    }
+    return days;
 }
 exports.genDateRange = genDateRange;
 /*
