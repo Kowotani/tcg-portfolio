@@ -185,7 +185,7 @@ export function getChartDataFromDatedValues(
         
       // create new object
       } else {
-        values = {seriesName: datedValue.value}
+        values = {[seriesName]: datedValue.value}
       }
 
       dataMap.set(datedValue.date.getTime(), values)
