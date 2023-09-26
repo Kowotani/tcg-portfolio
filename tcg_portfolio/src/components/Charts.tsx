@@ -43,21 +43,25 @@ const BLUE = '#3182CE'
 DESC
   Get the width of the Price axis based on the longest value in the data
 INPUT
-  data: A TDatedValue[] corresponding to the chart data
+  dataPoints: A TChartDataPoint[]
+  dataKey: The name of the data series to use
 RETURN
   The desired width of the Price axis
 */
-function getPriceAxisWidth(data: TDatedValue[]): number {
+function getPriceAxisWidth(
+  dataPoints: TChartDataPoint[],
+  dataKey: string
+): number {
 
   // get min value
-  const minValue = _.minBy(data, (datedValue: TDatedValue) => {
-    return datedValue.value
-  })?.value as number
+  const minValue = _.minBy(dataPoints, (dataPoint: TChartDataPoint) => {
+    return dataPoint.values[dataKey]
+  })?.values[dataKey] as number
 
   // get max value
-  const maxValue = _.maxBy(data, (datedValue: TDatedValue) => {
-    return datedValue.value
-  })?.value as number
+  const maxValue = _.maxBy(dataPoints, (dataPoint: TChartDataPoint) => {
+    return dataPoint.values[dataKey]
+  })?.values[dataKey] as number
 
   const longestValue = _.max([Math.abs(minValue), Math.abs(maxValue)])
 
@@ -73,21 +77,27 @@ function getPriceAxisWidth(data: TDatedValue[]): number {
 // Custom Toolip
 // -------------
 
+type TCustomTooltipProps<MyValue extends ValueType, MyName extends NameType> =
+  TooltipProps<MyValue, MyName> & {
+  dataKey: string
+}
 const CustomTooltip = (
-  {active, payload}: TooltipProps<ValueType, NameType>
+  props: PropsWithChildren<TCustomTooltipProps<ValueType, NameType>>
 ) => {
 
-  if (active) {
+  if (props.active) {
 
     // parse payload
-    const payloadValue = _.first(payload) ? _.first(payload)?.payload : undefined
+    const payloadValue = _.first(props.payload) 
+      ? _.first(props.payload)?.payload 
+      : undefined
     const chartDataPoint = payloadValue as TChartDataPoint
 
     // create variables
     const date = formatInTimeZone(
       new Date(chartDataPoint.date), 'MMM d, yyyy', 'UTC')
     const marketValue = getFormattedPrice(
-      chartDataPoint.value, getBrowserLocale(), '$', 2
+      chartDataPoint.values[props.dataKey], getBrowserLocale(), '$', 2
     )
 
     return (
@@ -142,7 +152,8 @@ const RadioCard = (props: any) => {
 // -----------
 
 type TPriceChartProps = {
-  data: TDatedValue[],
+  data: Map<string, TDatedValue[]>,
+  dataKey: string,
   dateRange: ChartDateRange,
   height: number,
   minWidth: number
@@ -160,16 +171,22 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
   // chart data
   // ----------
 
+  const dataKey = `values.${props.dataKey}`
+
+  const chartData = getChartDataFromDatedValues(props.data) 
+
   // get start date and end date
   let startDate
   const endDate = new Date()
 
   // use input data to find start date
   if (dateRange === ChartDateRange.All) {
-    startDate = _.minBy(props.data, (datedValue: TDatedValue) => {
-      return datedValue.date
+    const startDateAsNumber = _.minBy(chartData, 
+      (dataPoint: TChartDataPoint) => {
+        return dataPoint.date
     })?.date
-
+    startDate = new Date(Number(startDateAsNumber))
+  
   // use input date range to find start date
   } else {
 
@@ -195,7 +212,7 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
     }
   }
 
-  const chartData = getChartDataFromDatedValues(props.data)  
+  
   assert(isDate(startDate), 'startDate is not a Date')
   const ticks = getDateAxisTicks(startDate, endDate, dateRange)
 
@@ -247,11 +264,11 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
             <YAxis 
               tick={{fontSize: 18}}
               tickFormatter={priceAxisTickFormatter}
-              width={getPriceAxisWidth(props.data)}
+              width={getPriceAxisWidth(chartData, props.dataKey)}
             />
             <CartesianGrid opacity={0.5} vertical={false}/>
             <Tooltip 
-              content={<CustomTooltip />}
+              content={<CustomTooltip dataKey={props.dataKey} />}
             />
             <defs>
               <linearGradient id='colorPrice' x1={0} y1={0} x2={0} y2={1}>
@@ -261,7 +278,7 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
             </defs>
             <Area 
               type='monotone' 
-              dataKey='value'
+              dataKey={dataKey}
               stroke={BLUE}
               strokeWidth={3}
               fill='url(#colorPrice)'

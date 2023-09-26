@@ -160,20 +160,50 @@ export function dateAxisTickFormatter(tick: number): string {
 
 /*
 DESC
-  Converts the input IDatedPriceData[] into an IPriceData[]
+  Returns a TChartDataPoint[] containing all of the input TDatedValue[][]
 INPUT
-  datedPriceData: An IDatedPriceData[]
+  datedValues: A Map of seriesName
 RETURN
-  An IPriceData[]
+  A TChartDataPoint[]
 */
 export function getChartDataFromDatedValues(
-  datedValues: TDatedValue[]
+  datedValuesMap: Map<string, TDatedValue[]>
 ): TChartDataPoint[] {
-  return datedValues.map((datedvalue: TDatedValue) => {
-    return {
-      date: datedvalue.date.getTime(),
-      value: datedvalue.value
-    } as TChartDataPoint
+
+  const dataMap = new Map<number, {[key: string]: number}>()
+
+  // populated dataMap
+  datedValuesMap.forEach((datedValues, seriesName) => {
+    datedValues.forEach((datedValue: TDatedValue) => {
+
+      const dateAsNumber = datedValue.date.getTime()
+      let values = dataMap.get(dateAsNumber)
+      
+      // set in existing object
+      if (values) {
+        values[seriesName] = datedValue.value
+        
+      // create new object
+      } else {
+        values = {seriesName: datedValue.value}
+      }
+
+      dataMap.set(datedValue.date.getTime(), values)
+    })
+  })
+
+  const dataPoints: TChartDataPoint[] = []
+
+  // populate datapoints
+  dataMap.forEach((values, dateAsNumber) => {
+    dataPoints.push({
+      date: dateAsNumber,
+      values: values
+    })
+  })
+
+  return _.sortBy(dataPoints, (dataPoint: TChartDataPoint) => {
+    return dataPoint.date
   })
 }
 
@@ -624,8 +654,7 @@ export function sortFnProductSearchResults(a: any, b: any): number {
 
 export type TChartDataPoint = {
   date: number,
-  value: number,
-  isInterpolated?: boolean
+  values: {[key: string]: number}
 }
 
 export type TChartMargins = {
