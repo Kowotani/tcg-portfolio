@@ -19,6 +19,7 @@ var PerformanceMetric;
     PerformanceMetric["CumPnL"] = "Cumulative Profit and Loss";
     PerformanceMetric["DailyPnL"] = "Daily Profit and Loss";
     PerformanceMetric["MarketValue"] = "Market Value";
+    PerformanceMetric["TotalCost"] = "Total Cost";
 })(PerformanceMetric = exports.PerformanceMetric || (exports.PerformanceMetric = {}));
 // -- product features
 // product language

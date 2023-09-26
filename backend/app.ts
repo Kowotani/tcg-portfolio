@@ -1,7 +1,7 @@
 import { loadImageToS3 } from './aws/s3Manager'
 import { 
   IDatedPriceData, IPopulatedPortfolio, IPortfolio, 
-  TPortfolioValueSeries, IPrice, IPriceData, IProduct, 
+  IPrice, IPriceData, IProduct, TPortfolioPerformanceData,
   
   PerformanceMetric, TimeseriesGranularity,
 
@@ -215,7 +215,7 @@ INPUT
     portfolioName: The name of the Portfolio
     startDate: The start date for performance calculation
     endDate: The end date for performance calculation
-    metric: The performance metric
+    metrics: An array of PerformanceMetrics
 RETURN
   TGetPortfolioPerformanceResBody response with status codes
 
@@ -236,31 +236,33 @@ app.get(PORTFOLIO_PERFORMANCE_URL, async (req: any, res: any) => {
     assert(isPortfolioDoc(portfolioDoc), 'Could not find Portfolio')
     const startDate = new Date(Date.parse(req.query.startDate))
     const endDate = new Date(Date.parse(req.query.endDate))
-    const metric = req.query.metric as PerformanceMetric
+    const metrics = req.query.metrics as PerformanceMetric[]
 
-    let values = [] as TDatedValue[]
+    // create performance data object
+    let performanceData: TPortfolioPerformanceData = {}
 
-    // market value
-    if (metric === PerformanceMetric.MarketValue) {
-      values = await getPortfolioMarketValueAsDatedValues(
-        portfolioDoc, startDate, endDate)
+    for (const metric of metrics) {
 
-    // unknown
-    } else {
-      const err = `Unknown metric: ${metric}`
-      throw new Error(err)
-    }
+      let fn: (a1: IPortfolio, a2: Date, a3: Date) => Promise<TDatedValue[]>
 
-    const portfolioValueSeries: TPortfolioValueSeries = {
-      portfolioName: portfolioDoc.portfolioName,
-      values: values
-    }
+      switch(metric) {
+        case PerformanceMetric.MarketValue:
+          fn = getPortfolioMarketValueAsDatedValues
+          break
+        default:
+          const err = `Unknown metric: ${metric}`
+          throw new Error(err)
+      }
+
+      const values = await fn(portfolioDoc, startDate, endDate)
+      performanceData[metric] = values
+    }    
 
     // return performance data
     res.status(200)
     
     const body: TGetPortfolioPerformanceResBody = {
-      data: portfolioValueSeries,
+      data: performanceData,
       message: GetPortfolioPerformanceStatus.Success
     }
     res.send(body)

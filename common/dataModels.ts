@@ -16,6 +16,7 @@ export enum PerformanceMetric {
   CumPnL = 'Cumulative Profit and Loss',
   DailyPnL = 'Daily Profit and Loss',
   MarketValue = 'Market Value',
+  TotalCost = 'Total Cost',
 }
 
 // -- product features
@@ -372,8 +373,8 @@ export type THoldingValueSeries = {
   values: TDatedValue[]
 }
 
-// used for storing Portfolio timeseries data
-export type TPortfolioValueSeries = {
-  portfolioName: string,
-  values: TDatedValue[]
+// used for storing Portfolio performance timeseries data,
+// as an object mapping PerformanceMetric => TDatedValue[]
+export type TPortfolioPerformanceData = {
+  [key in PerformanceMetric]?: TDatedValue[]
 }

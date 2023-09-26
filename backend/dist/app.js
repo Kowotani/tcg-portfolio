@@ -185,7 +185,7 @@ INPUT
     portfolioName: The name of the Portfolio
     startDate: The start date for performance calculation
     endDate: The end date for performance calculation
-    metric: The performance metric
+    metrics: An array of PerformanceMetrics
 RETURN
   TGetPortfolioPerformanceResBody response with status codes
 
@@ -204,25 +204,26 @@ app.get(common_1.PORTFOLIO_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void
         (0, common_1.assert)((0, utils_1.isPortfolioDoc)(portfolioDoc), 'Could not find Portfolio');
         const startDate = new Date(Date.parse(req.query.startDate));
         const endDate = new Date(Date.parse(req.query.endDate));
-        const metric = req.query.metric;
-        let values = [];
-        // market value
-        if (metric === common_1.PerformanceMetric.MarketValue) {
-            values = yield (0, mongoManager_1.getPortfolioMarketValueAsDatedValues)(portfolioDoc, startDate, endDate);
-            // unknown
+        const metrics = req.query.metrics;
+        // create performance data object
+        let performanceData = {};
+        for (const metric of metrics) {
+            let fn;
+            switch (metric) {
+                case common_1.PerformanceMetric.MarketValue:
+                    fn = mongoManager_1.getPortfolioMarketValueAsDatedValues;
+                    break;
+                default:
+                    const err = `Unknown metric: ${metric}`;
+                    throw new Error(err);
+            }
+            const values = yield fn(portfolioDoc, startDate, endDate);
+            performanceData[metric] = values;
         }
-        else {
-            const err = `Unknown metric: ${metric}`;
-            throw new Error(err);
-        }
-        const portfolioValueSeries = {
-            portfolioName: portfolioDoc.portfolioName,
-            values: values
-        };
         // return performance data
         res.status(200);
         const body = {
-            data: portfolioValueSeries,
+            data: performanceData,
             message: common_1.GetPortfolioPerformanceStatus.Success
         };
         res.send(body);

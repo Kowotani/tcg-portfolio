@@ -1,5 +1,5 @@
 import { 
-  IPortfolio, IProduct, TPortfolioValueSeries 
+  IPortfolio, IProduct, TPortfolioPerformanceData 
 } from "./dataModels"
 
 
@@ -154,7 +154,7 @@ export type TDataResBody<Type> = TResBody & {
   Req / Res:  Response
 */
 export type TGetPortfolioPerformanceResBody 
-  = TDataResBody<TPortfolioValueSeries>
+  = TDataResBody<TPortfolioPerformanceData>
 
 // -- product
 
