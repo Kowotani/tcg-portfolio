@@ -143,19 +143,35 @@ RETURN
   A string[] with readable dates
 */
 export function dateAxisTickFormatter(tick: number): string {
-
-  // determine numbers of days
-  // const startDate = new Date(Number(_.first(ticks)))
-  // const endDate = new Date(Number(_.last(ticks)))
-  // const daysBetween = getDaysBetween(startDate, endDate)
-
-  // return ticks.map((tick: number) => {
-  //   return daysBetween <= 360
-  //     ? format(tick, 'MMM d')
-  //     : format(tick, "MMM 'YY")
-  // })
-
   return formatInTimeZone(new Date(tick), 'MMM d', 'UTC')
+}
+
+/*
+DESC
+  Parses the input object and returns the chart dataKeys as follows:
+    - primary: The name of the primary dataKey
+    - reference?: The name of the reference dataKey
+INPUT
+  keys: An object containing the type of key to the name of the dataKey
+RETURN
+  An object with the parsed chart dataKeys
+*/
+export function getChartDataKeys(
+  keys: {[key: string]: string}
+): {[key: string]: string} {
+  const dataKeys: {[key: string]: string} = {}
+
+  // primary
+  if ('primaryKey' in keys) {
+    dataKeys['primaryKey'] = keys['primaryKey']
+  }
+
+  // reference
+  if ('referenceKey' in keys) {
+    dataKeys['referenceKey'] = keys['referenceKey']
+  }
+
+  return dataKeys
 }
 
 /*
@@ -208,22 +224,22 @@ export function getChartDataFromDatedValues(
 }
 
 /*
-  DESC
-    Returns an array of numbers (Dates) representing the ticks for the date axis
-    using either the input dateRange or numTicks
-  INPUT
-    startDate: The starting date
-    endDate: The ending date
-    dateRange: A ChartDateRange
-    number?: The number of ticks
-  RETURN
-    A number[]
+DESC
+  Returns an array of numbers (Dates) representing the ticks for the date axis
+  using either the input dateRange or numTicks
+INPUT
+  startDate: The starting date
+  endDate: The ending date
+  dateRange: A ChartDateRange
+  number?: The number of ticks
+RETURN
+  A number[]
 */
-export const getDateAxisTicks = (
+export function getDateAxisTicks(
   startDate: Date, 
   endDate: Date, 
   dateRange: ChartDateRange
-): number[] => {
+): number[] {
 
   let dates: Date[] = []
 

@@ -24,7 +24,7 @@ import {
   ChartDateRange, TChartDataPoint, 
 
   dateAxisTickFormatter, getBrowserLocale, getChartDataFromDatedValues, 
-  getDateAxisTicks, getFormattedPrice, priceAxisTickFormatter
+  getChartDataKeys, getDateAxisTicks, getFormattedPrice, priceAxisTickFormatter
 } from '../utils'
 
 
@@ -33,6 +33,7 @@ import {
 // =========
 
 const BLUE = '#3182CE'
+const GRAY = '#718096'
 
 
 // =========
@@ -79,7 +80,8 @@ function getPriceAxisWidth(
 
 type TCustomTooltipProps<MyValue extends ValueType, MyName extends NameType> =
   TooltipProps<MyValue, MyName> & {
-  dataKey: string
+  primaryKey: string,
+  referenceKey?: string
 }
 const CustomTooltip = (
   props: PropsWithChildren<TCustomTooltipProps<ValueType, NameType>>
@@ -96,15 +98,25 @@ const CustomTooltip = (
     // create variables
     const date = formatInTimeZone(
       new Date(chartDataPoint.date), 'MMM d, yyyy', 'UTC')
-    const marketValue = getFormattedPrice(
-      chartDataPoint.values[props.dataKey], getBrowserLocale(), '$', 2
+    const primaryValue = getFormattedPrice(
+      chartDataPoint.values[props.primaryKey], getBrowserLocale(), '$', 2
     )
+    const referenceValue = props.referenceKey
+      ? getFormattedPrice(
+        chartDataPoint.values[props.referenceKey], getBrowserLocale(), '$', 2
+      )
+      : undefined
 
     return (
       <Card>
         <CardBody p={2}>
-          <Text as='b' fontSize='large'>{date}</Text>
-          <Text fontSize='large'>{marketValue}</Text>
+          <Text as='b' fontSize='medium'>{date}</Text>
+          {/* Primary */}
+          <Text fontSize='medium'>{props.primaryKey}: {primaryValue}</Text>
+          {/* Reference */}
+          {referenceValue &&
+            <Text fontSize='medium'>{props.referenceKey}: {referenceValue}</Text>
+          }
         </CardBody>
       </Card>
     )
@@ -153,7 +165,7 @@ const RadioCard = (props: any) => {
 
 type TPriceChartProps = {
   data: Map<string, TDatedValue[]>,
-  dataKey: string,
+  dataKeys: {[key: string]: string},
   dateRange: ChartDateRange,
   height: number,
   minWidth: number
@@ -171,7 +183,10 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
   // chart data
   // ----------
 
-  const dataKey = `values.${props.dataKey}`
+  // get dataKeys
+  const { primaryKey, referenceKey } = getChartDataKeys(props.dataKeys)
+  const primaryDataKey = `values.${primaryKey}`
+  const referenceDataKey = referenceKey ? `values.${referenceKey}`: undefined
 
   const chartData = getChartDataFromDatedValues(props.data) 
 
@@ -264,11 +279,16 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
             <YAxis 
               tick={{fontSize: 18}}
               tickFormatter={priceAxisTickFormatter}
-              width={getPriceAxisWidth(chartData, props.dataKey)}
+              width={getPriceAxisWidth(chartData, primaryKey)}
             />
             <CartesianGrid opacity={0.5} vertical={false}/>
             <Tooltip 
-              content={<CustomTooltip dataKey={props.dataKey} />}
+              content={
+                <CustomTooltip 
+                  primaryKey={primaryKey}
+                  referenceKey={referenceKey}
+                />
+              }
             />
             <defs>
               <linearGradient id='colorPrice' x1={0} y1={0} x2={0} y2={1}>
@@ -278,12 +298,22 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
             </defs>
             <Area 
               type='monotone' 
-              dataKey={dataKey}
+              dataKey={primaryDataKey}
               stroke={BLUE}
               strokeWidth={3}
               fill='url(#colorPrice)'
               fillOpacity={1}
             />
+            {referenceDataKey &&
+              <Area 
+                type='monotone'
+                dataKey={referenceDataKey}
+                stroke={GRAY}
+                strokeWidth={2}
+                strokeDasharray='5 5'
+                fillOpacity={0}
+              />
+            }
           </AreaChart>
         </ResponsiveContainer>
       </Box>
