@@ -180,13 +180,15 @@ export function getHoldingMarketValueSeries(
   endDate: Date
 ): df.Series {
 
-  // verify that priceSeries has sufficient data
-  assert(
-    String(_.head(priceSeries.index)) <= startDate.toISOString(),
-    'priceSeries does not have data on or before startDate')
-  assert(
-    String(_.last(priceSeries.index)) >= endDate.toISOString(),
-    'priceSeries does not have data on or after endDate')
+  // align price series
+  const prices = densifyAndFillSeries(
+    priceSeries,
+    startDate,
+    endDate,
+    'locf',
+    undefined,
+    0
+  )
 
   // -- get holding value series
   const transactionSeries = getHoldingTransactionQuantitySeries(holding)
@@ -199,11 +201,11 @@ export function getHoldingMarketValueSeries(
     undefined,
     0
   )
-  const pricesIx = priceSeries.index.map((ix: string | number) => {
+  const pricesIx = prices.index.map((ix: string | number) => {
     return String(ix) >= startDate.toISOString()
       && String(ix) <= endDate.toISOString()
   })
-  const holdingValueSeries = quantitySeries.mul(priceSeries.loc(pricesIx))
+  const holdingValueSeries = quantitySeries.mul(prices.loc(pricesIx))
 
   // -- get revenue series
   const dailyRevenueSeries = getHoldingRevenueSeries(holding)

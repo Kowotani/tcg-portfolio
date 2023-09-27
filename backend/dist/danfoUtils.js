@@ -156,18 +156,21 @@ RETURN
   A danfo Series
 */
 function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
-    // verify that priceSeries has sufficient data
-    (0, common_1.assert)(String(_.head(priceSeries.index)) <= startDate.toISOString(), 'priceSeries does not have data on or before startDate');
-    (0, common_1.assert)(String(_.last(priceSeries.index)) >= endDate.toISOString(), 'priceSeries does not have data on or after endDate');
+    // align price series
+    const prices = densifyAndFillSeries(priceSeries, startDate, endDate, 'locf', undefined, 0);
+    if ((0, common_1.getHoldingTcgplayerId)(holding) === 493975) {
+        console.log(priceSeries);
+        console.log(prices);
+    }
     // -- get holding value series
     const transactionSeries = getHoldingTransactionQuantitySeries(holding);
     const cumTransactionSeries = transactionSeries.cumSum();
     const quantitySeries = densifyAndFillSeries(cumTransactionSeries, startDate, endDate, 'locf', undefined, 0);
-    const pricesIx = priceSeries.index.map((ix) => {
+    const pricesIx = prices.index.map((ix) => {
         return String(ix) >= startDate.toISOString()
             && String(ix) <= endDate.toISOString();
     });
-    const holdingValueSeries = quantitySeries.mul(priceSeries.loc(pricesIx));
+    const holdingValueSeries = quantitySeries.mul(prices.loc(pricesIx));
     // -- get revenue series
     const dailyRevenueSeries = getHoldingRevenueSeries(holding);
     const cumRevenueSeries = dailyRevenueSeries.cumSum();
