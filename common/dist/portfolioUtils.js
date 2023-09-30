@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getPortfolioUnrealizedPnl = exports.getPortfolioTotalRevenue = exports.getPortfolioTotalPnl = exports.getPortfolioTotalCost = exports.getPortfolioSaleQuantity = exports.getPortfolioRealizedPnl = exports.getPortfolioPurchaseQuantity = exports.getPortfolioPercentPnl = exports.getPortfolioMarketValue = exports.getAggPortfolioTotalCost = exports.getAggPortfolioMarketValue = exports.getPortfolioNames = exports.getPortfolioHoldings = exports.getPortfolioFirstTransactionDate = exports.getIPortfoliosFromIPopulatedPortfolios = void 0;
+exports.getPortfolioUnrealizedPnl = exports.getPortfolioTotalRevenue = exports.getPortfolioTotalPnl = exports.getPortfolioTotalCost = exports.getPortfolioSaleQuantity = exports.getPortfolioRealizedPnl = exports.getPortfolioPurchaseQuantity = exports.getPortfolioPercentPnl = exports.getPortfolioMarketValue = exports.getAggPortfolioTotalCost = exports.getAggPortfolioMarketValue = exports.getPortfolioNames = exports.getPortfolioHoldings = exports.getPortfolioHolding = exports.getPortfolioFirstTransactionDate = exports.getIPortfoliosFromIPopulatedPortfolios = void 0;
 var _ = require("lodash");
 var utils_1 = require("./utils");
 var holdingUtils_1 = require("./holdingUtils");
@@ -55,9 +55,34 @@ function getPortfolioFirstTransactionDate(portfolio) {
 exports.getPortfolioFirstTransactionDate = getPortfolioFirstTransactionDate;
 /*
 DESC
+  Returns the Holding for the input IPortfolio and tcgplayerId, or null if it
+  does not exist
+INPUT
+  portfolio: An IPortfolio or IPopulatedPortfolio
+  tcgplayerId: The tcgplayerId of the Holding
+RETURN
+  An IHolding or IPopulatedHolding if exists, otherwise null
+*/
+function getPortfolioHolding(portfolio, tcgplayerId) {
+    var isPopulated = (0, utils_1.isIPopulatedPortfolio)(portfolio);
+    var holdings = isPopulated
+        ? portfolio.populatedHoldings
+        : portfolio.holdings;
+    var filtered = isPopulated
+        ? holdings.filter(function (h) {
+            return h.product.tcgplayerId === tcgplayerId;
+        })
+        : holdings.filter(function (h) {
+            return h.tcgplayerId === tcgplayerId;
+        });
+    return filtered.length ? filtered[0] : null;
+}
+exports.getPortfolioHolding = getPortfolioHolding;
+/*
+DESC
   Returns the Holdings for the input IPortfolio
 INPUT
-  portfolio: An IPortfolio
+  portfolio: An IPortfolio or IPopulatedPortfolio
 RETURN
   An IHolding[] or IPopulatedHolding[]
 */

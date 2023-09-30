@@ -1,6 +1,7 @@
 import { IHolding, IPopulatedHolding, IPortfolio, IPopulatedPortfolio, IPriceData } from './dataModels';
 export declare function getIPortfoliosFromIPopulatedPortfolios(populatedPortfolios: IPopulatedPortfolio[]): IPortfolio[];
 export declare function getPortfolioFirstTransactionDate(portfolio: IPortfolio | IPopulatedPortfolio): Date | undefined;
+export declare function getPortfolioHolding(portfolio: IPortfolio | IPopulatedPortfolio, tcgplayerId: number): IHolding | IPopulatedHolding | null;
 export declare function getPortfolioHoldings(portfolio: IPortfolio | IPopulatedPortfolio): IHolding[] | IPopulatedHolding[];
 export declare function getPortfolioNames(portfolios: IPortfolio[] | IPopulatedPortfolio[]): string[];
 export declare function getAggPortfolioMarketValue(portfolios: IPortfolio[] | IPopulatedPortfolio[], prices: Map<number, IPriceData>): number;

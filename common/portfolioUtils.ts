@@ -3,7 +3,7 @@ import {
   IHolding, IPopulatedHolding, IPortfolio, IPortfolioBase, IPopulatedPortfolio, 
   IPriceData
 } from './dataModels'
-import { assert, isIHolding, isIPortfolio } from './utils'
+import { assert, isIHolding, isIPopulatedPortfolio, isIPortfolio } from './utils'
 import { 
   getHoldingFirstTransactionDate, getHoldingMarketValue,
   getHoldingPurchaseQuantity, getHoldingRealizedPnl, getHoldingSaleQuantity, 
@@ -76,9 +76,41 @@ export function getPortfolioFirstTransactionDate(
 
 /*
 DESC
+  Returns the Holding for the input IPortfolio and tcgplayerId, or null if it
+  does not exist
+INPUT
+  portfolio: An IPortfolio or IPopulatedPortfolio
+  tcgplayerId: The tcgplayerId of the Holding
+RETURN
+  An IHolding or IPopulatedHolding if exists, otherwise null
+*/
+export function getPortfolioHolding(
+  portfolio: IPortfolio | IPopulatedPortfolio,
+  tcgplayerId: number
+): IHolding | IPopulatedHolding | null {
+  
+  const isPopulated = isIPopulatedPortfolio(portfolio)
+
+  const holdings = isPopulated
+    ? portfolio.populatedHoldings
+    : portfolio.holdings
+
+  const filtered = isPopulated
+    ? (holdings as IPopulatedHolding[]).filter((h: IPopulatedHolding) => {
+        return h.product.tcgplayerId === tcgplayerId
+      })
+    : (holdings as IHolding[]).filter((h: IHolding) => {
+        return h.tcgplayerId === tcgplayerId
+      })
+  
+  return filtered.length ? filtered[0] : null
+}
+
+/*
+DESC
   Returns the Holdings for the input IPortfolio
 INPUT
-  portfolio: An IPortfolio
+  portfolio: An IPortfolio or IPopulatedPortfolio
 RETURN
   An IHolding[] or IPopulatedHolding[]
 */
