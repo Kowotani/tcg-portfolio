@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPortfolioMarketValueSeries = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingMarketValueSeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
+exports.getPortfolioMarketValueSeries = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingMarketValueSeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
 const common_1 = require("common");
 const df = __importStar(require("danfojs-node"));
 const _ = __importStar(require("lodash"));
@@ -158,10 +158,6 @@ RETURN
 function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
     // align price series
     const prices = densifyAndFillSeries(priceSeries, startDate, endDate, 'locf', undefined, 0);
-    if ((0, common_1.getHoldingTcgplayerId)(holding) === 493975) {
-        console.log(priceSeries);
-        console.log(prices);
-    }
     // -- get holding value series
     const transactionSeries = getHoldingTransactionQuantitySeries(holding);
     const cumTransactionSeries = transactionSeries.cumSum();
@@ -179,6 +175,32 @@ function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
     return holdingValueSeries.add(revenueSeries);
 }
 exports.getHoldingMarketValueSeries = getHoldingMarketValueSeries;
+/*
+DESC
+  Returns a series of total cost for the input IHolding between the input
+  startDate and endDate
+INPUT
+  holding: An IHolding
+  startDate: The start date of the Series
+  endDate: The end date of the Series
+RETURN
+  A danfo Series
+*/
+function getHoldingTotalCostSeries(holding, startDate, endDate) {
+    // get dated values of daily purchase costs
+    const purchases = (0, common_1.getHoldingPurchases)(holding);
+    const datedValues = purchases.map((txn) => {
+        return {
+            date: txn.date,
+            value: txn.price * txn.quantity
+        };
+    });
+    // align daily purchase costs to date index
+    const dailyPurchaseSeries = sortSeriesByIndex(getSeriesFromDatedValues(datedValues));
+    const purchaseSeries = densifyAndFillSeries(dailyPurchaseSeries, startDate, endDate, 'value', 0);
+    return purchaseSeries.cumSum();
+}
+exports.getHoldingTotalCostSeries = getHoldingTotalCostSeries;
 /*
 DESC
   Returns a series of daily transaction quantities for the input IHolding

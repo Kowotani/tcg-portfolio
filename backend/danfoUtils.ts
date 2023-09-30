@@ -225,6 +225,46 @@ export function getHoldingMarketValueSeries(
 
 /*
 DESC
+  Returns a series of total cost for the input IHolding between the input 
+  startDate and endDate
+INPUT
+  holding: An IHolding
+  startDate: The start date of the Series
+  endDate: The end date of the Series
+RETURN
+  A danfo Series
+*/
+export function getHoldingTotalCostSeries(
+  holding: IHolding | IPopulatedHolding,
+  startDate: Date,
+  endDate: Date
+): df.Series {
+
+  // get dated values of daily purchase costs
+  const purchases = getHoldingPurchases(holding)
+  const datedValues: TDatedValue[] = purchases.map((txn: ITransaction) => {
+    return {
+      date: txn.date,
+      value: txn.price * txn.quantity
+    }
+  })
+
+  // align daily purchase costs to date index
+  const dailyPurchaseSeries 
+    = sortSeriesByIndex(getSeriesFromDatedValues(datedValues))
+  const purchaseSeries = densifyAndFillSeries(
+    dailyPurchaseSeries, 
+    startDate,
+    endDate,
+    'value',
+    0
+  )
+
+  return purchaseSeries.cumSum() as df.Series
+}
+
+/*
+DESC
   Returns a series of daily transaction quantities for the input IHolding
 INPUT
   holding: An IHolding
