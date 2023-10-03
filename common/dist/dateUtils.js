@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getDaysBetween = exports.getClampedDate = exports.formatInTimeZone = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.isDateBefore = exports.isDateAfter = exports.getDaysBetween = exports.getClampedDate = exports.formatInTimeZone = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 var date_fns_tz_1 = require("date-fns-tz");
 // ==========
@@ -178,3 +178,37 @@ function getDaysBetween(startDate, endDate) {
     return (0, date_fns_1.differenceInCalendarDays)(startDate, endDate);
 }
 exports.getDaysBetween = getDaysBetween;
+/*
+DESC
+  Returns whether the first date is after the second date, or equal to if
+  orEqual is TRUE
+INPUT
+  firstDate: The first date
+  secondDate: The second date
+  orEqual?: Whether equality should be TRUE
+RETURN
+  TRUE if the first date is after (or equal to) the second date, FALSE otherwise
+*/
+function isDateAfter(first, second, orEqual) {
+    return orEqual
+        ? (0, date_fns_1.isAfter)(first, second) || (0, date_fns_1.isEqual)(first, second)
+        : (0, date_fns_1.isAfter)(first, second);
+}
+exports.isDateAfter = isDateAfter;
+/*
+DESC
+  Returns whether the first date is before the second date, or equal to if
+  orEqual is TRUE
+INPUT
+  firstDate: The first date
+  secondDate: The second date
+  orEqual?: Whether equality should be TRUE
+RETURN
+  TRUE if the first date is before (or equal to) the second date, FALSE otherwise
+*/
+function isDateBefore(first, second, orEqual) {
+    return orEqual
+        ? (0, date_fns_1.isBefore)(first, second) || (0, date_fns_1.isEqual)(first, second)
+        : (0, date_fns_1.isBefore)(first, second);
+}
+exports.isDateBefore = isDateBefore;

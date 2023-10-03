@@ -1,6 +1,7 @@
 import { 
   add, clamp, differenceInCalendarDays, eachMonthOfInterval, 
-  eachQuarterOfInterval, eachWeekOfInterval, eachYearOfInterval, sub
+  eachQuarterOfInterval, eachWeekOfInterval, eachYearOfInterval, isAfter, 
+  isBefore, isEqual, sub
 } from 'date-fns'
 import { format, utcToZonedTime } from 'date-fns-tz'
 
@@ -219,6 +220,48 @@ export function getDaysBetween(
   endDate: Date
 ): number {
   return differenceInCalendarDays(startDate, endDate)
+}
+
+/*
+DESC
+  Returns whether the first date is after the second date, or equal to if
+  orEqual is TRUE
+INPUT
+  firstDate: The first date
+  secondDate: The second date
+  orEqual?: Whether equality should be TRUE
+RETURN
+  TRUE if the first date is after (or equal to) the second date, FALSE otherwise
+*/
+export function isDateAfter(
+  first: Date, 
+  second: Date, 
+  orEqual?: boolean
+): boolean {
+  return orEqual 
+    ? isAfter(first, second) || isEqual(first, second)
+    : isAfter(first, second)
+}
+
+/*
+DESC
+  Returns whether the first date is before the second date, or equal to if
+  orEqual is TRUE
+INPUT
+  firstDate: The first date
+  secondDate: The second date
+  orEqual?: Whether equality should be TRUE
+RETURN
+  TRUE if the first date is before (or equal to) the second date, FALSE otherwise
+*/
+export function isDateBefore(
+  first: Date, 
+  second: Date, 
+  orEqual?: boolean
+): boolean {
+  return orEqual 
+    ? isBefore(first, second) || isEqual(first, second)
+    : isBefore(first, second)
 }
 
 
