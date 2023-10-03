@@ -3,10 +3,10 @@ import {
   IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, ITransaction, 
   TDatedValue,
 
-  genDateRange, getHoldingPurchases, getHoldingSales, getHoldingTcgplayerId, 
+  getHoldingPurchases, getHoldingSales, getHoldingTcgplayerId, 
   getPortfolioHoldings,
 
-  assert
+  assert, genDateRange, isDateAfter, isDateBefore
 } from 'common'
 import * as df from 'danfojs-node'
 import * as _ from 'lodash'
@@ -221,6 +221,39 @@ export function getHoldingMarketValueSeries(
 
   // -- get market value series
   return holdingValueSeries.add(revenueSeries) as df.Series
+}
+
+/*
+DESC
+  Returns a series of purchase costs for the input IHolding between the
+  input startDate and endDate
+INPUT
+  holding: An IHolding
+  startDate: The start date of the Series
+  endDate: The end date of the Series
+RETURN
+  A danfo Series
+*/
+export function getHoldingPurchaseCostSeries(
+  holding: IHolding | IPopulatedHolding,
+  startDate: Date,
+  endDate: Date
+): df.Series {
+
+  // get dated values of daily purchase costs
+  const allPurchases = getHoldingPurchases(holding)
+  const purchases = allPurchases.filter((txn: ITransaction) => {
+    return isDateAfter(txn.date, startDate, true) 
+      && isDateBefore(txn.date, endDate, true)
+  })
+  const datedValues: TDatedValue[] = purchases.map((txn: ITransaction) => {
+    return {
+      date: txn.date,
+      value: txn.price * txn.quantity
+    }
+  })
+
+  return sortSeriesByIndex(getSeriesFromDatedValues(datedValues))
 }
 
 /*

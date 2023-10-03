@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPortfolioMarketValueSeries = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingMarketValueSeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
+exports.getPortfolioMarketValueSeries = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingPurchaseCostSeries = exports.getHoldingMarketValueSeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
 const common_1 = require("common");
 const df = __importStar(require("danfojs-node"));
 const _ = __importStar(require("lodash"));
@@ -171,6 +171,33 @@ function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
     return holdingValueSeries.add(revenueSeries);
 }
 exports.getHoldingMarketValueSeries = getHoldingMarketValueSeries;
+/*
+DESC
+  Returns a series of purchase costs for the input IHolding between the
+  input startDate and endDate
+INPUT
+  holding: An IHolding
+  startDate: The start date of the Series
+  endDate: The end date of the Series
+RETURN
+  A danfo Series
+*/
+function getHoldingPurchaseCostSeries(holding, startDate, endDate) {
+    // get dated values of daily purchase costs
+    const allPurchases = (0, common_1.getHoldingPurchases)(holding);
+    const purchases = allPurchases.filter((txn) => {
+        return (0, common_1.isDateAfter)(txn.date, startDate, true)
+            && (0, common_1.isDateBefore)(txn.date, endDate, true);
+    });
+    const datedValues = purchases.map((txn) => {
+        return {
+            date: txn.date,
+            value: txn.price * txn.quantity
+        };
+    });
+    return sortSeriesByIndex(getSeriesFromDatedValues(datedValues));
+}
+exports.getHoldingPurchaseCostSeries = getHoldingPurchaseCostSeries;
 /*
 DESC
   Returns a series of total cost for the input IHolding between the input
