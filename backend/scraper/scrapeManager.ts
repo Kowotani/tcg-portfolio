@@ -1,5 +1,7 @@
 import { 
-  IDatedPriceData, IPrice, IPriceData, TimeseriesGranularity
+  IDatedPriceData, IPrice, IPriceData, TimeseriesGranularity, 
+
+  formatAsISO
 } from 'common'
 import { IMProduct } from '../mongo/models/productSchema'
 import { getProductDocs, insertPrices } from '../mongo/mongoManager'
@@ -56,12 +58,18 @@ RETURN
 export async function loadCurrentPrices(): Promise<number> {
 
   // get all Products
-  const productDocs = await getProductDocs()
+  const allProductDocs = await getProductDocs()
+
+  // exclude unreleased Products
+  const productDocs = allProductDocs.filter((product: IMProduct) => {
+    return formatAsISO(product.releaseDate) <= formatAsISO(new Date())
+  })
 
   // scrape price data
   const tcgplayerIds = productDocs.map((productDoc: IMProduct) => {
     return productDoc.tcgplayerId
   })
+
   const scrapedPrices = await scrapeCurrent(tcgplayerIds)
 
   // set price date
@@ -122,7 +130,12 @@ RETURN
 export async function loadHistoricalPrices(): Promise<number> {
 
   // get all Products
-  const productDocs = await getProductDocs()
+  const allProductDocs = await getProductDocs()
+
+  // exclude unreleased Products
+  const productDocs = allProductDocs.filter((product: IMProduct) => {
+    return formatAsISO(product.releaseDate) <= formatAsISO(new Date())
+  })
 
   // scrape price data
   const tcgplayerIds = productDocs.map((productDoc: IMProduct) => {

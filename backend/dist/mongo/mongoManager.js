@@ -899,7 +899,7 @@ function main() {
         //   ]
         // } 
         // const holdingB: IHolding = {
-        //   tcgplayerId: 121527,
+        //   tcgplayerId: 233232,
         //   transactions: [
         //     {
         //       type: TransactionType.Purchase,
@@ -926,20 +926,30 @@ function main() {
         //   portfolioName: 'foo',
         //   holdings: [holdingA, holdingB]
         // }
+        // const portfolio = {
+        //   userId: 1234,
+        //   portfolioName: 'Delta',
+        //   holdings: []
+        // }
+        // const portfolioDoc = await getPortfolioDoc(portfolio)
+        // const holding = getPortfolioHolding(portfolioDoc as IPortfolio, 233232)
+        // assert(holding)
         // const startDate = new Date('2023-09-01')
-        // const endDate = new Date('2023-09-12')
-        // const series = await getPortfolioMarketValueAsDatedValues(
-        //   portfolio, 
+        // const endDate = new Date('2023-09-10')
+        // const values = await getPortfolioMarketValueAsDatedValues(
+        //   portfolioDoc as IPortfolio, 
         //   startDate,
         //   endDate
         // )
-        // console.log(dfu.getSeriesFromDatedValues(series))
+        // const series = dfu.getSeriesFromDatedValues(values)
+        // const series = dfu.getHoldingTotalCostSeries(holding, startDate, endDate)
+        // console.log(series)
         // const series = getHoldingMarketValueSeries(
         //   holding,
         //   prices,
         //   startDate,
         //   endDate
-        //   )
+        // )
         // console.log('-- market value series')  
         // console.log(series.print())
         // holdings = [
@@ -989,7 +999,15 @@ function main() {
         //   console.log('historicalPrices not updated')
         // }
         // // -- Reset Prices
-        // const tcgplayerIds = [496041]
+        // const tcgplayerIds = [
+        //   287815,
+        //   449558,
+        //   449559,
+        //   451874,
+        //   451877,
+        //   475584,
+        //   488297
+        // ]
         // res = await resetPrices(tcgplayerIds)
         // if (res) {
         //   console.log(`${res.deleted} tcgplayerIds were reset, ${res.inserted} were initialized`)

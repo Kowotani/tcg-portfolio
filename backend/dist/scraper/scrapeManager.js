@@ -59,7 +59,11 @@ RETURN
 function loadCurrentPrices() {
     return __awaiter(this, void 0, void 0, function* () {
         // get all Products
-        const productDocs = yield (0, mongoManager_1.getProductDocs)();
+        const allProductDocs = yield (0, mongoManager_1.getProductDocs)();
+        // exclude unreleased Products
+        const productDocs = allProductDocs.filter((product) => {
+            return (0, common_1.formatAsISO)(product.releaseDate) <= (0, common_1.formatAsISO)(new Date());
+        });
         // scrape price data
         const tcgplayerIds = productDocs.map((productDoc) => {
             return productDoc.tcgplayerId;
@@ -112,7 +116,11 @@ RETURN
 function loadHistoricalPrices() {
     return __awaiter(this, void 0, void 0, function* () {
         // get all Products
-        const productDocs = yield (0, mongoManager_1.getProductDocs)();
+        const allProductDocs = yield (0, mongoManager_1.getProductDocs)();
+        // exclude unreleased Products
+        const productDocs = allProductDocs.filter((product) => {
+            return (0, common_1.formatAsISO)(product.releaseDate) <= (0, common_1.formatAsISO)(new Date());
+        });
         // scrape price data
         const tcgplayerIds = productDocs.map((productDoc) => {
             return productDoc.tcgplayerId;
