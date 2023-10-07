@@ -32,7 +32,7 @@ import {
 
   formatAsISO, getClampedDate, getHoldingAverageCost, 
   getHoldingAverageRevenue, getHoldingPurchaseQuantity, getHoldingSaleQuantity, 
-  getHoldingTotalCost, getHoldingTotalRevenue,
+  getHoldingTotalCost, getHoldingTotalRevenue, hasNonNegativeQuantity,
 
   assert, isNumeric
 } from 'common'
@@ -447,7 +447,7 @@ export const EditTransactionsModal = (
   function handleOnSave(): void {
 
     // check that purchaes >= sales
-    if (hasNonNegativeQuantity()) {
+    if (hasNonNegativeQuantity(holding)) {
 
       // update parent transactions
       props.setTransactions(transactions)
@@ -471,12 +471,6 @@ export const EditTransactionsModal = (
         isClosable: true,
       })          
     }
-  }
-
-  // validate that purchases >= sales
-  function hasNonNegativeQuantity(): boolean {
-    return getHoldingPurchaseQuantity(holding) 
-      >= getHoldingSaleQuantity(holding)
   }
 
 

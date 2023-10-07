@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingMarketValue = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = exports.getHoldingTcgplayerId = exports.getHoldingFirstTransactionDate = exports.getIHoldingsFromIPopulatedHoldings = void 0;
+exports.hasNonNegativeQuantity = exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingMarketValue = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = exports.getHoldingTcgplayerId = exports.getHoldingFirstTransactionDate = exports.getIHoldingsFromIPopulatedHoldings = void 0;
 var _ = require("lodash");
 var dataModels_1 = require("./dataModels");
 var utils_1 = require("./utils");
@@ -305,3 +305,19 @@ function getHoldingUnrealizedPnl(holding, price) {
         : (price - getHoldingAverageCost(holding)) * quantity;
 }
 exports.getHoldingUnrealizedPnl = getHoldingUnrealizedPnl;
+// ==========
+// validators
+// ==========
+/*
+DESC
+  Returns whether the Holding has non-negative quantity
+INPUT
+  holding: An IHolding
+RETURN
+  TRUE if the Holding has nnon-negative quantity, FALSE otherwise
+*/
+function hasNonNegativeQuantity(holding) {
+    return getHoldingPurchaseQuantity(holding)
+        >= getHoldingSaleQuantity(holding);
+}
+exports.hasNonNegativeQuantity = hasNonNegativeQuantity;

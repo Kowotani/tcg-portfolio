@@ -363,3 +363,23 @@ export function getHoldingUnrealizedPnl(
     ? undefined
     : (price - getHoldingAverageCost(holding)) * quantity
 }
+
+
+// ==========
+// validators
+// ==========
+
+/*
+DESC
+  Returns whether the Holding has non-negative quantity
+INPUT
+  holding: An IHolding
+RETURN
+  TRUE if the Holding has nnon-negative quantity, FALSE otherwise
+*/
+export function hasNonNegativeQuantity(
+  holding: IHolding | IPopulatedHolding
+): boolean {
+  return getHoldingPurchaseQuantity(holding) 
+    >= getHoldingSaleQuantity(holding)
+}
