@@ -1,8 +1,11 @@
 import { 
-  IPopulatedHolding,
+  IHolding, IPopulatedHolding, ITransaction, TDatedValue,
 
-  assert, isIPopulatedHolding
+  getHoldingPurchases, getHoldingSales,
+
+  assert, formatAsISO, isIPopulatedHolding
 } from 'common'
+import { getSeriesFromDatedValues, sortSeriesByIndex } from './danfo'
 import { isMatchingProduct } from './Product'
 
 
@@ -79,4 +82,59 @@ export function sortFnPopulatedHoldingDesc(a: any, b: any): number {
   const keyA = genPopulatedHoldingKey(a)
   const keyB = genPopulatedHoldingKey(b)
   return keyA < keyB ? 1 : keyB > keyA ? -1 : 0
+}
+
+
+// ==========
+// validators
+// ==========
+
+/*
+DESC
+  Returns whether the Holding ever has a non-negative quantity in its series
+  of Transactions
+INPUT
+  holding: An IHolding
+RETURN
+  TRUE if the Holding ever has non-negative quantity, FALSE otherwise
+*/
+export function hasNonNegativeQuantity(
+  holding: IHolding | IPopulatedHolding
+): boolean {
+
+  // get purchases and sales
+  const purchases = getHoldingPurchases(holding)
+  const sales = getHoldingSales(holding)
+
+  // aggregate net purchases and sales by date
+  const quantityMap = new Map<string, number>()
+
+  purchases.forEach((txn: ITransaction) => {
+    quantityMap.set(
+      formatAsISO(txn.date), 
+      (quantityMap.get(formatAsISO(txn.date)) ?? 0) + txn.quantity
+    )
+  })
+
+  sales.forEach((txn: ITransaction) => {
+    quantityMap.set(
+      formatAsISO(txn.date), 
+      (quantityMap.get(formatAsISO(txn.date)) ?? 0) - txn.quantity
+    )
+  })
+
+  // create dated values
+  const datedValues: TDatedValue[] = []
+  quantityMap.forEach((quantity: number, date: string) => {
+    datedValues.push({
+      date: new Date(Date.parse(date)),
+      value: quantity
+    })
+  })
+
+  // create danfo series
+  const series = sortSeriesByIndex(getSeriesFromDatedValues(datedValues))
+  const cumSeries = series.cumSum()
+
+  return cumSeries.min() >= 0
 }

@@ -16,4 +16,3 @@ export declare function getHoldingTotalCost(holding: IHolding | IPopulatedHoldin
 export declare function getHoldingTotalPnl(holding: IHolding | IPopulatedHolding, price: number): number | undefined;
 export declare function getHoldingTotalRevenue(holding: IHolding | IPopulatedHolding): number;
 export declare function getHoldingUnrealizedPnl(holding: IHolding | IPopulatedHolding, price: number): number | undefined;
-export declare function hasNonNegativeQuantity(holding: IHolding | IPopulatedHolding): boolean;

@@ -32,7 +32,7 @@ import {
 
   formatAsISO, getClampedDate, getHoldingAverageCost, 
   getHoldingAverageRevenue, getHoldingPurchaseQuantity, getHoldingSaleQuantity, 
-  getHoldingTotalCost, getHoldingTotalRevenue, hasNonNegativeQuantity,
+  getHoldingTotalCost, getHoldingTotalRevenue,
 
   assert, isNumeric
 } from 'common'
@@ -46,6 +46,7 @@ import { MetricSummary, TMetricSummaryItem
   } from './MetricSummary'
 import { TransactionTable } from './TransactionTable'
 import { getBrowserLocale } from '../utils/generic'
+import { hasNonNegativeQuantity } from '../utils/Holding'
 import { getFormattedPrice } from '../utils/Price'
 import { getProductNameWithLanguage } from '../utils/Product'
 
@@ -465,7 +466,7 @@ export const EditTransactionsModal = (
       
       toast({
         title: 'Error',
-        description: 'Sales cannot be greater than Purchases',
+        description: 'Cannot sell more than purchased',
         status: 'error',
         variant: 'subtle',
         isClosable: true,

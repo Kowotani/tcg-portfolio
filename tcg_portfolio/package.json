@@ -17,6 +17,7 @@
     "@types/react-dom": "^18.2.6",
     "axios": "^1.4.0",
     "common": "file:../common",
+    "danfojs": "^1.1.2",
     "date-fns": "^2.30.0",
     "formik": "^2.4.2",
     "framer-motion": "^6.5.1",
