@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-      "esModuleInterop": true, 
       "experimentalDecorators": true,
       "declaration": true,
       "outDir": "dist",  

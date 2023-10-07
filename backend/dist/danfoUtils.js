@@ -18,14 +18,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPortfolioMarketValueSeries = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingPurchaseCostSeries = exports.getHoldingMarketValueSeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
-var df = __importStar(require("danfojs-node"));
-var dateUtils_1 = require("./dateUtils");
-var holdingUtils_1 = require("./holdingUtils");
-var _ = __importStar(require("lodash"));
-var portfolioUtils_1 = require("./portfolioUtils");
-var utils_1 = require("./utils");
+const common_1 = require("common");
+const df = __importStar(require("danfojs-node"));
+const _ = __importStar(require("lodash"));
 // =======
 // generic
 // =======
@@ -47,14 +44,14 @@ RETURN
 */
 function densifyAndFillSeries(series, startDate, endDate, fillMode, fillValue, initialValue) {
     // get Series index
-    var index = (0, dateUtils_1.genDateRange)(startDate, endDate).map(function (date) {
+    const index = (0, common_1.genDateRange)(startDate, endDate).map((date) => {
         return date.toISOString();
     });
     // populate values for Series
-    var values = [];
-    index.forEach(function (date, ix) {
+    let values = [];
+    index.forEach((date, ix) => {
         // get value from series, if available
-        var seriesValue = series.at(date);
+        const seriesValue = series.at(date);
         // matched
         if (seriesValue !== undefined) {
             values.push(Number(seriesValue));
@@ -76,7 +73,7 @@ function densifyAndFillSeries(series, startDate, endDate, fillMode, fillValue, i
             values.push(0);
         }
     });
-    return new df.Series(values, { index: index });
+    return new df.Series(values, { index });
 }
 exports.densifyAndFillSeries = densifyAndFillSeries;
 /*
@@ -88,11 +85,11 @@ RETURN
   A TDatedValue[]
 */
 function getDatedValuesFromSeries(series) {
-    var datedValues = series.index.map(function (index) {
-        var date = _.isNumber(index)
+    const datedValues = series.index.map((index) => {
+        const date = _.isNumber(index)
             ? new Date(index)
             : new Date(Date.parse(index));
-        var value = _.isNumber(index)
+        const value = _.isNumber(index)
             ? Number(series.iat(index))
             : Number(series.at(index));
         return {
@@ -112,13 +109,13 @@ RETURN
   A danfo Series
 */
 function getSeriesFromDatedValues(datedValues) {
-    var index = datedValues.map(function (dv) {
+    const index = datedValues.map((dv) => {
         return dv.date.toISOString();
     });
-    var values = datedValues.map(function (dv) {
+    const values = datedValues.map((dv) => {
         return dv.value;
     });
-    return new df.Series(values, { index: index });
+    return new df.Series(values, { index });
 }
 exports.getSeriesFromDatedValues = getSeriesFromDatedValues;
 /*
@@ -130,13 +127,13 @@ RETURN
   A danfo Series
 */
 function sortSeriesByIndex(series) {
-    var index = _.sortBy(series.index, function (el) { return el; });
-    var values = index.map(function (ix) {
+    const index = _.sortBy(series.index, el => el);
+    const values = index.map((ix) => {
         return typeof ix === 'string'
             ? series.at(ix)
             : series.iat(ix);
     });
-    return new df.Series(values, { index: index });
+    return new df.Series(values, { index });
 }
 exports.sortSeriesByIndex = sortSeriesByIndex;
 // =======
@@ -156,20 +153,20 @@ RETURN
 */
 function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
     // align price series
-    var prices = densifyAndFillSeries(priceSeries, startDate, endDate, 'locf', undefined, 0);
+    const prices = densifyAndFillSeries(priceSeries, startDate, endDate, 'locf', undefined, 0);
     // -- get holding value series
-    var transactionSeries = getHoldingTransactionQuantitySeries(holding);
-    var cumTransactionSeries = transactionSeries.cumSum();
-    var quantitySeries = densifyAndFillSeries(cumTransactionSeries, startDate, endDate, 'locf', undefined, 0);
-    var pricesIx = prices.index.map(function (ix) {
+    const transactionSeries = getHoldingTransactionQuantitySeries(holding);
+    const cumTransactionSeries = transactionSeries.cumSum();
+    const quantitySeries = densifyAndFillSeries(cumTransactionSeries, startDate, endDate, 'locf', undefined, 0);
+    const pricesIx = prices.index.map((ix) => {
         return String(ix) >= startDate.toISOString()
             && String(ix) <= endDate.toISOString();
     });
-    var holdingValueSeries = quantitySeries.mul(prices.loc(pricesIx));
+    const holdingValueSeries = quantitySeries.mul(prices.loc(pricesIx));
     // -- get revenue series
-    var dailyRevenueSeries = getHoldingRevenueSeries(holding);
-    var cumRevenueSeries = dailyRevenueSeries.cumSum();
-    var revenueSeries = densifyAndFillSeries(cumRevenueSeries, startDate, endDate, 'locf', undefined, 0);
+    const dailyRevenueSeries = getHoldingRevenueSeries(holding);
+    const cumRevenueSeries = dailyRevenueSeries.cumSum();
+    const revenueSeries = densifyAndFillSeries(cumRevenueSeries, startDate, endDate, 'locf', undefined, 0);
     // -- get market value series
     return holdingValueSeries.add(revenueSeries);
 }
@@ -187,12 +184,12 @@ RETURN
 */
 function getHoldingPurchaseCostSeries(holding, startDate, endDate) {
     // get dated values of daily purchase costs
-    var allPurchases = (0, holdingUtils_1.getHoldingPurchases)(holding);
-    var purchases = allPurchases.filter(function (txn) {
-        return (0, dateUtils_1.isDateAfter)(txn.date, startDate, true)
-            && (0, dateUtils_1.isDateBefore)(txn.date, endDate, true);
+    const allPurchases = (0, common_1.getHoldingPurchases)(holding);
+    const purchases = allPurchases.filter((txn) => {
+        return (0, common_1.isDateAfter)(txn.date, startDate, true)
+            && (0, common_1.isDateBefore)(txn.date, endDate, true);
     });
-    var datedValues = purchases.map(function (txn) {
+    const datedValues = purchases.map((txn) => {
         return {
             date: txn.date,
             value: txn.price * txn.quantity
@@ -214,16 +211,16 @@ RETURN
 */
 function getHoldingTotalCostSeries(holding, startDate, endDate) {
     // get dated values of daily purchase costs
-    var purchases = (0, holdingUtils_1.getHoldingPurchases)(holding);
-    var datedValues = purchases.map(function (txn) {
+    const purchases = (0, common_1.getHoldingPurchases)(holding);
+    const datedValues = purchases.map((txn) => {
         return {
             date: txn.date,
             value: txn.price * txn.quantity
         };
     });
     // align daily purchase costs to date index
-    var dailyPurchaseSeries = sortSeriesByIndex(getSeriesFromDatedValues(datedValues));
-    var purchaseSeries = densifyAndFillSeries(dailyPurchaseSeries, startDate, endDate, 'value', 0);
+    const dailyPurchaseSeries = sortSeriesByIndex(getSeriesFromDatedValues(datedValues));
+    const purchaseSeries = densifyAndFillSeries(dailyPurchaseSeries, startDate, endDate, 'value', 0);
     return purchaseSeries.cumSum();
 }
 exports.getHoldingTotalCostSeries = getHoldingTotalCostSeries;
@@ -237,20 +234,20 @@ RETURN
 */
 function getHoldingTransactionQuantitySeries(holding) {
     // get purchase and sales
-    var purchases = (0, holdingUtils_1.getHoldingPurchases)(holding);
-    var sales = (0, holdingUtils_1.getHoldingSales)(holding);
+    const purchases = (0, common_1.getHoldingPurchases)(holding);
+    const sales = (0, common_1.getHoldingSales)(holding);
     // summarize transaction quantities in a map
-    var quantityMap = new Map();
-    purchases.forEach(function (txn) {
+    const quantityMap = new Map();
+    purchases.forEach((txn) => {
         var _a;
         quantityMap.set(txn.date.toISOString(), ((_a = quantityMap.get(txn.date.toISOString())) !== null && _a !== void 0 ? _a : 0) + txn.quantity);
     });
-    sales.forEach(function (txn) {
+    sales.forEach((txn) => {
         var _a;
         quantityMap.set(txn.date.toISOString(), ((_a = quantityMap.get(txn.date.toISOString())) !== null && _a !== void 0 ? _a : 0) - txn.quantity);
     });
-    var datedValues = [];
-    quantityMap.forEach(function (value, key) {
+    const datedValues = [];
+    quantityMap.forEach((value, key) => {
         if (value !== 0) {
             datedValues.push({
                 date: new Date(Date.parse(key)),
@@ -270,8 +267,8 @@ RETURN
   A danfo Series
 */
 function getHoldingRevenueSeries(holding) {
-    var sales = (0, holdingUtils_1.getHoldingSales)(holding);
-    var datedValues = sales.map(function (txn) {
+    const sales = (0, common_1.getHoldingSales)(holding);
+    const datedValues = sales.map((txn) => {
         return {
             date: txn.date,
             value: txn.price * txn.quantity
@@ -296,19 +293,19 @@ RETURN
   A danfo Series
 */
 function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, endDate) {
-    var holdings = (0, portfolioUtils_1.getPortfolioHoldings)(portfolio);
+    const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
     // get market value series of holdings
-    var marketValues = holdings.map(function (holding) {
-        var tcgplayerId = (0, holdingUtils_1.getHoldingTcgplayerId)(holding);
-        var priceSeries = priceSeriesMap.get(tcgplayerId);
+    const marketValues = holdings.map((holding) => {
+        const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
+        const priceSeries = priceSeriesMap.get(tcgplayerId);
         // verify that prices exist for this tcgplayerId
-        (0, utils_1.assert)(priceSeries instanceof df.Series, "Could not find prices for tcgplayerId: ".concat(tcgplayerId));
+        (0, common_1.assert)(priceSeries instanceof df.Series, `Could not find prices for tcgplayerId: ${tcgplayerId}`);
         return getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate);
     });
     // create empty Series used for summation
-    var emptySeries = densifyAndFillSeries(new df.Series([0], { index: [startDate.toISOString()] }), startDate, endDate, 'value', 0, 0);
+    const emptySeries = densifyAndFillSeries(new df.Series([0], { index: [startDate.toISOString()] }), startDate, endDate, 'value', 0, 0);
     // get market value series of portfolio
-    return marketValues.reduce(function (acc, cur) {
+    return marketValues.reduce((acc, cur) => {
         return acc = acc.add(cur);
     }, emptySeries);
 }
