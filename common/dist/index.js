@@ -11,6 +11,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 exports.__esModule = true;
 __exportStar(require("./api"), exports);
+__exportStar(require("./danfoUtils"), exports);
 __exportStar(require("./dataModels"), exports);
 __exportStar(require("./dateUtils"), exports);
 __exportStar(require("./holdingUtils"), exports);

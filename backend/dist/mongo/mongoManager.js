@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -926,24 +930,29 @@ function main() {
         //   portfolioName: 'foo',
         //   holdings: [holdingA, holdingB]
         // }
-        // const portfolio = {
-        //   userId: 1234,
-        //   portfolioName: 'Delta',
-        //   holdings: []
-        // }
-        // const portfolioDoc = await getPortfolioDoc(portfolio)
-        // const holding = getPortfolioHolding(portfolioDoc as IPortfolio, 233232)
-        // assert(holding)
-        // const startDate = new Date('2023-09-01')
-        // const endDate = new Date('2023-09-10')
+        const portfolio = {
+            userId: 1234,
+            portfolioName: 'Delta',
+            holdings: []
+        };
+        const portfolioDoc = yield getPortfolioDoc(portfolio);
+        const tcgplayerId = 493975;
+        const holding = (0, common_1.getPortfolioHolding)(portfolioDoc, 493975);
+        (0, common_1.assert)(holding);
+        const startDate = new Date('2023-06-09');
+        const endDate = new Date('2023-10-01');
         // const values = await getPortfolioMarketValueAsDatedValues(
         //   portfolioDoc as IPortfolio, 
         //   startDate,
         //   endDate
         // )
+        const priceMap = yield getPriceMapOfSeries([tcgplayerId], startDate, endDate);
+        const priceSeries = priceMap.get(tcgplayerId);
         // const series = dfu.getSeriesFromDatedValues(values)
-        // const series = dfu.getHoldingTotalCostSeries(holding, startDate, endDate)
+        // const series = dfu.getHoldingPurchaseCostSeries(holding, startDate, endDate)
         // console.log(series)
+        const twr = dfu.getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate);
+        console.log(twr);
         // const series = getHoldingMarketValueSeries(
         //   holding,
         //   prices,
