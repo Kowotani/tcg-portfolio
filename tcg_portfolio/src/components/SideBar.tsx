@@ -9,7 +9,8 @@ import {
 import { AddProductForm } from './AddProductForm'
 import { PortfolioPanelManager } from './PortfolioPanelManager'
 import { SideBarNavContext } from '../state/SideBarNavContext'
-import { ISideBarNav, ISideBarNavContext, SideBarNav } from '../utils'
+import { ISideBarNav, ISideBarNavContext, SideBarNav } from '../utils/SideBar'
+
 
 // ==============
 // Sub Components

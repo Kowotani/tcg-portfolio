@@ -1,6 +1,6 @@
 import { createContext, PropsWithChildren, useState } from 'react'
 import { IDatedPriceData } from 'common'
-import { ILatestPricesContext } from '../utils'
+import { ILatestPricesContext } from '../utils/Price'
 
 // create context
 export const LatestPricesContext 

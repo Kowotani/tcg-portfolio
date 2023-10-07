@@ -23,11 +23,10 @@ import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
 import { LatestPricesContext } from '../state/LatestPricesContext'
-import { 
-  ILatestPricesContext, 
+import { getBrowserLocale } from '../utils/generic'
+import { ILatestPricesContext, getFormattedPrice } from '../utils/Price'
+import { getProductNameWithLanguage } from '../utils/Product'
 
-  getBrowserLocale, getFormattedPrice, getProductNameWithLanguage
-} from '../utils'
 
 type THoldingCardProps = {
   marketPrice: number,

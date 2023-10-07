@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren } from 'react'
 import { 
   Box,
   InputGroup, 
@@ -6,7 +6,7 @@ import {
   InputRightAddon,
   Tooltip,
   VStack
-} from '@chakra-ui/react';
+} from '@chakra-ui/react'
 
 
 // ==========

@@ -24,7 +24,8 @@ import {
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField'
 import { SideBarNavContext } from '../state/SideBarNavContext'
-import { isHttpUrl, ISideBarNavContext, SideBarNav } from '../utils'
+import { isHttpUrl } from '../utils/generic'
+import { ISideBarNavContext, SideBarNav } from '../utils/SideBar'
 
 
 // ==============

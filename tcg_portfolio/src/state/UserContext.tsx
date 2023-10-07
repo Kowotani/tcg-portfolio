@@ -1,5 +1,5 @@
 import { createContext, PropsWithChildren, useState } from 'react'
-import { IUser, IUserContext, UserType } from '../utils'
+import { IUser, IUserContext, UserType } from '../utils/User'
 
 // create context
 export const UserContext = createContext<IUserContext | null>(null)

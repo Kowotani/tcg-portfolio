@@ -19,11 +19,11 @@ import { EditPortfolioForm } from './EditPortfolioForm'
 import { PortfolioPerformance } from './PortfolioPerformance'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { UserContext } from '../state/UserContext'
+import { PortfolioPanelNav } from '../utils/PortfolioPanel'
 import { 
-  ILatestPricesContext, IUserContext, PortfolioPanelNav,
-
-  getPriceMapFromPriceAPIResponse
-} from '../utils' 
+  ILatestPricesContext, getPriceMapFromPriceAPIResponse
+} from '../utils/Price'
+import { IUserContext } from '../utils/User'
 
 
 export const PortfolioPanelManager = () => {
@@ -180,6 +180,17 @@ export const PortfolioPanelManager = () => {
 
   return (
     <>
+      {/* Breadcrumb */}
+      <Breadcrumb spacing='8px'>
+        {breadcrumbTrail.map((path: string) => {
+          return (
+            <BreadcrumbItem key={path}>
+              <Text>{path}</Text>
+            </BreadcrumbItem>
+          )
+        })}
+      </Breadcrumb>
+      
       {isLoadingLatestPrices
         ? (
           <Progress 
@@ -189,17 +200,6 @@ export const PortfolioPanelManager = () => {
           />
         ) : (
           <>
-            {/* Breadcrumb */}
-            <Breadcrumb spacing='8px'>
-              {breadcrumbTrail.map((path: string) => {
-                return (
-                  <BreadcrumbItem key={path}>
-                    <Text>{path}</Text>
-                  </BreadcrumbItem>
-                )
-              })}
-            </Breadcrumb>
-
             {/* Portfolio Overview */}
             {nav === PortfolioPanelNav.All 
               && (

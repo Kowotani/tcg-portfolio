@@ -6,8 +6,7 @@ import {
   VStack 
 } from '@chakra-ui/react'
 import { IProduct, ProductLanguage } from 'common'
-import { NonVisibileProductSubtypes 
-} from '../utils'
+import { NonVisibileProductSubtypes } from '../utils/Product'
 
 type TProductSearchResult = {
   product: IProduct,

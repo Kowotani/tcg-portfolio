@@ -20,7 +20,8 @@ import {
   
   TPutPortfolioReqBody,
 
-  assert, isASCII, isIPopulatedHolding, isIPortfolio, isTResBody, TPostPortfolioReqBody
+  assert, isASCII, isIPopulatedHolding, isIPortfolio, isTResBody, 
+  TPostPortfolioReqBody
 } from 'common'
 import { FilterInput } from './FilterInput'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
@@ -32,13 +33,14 @@ import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { CascadingSlideFade } from './Transitions'
+import { filterFnHoldingCard, sortFnPopulatedHoldingAsc } from '../utils/Holding'
+import { PortfolioPanelNav } from '../utils/PortfolioPanel'
 import { 
-  ILatestPricesContext, PortfolioPanelNav,
-
-  getIPriceDataMapFromIDatedPriceDataMap, filterFnHoldingCard, 
-  filterFnProductSearchResult, sortFnPopulatedHoldingAsc, 
-  sortFnProductSearchResults
-} from '../utils' 
+  ILatestPricesContext, getIPriceDataMapFromIDatedPriceDataMap 
+} from '../utils/Price'
+import { 
+  filterFnProductSearchResult, sortFnProductSearchResults 
+} from '../utils/Product'
 
 
 type TEditPortfolioProps = {

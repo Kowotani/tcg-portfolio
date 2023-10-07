@@ -1,5 +1,5 @@
-import { PropsWithChildren } from 'react';
-import { BoxProps, Image } from '@chakra-ui/react';
+import { PropsWithChildren } from 'react'
+import { BoxProps, Image } from '@chakra-ui/react'
 import { IProduct } from 'common'
 
 

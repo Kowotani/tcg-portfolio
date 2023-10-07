@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren } from 'react'
 import { 
   Box,
   HStack,
@@ -8,7 +8,8 @@ import {
   VStack
 } from '@chakra-ui/react'
 import * as _ from 'lodash'
-import { getBrowserLocale, getFormattedPrice } from '../utils'
+import { getBrowserLocale } from '../utils/generic'
+import { getFormattedPrice } from '../utils/Price'
 
 
 // --------------

@@ -1,13 +1,13 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren } from 'react'
 import { 
   Card,
   CardBody,
   HStack,
   StackDivider,
-} from '@chakra-ui/react';
+} from '@chakra-ui/react'
 import { IProduct } from 'common'
-import { ProductDescription } from './ProductDescription';
-import { ProductImage } from './ProductImage';
+import { ProductDescription } from './ProductDescription'
+import { ProductImage } from './ProductImage'
 
 
 

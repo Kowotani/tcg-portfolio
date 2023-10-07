@@ -1,5 +1,5 @@
 import { createContext, PropsWithChildren, useState } from 'react'
-import { ISideBarNavContext, SideBarNav } from '../utils'
+import { ISideBarNavContext, SideBarNav } from '../utils/SideBar'
 
 // create context
 export const SideBarNavContext = createContext<ISideBarNavContext | null>(null)

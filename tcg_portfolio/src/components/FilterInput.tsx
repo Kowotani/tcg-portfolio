@@ -8,10 +8,11 @@ import {
   InputGroup, 
   InputLeftElement,
   InputRightElement,   
-} from '@chakra-ui/react';
-import { FaFilter, FaRegTimesCircle } from 'react-icons/fa';
+} from '@chakra-ui/react'
+import { FaFilter, FaRegTimesCircle } from 'react-icons/fa'
 
 // https://github.com/GastonKhouri/chakra-ui-search/blob/main/src/components/Search.tsx
+
 
 type TFilterInput = BoxProps & {
   value: string;

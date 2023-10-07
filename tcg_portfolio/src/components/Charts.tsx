@@ -23,9 +23,11 @@ import {
 import { 
   ChartDateRange, TChartDataPoint, 
 
-  dateAxisTickFormatter, getBrowserLocale, getChartDataFromDatedValues, 
-  getChartDataKeys, getDateAxisTicks, getFormattedPrice, priceAxisTickFormatter
-} from '../utils'
+  dateAxisTickFormatter, getChartDataFromDatedValues, 
+  getChartDataKeys, getDateAxisTicks, priceAxisTickFormatter
+} from '../utils/Chart'
+import { getBrowserLocale } from '../utils/generic'
+import { getFormattedPrice } from '../utils/Price'
 
 
 // =========

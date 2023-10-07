@@ -29,10 +29,10 @@ import { SideBarNavContext } from '../state/SideBarNavContext'
 import { UserContext } from '../state/UserContext'
 import { CascadingSlideFade } from './Transitions'
 import { 
-  ILatestPricesContext, ISideBarNavContext, IUserContext, SideBarNav, 
-  
-  getIPriceDataMapFromIDatedPriceDataMap 
-} from '../utils' 
+  ILatestPricesContext, getIPriceDataMapFromIDatedPriceDataMap 
+} from '../utils/Price'
+import { ISideBarNavContext, SideBarNav } from '../utils/SideBar' 
+import { IUserContext } from '../utils/User'
 
 
 type TAllPortfoliosProps = {

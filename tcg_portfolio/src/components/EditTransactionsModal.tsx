@@ -45,9 +45,9 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { MetricSummary, TMetricSummaryItem 
   } from './MetricSummary'
 import { TransactionTable } from './TransactionTable'
-import { 
-  getBrowserLocale, getFormattedPrice, getProductNameWithLanguage 
-} from '../utils'
+import { getBrowserLocale } from '../utils/generic'
+import { getFormattedPrice } from '../utils/Price'
+import { getProductNameWithLanguage } from '../utils/Product'
 
 
 // ==============

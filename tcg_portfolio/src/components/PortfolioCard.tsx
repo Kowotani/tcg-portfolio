@@ -33,10 +33,8 @@ import * as _ from 'lodash'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { 
-  ILatestPricesContext, 
-
-  getIPriceDataMapFromIDatedPriceDataMap
-} from '../utils'
+  ILatestPricesContext, getIPriceDataMapFromIDatedPriceDataMap
+} from '../utils/Price'
 
 
 type TPortfolioCardProps = {

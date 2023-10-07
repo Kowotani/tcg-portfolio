@@ -1,8 +1,9 @@
-import { PropsWithChildren } from 'react';
-import { Box, BoxProps, Text } from '@chakra-ui/react';
+import { PropsWithChildren } from 'react'
+import { Box, BoxProps, Text } from '@chakra-ui/react'
 import { IProduct } from 'common'
-import { getProductNameWithLanguage, NonVisibileProductSubtypes 
-} from '../utils';
+import { 
+  getProductNameWithLanguage, NonVisibileProductSubtypes 
+} from '../utils/Product'
 
 
 // ==============
