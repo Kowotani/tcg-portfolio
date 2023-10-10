@@ -66,20 +66,22 @@ async function getBrowser(): Promise<Browser>{
 
 /*
 DESC
-  Returns a new Page from a Puppeteer Browser
+  Returns a new Page from the input Puppeteer Browser, or a new Browser
+INPUT
+  browser?: An existing Puppeteer Browser
 RETURN
   A Puppeteer Page
 */
-async function getPage(): Promise<Page> {
+async function getPage(browser?: Browser): Promise<Page> {
 
   try {
 
     // get browser
-    const browser = await getBrowser()
+    const browserObj = browser ?? await getBrowser()
 
     // success
-    if (browser) {
-      return await browser.newPage()
+    if (browserObj) {
+      return await browserObj.newPage()
 
     // error
     } else {
@@ -234,11 +236,14 @@ export async function scrapeHistorical(
 
   try {
 
-    // get empty page
-    const emptyPage = await getPage()
+    // get browser
+    const browser = await getBrowser()
 
     // iterate through ids
     for (const tcgplayerId of tcgplayerIds) {
+
+      // get empty page
+      const emptyPage = await getPage(browser)
 
       // navigate to the url
       const url = URL_BASE + tcgplayerId + '/'
@@ -323,6 +328,9 @@ export async function scrapeHistorical(
       })
 
       scrapeData.set(tcgplayerId, priceData)  
+
+      // close page
+      await page.close()
     }
 
   } catch(err) {

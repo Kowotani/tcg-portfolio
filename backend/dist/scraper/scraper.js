@@ -75,18 +75,20 @@ function getBrowser() {
 }
 /*
 DESC
-  Returns a new Page from a Puppeteer Browser
+  Returns a new Page from the input Puppeteer Browser, or a new Browser
+INPUT
+  browser?: An existing Puppeteer Browser
 RETURN
   A Puppeteer Page
 */
-function getPage() {
+function getPage(browser) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // get browser
-            const browser = yield getBrowser();
+            const browserObj = browser !== null && browser !== void 0 ? browser : yield getBrowser();
             // success
-            if (browser) {
-                return yield browser.newPage();
+            if (browserObj) {
+                return yield browserObj.newPage();
                 // error
             }
             else {
@@ -216,10 +218,12 @@ function scrapeHistorical(tcgplayerIds) {
         // store return data
         let scrapeData = new Map();
         try {
-            // get empty page
-            const emptyPage = yield getPage();
+            // get browser
+            const browser = yield getBrowser();
             // iterate through ids
             for (const tcgplayerId of tcgplayerIds) {
+                // get empty page
+                const emptyPage = yield getPage(browser);
                 // navigate to the url
                 const url = URL_BASE + tcgplayerId + '/';
                 const page = yield navigatePage(emptyPage, url);
@@ -291,6 +295,8 @@ function scrapeHistorical(tcgplayerIds) {
                     }
                 });
                 scrapeData.set(tcgplayerId, priceData);
+                // close page
+                yield page.close();
             }
         }
         catch (err) {
