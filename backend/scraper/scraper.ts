@@ -6,7 +6,10 @@ import {
 } from 'common'
 import * as _ from 'lodash'
 import puppeteer, { Browser, ElementHandle, Page } from 'puppeteer'
-import { isTCGPlayerDateRange } from '../utils'
+import { 
+  TcgPlayerChartDateRange, TcgPlayerChartDataRangeToDateRangeButton, 
+  TcgPlayerChartDataRangeToDateRangeChart, isTCGPlayerDateRange 
+} from '../utils'
 
 
 // =========
@@ -14,7 +17,7 @@ import { isTCGPlayerDateRange } from '../utils'
 // =========
 
 const URL_BASE = 'https://www.tcgplayer.com/product/'
-const PRICE_CHART_RENDER_DELAY = 1500
+const PRICE_CHART_RENDER_DELAY = 3000
 
 
 // =====
@@ -228,7 +231,8 @@ RETURN
   A Map of tcgplayerId -> IDatedPriceData[]
 */
 export async function scrapeHistorical(
-  tcgplayerIds: number[]
+  tcgplayerIds: number[],
+  dateRange: TcgPlayerChartDateRange
 ): Promise<Map<number, IDatedPriceData[]>> {
 
   // store return data
@@ -236,14 +240,16 @@ export async function scrapeHistorical(
 
   try {
 
-    // get browser
-    const browser = await getBrowser()
+    // get empty page
+    const emptyPage = await getPage()
+
+    let counter = 1
 
     // iterate through ids
     for (const tcgplayerId of tcgplayerIds) {
 
-      // get empty page
-      const emptyPage = await getPage(browser)
+      console.log(counter)
+      counter += 1
 
       // navigate to the url
       const url = URL_BASE + tcgplayerId + '/'
@@ -253,20 +259,25 @@ export async function scrapeHistorical(
       const priceChartPath = "//div[@class='martech-charts-bottom-controls']//div[@class='charts-time-frame']"
       await page.waitForXPath(priceChartPath)
      
-      // click the 1Y button
-      const buttonPath = "//button[@class='charts-item' and contains(., '1Y')]"
-      const [button] = await page.$x(buttonPath)
-      if (button) {
-        await (button as ElementHandle<Element>).click()
-      } else {
-        const msg = `Could not find button path: ${buttonPath}`
-        throw new Error(msg)
-      }
+      // change the chart date range, if necessary
+      if (dateRange != TcgPlayerChartDateRange.ThreeMonths) {
+        const buttonLabel = TcgPlayerChartDataRangeToDateRangeButton[dateRange]
+        const chartLabel = TcgPlayerChartDataRangeToDateRangeChart[dateRange]
 
-      // wait for past year to render
-      await sleep(PRICE_CHART_RENDER_DELAY)
-      const pastYearPath = "//div[@class='charts-timeframe' and contains(., 'Past Year')]"
-      await page.waitForXPath(pastYearPath)
+        const buttonPath = `//button[@class='charts-item' and contains(., '${buttonLabel}')]`
+        const [button] = await page.$x(buttonPath)
+        if (button) {
+          await (button as ElementHandle<Element>).click()
+        } else {
+          const msg = `Could not find button path: ${buttonPath}`
+          throw new Error(msg)
+        }
+
+        // wait for chart to update
+        await sleep(PRICE_CHART_RENDER_DELAY)
+        const pastYearPath = `//div[@class='charts-timeframe' and contains(., '${chartLabel}')]`
+        await page.waitForXPath(pastYearPath)
+      }
 
       // set path for Price History table
       const chartPath = '.chart-container table tbody tr'
@@ -327,10 +338,11 @@ export async function scrapeHistorical(
         }
       })
 
-      scrapeData.set(tcgplayerId, priceData)  
-
-      // close page
-      await page.close()
+      if (priceData.length > 0) {
+        scrapeData.set(tcgplayerId, priceData)  
+      } else {
+        console.log(`Could not scrape prices for tcgplayerId: ${tcgplayerId}`)
+      }
     }
 
   } catch(err) {

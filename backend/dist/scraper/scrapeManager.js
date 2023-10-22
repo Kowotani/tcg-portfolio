@@ -13,6 +13,7 @@ exports.loadHistoricalPrices = exports.loadCurrentPrices = exports.loadCurrentPr
 const common_1 = require("common");
 const mongoManager_1 = require("../mongo/mongoManager");
 const scraper_1 = require("./scraper");
+const utils_1 = require("../utils");
 // =========
 // functions
 // =========
@@ -125,7 +126,7 @@ function loadHistoricalPrices() {
         const tcgplayerIds = productDocs.map((productDoc) => {
             return productDoc.tcgplayerId;
         });
-        const scrapedPrices = yield (0, scraper_1.scrapeHistorical)(tcgplayerIds);
+        const scrapedPrices = yield (0, scraper_1.scrapeHistorical)(tcgplayerIds, utils_1.TcgPlayerChartDateRange.ThreeMonths);
         let priceDocs = [];
         // iterate through each Product
         productDocs.forEach(productDoc => {

@@ -41,7 +41,7 @@ const utils_1 = require("../utils");
 // constants
 // =========
 const URL_BASE = 'https://www.tcgplayer.com/product/';
-const PRICE_CHART_RENDER_DELAY = 1500;
+const PRICE_CHART_RENDER_DELAY = 3000;
 // =========
 // functions
 // =========
@@ -213,37 +213,42 @@ INPUT
 RETURN
   A Map of tcgplayerId -> IDatedPriceData[]
 */
-function scrapeHistorical(tcgplayerIds) {
+function scrapeHistorical(tcgplayerIds, dateRange) {
     return __awaiter(this, void 0, void 0, function* () {
         // store return data
         let scrapeData = new Map();
         try {
-            // get browser
-            const browser = yield getBrowser();
+            // get empty page
+            const emptyPage = yield getPage();
+            let counter = 1;
             // iterate through ids
             for (const tcgplayerId of tcgplayerIds) {
-                // get empty page
-                const emptyPage = yield getPage(browser);
+                console.log(counter);
+                counter += 1;
                 // navigate to the url
                 const url = URL_BASE + tcgplayerId + '/';
                 const page = yield navigatePage(emptyPage, url);
                 // wait for price chart to render
                 const priceChartPath = "//div[@class='martech-charts-bottom-controls']//div[@class='charts-time-frame']";
                 yield page.waitForXPath(priceChartPath);
-                // click the 1Y button
-                const buttonPath = "//button[@class='charts-item' and contains(., '1Y')]";
-                const [button] = yield page.$x(buttonPath);
-                if (button) {
-                    yield button.click();
+                // change the chart date range, if necessary
+                if (dateRange != utils_1.TcgPlayerChartDateRange.ThreeMonths) {
+                    const buttonLabel = utils_1.TcgPlayerChartDataRangeToDateRangeButton[dateRange];
+                    const chartLabel = utils_1.TcgPlayerChartDataRangeToDateRangeChart[dateRange];
+                    const buttonPath = `//button[@class='charts-item' and contains(., '${buttonLabel}')]`;
+                    const [button] = yield page.$x(buttonPath);
+                    if (button) {
+                        yield button.click();
+                    }
+                    else {
+                        const msg = `Could not find button path: ${buttonPath}`;
+                        throw new Error(msg);
+                    }
+                    // wait for chart to update
+                    yield (0, common_1.sleep)(PRICE_CHART_RENDER_DELAY);
+                    const pastYearPath = `//div[@class='charts-timeframe' and contains(., '${chartLabel}')]`;
+                    yield page.waitForXPath(pastYearPath);
                 }
-                else {
-                    const msg = `Could not find button path: ${buttonPath}`;
-                    throw new Error(msg);
-                }
-                // wait for past year to render
-                yield (0, common_1.sleep)(PRICE_CHART_RENDER_DELAY);
-                const pastYearPath = "//div[@class='charts-timeframe' and contains(., 'Past Year')]";
-                yield page.waitForXPath(pastYearPath);
                 // set path for Price History table
                 const chartPath = '.chart-container table tbody tr';
                 // scrape text from divs
@@ -294,9 +299,12 @@ function scrapeHistorical(tcgplayerIds) {
                         }
                     }
                 });
-                scrapeData.set(tcgplayerId, priceData);
-                // close page
-                yield page.close();
+                if (priceData.length > 0) {
+                    scrapeData.set(tcgplayerId, priceData);
+                }
+                else {
+                    console.log(`Could not scrape prices for tcgplayerId: ${tcgplayerId}`);
+                }
             }
         }
         catch (err) {

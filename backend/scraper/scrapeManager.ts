@@ -6,6 +6,7 @@ import {
 import { IMProduct } from '../mongo/models/productSchema'
 import { getProductDocs, insertPrices } from '../mongo/mongoManager'
 import { scrapeCurrent, scrapeHistorical } from './scraper'
+import { TcgPlayerChartDateRange } from '../utils'
 
 
 // =========
@@ -124,10 +125,14 @@ export async function loadCurrentPrices(): Promise<number> {
 /*
 DESC
   Loads historical price data for all known products
+INPUT
+  dateRange: A TcgPlayerChartDateRange specifying the date range
 RETURN
   The number of Price documents inserted
 */
-export async function loadHistoricalPrices(): Promise<number> {
+export async function loadHistoricalPrices(
+  dateRange: TcgPlayerChartDateRange
+): Promise<number> {
 
   // get all Products
   const allProductDocs = await getProductDocs()
@@ -141,7 +146,8 @@ export async function loadHistoricalPrices(): Promise<number> {
   const tcgplayerIds = productDocs.map((productDoc: IMProduct) => {
     return productDoc.tcgplayerId
   })
-  const scrapedPrices = await scrapeHistorical(tcgplayerIds)
+  const scrapedPrices 
+    = await scrapeHistorical(tcgplayerIds, dateRange)
 
   let priceDocs: IPrice[] = []
 
