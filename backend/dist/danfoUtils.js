@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -23,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPortfolioMarketValueSeries = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingPurchaseCostSeries = exports.getHoldingCostOfGoodsSoldSeries = exports.getHoldingMarketValueSeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
+exports.getPortfolioMarketValueSeries = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingCostOfGoodsSoldSeries = exports.getHoldingMarketValueSeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
 const common_1 = require("common");
 const df = __importStar(require("danfojs-node"));
 const _ = __importStar(require("lodash"));
@@ -168,7 +164,7 @@ function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
     });
     const holdingValueSeries = quantitySeries.mul(prices.loc(pricesIx));
     // -- get revenue series
-    const dailyRevenueSeries = getHoldingRevenueSeries(holding);
+    const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDate, endDate);
     const cumRevenueSeries = dailyRevenueSeries.cumSum();
     const revenueSeries = densifyAndFillSeries(cumRevenueSeries, startDate, endDate, 'locf', undefined, 0);
     // -- get market value series
@@ -200,8 +196,6 @@ function getHoldingCostOfGoodsSoldSeries(holding) {
         let quantity = 0;
         // calculate COGS
         while (quantity < sale.quantity && sortedPurchases.length) {
-            console.log(`quantity: ${quantity}`);
-            console.log(sortedPurchases);
             // get first remaining Purchase
             const purchase = sortedPurchases.shift();
             (0, common_1.assert)(purchase, 'sortedPurchases is empty');
@@ -225,7 +219,7 @@ function getHoldingCostOfGoodsSoldSeries(holding) {
         // set the COGS
         cogs.push({
             date: sale.date,
-            value: price
+            value: price * quantity
         });
     });
     // return COGS as Danfo Series
@@ -259,6 +253,75 @@ function getHoldingPurchaseCostSeries(holding, startDate, endDate) {
     return sortSeriesByIndex(getSeriesFromDatedValues(datedValues));
 }
 exports.getHoldingPurchaseCostSeries = getHoldingPurchaseCostSeries;
+/*
+DESC
+  Returns the time-weighted return for the input IHolding between the input
+  startDate and endDate using the input priceSeries, annualized if input
+INPUT
+  holding: An IHolding
+  priceSeries: A danfo Series of prices\
+  startDate: The start date of the Series
+  endDate: The end date of the Series
+  annualized?: TRUE if the return should be annualized, FALSE otherwise
+RETURN
+  The time-weighted return
+*/
+function getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate, annualized) {
+    // get market value series
+    const marketValueSeries = getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate);
+    // get daily purchase cost series
+    const dailyPurchaseSeries = getHoldingPurchaseCostSeries(holding, startDate, endDate);
+    // get daily revenue series
+    const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDate, endDate);
+    // get cost of goods sold series
+    const costOfGoodsSoldSeries = getHoldingCostOfGoodsSoldSeries(holding);
+    // create index for return calculations
+    const index = _.uniq(_.concat(dailyPurchaseSeries.index, costOfGoodsSoldSeries.index, [endDate.toISOString()])).sort();
+    // create numerator array
+    // since returns are defined as t / (t-1), ignore the first element
+    const numerators = _.slice(index, 1).map((date) => {
+        const marketValue = marketValueSeries.at(date);
+        const purchaseCost = dailyPurchaseSeries.index.includes(date)
+            ? dailyPurchaseSeries.at(date)
+            : 0;
+        const revenue = dailyRevenueSeries.index.includes(date)
+            ? dailyRevenueSeries.at(date)
+            : 0;
+        const cogs = costOfGoodsSoldSeries.index.includes(date)
+            ? costOfGoodsSoldSeries.at(date)
+            : 0;
+        (0, common_1.assert)(_.isNumber(marketValue), 'Numerator market value is not a number');
+        (0, common_1.assert)(_.isNumber(purchaseCost), 'Numerator purchase cost is not a number');
+        (0, common_1.assert)(_.isNumber(revenue), 'Numerator revenue cost is not a number');
+        (0, common_1.assert)(_.isNumber(cogs), 'Numerator cogs cost is not a number');
+        return marketValue - purchaseCost + revenue - cogs;
+    });
+    // create denominator array
+    // since returns are defined as t / (t-1), ignore the last element
+    const denominators = _.slice(index, 0, index.length - 1)
+        .map((date, ix) => {
+        const value = ix === 0
+            ? dailyPurchaseSeries.at(date)
+            : marketValueSeries.at(date);
+        (0, common_1.assert)(_.isNumber(value), 'Denominator market value is not a number');
+        return value;
+    });
+    // create return series
+    (0, common_1.assert)(numerators.length === denominators.length, 'Numerator and denominator arrays are not the same length');
+    const returns = numerators.map((numerator, ix) => {
+        const denominator = denominators[ix];
+        return numerator / denominator - 1;
+    });
+    // calculate time-weighted return for the period
+    const timeWeightedReturn = returns.reduce((acc, cur) => {
+        return acc = acc * (1 + cur);
+    }, 1) - 1;
+    // annualize if necessary
+    return annualized
+        ? Math.pow((1 + timeWeightedReturn), 365 / (0, common_1.getDaysBetween)(startDate, endDate)) - 1
+        : timeWeightedReturn;
+}
+exports.getHoldingTimeWeightedReturn = getHoldingTimeWeightedReturn;
 /*
 DESC
   Returns a series of total cost for the input IHolding between the input
@@ -321,14 +384,21 @@ function getHoldingTransactionQuantitySeries(holding) {
 exports.getHoldingTransactionQuantitySeries = getHoldingTransactionQuantitySeries;
 /*
 DESC
-  Returns a series of daily revenue for the input IHolding
+  Returns a series of daily revenue for the input IHolding between the input
+  startDate and endDate
 INPUT
   holding: An IHolding
+  startDate: The start date of the Series
+  endDate: The end date of the Series
 RETURN
   A danfo Series
 */
-function getHoldingRevenueSeries(holding) {
-    const sales = (0, common_1.getHoldingSales)(holding);
+function getHoldingRevenueSeries(holding, startDate, endDate) {
+    const allSales = (0, common_1.getHoldingSales)(holding);
+    const sales = allSales.filter((txn) => {
+        return (0, common_1.isDateAfter)(txn.date, startDate, true)
+            && (0, common_1.isDateBefore)(txn.date, endDate, true);
+    });
     const datedValues = sales.map((txn) => {
         return {
             date: txn.date,

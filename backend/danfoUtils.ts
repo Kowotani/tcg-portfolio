@@ -6,7 +6,7 @@ import {
   getHoldingAggregatedPurchases, getHoldingAggregatedSales, getHoldingPurchases, 
   getHoldingSales, getHoldingTcgplayerId, getPortfolioHoldings,
 
-  assert, genDateRange, isDateAfter, isDateBefore
+  assert, genDateRange, getDaysBetween, isDateAfter, isDateBefore
 } from 'common'
 import * as df from 'danfojs-node'
 import * as _ from 'lodash'
@@ -208,7 +208,8 @@ export function getHoldingMarketValueSeries(
   const holdingValueSeries = quantitySeries.mul(prices.loc(pricesIx))
 
   // -- get revenue series
-  const dailyRevenueSeries = getHoldingRevenueSeries(holding)
+  const dailyRevenueSeries 
+    = getHoldingRevenueSeries(holding, startDate, endDate)
   const cumRevenueSeries = dailyRevenueSeries.cumSum() as df.Series
   const revenueSeries = densifyAndFillSeries(
     cumRevenueSeries,
@@ -286,7 +287,7 @@ export function getHoldingCostOfGoodsSoldSeries(
     // set the COGS
     cogs.push({
       date: sale.date,
-      value: price
+      value: price * quantity
     } as TDatedValue)
   })
 
@@ -325,6 +326,105 @@ export function getHoldingPurchaseCostSeries(
   })
 
   return sortSeriesByIndex(getSeriesFromDatedValues(datedValues))
+}
+
+/*
+DESC
+  Returns the time-weighted return for the input IHolding between the input 
+  startDate and endDate using the input priceSeries, annualized if input
+INPUT
+  holding: An IHolding
+  priceSeries: A danfo Series of prices\
+  startDate: The start date of the Series
+  endDate: The end date of the Series
+  annualized?: TRUE if the return should be annualized, FALSE otherwise
+RETURN
+  The time-weighted return
+*/
+export function getHoldingTimeWeightedReturn(
+  holding: IHolding | IPopulatedHolding,
+  priceSeries: df.Series,
+  startDate: Date,
+  endDate: Date,
+  annualized?: boolean
+): number {
+
+  // get market value series
+  const marketValueSeries 
+    = getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate)
+
+  // get daily purchase cost series
+  const dailyPurchaseSeries 
+    = getHoldingPurchaseCostSeries(holding, startDate, endDate)
+
+  // get daily revenue series
+  const dailyRevenueSeries 
+    = getHoldingRevenueSeries(holding, startDate, endDate)
+
+  // get cost of goods sold series
+  const costOfGoodsSoldSeries = getHoldingCostOfGoodsSoldSeries(holding)
+
+  // create index for return calculations
+  const index = _.uniq(
+    _.concat(
+      dailyPurchaseSeries.index as string[], 
+      costOfGoodsSoldSeries.index as string[],
+      [endDate.toISOString()]
+  )).sort()
+
+  // create numerator array
+  // since returns are defined as t / (t-1), ignore the first element
+  const numerators = _.slice(index, 1).map((date: string) => {
+    const marketValue = marketValueSeries.at(date)
+    const purchaseCost = dailyPurchaseSeries.index.includes(date)
+      ? dailyPurchaseSeries.at(date)
+      : 0
+    const revenue = dailyRevenueSeries.index.includes(date)
+      ? dailyRevenueSeries.at(date)
+      : 0
+    const cogs = costOfGoodsSoldSeries.index.includes(date)
+      ? costOfGoodsSoldSeries.at(date)
+      : 0
+    
+    assert(_.isNumber(marketValue), 'Numerator market value is not a number')
+    assert(_.isNumber(purchaseCost), 'Numerator purchase cost is not a number')
+    assert(_.isNumber(revenue), 'Numerator revenue cost is not a number')
+    assert(_.isNumber(cogs), 'Numerator cogs cost is not a number')
+
+    return marketValue - purchaseCost + revenue - cogs
+  })
+
+  // create denominator array
+  // since returns are defined as t / (t-1), ignore the last element
+  const denominators = _.slice(index, 0, index.length - 1)
+    .map((date: string, ix: number) => {
+      const value = ix === 0
+        ? dailyPurchaseSeries.at(date)
+        : marketValueSeries.at(date)
+      assert(_.isNumber(value), 'Denominator market value is not a number')
+      return value
+  })
+
+  // create return series
+  assert(numerators.length === denominators.length, 
+    'Numerator and denominator arrays are not the same length')
+  const returns = numerators.map((numerator: number, ix: number) => {
+    const denominator = denominators[ix]
+    return numerator / denominator - 1
+  })
+
+  // calculate time-weighted return for the period
+  const timeWeightedReturn = returns.reduce((acc, cur) => {
+    return acc = acc * (1 + cur)
+  }, 1) - 1
+
+  // annualize if necessary
+  return annualized
+    ? Math.pow(
+        (1 + timeWeightedReturn), 
+        365 / getDaysBetween(startDate, endDate)
+      ) - 1
+    : timeWeightedReturn
 }
 
 /*
@@ -413,17 +513,26 @@ export function getHoldingTransactionQuantitySeries(
 
 /*
 DESC
-  Returns a series of daily revenue for the input IHolding
+  Returns a series of daily revenue for the input IHolding between the input
+  startDate and endDate
 INPUT
   holding: An IHolding
+  startDate: The start date of the Series
+  endDate: The end date of the Series
 RETURN
   A danfo Series
 */
 export function getHoldingRevenueSeries(
-  holding: IHolding | IPopulatedHolding
+  holding: IHolding | IPopulatedHolding,
+  startDate: Date,
+  endDate: Date
 ): df.Series {
 
-  const sales = getHoldingSales(holding)
+  const allSales = getHoldingSales(holding)
+  const sales = allSales.filter((txn: ITransaction) => {
+    return isDateAfter(txn.date, startDate, true) 
+      && isDateBefore(txn.date, endDate, true)
+  })
 
   const datedValues: TDatedValue[] = sales.map((txn: ITransaction) => {
     return {
