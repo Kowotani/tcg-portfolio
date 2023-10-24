@@ -1,8 +1,9 @@
 "use strict";
 exports.__esModule = true;
-exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingMarketValue = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = exports.getHoldingTcgplayerId = exports.getHoldingFirstTransactionDate = exports.getIHoldingsFromIPopulatedHoldings = void 0;
-var _ = require("lodash");
+exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHoldingTotalPnl = exports.getHoldingTotalCost = exports.getHoldingSaleQuantity = exports.getHoldingSales = exports.getHoldingRealizedPnl = exports.getHoldingQuantity = exports.getHoldingPurchaseQuantity = exports.getHoldingPurchases = exports.getHoldingPercentPnl = exports.getHoldingMarketValue = exports.getHoldingAverageRevenue = exports.getHoldingAverageCost = exports.getHoldingAggregatedSales = exports.getHoldingAggregatedPurchases = exports.getHoldingTcgplayerId = exports.getHoldingFirstTransactionDate = exports.getIHoldingsFromIPopulatedHoldings = void 0;
+var dateUtils_1 = require("./dateUtils");
 var dataModels_1 = require("./dataModels");
+var _ = require("lodash");
 var utils_1 = require("./utils");
 // ==========
 // converters
@@ -66,6 +67,64 @@ exports.getHoldingTcgplayerId = getHoldingTcgplayerId;
 // ==================
 // metric calculators
 // ==================
+/*
+DESC
+  Returns the Purchases of the input Holding aggregated by transaction date
+INPUT
+  holding: An IHolding
+RETURN
+  An ITransaction[] with Puchases aggregated by transaction date
+*/
+function getHoldingAggregatedPurchases(holding) {
+    // get Holding Purchases
+    var purchases = getHoldingPurchases(holding);
+    // create Map of [Date as string] => [ITransaction]
+    var purchaseMap = new Map();
+    // aggregate each Purchase into the Map
+    purchases.forEach(function (txn) {
+        var existingTxn = purchaseMap.get((0, dateUtils_1.formatAsISO)(txn.date));
+        purchaseMap.set((0, dateUtils_1.formatAsISO)(txn.date), existingTxn
+            ? {
+                date: txn.date,
+                price: (existingTxn.price * existingTxn.quantity
+                    + txn.price * txn.quantity) / (existingTxn.quantity + txn.quantity),
+                quantity: existingTxn.quantity + txn.quantity,
+                type: txn.type
+            }
+            : txn);
+    });
+    return Array.from(purchaseMap.values());
+}
+exports.getHoldingAggregatedPurchases = getHoldingAggregatedPurchases;
+/*
+DESC
+  Returns the Sales of the input Holding aggregated by transaction date
+INPUT
+  holding: An IHolding
+RETURN
+  An ITransaction[] with Sales aggregated by transaction date
+*/
+function getHoldingAggregatedSales(holding) {
+    // get Holding Sales
+    var sales = getHoldingSales(holding);
+    // create Map of [Date as string] => [ITransaction]
+    var purchaseMap = new Map();
+    // aggregate each Sale into the Map
+    sales.forEach(function (txn) {
+        var existingTxn = purchaseMap.get((0, dateUtils_1.formatAsISO)(txn.date));
+        purchaseMap.set((0, dateUtils_1.formatAsISO)(txn.date), existingTxn
+            ? {
+                date: txn.date,
+                price: (existingTxn.price * existingTxn.quantity
+                    + txn.price * txn.quantity) / (existingTxn.quantity + txn.quantity),
+                quantity: existingTxn.quantity + txn.quantity,
+                type: txn.type
+            }
+            : txn);
+    });
+    return Array.from(purchaseMap.values());
+}
+exports.getHoldingAggregatedSales = getHoldingAggregatedSales;
 /*
 DESC
   Returns the average purchase cost from the input IHolding. This value

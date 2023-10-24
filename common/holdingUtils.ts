@@ -1,7 +1,8 @@
-import * as _ from 'lodash'
+import { formatAsISO } from './dateUtils'
 import { 
   IHolding, IPopulatedHolding, ITransaction, TransactionType 
 } from './dataModels'
+import * as _ from 'lodash'
 import { assert, isIHolding } from './utils'
 
 
@@ -79,6 +80,82 @@ export function getHoldingTcgplayerId(
 // ==================
 // metric calculators
 // ==================
+
+/*
+DESC
+  Returns the Purchases of the input Holding aggregated by transaction date
+INPUT
+  holding: An IHolding
+RETURN
+  An ITransaction[] with Puchases aggregated by transaction date
+*/
+export function getHoldingAggregatedPurchases(
+  holding: IHolding | IPopulatedHolding
+): ITransaction[] {
+
+  // get Holding Purchases
+  const purchases = getHoldingPurchases(holding)
+
+  // create Map of [Date as string] => [ITransaction]
+  const purchaseMap = new Map<string, ITransaction>()
+
+  // aggregate each Purchase into the Map
+  purchases.forEach((txn: ITransaction) => {
+    const existingTxn = purchaseMap.get(formatAsISO(txn.date))
+    purchaseMap.set(
+      formatAsISO(txn.date),
+      existingTxn 
+        ? {
+          date: txn.date,
+          price: (existingTxn.price * existingTxn.quantity 
+            + txn.price * txn.quantity) / (existingTxn.quantity + txn.quantity),
+          quantity: existingTxn.quantity + txn.quantity,
+          type: txn.type
+        } as ITransaction
+        : txn
+    )
+  })
+
+  return Array.from(purchaseMap.values())
+}
+
+/*
+DESC
+  Returns the Sales of the input Holding aggregated by transaction date
+INPUT
+  holding: An IHolding
+RETURN
+  An ITransaction[] with Sales aggregated by transaction date
+*/
+export function getHoldingAggregatedSales(
+  holding: IHolding | IPopulatedHolding
+): ITransaction[] {
+
+  // get Holding Sales
+  const sales = getHoldingSales(holding)
+
+  // create Map of [Date as string] => [ITransaction]
+  const purchaseMap = new Map<string, ITransaction>()
+
+  // aggregate each Sale into the Map
+  sales.forEach((txn: ITransaction) => {
+    const existingTxn = purchaseMap.get(formatAsISO(txn.date))
+    purchaseMap.set(
+      formatAsISO(txn.date),
+      existingTxn 
+        ? {
+          date: txn.date,
+          price: (existingTxn.price * existingTxn.quantity 
+            + txn.price * txn.quantity) / (existingTxn.quantity + txn.quantity),
+          quantity: existingTxn.quantity + txn.quantity,
+          type: txn.type
+        } as ITransaction
+        : txn
+    )
+  })
+
+  return Array.from(purchaseMap.values())
+}
 
 /*
 DESC
