@@ -3,8 +3,8 @@ import {
   IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, ITransaction, 
   TDatedValue,
 
-  getHoldingPurchases, getHoldingSales, getHoldingTcgplayerId, 
-  getPortfolioHoldings,
+  getHoldingAggregatedPurchases, getHoldingAggregatedSales, getHoldingPurchases, 
+  getHoldingSales, getHoldingTcgplayerId, getPortfolioHoldings,
 
   assert, genDateRange, isDateAfter, isDateBefore
 } from 'common'
@@ -221,6 +221,77 @@ export function getHoldingMarketValueSeries(
 
   // -- get market value series
   return holdingValueSeries.add(revenueSeries) as df.Series
+}
+
+/*
+DESC
+  Returns a series of cost of goods sold for the input IHolding. The index of
+  the returned Series will correspond to each date with a Sale
+INPUT
+  holding: An IHolding
+RETURN
+  A danfo Series
+*/
+export function getHoldingCostOfGoodsSoldSeries(
+  holding: IHolding | IPopulatedHolding
+): df.Series {
+
+  // get Purchase and Sales
+  const purchases = getHoldingAggregatedPurchases(holding)
+  const sales = getHoldingAggregatedSales(holding)
+
+  // sort Purchases and Sales
+  let sortedPurchases = _.sortBy(purchases, [(txn: ITransaction) => txn.date])
+  const sortedSales = _.sortBy(sales, [(txn: ITransaction) => txn.date])
+
+  // store datedValues of COGS
+  let cogs: TDatedValue[] = []
+
+  // create datedValues of cost of goods sold for each Sale transaction date
+  sortedSales.map((sale: ITransaction) => {
+
+    // accumulate price and quantity of COGS
+    let price = 0
+    let quantity = 0
+
+    // calculate COGS
+    while (quantity < sale.quantity && sortedPurchases.length) {
+
+      // get first remaining Purchase
+      const purchase = sortedPurchases.shift()
+      assert(purchase, 
+        'sortedPurchases is empty')
+      assert(isDateBefore(purchase.date, sale.date, true),
+        'Insufficient Purchases to calculate COGS')
+
+      // calculate the portion of the Purchase used (eg. sold)
+      const usedQuantity = Math.min(sale.quantity - quantity, purchase.quantity)
+
+      // update COGS
+      price = (price * quantity + purchase.price * usedQuantity) 
+        / (quantity + usedQuantity)
+      quantity = quantity + usedQuantity
+      
+      // add back unused portion of the Purchase
+      if (usedQuantity < purchase.quantity) {
+        sortedPurchases.unshift({
+          date: purchase.date,
+          price: purchase.price,
+          quantity: purchase.quantity - usedQuantity,
+          type: purchase.type
+        } as ITransaction)
+      }
+    }
+
+    // set the COGS
+    cogs.push({
+      date: sale.date,
+      value: price
+    } as TDatedValue)
+  })
+
+  // return COGS as Danfo Series
+  return sortSeriesByIndex(getSeriesFromDatedValues(cogs))
 }
 
 /*
