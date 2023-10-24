@@ -1,164 +1,64 @@
-
 import { 
-  IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, ITransaction, 
-  TDatedValue,
+  IHolding, IPopulatedHolding, ITransaction, TDatedValue,
 
-  getHoldingAggregatedPurchases, getHoldingAggregatedSales, getHoldingPurchases, 
-  getHoldingSales, getHoldingTcgplayerId, getPortfolioHoldings,
+  getHoldingAggregatedPurchases, getHoldingAggregatedSales, getHoldingQuantity, 
+  getHoldingPurchases, getHoldingSales,
 
-  assert, genDateRange, getDaysBetween, isDateAfter, isDateBefore
+  assert, getDaysBetween, isDateAfter, isDateBefore
 } from 'common'
+import { 
+  densifyAndFillSeries, getSeriesFromDatedValues, sortSeriesByIndex 
+} from './danfo'
 import * as df from 'danfojs-node'
 import * as _ from 'lodash'
+import { IMHolding } from '../mongo/models/holdingSchema'
+import { IMProduct } from '../mongo/models/productSchema'
+import { getProductDocs } from '../mongo/mongoManager'
+import { isProductDoc, genProductNotFoundError } from './Product'
 
 
-// =======
-// generic
-// =======
-
-/*
-DESC
-  Converts the input danfo Seeries into a TDatedValue[]
-INPUT
-  series: A danfo Series
-  startDate: The starting date
-  endDate: The ending date
-  fillMode: The method by which to fill missing values
-    locf: Last observed carry forward
-    value: Use the input fillValue
-  fillValue?: The static value to use with fillMode=value
-  initalValue?: The initial value to use if startDate is earlier than the 
-    first danfo Series date
-RETURN
-  A danfo Series
-*/
-export function densifyAndFillSeries(
-  series: df.Series,
-  startDate: Date,
-  endDate: Date,
-  fillMode: 'locf' | 'value',
-  fillValue?: number,
-  initialValue?: number
-): df.Series {
-
-  // get Series index
-  const index = genDateRange(startDate, endDate).map((date: Date) => {
-    return date.toISOString()
-  })
-
-  // populate values for Series
-  let values: number[] = []
-  index.forEach((date: string, ix: number) => {
-
-    // get value from series, if available
-    const seriesValue = series.at(date)
-
-    // matched
-    if (seriesValue !== undefined) {
-      values.push(Number(seriesValue))
-    
-    // unmatched, initial value
-    } else if (ix === 0 && initialValue) {
-      values.push(initialValue)
-
-    // unmatched, fill value
-    } else if (fillMode === 'value' && fillValue) {
-      values.push(fillValue)
-
-    // unmatched, locf
-    } else if (fillMode === 'locf' && ix > 0) {
-      values.push(values[ix - 1])
-    
-    // default to 0
-    } else {
-      values.push(0)
-    }
-  })
-
-  return new df.Series(values, {index})
-}
+// ==========
+// converters
+// ==========
 
 /*
 DESC
-  Converts the input danfo Seeries into a TDatedValue[]
+  Converts an IHolding[] to an IMHolding[], which entails:
+    - adding the product field with Product ObjectId
 INPUT
-  series: A danfo Series
+  holdings: An IHolding[]
 RETURN
-  A TDatedValue[]
+  An IMHolding[]
 */
-export function getDatedValuesFromSeries(
-  series: df.Series
-): TDatedValue[] {
+export async function getIMHoldingsFromIHoldings(
+  holdings: IHolding[]
+): Promise<IMHolding[]> {
 
-  const datedValues = series.index.map((index: string | number) => {
-    
-    const date = _.isNumber(index)
-      ? new Date(index)
-      : new Date(Date.parse(index))
+  const productDocs = await getProductDocs()
+  const newHoldings = holdings.map((holding: IHolding) => {
 
-    const value = _.isNumber(index)
-      ? Number(series.iat(index))
-      : Number(series.at(index))
+    // find Product
+    const productDoc = productDocs.find((product: IMProduct) => {
+      return product.tcgplayerId === Number(holding.tcgplayerId)
+    })
+    assert(
+      isProductDoc(productDoc),
+      genProductNotFoundError('getIMHoldingsFromIHoldings()').toString()
+    )
 
-    return {
-      date: date,
-      value: value
-    }
-  })
-
-  return datedValues
-}
-
-/*
-DESC
-  Converts the input TDatedValue[] into a danfo Seeries
-INPUT
-  datedValues: A TDatedValue[]
-RETURN
-  A danfo Series
-*/
-export function getSeriesFromDatedValues(
-  datedValues: TDatedValue[]
-): df.Series {
-
-  const index = datedValues.map((dv: TDatedValue) => {
-    return dv.date.toISOString()
-  })
-
-  const values = datedValues.map((dv: TDatedValue) => {
-    return dv.value
-  })
-
-  return new df.Series(values, {index})
-}
-
-/*
-DESC
-  Returns the input Series sorted by the index
-INPUT
-  series: A danfo Series
-RETURN
-  A danfo Series
-*/
-export function sortSeriesByIndex(
-  series: df.Series
-): df.Series {
-
-  const index = _.sortBy(series.index, el => el)
-
-  const values = index.map((ix: string | number) => {
-
-    return typeof ix === 'string'
-      ? series.at(ix)
-      : series.iat(ix)
+    // create IMHolding
+    return ({
+      ...holding,
+      product: productDoc._id
+    } as IMHolding)
   })
   
-  return new df.Series(values, {index})
+  return newHoldings
 }
 
 
 // =======
-// holding
+// getters
 // =======
 
 /*
@@ -545,62 +445,66 @@ export function getHoldingRevenueSeries(
 }
 
 
-// =========
-// portfolio
-// =========
+// ==========
+// validators
+// ==========
 
 /*
 DESC
-  Returns a series of daily market values for the input IPortfolio between the
-  input startDate and endDate using prices in the input priceSeriesMap
+  Validates whether the input Holdings are valid. The validity checks are:
+    - unique tcgplayerId for each Holding
+    - the Product exists for each Holding
+    - the Transaction quantity >= 0 for each Holding
 INPUT
-  portfolio: An IPortfolio
-  priceSeriesMap: A Map of tcgplayerId => danfo Series of Prices
-  startDate: The start date of the Series
-  endDate: The end date of the Series
+  holdings: An IHolding[]
 RETURN
-  A danfo Series
+  TRUE if the input is a valid set of IHolding[], FALSE otherwise
 */
-export function getPortfolioMarketValueSeries(
-  portfolio: IPortfolio | IPopulatedPortfolio,
-  priceSeriesMap: Map<number, df.Series>,
-  startDate: Date,
-  endDate: Date
-): df.Series {
-
-  const holdings = getPortfolioHoldings(portfolio)
-
-  // get market value series of holdings
-  const marketValues = holdings.map((holding: IHolding | IPopulatedHolding) => {
-
-    const tcgplayerId = getHoldingTcgplayerId(holding)
-    const priceSeries = priceSeriesMap.get(tcgplayerId)
-
-    // verify that prices exist for this tcgplayerId
-    assert(
-      priceSeries instanceof df.Series,
-      `Could not find prices for tcgplayerId: ${tcgplayerId}`)
-
-    return getHoldingMarketValueSeries(
-      holding,
-      priceSeries,
-      startDate,
-      endDate
-    )
+export async function areValidHoldings(holdings: IHolding[]): Promise<boolean> {
+  
+  // unique tcgplayerId
+  const tcgplayerIds = holdings.map((holding: IHolding) => {
+    return Number(holding.tcgplayerId)
   })
+  if (tcgplayerIds.length > _.uniq(tcgplayerIds).length) {
+    console.log(`Duplicate tcgplayerIds detected in isValidHoldings()`)
+    return false
+  }
 
-  // create empty Series used for summation
-  const emptySeries = densifyAndFillSeries(
-    new df.Series([0], {index: [startDate.toISOString()]}),
-    startDate,
-    endDate,
-    'value',
-    0,
-    0
-  )
+  // all Products exist
+  const productDocs = await getProductDocs()
+  const productTcgplayerIds = productDocs.map((doc: IMProduct) => {
+    return doc.tcgplayerId
+  })
+  const unknownTcgplayerIds = _.difference(tcgplayerIds, productTcgplayerIds)
+  if (unknownTcgplayerIds.length > 0) {
+    console.log(`Products not found for tcgplayerIds in hasValidHoldings(): ${unknownTcgplayerIds}`)
+    return false
+  }
 
-  // get market value series of portfolio
-  return marketValues.reduce((acc: df.Series, cur: df.Series) => {
-    return acc = acc.add(cur) as df.Series
-  }, emptySeries)
+  // quantity >= 0
+  if (!_.every(holdings, (holding: IHolding) => {
+    return hasValidTransactions(holding)
+  })) {
+    return false
+  }
+
+  // all checks passed
+  return true
+}
+
+/*
+DESC
+  Validates whether the input IHolding has valid Transactions. The validity 
+  checks are:
+    - the net quantity is greater than or equal to 0
+INPUT
+  holding: An IHolding[]
+RETURN
+  TRUE if the input IHolding has valid set of ITransaction[], FALSE otherwise
+*/
+export function hasValidTransactions(holding: IHolding): boolean {
+
+  // net quantity
+  return getHoldingQuantity(holding) >= 0
 }

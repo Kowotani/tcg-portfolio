@@ -18,126 +18,52 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPortfolioMarketValueSeries = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingCostOfGoodsSoldSeries = exports.getHoldingMarketValueSeries = exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
+exports.hasValidTransactions = exports.areValidHoldings = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingCostOfGoodsSoldSeries = exports.getHoldingMarketValueSeries = exports.getIMHoldingsFromIHoldings = void 0;
 const common_1 = require("common");
-const df = __importStar(require("danfojs-node"));
+const danfo_1 = require("./danfo");
 const _ = __importStar(require("lodash"));
+const mongoManager_1 = require("../mongo/mongoManager");
+const Product_1 = require("./Product");
+// ==========
+// converters
+// ==========
+/*
+DESC
+  Converts an IHolding[] to an IMHolding[], which entails:
+    - adding the product field with Product ObjectId
+INPUT
+  holdings: An IHolding[]
+RETURN
+  An IMHolding[]
+*/
+function getIMHoldingsFromIHoldings(holdings) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const productDocs = yield (0, mongoManager_1.getProductDocs)();
+        const newHoldings = holdings.map((holding) => {
+            // find Product
+            const productDoc = productDocs.find((product) => {
+                return product.tcgplayerId === Number(holding.tcgplayerId);
+            });
+            (0, common_1.assert)((0, Product_1.isProductDoc)(productDoc), (0, Product_1.genProductNotFoundError)('getIMHoldingsFromIHoldings()').toString());
+            // create IMHolding
+            return Object.assign(Object.assign({}, holding), { product: productDoc._id });
+        });
+        return newHoldings;
+    });
+}
+exports.getIMHoldingsFromIHoldings = getIMHoldingsFromIHoldings;
 // =======
-// generic
-// =======
-/*
-DESC
-  Converts the input danfo Seeries into a TDatedValue[]
-INPUT
-  series: A danfo Series
-  startDate: The starting date
-  endDate: The ending date
-  fillMode: The method by which to fill missing values
-    locf: Last observed carry forward
-    value: Use the input fillValue
-  fillValue?: The static value to use with fillMode=value
-  initalValue?: The initial value to use if startDate is earlier than the
-    first danfo Series date
-RETURN
-  A danfo Series
-*/
-function densifyAndFillSeries(series, startDate, endDate, fillMode, fillValue, initialValue) {
-    // get Series index
-    const index = (0, common_1.genDateRange)(startDate, endDate).map((date) => {
-        return date.toISOString();
-    });
-    // populate values for Series
-    let values = [];
-    index.forEach((date, ix) => {
-        // get value from series, if available
-        const seriesValue = series.at(date);
-        // matched
-        if (seriesValue !== undefined) {
-            values.push(Number(seriesValue));
-            // unmatched, initial value
-        }
-        else if (ix === 0 && initialValue) {
-            values.push(initialValue);
-            // unmatched, fill value
-        }
-        else if (fillMode === 'value' && fillValue) {
-            values.push(fillValue);
-            // unmatched, locf
-        }
-        else if (fillMode === 'locf' && ix > 0) {
-            values.push(values[ix - 1]);
-            // default to 0
-        }
-        else {
-            values.push(0);
-        }
-    });
-    return new df.Series(values, { index });
-}
-exports.densifyAndFillSeries = densifyAndFillSeries;
-/*
-DESC
-  Converts the input danfo Seeries into a TDatedValue[]
-INPUT
-  series: A danfo Series
-RETURN
-  A TDatedValue[]
-*/
-function getDatedValuesFromSeries(series) {
-    const datedValues = series.index.map((index) => {
-        const date = _.isNumber(index)
-            ? new Date(index)
-            : new Date(Date.parse(index));
-        const value = _.isNumber(index)
-            ? Number(series.iat(index))
-            : Number(series.at(index));
-        return {
-            date: date,
-            value: value
-        };
-    });
-    return datedValues;
-}
-exports.getDatedValuesFromSeries = getDatedValuesFromSeries;
-/*
-DESC
-  Converts the input TDatedValue[] into a danfo Seeries
-INPUT
-  datedValues: A TDatedValue[]
-RETURN
-  A danfo Series
-*/
-function getSeriesFromDatedValues(datedValues) {
-    const index = datedValues.map((dv) => {
-        return dv.date.toISOString();
-    });
-    const values = datedValues.map((dv) => {
-        return dv.value;
-    });
-    return new df.Series(values, { index });
-}
-exports.getSeriesFromDatedValues = getSeriesFromDatedValues;
-/*
-DESC
-  Returns the input Series sorted by the index
-INPUT
-  series: A danfo Series
-RETURN
-  A danfo Series
-*/
-function sortSeriesByIndex(series) {
-    const index = _.sortBy(series.index, el => el);
-    const values = index.map((ix) => {
-        return typeof ix === 'string'
-            ? series.at(ix)
-            : series.iat(ix);
-    });
-    return new df.Series(values, { index });
-}
-exports.sortSeriesByIndex = sortSeriesByIndex;
-// =======
-// holding
+// getters
 // =======
 /*
 DESC
@@ -153,11 +79,11 @@ RETURN
 */
 function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
     // align price series
-    const prices = densifyAndFillSeries(priceSeries, startDate, endDate, 'locf', undefined, 0);
+    const prices = (0, danfo_1.densifyAndFillSeries)(priceSeries, startDate, endDate, 'locf', undefined, 0);
     // -- get holding value series
     const transactionSeries = getHoldingTransactionQuantitySeries(holding);
     const cumTransactionSeries = transactionSeries.cumSum();
-    const quantitySeries = densifyAndFillSeries(cumTransactionSeries, startDate, endDate, 'locf', undefined, 0);
+    const quantitySeries = (0, danfo_1.densifyAndFillSeries)(cumTransactionSeries, startDate, endDate, 'locf', undefined, 0);
     const pricesIx = prices.index.map((ix) => {
         return String(ix) >= startDate.toISOString()
             && String(ix) <= endDate.toISOString();
@@ -166,7 +92,7 @@ function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
     // -- get revenue series
     const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDate, endDate);
     const cumRevenueSeries = dailyRevenueSeries.cumSum();
-    const revenueSeries = densifyAndFillSeries(cumRevenueSeries, startDate, endDate, 'locf', undefined, 0);
+    const revenueSeries = (0, danfo_1.densifyAndFillSeries)(cumRevenueSeries, startDate, endDate, 'locf', undefined, 0);
     // -- get market value series
     return holdingValueSeries.add(revenueSeries);
 }
@@ -223,7 +149,7 @@ function getHoldingCostOfGoodsSoldSeries(holding) {
         });
     });
     // return COGS as Danfo Series
-    return sortSeriesByIndex(getSeriesFromDatedValues(cogs));
+    return (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(cogs));
 }
 exports.getHoldingCostOfGoodsSoldSeries = getHoldingCostOfGoodsSoldSeries;
 /*
@@ -250,7 +176,7 @@ function getHoldingPurchaseCostSeries(holding, startDate, endDate) {
             value: txn.price * txn.quantity
         };
     });
-    return sortSeriesByIndex(getSeriesFromDatedValues(datedValues));
+    return (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(datedValues));
 }
 exports.getHoldingPurchaseCostSeries = getHoldingPurchaseCostSeries;
 /*
@@ -343,8 +269,8 @@ function getHoldingTotalCostSeries(holding, startDate, endDate) {
         };
     });
     // align daily purchase costs to date index
-    const dailyPurchaseSeries = sortSeriesByIndex(getSeriesFromDatedValues(datedValues));
-    const purchaseSeries = densifyAndFillSeries(dailyPurchaseSeries, startDate, endDate, 'value', 0);
+    const dailyPurchaseSeries = (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(datedValues));
+    const purchaseSeries = (0, danfo_1.densifyAndFillSeries)(dailyPurchaseSeries, startDate, endDate, 'value', 0);
     return purchaseSeries.cumSum();
 }
 exports.getHoldingTotalCostSeries = getHoldingTotalCostSeries;
@@ -379,7 +305,7 @@ function getHoldingTransactionQuantitySeries(holding) {
             });
         }
     });
-    return sortSeriesByIndex(getSeriesFromDatedValues(datedValues));
+    return (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(datedValues));
 }
 exports.getHoldingTransactionQuantitySeries = getHoldingTransactionQuantitySeries;
 /*
@@ -405,39 +331,66 @@ function getHoldingRevenueSeries(holding, startDate, endDate) {
             value: txn.price * txn.quantity
         };
     });
-    return sortSeriesByIndex(getSeriesFromDatedValues(datedValues));
+    return (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(datedValues));
 }
 exports.getHoldingRevenueSeries = getHoldingRevenueSeries;
-// =========
-// portfolio
-// =========
+// ==========
+// validators
+// ==========
 /*
 DESC
-  Returns a series of daily market values for the input IPortfolio between the
-  input startDate and endDate using prices in the input priceSeriesMap
+  Validates whether the input Holdings are valid. The validity checks are:
+    - unique tcgplayerId for each Holding
+    - the Product exists for each Holding
+    - the Transaction quantity >= 0 for each Holding
 INPUT
-  portfolio: An IPortfolio
-  priceSeriesMap: A Map of tcgplayerId => danfo Series of Prices
-  startDate: The start date of the Series
-  endDate: The end date of the Series
+  holdings: An IHolding[]
 RETURN
-  A danfo Series
+  TRUE if the input is a valid set of IHolding[], FALSE otherwise
 */
-function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, endDate) {
-    const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
-    // get market value series of holdings
-    const marketValues = holdings.map((holding) => {
-        const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
-        const priceSeries = priceSeriesMap.get(tcgplayerId);
-        // verify that prices exist for this tcgplayerId
-        (0, common_1.assert)(priceSeries instanceof df.Series, `Could not find prices for tcgplayerId: ${tcgplayerId}`);
-        return getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate);
+function areValidHoldings(holdings) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // unique tcgplayerId
+        const tcgplayerIds = holdings.map((holding) => {
+            return Number(holding.tcgplayerId);
+        });
+        if (tcgplayerIds.length > _.uniq(tcgplayerIds).length) {
+            console.log(`Duplicate tcgplayerIds detected in isValidHoldings()`);
+            return false;
+        }
+        // all Products exist
+        const productDocs = yield (0, mongoManager_1.getProductDocs)();
+        const productTcgplayerIds = productDocs.map((doc) => {
+            return doc.tcgplayerId;
+        });
+        const unknownTcgplayerIds = _.difference(tcgplayerIds, productTcgplayerIds);
+        if (unknownTcgplayerIds.length > 0) {
+            console.log(`Products not found for tcgplayerIds in hasValidHoldings(): ${unknownTcgplayerIds}`);
+            return false;
+        }
+        // quantity >= 0
+        if (!_.every(holdings, (holding) => {
+            return hasValidTransactions(holding);
+        })) {
+            return false;
+        }
+        // all checks passed
+        return true;
     });
-    // create empty Series used for summation
-    const emptySeries = densifyAndFillSeries(new df.Series([0], { index: [startDate.toISOString()] }), startDate, endDate, 'value', 0, 0);
-    // get market value series of portfolio
-    return marketValues.reduce((acc, cur) => {
-        return acc = acc.add(cur);
-    }, emptySeries);
 }
-exports.getPortfolioMarketValueSeries = getPortfolioMarketValueSeries;
+exports.areValidHoldings = areValidHoldings;
+/*
+DESC
+  Validates whether the input IHolding has valid Transactions. The validity
+  checks are:
+    - the net quantity is greater than or equal to 0
+INPUT
+  holding: An IHolding[]
+RETURN
+  TRUE if the input IHolding has valid set of ITransaction[], FALSE otherwise
+*/
+function hasValidTransactions(holding) {
+    // net quantity
+    return (0, common_1.getHoldingQuantity)(holding) >= 0;
+}
+exports.hasValidTransactions = hasValidTransactions;

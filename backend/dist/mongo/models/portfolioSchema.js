@@ -1,8 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.portfolioSchema = void 0;
-const mongoose_1 = require("mongoose");
+exports.Portfolio = exports.portfolioSchema = void 0;
 const holdingSchema_1 = require("./holdingSchema");
+const mongoose_1 = __importStar(require("mongoose"));
 // ==========
 // properties
 // ==========
@@ -23,103 +42,7 @@ exports.portfolioSchema = new mongoose_1.Schema({
         type: String,
     }
 });
-// =======
-// methods
-// =======
-// // -- holdings
-// // add holdings
-// portfolioSchema.method('addHoldings', 
-//   function addHoldings(holdingInput: IMHolding | IMHolding[]): void {
-//     Array.isArray(holdingInput)
-//       ? this.holdings = this.holdings.concat(holdingInput)
-//       : this.holdings.push(holdingInput)
-//     this.save()
-// });
-// // delete holding
-// portfolioSchema.method('deleteHolding',
-//   function deleteHolding(tcgplayerId: number): void {
-//     this.holdings = this.holdings.filter((holding: IMHolding) => {
-//       return holding.tcgplayerId !== tcgplayerId
-//     })
-//     this.save()
-// });
-// // delete holdings
-// portfolioSchema.method('deleteHoldings',
-//   function deleteHoldings(): void {
-//     this.holdings = []
-//     this.save()
-// });
-// // -- getters
-// /* 
-//   TODO:
-//   getTotalRevenue
-//   getProfit
-//   account for profit in returns
-// */ 
-// // get user ID
-// portfolioSchema.method('getUserId', 
-//   function getUserId(): number {
-//     return this.userId
-// });
-// // get portfolio name
-// portfolioSchema.method('getPortfolioName', 
-//   function getPortfolioName(): string {
-//     return this.portfolioName
-// });
-// // get description
-// portfolioSchema.method('getDescription', 
-//   function getDescription(): string | undefined {
-//     return this.description
-// });
-// // get holdings
-// portfolioSchema.method('getHoldings', 
-//   function getHoldings(): IMHolding[] {
-//     return this.holdings
-// });
-// // -- checkers
-// // holding exists
-// portfolioSchema.method('hasHolding',
-//   function hasHolding(tcgplayerId: number): boolean {
-//     return this.holdings.filter((holding: IMHolding) => {
-//       return holding.tcgplayerId === tcgplayerId
-//     }).length > 0
-//   }
-// )
-// // -- return inputs
-// // get total cost
-// portfolioSchema.method('getTotalCost', 
-//   function getTotalCost(): number | undefined {
-//     return this.getHoldings().length > 0
-//       ? _.sum(this.getHoldings().map(
-//         (holding: typeof holdingSchema) => {
-//           return holding.methods.getTotalCost()
-//         }))
-//       : undefined
-// });
-// // get market value
-// portfolioSchema.method('getMarketValue', 
-//   function getMarketValue(prices: Map<number, number>): number | undefined {
-//     return this.getHoldings().length > 0
-//       ? _.sum(this.getHoldings().map(
-//         (holding: typeof holdingSchema) => {
-//           const price = prices.get(
-//             holding.methods.getProduct().tcgplayerId) ?? 0
-//           return holding.methods.getMarketValue(price)
-//         }))
-//       : undefined
-// });
-// // -- returns
-// // get dollar return
-// portfolioSchema.method('getDollarReturn', 
-//   function getDollarReturn(prices: Map<number, number>): number | undefined {
-//     return this.getPurchases().length > 0
-//       ? this.getMarketValue(prices) - this.getTotalCost()
-//       : undefined
-// });
-// // get percentage return
-// portfolioSchema.method('getPercentageReturn', 
-//   function getPercentageReturn(prices: Map<number, number>): number | undefined {
-//     return this.getPurchases().length > 0
-//       ? this.getMarketValue(prices) / this.getTotalCost() - 1
-//       : undefined
-// });
+// ==============
+// mongoose model
+// ==============
+exports.Portfolio = mongoose_1.default.model('Portfolio', exports.portfolioSchema);

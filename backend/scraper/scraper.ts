@@ -9,7 +9,7 @@ import puppeteer, { Browser, ElementHandle, Page } from 'puppeteer'
 import { 
   TcgPlayerChartDateRange, TcgPlayerChartDataRangeToDateRangeButton, 
   TcgPlayerChartDataRangeToDateRangeChart, isTCGPlayerDateRange 
-} from '../utils'
+} from '../utils/Chart'
 
 
 // =========

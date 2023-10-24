@@ -97,6 +97,15 @@ export interface IUser {
   email: string,
 }
 
+// -- Historical Price
+
+export interface IHistoricalPrice {
+  tcgplayerId: number,
+  date: Date,
+  marketPrice: number,
+  isInterpolated: boolean
+}
+
 // -- Price
 
 export interface IDatedPriceData {

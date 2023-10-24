@@ -1,5 +1,5 @@
-import { Schema } from 'mongoose';
-import { ITransaction, TransactionType } from 'common';
+import { ITransaction, TransactionType } from 'common'
+import { Schema } from 'mongoose'
 
 
 // ==========
@@ -34,4 +34,4 @@ export const transactionSchema = new Schema<IMTransaction>({
     min: 1,
     required: true
   },
-});
+})

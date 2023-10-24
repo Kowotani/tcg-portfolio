@@ -34,9 +34,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getPriceMapOfSeries = exports.getPriceMapOfDatedValues = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioMarketValueAsDatedValues = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
 // imports
 const common_1 = require("common");
-const dfu = __importStar(require("../danfoUtils"));
+const Holding_1 = require("../utils/Holding");
 const mongoose_1 = __importDefault(require("mongoose"));
-const utils_1 = require("../utils");
+const historicalPriceSchema_1 = require("./models/historicalPriceSchema");
+const portfolioSchema_1 = require("./models/portfolioSchema");
+const priceSchema_1 = require("./models/priceSchema");
+const productSchema_1 = require("./models/productSchema");
+const dfu = __importStar(require("../utils/danfo"));
+const Portfolio_1 = require("../utils/Portfolio");
+const Price_1 = require("../utils/Price");
+const Product_1 = require("../utils/Product");
+const Portfolio_2 = require("../utils/Portfolio");
 // =======
 // globals
 // =======
@@ -66,11 +74,11 @@ function addPortfolio(portfolio) {
         try {
             // check if portfolioName exists for this userId
             const portfolioDoc = yield getPortfolioDoc(portfolio);
-            if ((0, utils_1.isPortfolioDoc)(portfolioDoc)) {
-                throw (0, utils_1.genPortfolioAlreadyExistsError)(userId, portfolioName, 'addPortfolio()');
+            if ((0, Portfolio_1.isPortfolioDoc)(portfolioDoc)) {
+                throw (0, Portfolio_1.genPortfolioAlreadyExistsError)(userId, portfolioName, 'addPortfolio()');
             }
             // get IMHolding[]
-            const holdings = yield (0, utils_1.getIMHoldingsFromIHoldings)(portfolio.holdings);
+            const holdings = yield (0, Holding_1.getIMHoldingsFromIHoldings)(portfolio.holdings);
             // create IPortfolio
             let newPortfolio = {
                 userId: userId,
@@ -81,7 +89,7 @@ function addPortfolio(portfolio) {
                 newPortfolio['description'] = portfolio.description;
             }
             // create the portfolio  
-            yield utils_1.Portfolio.create(newPortfolio);
+            yield portfolioSchema_1.Portfolio.create(newPortfolio);
             return true;
         }
         catch (err) {
@@ -109,11 +117,11 @@ function deletePortfolio(portfolio) {
         try {
             // check if portfolioName exists for this userId
             const portfolioDoc = yield getPortfolioDoc(portfolio);
-            if (!(0, utils_1.isPortfolioDoc)(portfolioDoc)) {
-                throw (0, utils_1.genPortfolioNotFoundError)(userId, portfolioName, 'deletePortfolio()');
+            if (!(0, Portfolio_1.isPortfolioDoc)(portfolioDoc)) {
+                throw (0, Portfolio_1.genPortfolioNotFoundError)(userId, portfolioName, 'deletePortfolio()');
             }
             // delete the portfolio  
-            const res = yield utils_1.Portfolio.deleteOne({
+            const res = yield portfolioSchema_1.Portfolio.deleteOne({
                 'userId': userId,
                 'portfolioName': portfolioName,
             });
@@ -140,7 +148,7 @@ function getPortfolioDoc(portfolio) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const portfolioDoc = yield utils_1.Portfolio.findOne({
+            const portfolioDoc = yield portfolioSchema_1.Portfolio.findOne({
                 'userId': portfolio.userId,
                 'portfolioName': portfolio.portfolioName,
             });
@@ -166,7 +174,7 @@ function getPortfolioDocs(userId) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const docs = yield utils_1.Portfolio.find({ 'userId': userId });
+            const docs = yield portfolioSchema_1.Portfolio.find({ 'userId': userId });
             return docs;
         }
         catch (err) {
@@ -196,7 +204,7 @@ function getPortfolioMarketValueAsDatedValues(portfolio, startDate, endDate) {
         });
         const priceMap = yield getPriceMapOfSeries(tcgplayerIds, startDate, endDate);
         // get market value
-        const marketValueSeries = dfu.getPortfolioMarketValueSeries(portfolio, priceMap, startDate, endDate);
+        const marketValueSeries = (0, Portfolio_2.getPortfolioMarketValueSeries)(portfolio, priceMap, startDate, endDate);
         return dfu.getDatedValuesFromSeries(marketValueSeries);
     });
 }
@@ -214,7 +222,7 @@ function getPortfolios(userId) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const docs = yield utils_1.Portfolio
+            const docs = yield portfolioSchema_1.Portfolio
                 .find({ 'userId': userId })
                 .populate({
                 path: 'holdings',
@@ -261,20 +269,20 @@ function setPortfolio(existingPortfolio, newPortfolio) {
             // check that userIds match
             (0, common_1.assert)(existingPortfolio.userId === newPortfolio.userId, `Mismatched userIds provided to setPortfolio(${existingPortfolio.userId}, ${newPortfolio.userId})`);
             // check that new Portfolio Holdings are valid
-            const hasValidHoldings = yield (0, utils_1.areValidHoldings)(newPortfolio.holdings);
+            const hasValidHoldings = yield (0, Holding_1.areValidHoldings)(newPortfolio.holdings);
             if (!hasValidHoldings) {
                 const errMsg = 'New portfolio has invalid holdings';
                 throw new Error(errMsg);
             }
             // check if Portfolio exists
             const portfolioDoc = yield getPortfolioDoc(existingPortfolio);
-            if (!(0, utils_1.isPortfolioDoc)(portfolioDoc)) {
+            if (!(0, Portfolio_1.isPortfolioDoc)(portfolioDoc)) {
                 const errMsg = `Portfolio not found (${existingPortfolio.userId}, ${existingPortfolio.portfolioName})`;
                 throw new Error(errMsg);
             }
-            (0, common_1.assert)((0, utils_1.isPortfolioDoc)(portfolioDoc), (0, utils_1.genPortfolioNotFoundError)(existingPortfolio.userId, existingPortfolio.portfolioName, 'setPortfolio()').toString());
+            (0, common_1.assert)((0, Portfolio_1.isPortfolioDoc)(portfolioDoc), (0, Portfolio_1.genPortfolioNotFoundError)(existingPortfolio.userId, existingPortfolio.portfolioName, 'setPortfolio()').toString());
             // create IMPortfolio for new Portfolio
-            const newIMPortfolio = Object.assign(Object.assign({}, newPortfolio), { holdings: yield (0, utils_1.getIMHoldingsFromIHoldings)(newPortfolio.holdings) });
+            const newIMPortfolio = Object.assign(Object.assign({}, newPortfolio), { holdings: yield (0, Holding_1.getIMHoldingsFromIHoldings)(newPortfolio.holdings) });
             // overwrite existing Portfolio with new Portfolio
             portfolioDoc.overwrite(newIMPortfolio);
             yield portfolioDoc.save();
@@ -309,7 +317,7 @@ function getLatestPrices() {
                 marketPrice: number
               }
             */
-            const priceData = yield utils_1.HistoricalPrice.aggregate()
+            const priceData = yield historicalPriceSchema_1.HistoricalPrice.aggregate()
                 .group({
                 _id: {
                     tcgplayerId: '$tcgplayerId',
@@ -397,7 +405,7 @@ function getPriceMapOfDatedValues(tcgplayerIds, startDate, endDate) {
                 filter['date'] = { $lte: endDate };
             }
             // query data
-            const priceDocs = yield utils_1.HistoricalPrice.find(filter)
+            const priceDocs = yield historicalPriceSchema_1.HistoricalPrice.find(filter)
                 .sort({ 'tcgplayerId': 1, 'date': 1 });
             // created dated value map
             const datedValueMap = new Map();
@@ -467,8 +475,8 @@ function insertPrices(docs) {
         yield mongoose_1.default.connect(url);
         try {
             // create IMPrice[]
-            const priceDocs = yield (0, utils_1.getIMPricesFromIPrices)(docs);
-            const res = yield utils_1.Price.insertMany(priceDocs);
+            const priceDocs = yield (0, Price_1.getIMPricesFromIPrices)(docs);
+            const res = yield priceSchema_1.Price.insertMany(priceDocs);
             return res.length;
         }
         catch (err) {
@@ -494,14 +502,14 @@ function resetPrices(tcgplayerIds) {
             let prices = [];
             for (const tcgplayerId of tcgplayerIds) {
                 // delete Price documents
-                yield utils_1.Price.deleteMany({ tcgplayerId: tcgplayerId });
+                yield priceSchema_1.Price.deleteMany({ tcgplayerId: tcgplayerId });
                 returnValues.deleted += 1;
                 // get Product
                 const productDoc = productDocs.find((product) => {
                     return product.tcgplayerId === tcgplayerId;
                 });
                 // insert MSRP Price document, if MSRP exists
-                if ((0, utils_1.isProductDoc)(productDoc) && productDoc.msrp) {
+                if ((0, Product_1.isProductDoc)(productDoc) && productDoc.msrp) {
                     const price = {
                         priceDate: productDoc.releaseDate,
                         tcgplayerId: tcgplayerId,
@@ -514,8 +522,8 @@ function resetPrices(tcgplayerIds) {
                 }
             }
             // insert Prices
-            const priceDocs = yield (0, utils_1.getIMPricesFromIPrices)(prices);
-            const res = yield utils_1.Price.insertMany(priceDocs);
+            const priceDocs = yield (0, Price_1.getIMPricesFromIPrices)(prices);
+            const res = yield priceSchema_1.Price.insertMany(priceDocs);
             returnValues.inserted = res.length;
             return returnValues;
         }
@@ -537,8 +545,8 @@ function getProductDoc({ tcgplayerId, hexStringId } = {}) {
         yield mongoose_1.default.connect(url);
         try {
             const productDoc = tcgplayerId
-                ? yield utils_1.Product.findOne({ 'tcgplayerId': tcgplayerId })
-                : yield utils_1.Product.findById(hexStringId);
+                ? yield productSchema_1.Product.findOne({ 'tcgplayerId': tcgplayerId })
+                : yield productSchema_1.Product.findById(hexStringId);
             return productDoc;
         }
         catch (err) {
@@ -559,7 +567,7 @@ function getProductDocs() {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const docs = yield utils_1.Product.find({});
+            const docs = yield productSchema_1.Product.find({});
             return docs;
         }
         catch (err) {
@@ -582,7 +590,7 @@ function insertProducts(docs) {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const res = yield utils_1.Product.insertMany(docs);
+            const res = yield productSchema_1.Product.insertMany(docs);
             return res.length;
         }
         catch (err) {
@@ -610,10 +618,10 @@ function setProductProperty(tcgplayerId, key, value) {
         try {
             // check if Product exists
             const productDoc = yield getProductDoc({ tcgplayerId: tcgplayerId });
-            if (!(0, utils_1.isProductDoc)(productDoc)) {
-                throw (0, utils_1.genProductNotFoundError)('setProductProperty()', tcgplayerId);
+            if (!(0, Product_1.isProductDoc)(productDoc)) {
+                throw (0, Product_1.genProductNotFoundError)('setProductProperty()', tcgplayerId);
             }
-            (0, common_1.assert)((0, utils_1.isProductDoc)(productDoc), (0, utils_1.genProductNotFoundError)('setProductProperty()', tcgplayerId).toString());
+            (0, common_1.assert)((0, Product_1.isProductDoc)(productDoc), (0, Product_1.genProductNotFoundError)('setProductProperty()', tcgplayerId).toString());
             // update Product
             productDoc.set(key, value);
             yield productDoc.save();
@@ -641,7 +649,7 @@ function updateHistoricalPrices() {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const res = yield utils_1.Price.aggregate([
+            const res = yield priceSchema_1.Price.aggregate([
                 // join to Product
                 {
                     $lookup: {
@@ -782,8 +790,9 @@ function main() {
         // }
         // const p233232 = await getProductDoc({'tcgplayerId': 233232})
         // const p449558 = await getProductDoc({'tcgplayerId': 449558})
-        // const userId = 456
-        // const portfolioName = 'Gamma Investments'
+        // const userId = 1234
+        // const portfolioName = 'Delta'
+        // const tcgplayerId = 493975
         // const description = 'Washer dryer mechanic'
         // let holdings: IHolding[] = [
         //   {
@@ -804,12 +813,20 @@ function main() {
         //     ],
         //   },
         // ]
-        // // // -- Set Portfolio
+        // // -- Set Portfolio
         // const portfolio: IPortfolio = {
         //   userId: userId, 
         //   portfolioName: portfolioName,
         //   holdings: [],
         // }
+        // const portoflioDoc = await getPortfolioDoc(portfolio) as IPortfolio
+        // const holding = getPortfolioHolding(portoflioDoc, tcgplayerId) as IHolding
+        // const startDate = new Date(Date.parse('2023-06-09'))
+        // const endDate = new Date(Date.parse('2023-10-01'))
+        // const priceMap = await getPriceMapOfSeries([tcgplayerId])
+        // const priceSeries = priceMap.get(tcgplayerId) as df.Series
+        // const twr = dfu.getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate)
+        // console.log(twr)
         // const newPortfolio: IPortfolio = {
         //   userId: userId, 
         //   portfolioName: portfolioName,
@@ -899,7 +916,7 @@ function main() {
         //   ]
         // } 
         // const holdingB: IHolding = {
-        //   tcgplayerId: 233232,
+        //   tcgplayerId: 121527,
         //   transactions: [
         //     {
         //       type: TransactionType.Purchase,
@@ -926,30 +943,20 @@ function main() {
         //   portfolioName: 'foo',
         //   holdings: [holdingA, holdingB]
         // }
-        // const portfolio = {
-        //   userId: 1234,
-        //   portfolioName: 'Delta',
-        //   holdings: []
-        // }
-        // const portfolioDoc = await getPortfolioDoc(portfolio)
-        // const holding = getPortfolioHolding(portfolioDoc as IPortfolio, 233232)
-        // assert(holding)
         // const startDate = new Date('2023-09-01')
-        // const endDate = new Date('2023-09-10')
-        // const values = await getPortfolioMarketValueAsDatedValues(
-        //   portfolioDoc as IPortfolio, 
+        // const endDate = new Date('2023-09-12')
+        // const series = await getPortfolioMarketValueAsDatedValues(
+        //   portfolio, 
         //   startDate,
         //   endDate
         // )
-        // const series = dfu.getSeriesFromDatedValues(values)
-        // const series = dfu.getHoldingTotalCostSeries(holding, startDate, endDate)
-        // console.log(series)
+        // console.log(dfu.getSeriesFromDatedValues(series))
         // const series = getHoldingMarketValueSeries(
         //   holding,
         //   prices,
         //   startDate,
         //   endDate
-        // )
+        //   )
         // console.log('-- market value series')  
         // console.log(series.print())
         // holdings = [
@@ -999,15 +1006,7 @@ function main() {
         //   console.log('historicalPrices not updated')
         // }
         // // -- Reset Prices
-        // const tcgplayerIds = [
-        //   287815,
-        //   449558,
-        //   449559,
-        //   451874,
-        //   451877,
-        //   475584,
-        //   488297
-        // ]
+        // const tcgplayerIds = [496041]
         // res = await resetPrices(tcgplayerIds)
         // if (res) {
         //   console.log(`${res.deleted} tcgplayerIds were reset, ${res.inserted} were initialized`)

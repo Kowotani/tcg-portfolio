@@ -1,7 +1,8 @@
-// imports
-import { Schema } from 'mongoose'
-import { IProduct, ProductLanguage, ProductSubtype, ProductType, 
-  TCG } from 'common'
+import { 
+  IProduct, ProductLanguage, ProductSubtype, ProductType, TCG 
+} from 'common'
+import mongoose, { Schema } from 'mongoose'
+
 
 // ==========
 // interfaces
@@ -54,4 +55,11 @@ export const productSchema = new Schema<IMProduct>({
     enum: ProductSubtype
   },
   setCode: String,
-});
+})
+
+
+// ==============
+// mongoose model
+// ==============
+
+export const Product = mongoose.model('Product', productSchema)

@@ -1,5 +1,5 @@
-import { Schema } from 'mongoose'
-import { IHistoricalPrice } from '../../utils'
+import { IHistoricalPrice } from 'common'
+import mongoose, { Schema } from 'mongoose'
 
 
 // ==========
@@ -33,3 +33,11 @@ export const historicalPriceSchema = new Schema<IMHistoricalPrice>({
     require: true
   },
 })
+
+
+// ==============
+// mongoose model
+// ==============
+
+export const HistoricalPrice 
+  = mongoose.model('HistoricalPrice', historicalPriceSchema)

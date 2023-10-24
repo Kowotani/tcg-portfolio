@@ -60,6 +60,12 @@ export interface IUser {
     passwordSalt: string;
     email: string;
 }
+export interface IHistoricalPrice {
+    tcgplayerId: number;
+    date: Date;
+    marketPrice: number;
+    isInterpolated: boolean;
+}
 export interface IDatedPriceData {
     priceDate: Date;
     prices: IPriceData;

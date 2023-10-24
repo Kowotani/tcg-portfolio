@@ -1,6 +1,6 @@
-// imports
 import { IPrice, IPriceData, TimeseriesGranularity } from 'common'
 import mongoose, { Schema } from 'mongoose'
+
 
 // ==========
 // interfaces
@@ -54,4 +54,11 @@ export const priceSchema = new Schema<IMPrice>(
       metaField: 'tcgplayerId',
       granularity: TimeseriesGranularity.Hours
     }
-  });
+  })
+
+
+// ==============
+// mongoose model
+// ==============
+
+export const Price = mongoose.model('Price', priceSchema)

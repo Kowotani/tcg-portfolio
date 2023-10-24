@@ -18,7 +18,8 @@ const express_1 = __importDefault(require("express"));
 const mongoManager_1 = require("./mongo/mongoManager");
 const multer_1 = __importDefault(require("multer"));
 const scrapeManager_1 = require("./scraper/scrapeManager");
-const utils_1 = require("./utils");
+const Portfolio_1 = require("./utils/Portfolio");
+const Product_1 = require("./utils/Product");
 const upload = (0, multer_1.default)();
 const app = (0, express_1.default)();
 const port = 3030;
@@ -49,7 +50,7 @@ app.delete(common_1.PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0
     try {
         // check if Portfolio exists
         const portfolioDoc = yield (0, mongoManager_1.getPortfolioDoc)(portfolio);
-        if (!(0, utils_1.isPortfolioDoc)(portfolioDoc)) {
+        if (!(0, Portfolio_1.isPortfolioDoc)(portfolioDoc)) {
             res.status(204);
             const body = {
                 message: common_1.DeletePortfolioStatus.DoesNotExist
@@ -201,7 +202,7 @@ app.get(common_1.PORTFOLIO_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void
             portfolioName: req.query.portfolioName,
             holdings: []
         });
-        (0, common_1.assert)((0, utils_1.isPortfolioDoc)(portfolioDoc), 'Could not find Portfolio');
+        (0, common_1.assert)((0, Portfolio_1.isPortfolioDoc)(portfolioDoc), 'Could not find Portfolio');
         const startDate = new Date(Date.parse(req.query.startDate));
         const endDate = new Date(Date.parse(req.query.endDate));
         const metrics = req.query.metrics;
@@ -325,7 +326,7 @@ app.post(common_1.LATEST_PRICES_URL, upload.none(), (req, res) => __awaiter(void
         const tcgplayerId = body.tcgplayerId;
         // check if Product exists
         const productDoc = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: tcgplayerId });
-        if (!(0, utils_1.isProductDoc)(productDoc)) {
+        if (!(0, Product_1.isProductDoc)(productDoc)) {
             const errMsg = `Product not found for tcgplayerId: ${tcgplayerId}`;
             throw new Error(errMsg);
         }
@@ -389,7 +390,7 @@ app.post(common_1.PRICE_URL, upload.none(), (req, res) => __awaiter(void 0, void
         };
         // check if Product exists
         const productDoc = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: price.tcgplayerId });
-        if (!(0, utils_1.isProductDoc)(productDoc)) {
+        if (!(0, Product_1.isProductDoc)(productDoc)) {
             const errMsg = `Product not found for tcgplayerId: ${price.tcgplayerId}`;
             throw new Error(errMsg);
         }
@@ -445,7 +446,7 @@ app.post(common_1.PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0, vo
     const tcgplayerId = data.tcgplayerId;
     // check if product already exists (via tcgplayerId)
     const productDoc = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: tcgplayerId });
-    if ((0, utils_1.isProductDoc)(productDoc)) {
+    if ((0, Product_1.isProductDoc)(productDoc)) {
         res.status(202);
         const body = {
             tcgplayerId: data.tcgplayerId,

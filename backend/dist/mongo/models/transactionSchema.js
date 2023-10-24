@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.transactionSchema = void 0;
-const mongoose_1 = require("mongoose");
 const common_1 = require("common");
+const mongoose_1 = require("mongoose");
 // ==========
 // properties
 // ==========

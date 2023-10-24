@@ -6,7 +6,7 @@ import {
 import { IMProduct } from '../mongo/models/productSchema'
 import { getProductDocs, insertPrices } from '../mongo/mongoManager'
 import { scrapeCurrent, scrapeHistorical } from './scraper'
-import { TcgPlayerChartDateRange } from '../utils'
+import { TcgPlayerChartDateRange } from '../utils/Chart'
 
 
 // =========

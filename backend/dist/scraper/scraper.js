@@ -36,7 +36,7 @@ exports.scrapeHistorical = exports.scrapeCurrent = void 0;
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
 const puppeteer_1 = __importDefault(require("puppeteer"));
-const utils_1 = require("../utils");
+const Chart_1 = require("../utils/Chart");
 // =========
 // constants
 // =========
@@ -232,9 +232,9 @@ function scrapeHistorical(tcgplayerIds, dateRange) {
                 const priceChartPath = "//div[@class='martech-charts-bottom-controls']//div[@class='charts-time-frame']";
                 yield page.waitForXPath(priceChartPath);
                 // change the chart date range, if necessary
-                if (dateRange != utils_1.TcgPlayerChartDateRange.ThreeMonths) {
-                    const buttonLabel = utils_1.TcgPlayerChartDataRangeToDateRangeButton[dateRange];
-                    const chartLabel = utils_1.TcgPlayerChartDataRangeToDateRangeChart[dateRange];
+                if (dateRange != Chart_1.TcgPlayerChartDateRange.ThreeMonths) {
+                    const buttonLabel = Chart_1.TcgPlayerChartDataRangeToDateRangeButton[dateRange];
+                    const chartLabel = Chart_1.TcgPlayerChartDataRangeToDateRangeChart[dateRange];
                     const buttonPath = `//button[@class='charts-item' and contains(., '${buttonLabel}')]`;
                     const [button] = yield page.$x(buttonPath);
                     if (button) {
@@ -275,7 +275,7 @@ function scrapeHistorical(tcgplayerIds, dateRange) {
                 const [curMonth, curDay] = [today.getMonth() + 1, today.getDate()];
                 scrapedTexts.forEach((st) => {
                     var _a;
-                    if ((0, utils_1.isTCGPlayerDateRange)(st.text) && (0, common_1.isPriceString)(st.price)
+                    if ((0, Chart_1.isTCGPlayerDateRange)(st.text) && (0, common_1.isPriceString)(st.price)
                         && (0, common_1.getPriceFromString)(st.price) > 0) {
                         // get the end date
                         const monthDay = st.text.split(' ')[2].trim();

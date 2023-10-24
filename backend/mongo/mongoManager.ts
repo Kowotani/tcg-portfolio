@@ -5,27 +5,25 @@ import {
   
   TimeseriesGranularity,
 
-  getHoldingTcgplayerId, getPortfolioHoldings,
+  getHoldingTcgplayerId, getPortfolioHoldings, 
 
   assert, isIPopulatedHolding
 } from 'common'
 import * as df from 'danfojs-node'
-import * as dfu from '../danfoUtils'
+import { areValidHoldings, getIMHoldingsFromIHoldings } from '../utils/Holding'
 import * as _ from 'lodash'
 import mongoose, { HydratedDocument} from 'mongoose'
-import { IMHistoricalPrice } from './models/historicalPriceSchema'
-import { IMPortfolio } from './models/portfolioSchema'
-import { IMProduct } from './models/productSchema'
+import { HistoricalPrice, IMHistoricalPrice } from './models/historicalPriceSchema'
+import { IMPortfolio, Portfolio } from './models/portfolioSchema'
+import { Price } from './models/priceSchema'
+import { IMProduct, Product } from './models/productSchema'
+import * as dfu from '../utils/danfo'
 import { 
-  HistoricalPrice, Portfolio, Product, Price,
-
-  getIMHoldingsFromIHoldings, getIMPricesFromIPrices,
-  
-  genPortfolioAlreadyExistsError, genPortfolioNotFoundError, 
-  genProductNotFoundError,
-
-  areValidHoldings, isPortfolioDoc, isProductDoc
-} from '../utils'
+  genPortfolioAlreadyExistsError, genPortfolioNotFoundError, isPortfolioDoc
+} from '../utils/Portfolio'
+import { getIMPricesFromIPrices } from '../utils/Price'
+import { genProductNotFoundError, isProductDoc } from '../utils/Product'
+import { getPortfolioMarketValueSeries } from '../utils/Portfolio'
 
 
 // =======
@@ -218,7 +216,7 @@ export async function getPortfolioMarketValueAsDatedValues(
   const priceMap = await getPriceMapOfSeries(tcgplayerIds, startDate, endDate)
 
   // get market value
-  const marketValueSeries = dfu.getPortfolioMarketValueSeries(
+  const marketValueSeries = getPortfolioMarketValueSeries(
     portfolio, priceMap, startDate, endDate)
 
   return dfu.getDatedValuesFromSeries(marketValueSeries)
@@ -945,8 +943,9 @@ async function main(): Promise<number> {
   // const p233232 = await getProductDoc({'tcgplayerId': 233232})
   // const p449558 = await getProductDoc({'tcgplayerId': 449558})
 
-  // const userId = 456
-  // const portfolioName = 'Gamma Investments'
+  // const userId = 1234
+  // const portfolioName = 'Delta'
+  // const tcgplayerId = 493975
   // const description = 'Washer dryer mechanic'
   // let holdings: IHolding[] = [
   //   {
@@ -968,12 +967,23 @@ async function main(): Promise<number> {
   //   },
   // ]
 
-  // // // -- Set Portfolio
+
+
+  // // -- Set Portfolio
   // const portfolio: IPortfolio = {
   //   userId: userId, 
   //   portfolioName: portfolioName,
   //   holdings: [],
   // }
+  // const portoflioDoc = await getPortfolioDoc(portfolio) as IPortfolio
+  // const holding = getPortfolioHolding(portoflioDoc, tcgplayerId) as IHolding
+  // const startDate = new Date(Date.parse('2023-06-09'))
+  // const endDate = new Date(Date.parse('2023-10-01'))
+  // const priceMap = await getPriceMapOfSeries([tcgplayerId])
+  // const priceSeries = priceMap.get(tcgplayerId) as df.Series
+  // const twr = dfu.getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate)
+  // console.log(twr)
+
   // const newPortfolio: IPortfolio = {
   //   userId: userId, 
   //   portfolioName: portfolioName,

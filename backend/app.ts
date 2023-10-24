@@ -26,7 +26,8 @@ import {
 } from './mongo/mongoManager'
 import multer from 'multer'
 import { loadCurrentPrice } from './scraper/scrapeManager'
-import { isPortfolioDoc, isProductDoc } from './utils'
+import { isPortfolioDoc } from './utils/Portfolio'
+import { isProductDoc } from './utils/Product'
 
 const upload = multer()
 const app = express()
