@@ -169,6 +169,7 @@ type TPriceChartProps = {
   data: Map<string, TDatedValue[]>,
   dataKeys: {[key: string]: string},
   dateRange: ChartDateRange,
+  enableRadio: boolean,
   height: number,
   minWidth: number
 }
@@ -319,7 +320,8 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
           </AreaChart>
         </ResponsiveContainer>
       </Box>
-      <Box minWidth={props.minWidth} marginTop={2}>
+      {props.enableRadio && (
+        <Box minWidth={props.minWidth} marginTop={2}>
         <HStack display='flex' justifyContent='space-evenly' {...group}>
           {dateRangeOptions.map((value: any) => {
             const radio = getRadioProps({ value })
@@ -330,7 +332,8 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
             )
           })}
         </HStack>
-      </Box>
+        </Box>
+      )}
     </>
   )
 }
