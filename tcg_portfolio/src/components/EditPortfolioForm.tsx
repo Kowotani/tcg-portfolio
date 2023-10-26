@@ -26,7 +26,7 @@ import {
 import { FilterInput } from './FilterInput'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
-import { HoldingCard } from './HoldingCard'
+import { HoldingInputCard } from './HoldingInputCard'
 import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { ProductSearchResult } from './ProductSearchResult';
@@ -691,7 +691,7 @@ export const EditPortfolioForm = (
               duration={0.5}
             >
               <Box m='16px 0px'>
-                <HoldingCard
+                <HoldingInputCard
                   marketPrice={marketPrice}    
                   populatedHolding={holding}
                   onHoldingDelete={onHoldingDelete}

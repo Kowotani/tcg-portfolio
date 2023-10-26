@@ -34,7 +34,9 @@ type THoldingCardProps = {
   onHoldingDelete: (holding: IPopulatedHolding) => void,
   onHoldingUpdate: (holding: IPopulatedHolding) => void,
 }
-export const HoldingCard = (props: PropsWithChildren<THoldingCardProps>) => {
+export const HoldingInputCard = (
+  props: PropsWithChildren<THoldingCardProps>
+) => {
 
   // modal
   const { isOpen, onOpen, onClose } = useDisclosure()
