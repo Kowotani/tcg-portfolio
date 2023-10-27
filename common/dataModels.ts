@@ -382,8 +382,15 @@ export type THoldingValueSeries = {
   values: TDatedValue[]
 }
 
-// used for storing Portfolio performance timeseries data,
+// used for storing performance timeseries data
 // as an object mapping PerformanceMetric => TDatedValue[]
-export type TPortfolioPerformanceData = {
+export type TPerformanceData = {
   [key in PerformanceMetric]?: TDatedValue[]
+}
+
+// used for storing performance timeseries data for a Holding
+// as an object storing a mapping of PerformanceMetric => TDatedValue[]
+export type THoldingPerformanceData = {
+  tcgplayerId: number,
+  performanceData: TPerformanceData
 }

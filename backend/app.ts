@@ -1,7 +1,7 @@
 import { loadImageToS3 } from './aws/s3Manager'
 import { 
   IDatedPriceData, IPopulatedPortfolio, IPortfolio, 
-  IPrice, IPriceData, IProduct, TPortfolioPerformanceData,
+  IPrice, IPriceData, IProduct, TPerformanceData,
   
   PerformanceMetric, TimeseriesGranularity,
 
@@ -247,7 +247,7 @@ app.get(PORTFOLIO_PERFORMANCE_URL, async (req: any, res: any) => {
     const metrics = String(req.query.metrics).split(',') as PerformanceMetric[]
 
     // create performance data object
-    let performanceData: TPortfolioPerformanceData = {}
+    let performanceData: TPerformanceData = {}
 
     for (const metric of metrics) {
 

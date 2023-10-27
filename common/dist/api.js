@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.PRICE_URL = exports.LATEST_PRICES_URL = exports.LATEST_PRICE_URL = exports.PRODUCTS_URL = exports.PRODUCT_URL = exports.PORTFOLIOS_URL = exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PostLatestPriceStatus = exports.GetPortfoliosStatus = exports.GetPortfolioPerformanceStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
+exports.PRICE_URL = exports.LATEST_PRICES_URL = exports.LATEST_PRICE_URL = exports.PRODUCTS_URL = exports.PRODUCT_URL = exports.PORTFOLIOS_URL = exports.PORTFOLIO_HOLDINGS_PERFORMANCE_URL = exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PostLatestPriceStatus = exports.GetPortfoliosStatus = exports.GetPortfolioPerformanceStatus = exports.GetPortfolioHoldingsPerformanceStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
 // =====
 // enums
 // =====
@@ -33,6 +33,15 @@ var PutPortfolioStatus;
     PutPortfolioStatus["Success"] = "Successfully updated Portfolio";
     PutPortfolioStatus["Error"] = "Error updating Portfolio";
 })(PutPortfolioStatus = exports.PutPortfolioStatus || (exports.PutPortfolioStatus = {}));
+/*
+  Endpoint:   PORTFOLIO_HOLDINGS_PERFORMANCE_URL
+  Type:       GET
+*/
+var GetPortfolioHoldingsPerformanceStatus;
+(function (GetPortfolioHoldingsPerformanceStatus) {
+    GetPortfolioHoldingsPerformanceStatus["Success"] = "Successfully retrieved Portfolio Holdings performance";
+    GetPortfolioHoldingsPerformanceStatus["Error"] = "Error retrieving Portfolio Holdings performance";
+})(GetPortfolioHoldingsPerformanceStatus = exports.GetPortfolioHoldingsPerformanceStatus || (exports.GetPortfolioHoldingsPerformanceStatus = {}));
 /*
   Endpoint:   PORTFOLIO_PERFORMANCE_URL
   Type:       GET
@@ -106,6 +115,7 @@ var GetProductsStatus;
 // -- portfolio
 exports.PORTFOLIO_URL = '/portfolio';
 exports.PORTFOLIO_PERFORMANCE_URL = "".concat(exports.PORTFOLIO_URL, "/performance");
+exports.PORTFOLIO_HOLDINGS_PERFORMANCE_URL = "".concat(exports.PORTFOLIO_URL, "/holdings/performance");
 exports.PORTFOLIOS_URL = '/portfolios';
 // -- product
 exports.PRODUCT_URL = '/product';

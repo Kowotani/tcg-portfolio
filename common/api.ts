@@ -1,6 +1,6 @@
 import { 
-  IPortfolio, IProduct, TPortfolioPerformanceData 
-} from "./dataModels"
+  IPortfolio, IProduct, THoldingPerformanceData, TPerformanceData 
+} from './dataModels'
 
 
 // =====
@@ -35,6 +35,15 @@ export enum PostPortfolioStatus {
 export enum PutPortfolioStatus {
   Success = 'Successfully updated Portfolio',
   Error = 'Error updating Portfolio',
+}
+
+/*
+  Endpoint:   PORTFOLIO_HOLDINGS_PERFORMANCE_URL
+  Type:       GET
+*/
+export enum GetPortfolioHoldingsPerformanceStatus {
+  Success = 'Successfully retrieved Portfolio Holdings performance',
+  Error = 'Error retrieving Portfolio Holdings performance',
 }
 
 /*
@@ -114,6 +123,8 @@ export enum GetProductsStatus {
 // -- portfolio
 export const PORTFOLIO_URL = '/portfolio'
 export const PORTFOLIO_PERFORMANCE_URL = `${PORTFOLIO_URL}/performance`
+export const PORTFOLIO_HOLDINGS_PERFORMANCE_URL 
+  = `${PORTFOLIO_URL}/holdings/performance`
 export const PORTFOLIOS_URL = '/portfolios'
 
 // -- product
@@ -148,13 +159,22 @@ export type TDataResBody<Type> = TResBody & {
 }
 
 // -- portfolio
+
 /*
   Endpoint:   PORTFOLIO_PERFORMANCE_URL
   Type:       GET
   Req / Res:  Response
 */
 export type TGetPortfolioPerformanceResBody 
-  = TDataResBody<TPortfolioPerformanceData>
+  = TDataResBody<TPerformanceData>
+
+/*
+  Endpoint:   PORTFOLIO_HOLDINGS_PERFORMANCE_URL
+  Type:       GET
+  Req / Res:  Response
+*/
+export type TGetPortfolioHoldingsPerformanceResBody 
+  = TDataResBody<THoldingPerformanceData[]>
 
 // -- product
 

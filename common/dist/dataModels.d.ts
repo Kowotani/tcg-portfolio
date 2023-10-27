@@ -180,6 +180,10 @@ export declare type THoldingValueSeries = {
     tcgplayerId: number;
     values: TDatedValue[];
 };
-export declare type TPortfolioPerformanceData = {
+export declare type TPerformanceData = {
     [key in PerformanceMetric]?: TDatedValue[];
+};
+export declare type THoldingPerformanceData = {
+    tcgplayerId: number;
+    performanceData: TPerformanceData;
 };
