@@ -110,7 +110,9 @@ export function getHoldingMarketValueSeries(
   // -- get revenue series
   const dailyRevenueSeries 
     = getHoldingRevenueSeries(holding, startDate, endDate)
-  const cumRevenueSeries = dailyRevenueSeries.cumSum() as df.Series
+  const cumRevenueSeries = dailyRevenueSeries.count() 
+    ? dailyRevenueSeries.cumSum() as df.Series
+    : dailyRevenueSeries
   const revenueSeries = densifyAndFillSeries(
     cumRevenueSeries,
     startDate,

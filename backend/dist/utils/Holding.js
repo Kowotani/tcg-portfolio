@@ -91,7 +91,9 @@ function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
     const holdingValueSeries = quantitySeries.mul(prices.loc(pricesIx));
     // -- get revenue series
     const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDate, endDate);
-    const cumRevenueSeries = dailyRevenueSeries.cumSum();
+    const cumRevenueSeries = dailyRevenueSeries.count()
+        ? dailyRevenueSeries.cumSum()
+        : dailyRevenueSeries;
     const revenueSeries = (0, danfo_1.densifyAndFillSeries)(cumRevenueSeries, startDate, endDate, 'locf', undefined, 0);
     // -- get market value series
     return holdingValueSeries.add(revenueSeries);
