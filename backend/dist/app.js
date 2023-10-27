@@ -205,7 +205,7 @@ app.get(common_1.PORTFOLIO_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void
         (0, common_1.assert)((0, Portfolio_1.isPortfolioDoc)(portfolioDoc), 'Could not find Portfolio');
         const startDate = new Date(Date.parse(req.query.startDate));
         const endDate = new Date(Date.parse(req.query.endDate));
-        const metrics = req.query.metrics;
+        const metrics = String(req.query.metrics).split(',');
         // create performance data object
         let performanceData = {};
         for (const metric of metrics) {
@@ -213,6 +213,9 @@ app.get(common_1.PORTFOLIO_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void
             switch (metric) {
                 case common_1.PerformanceMetric.MarketValue:
                     fn = mongoManager_1.getPortfolioMarketValueAsDatedValues;
+                    break;
+                case common_1.PerformanceMetric.TotalCost:
+                    fn = mongoManager_1.getPortfolioTotalCostAsDatedValues;
                     break;
                 default:
                     const err = `Unknown metric: ${metric}`;

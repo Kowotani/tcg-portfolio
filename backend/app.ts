@@ -20,9 +20,16 @@ import {
 } from 'common'
 import express from 'express'
 import { 
-  addPortfolio, deletePortfolio, getLatestPrices, 
-  getPortfolioMarketValueAsDatedValues, getPortfolioDoc, getPortfolios, 
-  getProductDoc, getProductDocs, insertPrices, insertProducts, setPortfolio
+  // Portfolio
+  addPortfolio, deletePortfolio, getPortfolioDoc, getPortfolios, 
+  getPortfolioMarketValueAsDatedValues, getPortfolioTotalCostAsDatedValues, 
+  setPortfolio,
+  
+  // Price
+  getLatestPrices, insertPrices, 
+  
+  // Product
+  getProductDoc, getProductDocs, insertProducts
 } from './mongo/mongoManager'
 import multer from 'multer'
 import { loadCurrentPrice } from './scraper/scrapeManager'
@@ -237,7 +244,7 @@ app.get(PORTFOLIO_PERFORMANCE_URL, async (req: any, res: any) => {
     assert(isPortfolioDoc(portfolioDoc), 'Could not find Portfolio')
     const startDate = new Date(Date.parse(req.query.startDate))
     const endDate = new Date(Date.parse(req.query.endDate))
-    const metrics = req.query.metrics as PerformanceMetric[]
+    const metrics = String(req.query.metrics).split(',') as PerformanceMetric[]
 
     // create performance data object
     let performanceData: TPortfolioPerformanceData = {}
@@ -250,11 +257,13 @@ app.get(PORTFOLIO_PERFORMANCE_URL, async (req: any, res: any) => {
         case PerformanceMetric.MarketValue:
           fn = getPortfolioMarketValueAsDatedValues
           break
+          case PerformanceMetric.TotalCost:
+            fn = getPortfolioTotalCostAsDatedValues
+            break
         default:
           const err = `Unknown metric: ${metric}`
           throw new Error(err)
       }
-
       const values = await fn(portfolioDoc, startDate, endDate)
       performanceData[metric] = values
     }    
