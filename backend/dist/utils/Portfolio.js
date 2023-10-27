@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isPortfolioDoc = exports.getPortfolioMarketValueSeries = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = void 0;
+exports.isPortfolioDoc = exports.getPortfolioTotalCostSeries = exports.getPortfolioMarketValueSeries = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = void 0;
 const common_1 = require("common");
 const danfo_1 = require("./danfo");
 const df = __importStar(require("danfojs-node"));
@@ -79,7 +79,7 @@ RETURN
 */
 function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, endDate) {
     const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
-    // get market value series of holdings
+    // get market value series of Holdings
     const marketValues = holdings.map((holding) => {
         const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
         const priceSeries = priceSeriesMap.get(tcgplayerId);
@@ -89,12 +89,38 @@ function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, end
     });
     // create empty Series used for summation
     const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDate.toISOString()] }), startDate, endDate, 'value', 0, 0);
-    // get market value series of portfolio
+    // get market value series of Portfolio
     return marketValues.reduce((acc, cur) => {
         return acc = acc.add(cur);
     }, emptySeries);
 }
 exports.getPortfolioMarketValueSeries = getPortfolioMarketValueSeries;
+/*
+DESC
+  Returns a series of total costs for the input IPortfolio between the
+  input startDate and endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate: The start date of the Series
+  endDate: The end date of the Series
+RETURN
+  A danfo Series
+*/
+function getPortfolioTotalCostSeries(portfolio, startDate, endDate) {
+    const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
+    // get total cost series of Holdings
+    const totalCosts = holdings.map((holding) => {
+        const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
+        return (0, Holding_1.getHoldingTotalCostSeries)(holding, startDate, endDate);
+    });
+    // create empty Series used for summation
+    const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDate.toISOString()] }), startDate, endDate, 'value', 0, 0);
+    // get total cost series of Portfolio
+    return totalCosts.reduce((acc, cur) => {
+        return acc = acc.add(cur);
+    }, emptySeries);
+}
+exports.getPortfolioTotalCostSeries = getPortfolioTotalCostSeries;
 // ===========
 // type guards
 // ===========

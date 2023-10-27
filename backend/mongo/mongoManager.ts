@@ -19,11 +19,12 @@ import { Price } from './models/priceSchema'
 import { IMProduct, Product } from './models/productSchema'
 import * as dfu from '../utils/danfo'
 import { 
+  getPortfolioMarketValueSeries, getPortfolioTotalCostSeries,
+
   genPortfolioAlreadyExistsError, genPortfolioNotFoundError, isPortfolioDoc
 } from '../utils/Portfolio'
 import { getIMPricesFromIPrices } from '../utils/Price'
 import { genProductNotFoundError, isProductDoc } from '../utils/Product'
-import { getPortfolioMarketValueSeries } from '../utils/Portfolio'
 
 
 // =======
@@ -199,8 +200,6 @@ INPUT
   portfolio: An IPortfolio
   startDate: The start date for market value calculation
   endDate: The end date for market value calculation
-RETURN
-  TRUE if the Portfolio was successfully created, FALSE otherwise
 */
 export async function getPortfolioMarketValueAsDatedValues(
   portfolio: IPortfolio,
@@ -220,6 +219,28 @@ export async function getPortfolioMarketValueAsDatedValues(
     portfolio, priceMap, startDate, endDate)
 
   return dfu.getDatedValuesFromSeries(marketValueSeries)
+}
+
+/*
+DESC
+  Returns the total cost of the input Portfolio between the startDate and
+  endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate: The start date for market value calculation
+  endDate: The end date for market value calculation
+*/
+export async function getPortfolioTotalCostAsDatedValues(
+  portfolio: IPortfolio,
+  startDate: Date,
+  endDate: Date
+): Promise<TDatedValue[]> {
+
+  // get total cost
+  const totalCostSeries = getPortfolioTotalCostSeries(
+    portfolio, startDate, endDate)
+
+  return dfu.getDatedValuesFromSeries(totalCostSeries)
 }
 
 /*
@@ -944,7 +965,7 @@ async function main(): Promise<number> {
   // const p449558 = await getProductDoc({'tcgplayerId': 449558})
 
   // const userId = 1234
-  // const portfolioName = 'Delta'
+  // const portfolioName = 'Beta Investments'
   // const tcgplayerId = 493975
   // const description = 'Washer dryer mechanic'
   // let holdings: IHolding[] = [
@@ -975,10 +996,12 @@ async function main(): Promise<number> {
   //   portfolioName: portfolioName,
   //   holdings: [],
   // }
-  // const portoflioDoc = await getPortfolioDoc(portfolio) as IPortfolio
+  // const portfolioDoc = await getPortfolioDoc(portfolio) as IPortfolio
   // const holding = getPortfolioHolding(portoflioDoc, tcgplayerId) as IHolding
-  // const startDate = new Date(Date.parse('2023-06-09'))
+  // const startDate = new Date(Date.parse('2023-06-01'))
   // const endDate = new Date(Date.parse('2023-10-01'))
+  // const series = getPortfolioTotalCostAsDatedValues(portfolioDoc, startDate, endDate)
+  // console.log(series)
   // const priceMap = await getPriceMapOfSeries([tcgplayerId])
   // const priceSeries = priceMap.get(tcgplayerId) as df.Series
   // const twr = dfu.getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate)

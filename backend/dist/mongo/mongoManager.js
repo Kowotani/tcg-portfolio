@@ -31,7 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getPriceMapOfSeries = exports.getPriceMapOfDatedValues = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioMarketValueAsDatedValues = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
+exports.updateHistoricalPrices = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = exports.resetPrices = exports.insertPrices = exports.getPriceMapOfSeries = exports.getPriceMapOfDatedValues = exports.getLatestPrices = exports.setPortfolio = exports.getPortfolios = exports.getPortfolioTotalCostAsDatedValues = exports.getPortfolioMarketValueAsDatedValues = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
 // imports
 const common_1 = require("common");
 const Holding_1 = require("../utils/Holding");
@@ -44,7 +44,6 @@ const dfu = __importStar(require("../utils/danfo"));
 const Portfolio_1 = require("../utils/Portfolio");
 const Price_1 = require("../utils/Price");
 const Product_1 = require("../utils/Product");
-const Portfolio_2 = require("../utils/Portfolio");
 // =======
 // globals
 // =======
@@ -192,8 +191,6 @@ INPUT
   portfolio: An IPortfolio
   startDate: The start date for market value calculation
   endDate: The end date for market value calculation
-RETURN
-  TRUE if the Portfolio was successfully created, FALSE otherwise
 */
 function getPortfolioMarketValueAsDatedValues(portfolio, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -204,11 +201,28 @@ function getPortfolioMarketValueAsDatedValues(portfolio, startDate, endDate) {
         });
         const priceMap = yield getPriceMapOfSeries(tcgplayerIds, startDate, endDate);
         // get market value
-        const marketValueSeries = (0, Portfolio_2.getPortfolioMarketValueSeries)(portfolio, priceMap, startDate, endDate);
+        const marketValueSeries = (0, Portfolio_1.getPortfolioMarketValueSeries)(portfolio, priceMap, startDate, endDate);
         return dfu.getDatedValuesFromSeries(marketValueSeries);
     });
 }
 exports.getPortfolioMarketValueAsDatedValues = getPortfolioMarketValueAsDatedValues;
+/*
+DESC
+  Returns the total cost of the input Portfolio between the startDate and
+  endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate: The start date for market value calculation
+  endDate: The end date for market value calculation
+*/
+function getPortfolioTotalCostAsDatedValues(portfolio, startDate, endDate) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get total cost
+        const totalCostSeries = (0, Portfolio_1.getPortfolioTotalCostSeries)(portfolio, startDate, endDate);
+        return dfu.getDatedValuesFromSeries(totalCostSeries);
+    });
+}
+exports.getPortfolioTotalCostAsDatedValues = getPortfolioTotalCostAsDatedValues;
 /*
 DESC
   Retrieves all IPopulatedPortfolios for the input userId
@@ -791,7 +805,7 @@ function main() {
         // const p233232 = await getProductDoc({'tcgplayerId': 233232})
         // const p449558 = await getProductDoc({'tcgplayerId': 449558})
         // const userId = 1234
-        // const portfolioName = 'Delta'
+        // const portfolioName = 'Beta Investments'
         // const tcgplayerId = 493975
         // const description = 'Washer dryer mechanic'
         // let holdings: IHolding[] = [
@@ -819,10 +833,12 @@ function main() {
         //   portfolioName: portfolioName,
         //   holdings: [],
         // }
-        // const portoflioDoc = await getPortfolioDoc(portfolio) as IPortfolio
+        // const portfolioDoc = await getPortfolioDoc(portfolio) as IPortfolio
         // const holding = getPortfolioHolding(portoflioDoc, tcgplayerId) as IHolding
-        // const startDate = new Date(Date.parse('2023-06-09'))
+        // const startDate = new Date(Date.parse('2023-06-01'))
         // const endDate = new Date(Date.parse('2023-10-01'))
+        // const series = getPortfolioTotalCostAsDatedValues(portfolioDoc, startDate, endDate)
+        // console.log(series)
         // const priceMap = await getPriceMapOfSeries([tcgplayerId])
         // const priceSeries = priceMap.get(tcgplayerId) as df.Series
         // const twr = dfu.getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate)

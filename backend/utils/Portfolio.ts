@@ -7,7 +7,9 @@ import {
 } from 'common'
 import { densifyAndFillSeries } from './danfo'
 import * as df from 'danfojs-node'
-import { getHoldingMarketValueSeries } from './Holding'
+import { 
+  getHoldingMarketValueSeries, getHoldingTotalCostSeries 
+} from './Holding'
 import * as _ from 'lodash'
 import { IMPortfolio, Portfolio } from '../mongo/models/portfolioSchema'
 
@@ -84,7 +86,7 @@ export function getPortfolioMarketValueSeries(
 
   const holdings = getPortfolioHoldings(portfolio)
 
-  // get market value series of holdings
+  // get market value series of Holdings
   const marketValues = holdings.map((holding: IHolding | IPopulatedHolding) => {
 
     const tcgplayerId = getHoldingTcgplayerId(holding)
@@ -113,10 +115,58 @@ export function getPortfolioMarketValueSeries(
     0
   )
 
-  // get market value series of portfolio
+  // get market value series of Portfolio
   return marketValues.reduce((acc: df.Series, cur: df.Series) => {
     return acc = acc.add(cur) as df.Series
   }, emptySeries)
+}
+
+/*
+DESC
+  Returns a series of total costs for the input IPortfolio between the
+  input startDate and endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate: The start date of the Series
+  endDate: The end date of the Series
+RETURN
+  A danfo Series
+*/
+export function getPortfolioTotalCostSeries(
+  portfolio: IPortfolio | IPopulatedPortfolio,
+  startDate: Date,
+  endDate: Date
+): df.Series {
+
+  const holdings = getPortfolioHoldings(portfolio)
+
+  // get total cost series of Holdings
+  const totalCosts = holdings.map((holding: IHolding | IPopulatedHolding) => {
+
+    const tcgplayerId = getHoldingTcgplayerId(holding)
+
+    return getHoldingTotalCostSeries(
+      holding,
+      startDate,
+      endDate
+    )
+  })
+
+  // create empty Series used for summation
+  const emptySeries = densifyAndFillSeries(
+    new df.Series([0], {index: [startDate.toISOString()]}),
+    startDate,
+    endDate,
+    'value',
+    0,
+    0
+  )
+
+  // get total cost series of Portfolio
+  return totalCosts.reduce((acc: df.Series, cur: df.Series) => {
+    return acc = acc.add(cur) as df.Series
+  }, emptySeries)
+
 }
 
 
