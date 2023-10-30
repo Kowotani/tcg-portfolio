@@ -1,0 +1,496 @@
+import { 
+  IDatedPriceData, IPrice, TDatedValue, TimeseriesGranularity, assert
+} from 'common'
+import * as df from 'danfojs-node'
+import { getProductDocs } from './Product'
+import * as _ from 'lodash'
+import mongoose from 'mongoose'
+import { HistoricalPrice, IMHistoricalPrice } from '../models/historicalPriceSchema'
+import { Price } from '../models/priceSchema'
+import { IMProduct } from '../models/productSchema'
+import * as dfu from '../../utils/danfo'
+import { getIMPricesFromIPrices } from '../../utils/Price'
+import { isProductDoc } from '../../utils/Product'
+
+
+// =======
+// globals
+// =======
+
+const url = 'mongodb://localhost:27017/tcgPortfolio'
+
+
+// =========
+// functions
+// =========
+
+/*
+DESC
+  Retrieves the latest market Prices for all Products
+RETURN
+  A Map<number, IDatedPriceData> where the key is a tcgplayerId
+*/
+export async function getLatestPrices(): Promise<Map<number, IDatedPriceData>> {
+
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    // get list of Price data with the following shape
+    /*
+      {
+        tcgplayerId: number,
+        priceDate: Date,
+        marketPrice: number
+      }
+    */
+    const priceData = await HistoricalPrice.aggregate()
+      .group({
+        _id: {
+          tcgplayerId: '$tcgplayerId',
+          priceDate: '$date'
+        },
+        marketPrice: {
+          $avg: '$marketPrice'
+        }
+      })
+      .group({
+        _id: {
+          tcgplayerId: '$_id.tcgplayerId'
+        },
+        data: {
+          '$topN': {
+            output: {
+              priceDate: '$_id.priceDate', 
+              marketPrice: '$marketPrice'
+            }, 
+            sortBy: {
+              '_id.priceDate': -1
+            }, 
+            n: 1
+        }}
+      })
+      .addFields({
+        element: {
+          '$first': '$data'
+        }
+      })
+      .project({
+        _id: false,
+    		tcgplayerId: '$_id.tcgplayerId',
+    		priceDate: '$element.priceDate',
+    		marketPrice: '$element.marketPrice'
+      })
+      .exec()
+    
+    // create the TTcgplayerIdPrices
+    let prices = new Map<number, IDatedPriceData>()
+    priceData.forEach((el: any) => {
+      prices.set(
+        el.tcgplayerId, 
+        {
+          priceDate: el.priceDate,
+          prices: {
+            marketPrice: el.marketPrice
+          }
+        } as IDatedPriceData
+    )})
+
+    return prices
+
+  } catch(err) {
+
+    const errMsg = `An error occurred in getLatestPrices(): ${err}`
+    throw new Error(errMsg)
+  } 
+}
+
+/*
+DESC
+  Retrieves the Prices for the input tcgplayerIds as a map of 
+  tcpglayerId => TDatedValue[]. The data can be sliced by the optional 
+  startDate and endDate, otherwise it  will return all data found
+INPUT
+  tcgplayerId[]: The tcgplayerIds
+  startDate?: The starting date for the Price series
+  endDate?: The ending date for the Price series
+RETURN
+  A map of tcpglayerId => TDatedValue[]
+*/
+export async function getPriceMapOfDatedValues(
+  tcgplayerIds: number[],
+  startDate?: Date,
+  endDate?: Date
+): Promise<Map<number, TDatedValue[]>> {
+
+  // if dates input, verify that startDate <= endDate
+  if (startDate && endDate) {
+    assert(
+      startDate.getTime() <= endDate.getTime(),
+      'startDate must be less than or equal to endDate'
+    )
+  }
+
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    // create filter
+    let filter: any = {tcgplayerId: {$in: tcgplayerIds}}
+    if (startDate) {
+      filter['date'] = {$gte: startDate}
+    }
+    if (endDate) {
+      filter['date'] = {$lte: endDate}
+    }
+
+    // query data
+    const priceDocs = await HistoricalPrice.find(filter)
+      .sort({'tcgplayerId': 1, 'date': 1})
+
+    // created dated value map
+    const datedValueMap = new Map<number, TDatedValue[]>()
+    priceDocs.forEach((price: IMHistoricalPrice) => {
+
+      // update map
+      const tcgplayerId = price.tcgplayerId
+      const datedValue: TDatedValue = {
+        date: price.date,
+        value: price.marketPrice
+      }
+      const values = datedValueMap.get(tcgplayerId)
+
+      // key exists
+      if (values) {
+        values.push(datedValue)
+
+      // key does not exist
+      } else {
+        datedValueMap.set(tcgplayerId, [datedValue])
+      }
+    })
+
+    return datedValueMap
+    
+  } catch(err) {
+  
+    const errMsg = `An error occurred in getPriceMap(): ${err}`
+    throw new Error(errMsg)
+  }
+}
+
+/*
+DESC
+  Retrieves the Prices for the input tcgplayerIds as a map of 
+  tcpglayerId => Series. The data can be sliced by the optional 
+  startDate and endDate, otherwise it  will return all data found
+INPUT
+  tcgplayerId[]: The tcgplayerIds
+  startDate?: The starting date for the Price series
+  endDate?: The ending date for the Price series
+RETURN
+  A map of tcpglayerId => Series
+*/
+export async function getPriceMapOfSeries(
+  tcgplayerIds: number[],
+  startDate?: Date,
+  endDate?: Date
+): Promise<Map<number, df.Series>> {
+
+  // get dated value map
+  const datedValueMap
+    = await getPriceMapOfDatedValues(tcgplayerIds, startDate, endDate)
+
+  // convert TDatedValue[] to Series
+  const seriesMap = new Map<number, df.Series>()
+    datedValueMap.forEach((value, key) => {
+      const series = dfu.getSeriesFromDatedValues(value)
+      seriesMap.set(key, series)
+    })
+
+  return seriesMap
+}
+
+/*
+DESC
+  Constructs Price documents from the input data and inserts them
+INPUT 
+  docs: An IPrice[]
+RETURN
+  The number of documents inserted
+*/
+export async function insertPrices(docs: IPrice[]): Promise<number> {
+
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    // create IMPrice[]
+    const priceDocs = await getIMPricesFromIPrices(docs)
+
+    const res = await Price.insertMany(priceDocs);
+    return res.length
+    
+  } catch(err) {
+  
+    const errMsg = `An error occurred in insertPrices(): ${err}`
+    throw new Error(errMsg)
+  }
+}
+
+/*
+DESC
+  Removes all Price documents for the input tcgplayerIds, then inserts a Price 
+  document for MSRP if it exists
+INPUT 
+  tcgplayerIds: An array of tcgplayerIds
+RETURN
+  The number of tcgplayerIds with reset Prices
+*/
+type TDeletedPricesRes = {
+  deleted: number,
+  inserted: number
+}
+export async function resetPrices(
+  tcgplayerIds: number[]
+): Promise<TDeletedPricesRes> {
+
+  // connect to db
+  await mongoose.connect(url)
+
+  // return value
+  let returnValues: TDeletedPricesRes = {
+    deleted: 0,
+    inserted: 0
+  }
+
+  try {
+
+    // get Products
+    const productDocs = await getProductDocs()
+
+    // MSRP prices to load
+    let prices: IPrice[] = []
+
+    for (const tcgplayerId of tcgplayerIds) {
+
+      // delete Price documents
+      await Price.deleteMany({tcgplayerId: tcgplayerId})
+      returnValues.deleted += 1
+
+      // get Product
+      const productDoc = productDocs.find((product: IMProduct) => {
+        return product.tcgplayerId === tcgplayerId
+      })
+
+      // insert MSRP Price document, if MSRP exists
+      if (isProductDoc(productDoc) && productDoc.msrp) {
+        const price: IPrice = {
+          priceDate: productDoc.releaseDate,
+          tcgplayerId: tcgplayerId,
+          granularity: TimeseriesGranularity.Hours,
+          prices: {
+            marketPrice: productDoc.msrp
+          }
+        }
+        prices.push(price)
+      }
+    }
+
+    // insert Prices
+    const priceDocs = await getIMPricesFromIPrices(prices)
+    const res = await Price.insertMany(priceDocs)
+    returnValues.inserted = res.length
+    return returnValues
+    
+  } catch(err) {
+  
+    const errMsg = `An error occurred in resetPrices(): ${err}`
+    throw new Error(errMsg)
+  }
+}
+
+
+// =====
+// views
+// =====
+
+/*
+DESC
+  This pipeline creates a price summary for all Products that is designed to
+  be used when calculating historical returns
+OUTPUT
+  historicalPrices collection of IHistoricalPrice documents
+*/
+export async function updateHistoricalPrices(): Promise<boolean> {
+
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    const res = await Price.aggregate([
+
+      // join to Product
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'product',
+          foreignField: '_id',
+          as: 'productDoc'
+        }
+      },
+      {
+        $unwind: '$productDoc'
+      },
+
+      // keep prices on or after the release date
+      {
+        $match: {
+          $expr: {
+            $gte: [
+              '$priceDate', 
+              '$productDoc.releaseDate'
+            ]
+          }
+        }
+      },
+
+      // aggregate existing prices for the same priceDate
+      {
+        $group: {
+          _id: {
+            tcgplayerId: '$tcgplayerId',
+            date: {
+              $dateTrunc: {
+                date: '$priceDate',
+                unit: 'day'
+              }
+            }
+          },
+          marketPrice: {
+            $avg: '$prices.marketPrice'
+          }
+        }
+      },      
+
+      // surface nested fields, append isInterpolated
+      {
+        $project: {
+          _id: false,
+          tcgplayerId: '$_id.tcgplayerId',
+          date: '$_id.date',
+          marketPrice: true,
+          isInterpolated: {$toBool: 0}
+        }
+      },      
+
+      // create timeseries of priceDate
+      {
+        $densify: {
+          field: 'date',
+          partitionByFields: ['tcgplayerId'],
+          range: {
+            step: 1,
+            unit: 'day',
+            bounds: 'full'
+          }
+        }
+      },
+
+      // interpolate missing data points
+      {
+        $fill: {
+          partitionByFields: ['tcgplayerId'],
+          sortBy: {'date': 1},
+          output: {
+            'tcgplayerId': {method: 'locf'},
+            'marketPrice': {method: 'linear'},
+            'isInterpolated': {value: true}
+          }
+        }
+      },
+
+      // filter out null marketPrices
+      // this is due to the releaseDate of Products being different
+      {
+        $match: {
+          marketPrice: {
+            $ne: null
+          }
+        }
+      },
+
+      // sort results
+      {
+        $sort: {
+          tcgplayerId: 1,
+          date: 1
+        }
+      },
+
+      // write results
+      {
+        $merge: {
+          on: ['tcgplayerId', 'date'], 
+          into: 'historicalprices',
+          whenMatched: 'replace'
+        }
+      }
+    ])
+    .exec()
+    return true
+
+  } catch(err) {
+    
+    const errMsg = `An error occurred in updateHistoricalPrices(): ${err}`
+    throw new Error(errMsg)
+  }
+
+}
+
+async function main(): Promise<number> {  
+
+  let res
+
+  // res = await getLatestPrices()
+  // if (res) {
+  //   logObject(res)
+  // } else {
+  //   console.log('Could not retrieve latest prices')
+  // }
+
+  // // -- Create historicalPrices
+  // res = await updateHistoricalPrices()
+  // if (res) {
+  //   console.log('historicalPrices updated')
+  // } else {
+  //   console.log('historicalPrices not updated')
+  // }
+
+  // // -- Reset Prices
+  // const tcgplayerIds = [496041]
+  // res = await resetPrices(tcgplayerIds)
+  // if (res) {
+  //   console.log(`${res.deleted} tcgplayerIds were reset, ${res.inserted} were initialized`)
+  // } else {
+  //   console.log('Prices not reset')
+  // }
+
+  // // -- Get Price DatedValues
+  // const tcgplayerId = 121527
+  // const priceSeries = await getPriceSeries(tcgplayerId, 
+  //   new Date(Date.parse('2023-09-01'))
+  // )
+  // // console.log('-- price series')
+  // // console.log(priceSeries)
+
+  return 0
+}
+
+main()
+  .then(console.log)
+  .catch(console.error)

@@ -1,6 +1,6 @@
 import { IPrice, assert } from 'common'
 import { IMPrice, Price } from '../mongo/models/priceSchema'
-import { getProductDocs } from '../mongo/mongoManager'
+import { getProductDocs } from '../mongo/dbi/Product'
 import { IMProduct } from '../mongo/models/productSchema'
 import { isProductDoc, genProductNotFoundError } from './Product'
 

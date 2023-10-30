@@ -32,8 +32,8 @@ exports.hasValidTransactions = exports.areValidHoldings = exports.getHoldingReve
 const common_1 = require("common");
 const danfo_1 = require("./danfo");
 const _ = __importStar(require("lodash"));
-const mongoManager_1 = require("../mongo/mongoManager");
-const Product_1 = require("./Product");
+const Product_1 = require("../mongo/dbi/Product");
+const Product_2 = require("./Product");
 // ==========
 // converters
 // ==========
@@ -48,13 +48,13 @@ RETURN
 */
 function getIMHoldingsFromIHoldings(holdings) {
     return __awaiter(this, void 0, void 0, function* () {
-        const productDocs = yield (0, mongoManager_1.getProductDocs)();
+        const productDocs = yield (0, Product_1.getProductDocs)();
         const newHoldings = holdings.map((holding) => {
             // find Product
             const productDoc = productDocs.find((product) => {
                 return product.tcgplayerId === Number(holding.tcgplayerId);
             });
-            (0, common_1.assert)((0, Product_1.isProductDoc)(productDoc), (0, Product_1.genProductNotFoundError)('getIMHoldingsFromIHoldings()').toString());
+            (0, common_1.assert)((0, Product_2.isProductDoc)(productDoc), (0, Product_2.genProductNotFoundError)('getIMHoldingsFromIHoldings()').toString());
             // create IMHolding
             return Object.assign(Object.assign({}, holding), { product: productDoc._id });
         });
@@ -361,7 +361,7 @@ function areValidHoldings(holdings) {
             return false;
         }
         // all Products exist
-        const productDocs = yield (0, mongoManager_1.getProductDocs)();
+        const productDocs = yield (0, Product_1.getProductDocs)();
         const productTcgplayerIds = productDocs.map((doc) => {
             return doc.tcgplayerId;
         });

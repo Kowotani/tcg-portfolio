@@ -15,11 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const s3Manager_1 = require("./aws/s3Manager");
 const common_1 = require("common");
 const express_1 = __importDefault(require("express"));
-const mongoManager_1 = require("./mongo/mongoManager");
+const Portfolio_1 = require("./mongo/dbi/Portfolio");
+const Product_1 = require("./mongo/dbi/Product");
+const Price_1 = require("./mongo/dbi/Price");
 const multer_1 = __importDefault(require("multer"));
 const scrapeManager_1 = require("./scraper/scrapeManager");
-const Portfolio_1 = require("./utils/Portfolio");
-const Product_1 = require("./utils/Product");
+const Portfolio_2 = require("./utils/Portfolio");
+const Product_2 = require("./utils/Product");
 const upload = (0, multer_1.default)();
 const app = (0, express_1.default)();
 const port = 3030;
@@ -49,8 +51,8 @@ app.delete(common_1.PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0
     };
     try {
         // check if Portfolio exists
-        const portfolioDoc = yield (0, mongoManager_1.getPortfolioDoc)(portfolio);
-        if (!(0, Portfolio_1.isPortfolioDoc)(portfolioDoc)) {
+        const portfolioDoc = yield (0, Portfolio_1.getPortfolioDoc)(portfolio);
+        if (!(0, Portfolio_2.isPortfolioDoc)(portfolioDoc)) {
             res.status(204);
             const body = {
                 message: common_1.DeletePortfolioStatus.DoesNotExist
@@ -59,7 +61,7 @@ app.delete(common_1.PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0
         }
         else {
             // delete portfolio
-            const isDeleted = yield (0, mongoManager_1.deletePortfolio)(portfolio);
+            const isDeleted = yield (0, Portfolio_1.deletePortfolio)(portfolio);
             // success
             if (isDeleted) {
                 res.status(200);
@@ -105,7 +107,7 @@ app.post(common_1.PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, 
     const portfolio = body.portfolio;
     try {
         // create Portfolio
-        const isCreated = yield (0, mongoManager_1.addPortfolio)(portfolio);
+        const isCreated = yield (0, Portfolio_1.addPortfolio)(portfolio);
         // success
         if (isCreated) {
             res.status(200);
@@ -149,7 +151,7 @@ app.put(common_1.PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, v
     const body = req.body;
     try {
         // update Portfolio
-        const isUpdated = yield (0, mongoManager_1.setPortfolio)(body.existingPortfolio, body.newPortfolio);
+        const isUpdated = yield (0, Portfolio_1.setPortfolio)(body.existingPortfolio, body.newPortfolio);
         // success
         if (isUpdated) {
             res.status(200);
@@ -197,12 +199,12 @@ RETURN
 app.get(common_1.PORTFOLIO_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // get portfolio
-        const portfolioDoc = yield (0, mongoManager_1.getPortfolioDoc)({
+        const portfolioDoc = yield (0, Portfolio_1.getPortfolioDoc)({
             userId: req.query.userId,
             portfolioName: req.query.portfolioName,
             holdings: []
         });
-        (0, common_1.assert)((0, Portfolio_1.isPortfolioDoc)(portfolioDoc), 'Could not find Portfolio');
+        (0, common_1.assert)((0, Portfolio_2.isPortfolioDoc)(portfolioDoc), 'Could not find Portfolio');
         const startDate = new Date(Date.parse(req.query.startDate));
         const endDate = new Date(Date.parse(req.query.endDate));
         const metrics = String(req.query.metrics).split(',');
@@ -212,10 +214,10 @@ app.get(common_1.PORTFOLIO_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void
             let fn;
             switch (metric) {
                 case common_1.PerformanceMetric.MarketValue:
-                    fn = mongoManager_1.getPortfolioMarketValueAsDatedValues;
+                    fn = Portfolio_1.getPortfolioMarketValueAsDatedValues;
                     break;
                 case common_1.PerformanceMetric.TotalCost:
-                    fn = mongoManager_1.getPortfolioTotalCostAsDatedValues;
+                    fn = Portfolio_1.getPortfolioTotalCostAsDatedValues;
                     break;
                 default:
                     const err = `Unknown metric: ${metric}`;
@@ -258,7 +260,7 @@ app.get(common_1.PORTFOLIOS_URL, (req, res) => __awaiter(void 0, void 0, void 0,
     try {
         // query Portfolios
         const userId = req.query.userId;
-        const data = yield (0, mongoManager_1.getPortfolios)(userId);
+        const data = yield (0, Portfolio_1.getPortfolios)(userId);
         // return Portfolios
         res.status(200);
         const body = {
@@ -292,7 +294,7 @@ RETURN
 app.get(common_1.LATEST_PRICES_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // query Prices
-        const latestPrices = yield (0, mongoManager_1.getLatestPrices)();
+        const latestPrices = yield (0, Price_1.getLatestPrices)();
         // return Prices
         res.status(200);
         const body = {
@@ -328,8 +330,8 @@ app.post(common_1.LATEST_PRICES_URL, upload.none(), (req, res) => __awaiter(void
         const body = req.body;
         const tcgplayerId = body.tcgplayerId;
         // check if Product exists
-        const productDoc = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: tcgplayerId });
-        if (!(0, Product_1.isProductDoc)(productDoc)) {
+        const productDoc = yield (0, Product_1.getProductDoc)({ tcgplayerId: tcgplayerId });
+        if (!(0, Product_2.isProductDoc)(productDoc)) {
             const errMsg = `Product not found for tcgplayerId: ${tcgplayerId}`;
             throw new Error(errMsg);
         }
@@ -392,13 +394,13 @@ app.post(common_1.PRICE_URL, upload.none(), (req, res) => __awaiter(void 0, void
             granularity: common_1.TimeseriesGranularity.Hours
         };
         // check if Product exists
-        const productDoc = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: price.tcgplayerId });
-        if (!(0, Product_1.isProductDoc)(productDoc)) {
+        const productDoc = yield (0, Product_1.getProductDoc)({ tcgplayerId: price.tcgplayerId });
+        if (!(0, Product_2.isProductDoc)(productDoc)) {
             const errMsg = `Product not found for tcgplayerId: ${price.tcgplayerId}`;
             throw new Error(errMsg);
         }
         // add Price
-        const numInserted = yield (0, mongoManager_1.insertPrices)([price]);
+        const numInserted = yield (0, Price_1.insertPrices)([price]);
         // success
         if (numInserted === 1) {
             res.status(201);
@@ -448,8 +450,8 @@ app.post(common_1.PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0, vo
     const data = body.formData;
     const tcgplayerId = data.tcgplayerId;
     // check if product already exists (via tcgplayerId)
-    const productDoc = yield (0, mongoManager_1.getProductDoc)({ tcgplayerId: tcgplayerId });
-    if ((0, Product_1.isProductDoc)(productDoc)) {
+    const productDoc = yield (0, Product_1.getProductDoc)({ tcgplayerId: tcgplayerId });
+    if ((0, Product_2.isProductDoc)(productDoc)) {
         res.status(202);
         const body = {
             tcgplayerId: data.tcgplayerId,
@@ -461,7 +463,7 @@ app.post(common_1.PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0, vo
     else {
         try {
             // add product
-            const numInserted = yield (0, mongoManager_1.insertProducts)([data]);
+            const numInserted = yield (0, Product_1.insertProducts)([data]);
             // load image to S3
             const isImageLoaded = body.imageUrl
                 ? yield (0, s3Manager_1.loadImageToS3)(tcgplayerId, body.imageUrl)
@@ -514,7 +516,7 @@ RETURN
 app.get(common_1.PRODUCTS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // query Products
-        const data = yield (0, mongoManager_1.getProductDocs)();
+        const data = yield (0, Product_1.getProductDocs)();
         // return Products
         res.status(200);
         const body = {

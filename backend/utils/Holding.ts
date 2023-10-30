@@ -13,7 +13,7 @@ import * as df from 'danfojs-node'
 import * as _ from 'lodash'
 import { IMHolding } from '../mongo/models/holdingSchema'
 import { IMProduct } from '../mongo/models/productSchema'
-import { getProductDocs } from '../mongo/mongoManager'
+import { getProductDocs } from '../mongo/dbi/Product'
 import { isProductDoc, genProductNotFoundError } from './Product'
 
 

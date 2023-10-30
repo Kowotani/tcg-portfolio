@@ -6,6 +6,10 @@
   "scripts": {
     "start": "tsc && node dist/app.js",
     "mongoManager": "tsc && node dist/mongo/mongoManager.js",
+    "holdingDbi": "tsc && node dist/mongo/dbi/Holding.js",
+    "portfolioDbi": "tsc && node dist/mongo/dbi/Portfolio.js",
+    "priceDbi": "tsc && node dist/mongo/dbi/Price.js",
+    "productDbi": "tsc && node dist/mongo/dbi/Product.js",
     "s3Manager": "tsc && node dist/aws/s3Manager.js",
     "scraper": "tsc && node dist/scraper/scrapeManager.js"
   },

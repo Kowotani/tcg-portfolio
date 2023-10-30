@@ -4,7 +4,8 @@ import {
   formatAsISO
 } from 'common'
 import { IMProduct } from '../mongo/models/productSchema'
-import { getProductDocs, insertPrices } from '../mongo/mongoManager'
+import { insertPrices } from '../mongo/dbi/Price'
+import { getProductDocs } from '../mongo/dbi/Product'
 import { scrapeCurrent, scrapeHistorical } from './scraper'
 import { TcgPlayerChartDateRange } from '../utils/Chart'
 

@@ -1,36 +1,41 @@
 import { loadImageToS3 } from './aws/s3Manager'
-import { 
-  IDatedPriceData, IPopulatedPortfolio, IPortfolio, 
-  IPrice, IPriceData, IProduct, TPerformanceData,
+import {
+  // data models 
+  IDatedPriceData, IHolding, IPopulatedPortfolio, IPortfolio, 
+  IPrice, IPriceData, IProduct, TDatedValue, THoldingPerformanceData, 
+  TPerformanceData,
   
   PerformanceMetric, TimeseriesGranularity,
 
-  DeletePortfolioStatus, GetPortfolioPerformanceStatus, GetPortfoliosStatus, 
-  GetPricesStatus, GetProductsStatus, PostLatestPriceStatus, PostPortfolioStatus, 
-  PostPriceStatus, PostProductStatus, PutPortfolioStatus,
+  // api response status
+  DeletePortfolioStatus, GetPortfolioHoldingsPerformanceStatus, 
+  GetPortfolioPerformanceStatus, GetPortfoliosStatus, 
+  GetPricesStatus, GetProductsStatus, PostLatestPriceStatus, 
+  PostPortfolioStatus, PostPriceStatus, PostProductStatus, PutPortfolioStatus,
   
-  TDataResBody, TDeletePortfolioReqBody, TGetPortfolioPerformanceResBody, 
-  TPostLatestPriceReqBody, TPostPortfolioReqBody, TPostPriceReqBody, 
-  TPutPortfolioReqBody, TPostProductReqBody, TProductPostResBody, TResBody, 
+  // request / response data models
+  TDataResBody, TDeletePortfolioReqBody, TGetPortfolioHoldingsPerformanceResBody,
+  TGetPortfolioPerformanceResBody, TPostLatestPriceReqBody, 
+  TPostPortfolioReqBody, TPostPriceReqBody, TPutPortfolioReqBody, 
+  TPostProductReqBody, TProductPostResBody, TResBody, 
 
-  LATEST_PRICES_URL, PORTFOLIO_URL, PORTFOLIO_PERFORMANCE_URL, PORTFOLIOS_URL, 
-  PRICE_URL, PRODUCT_URL, PRODUCTS_URL, TDatedValue, 
+  // endpoint URLs
+  LATEST_PRICES_URL, PORTFOLIO_URL, PORTFOLIO_HOLDINGS_PERFORMANCE_URL, 
+  PORTFOLIO_PERFORMANCE_URL, PORTFOLIOS_URL, PRICE_URL, PRODUCT_URL, 
+  PRODUCTS_URL, 
 
   assert
 } from 'common'
 import express from 'express'
 import { 
-  // Portfolio
   addPortfolio, deletePortfolio, getPortfolioDoc, getPortfolios, 
   getPortfolioMarketValueAsDatedValues, getPortfolioTotalCostAsDatedValues, 
-  setPortfolio,
-  
-  // Price
-  getLatestPrices, insertPrices, 
-  
-  // Product
-  getProductDoc, getProductDocs, insertProducts
-} from './mongo/mongoManager'
+  setPortfolio 
+} from './mongo/dbi/Portfolio'
+import { 
+  getProductDoc, getProductDocs, insertProducts 
+} from './mongo/dbi/Product'
+import { getLatestPrices, insertPrices } from './mongo/dbi/Price'
 import multer from 'multer'
 import { loadCurrentPrice } from './scraper/scrapeManager'
 import { isPortfolioDoc } from './utils/Portfolio'
