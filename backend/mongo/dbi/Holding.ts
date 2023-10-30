@@ -9,8 +9,7 @@ import * as dfu from '../../utils/danfo'
 import { 
   getHoldingMarketValueSeries, getHoldingTotalCostSeries 
 } from '../../utils/Holding'
-import { IPortfolio, getPortfolioHolding } from 'common'
-import { getPortfolioDoc } from './Portfolio'
+
 
 // =========
 // functions

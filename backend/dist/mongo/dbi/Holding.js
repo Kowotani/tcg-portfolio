@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -38,8 +34,6 @@ const common_1 = require("common");
 const Price_1 = require("./Price");
 const dfu = __importStar(require("../../utils/danfo"));
 const Holding_1 = require("../../utils/Holding");
-const common_2 = require("common");
-const Portfolio_1 = require("./Portfolio");
 // =========
 // functions
 // =========
@@ -84,9 +78,9 @@ exports.getHoldingTotalCostAsDatedValues = getHoldingTotalCostAsDatedValues;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let res;
-        const userId = 1234;
-        const portfolioName = 'Delta';
-        const tcgplayerId = 121527;
+        // const userId = 1234
+        // const portfolioName = 'Delta'
+        // const tcgplayerId = 121527
         // const description = 'Washer dryer mechanic'
         // let holdings: IHolding[] = [
         //   {
@@ -107,19 +101,19 @@ function main() {
         //     ],
         //   },
         // ]
-        const portfolio = {
-            userId: userId,
-            portfolioName: portfolioName,
-            holdings: [],
-        };
-        const portfolioDoc = yield (0, Portfolio_1.getPortfolioDoc)(portfolio);
-        const holding = (0, common_2.getPortfolioHolding)(portfolioDoc, tcgplayerId);
-        const startDate = new Date(Date.parse('2023-09-01'));
-        const endDate = new Date(Date.parse('2023-09-14'));
+        // const portfolio: IPortfolio = {
+        //   userId: userId, 
+        //   portfolioName: portfolioName,
+        //   holdings: [],
+        // }
+        // const portfolioDoc = await getPortfolioDoc(portfolio) as IPortfolio
+        // const holding = getPortfolioHolding(portfolioDoc, tcgplayerId) as IHolding
+        // const startDate = new Date(Date.parse('2023-09-01'))
+        // const endDate = new Date(Date.parse('2023-09-14'))
         // const priceMap = await getPriceMapOfSeries([tcgplayerId])
         // const priceSeries = priceMap.get(tcgplayerId) as df.Series
-        const series = yield getHoldingTotalCostAsDatedValues(holding, startDate, endDate);
-        console.log(series);
+        // const series = await getHoldingTotalCostAsDatedValues(holding, startDate, endDate)
+        // console.log(series)
         // const twr = dfu.getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate)
         // console.log(twr)
         // const newPortfolio: IPortfolio = {
@@ -133,7 +127,7 @@ function main() {
         // } else {
         //   console.log('Portfolio not set')
         // }
-        // return 0
+        return 0;
     });
 }
 main()
