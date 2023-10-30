@@ -6,8 +6,11 @@ import * as df from 'danfojs-node'
 import { getPriceMapOfSeries } from './Price'
 import * as _ from 'lodash'
 import * as dfu from '../../utils/danfo'
-import { getHoldingMarketValueSeries } from '../../utils/Holding'
-
+import { 
+  getHoldingMarketValueSeries, getHoldingTotalCostSeries 
+} from '../../utils/Holding'
+import { IPortfolio, getPortfolioHolding } from 'common'
+import { getPortfolioDoc } from './Portfolio'
 
 // =========
 // functions
@@ -18,7 +21,7 @@ DESC
   Returns the market value of the input Portfolio between the startDate and
   endDate
 INPUT
-  portfolio: An IPortfolio
+  holding: A IHolding
   startDate: The start date for market value calculation
   endDate: The end date for market value calculation
 */
@@ -39,6 +42,29 @@ export async function getHoldingMarketValueAsDatedValues(
 
   return dfu.getDatedValuesFromSeries(marketValueSeries)
 }
+
+/*
+DESC
+  Returns the total cost of the input Holding between the startDate and
+  endDate
+INPUT
+  holding: An IHolding
+  startDate: The start date for market value calculation
+  endDate: The end date for market value calculation
+*/
+export async function getHoldingTotalCostAsDatedValues(
+  holding: IHolding | IPopulatedHolding,
+  startDate: Date,
+  endDate: Date
+): Promise<TDatedValue[]> {
+
+  // get total cost
+  const totalCostSeries = getHoldingTotalCostSeries(
+    holding, startDate, endDate)
+
+  return dfu.getDatedValuesFromSeries(totalCostSeries)
+}
+
 
 async function main(): Promise<number> {  
 
@@ -79,7 +105,7 @@ async function main(): Promise<number> {
   // const endDate = new Date(Date.parse('2023-09-14'))
   // const priceMap = await getPriceMapOfSeries([tcgplayerId])
   // const priceSeries = priceMap.get(tcgplayerId) as df.Series
-  // const series = getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate)
+  // const series = await getHoldingTotalCostAsDatedValues(holding, startDate, endDate)
   // console.log(series)
   // const twr = dfu.getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate)
   // console.log(twr)
