@@ -5,12 +5,14 @@ import {
   
   TimeseriesGranularity,
 
-  getHoldingTcgplayerId, getPortfolioHoldings, 
+  getHoldingTcgplayerId, getPortfolioHoldings,
 
   assert, isIPopulatedHolding
 } from 'common'
 import * as df from 'danfojs-node'
-import { areValidHoldings, getIMHoldingsFromIHoldings } from '../utils/Holding'
+import { 
+  areValidHoldings, getHoldingMarketValueSeries, getIMHoldingsFromIHoldings 
+} from '../utils/Holding'
 import * as _ from 'lodash'
 import mongoose, { HydratedDocument} from 'mongoose'
 import { HistoricalPrice, IMHistoricalPrice } from './models/historicalPriceSchema'
@@ -38,6 +40,38 @@ const url = 'mongodb://localhost:27017/tcgPortfolio'
 // =========
 // functions
 // =========
+
+// -------
+// Holding
+// -------
+
+/*
+DESC
+  Returns the market value of the input Portfolio between the startDate and
+  endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate: The start date for market value calculation
+  endDate: The end date for market value calculation
+*/
+export async function getHoldingMarketValueAsDatedValues(
+  holding: IHolding | IPopulatedHolding,
+  startDate: Date,
+  endDate: Date
+): Promise<TDatedValue[]> {
+
+  // get price map
+  const tcgplayerId = getHoldingTcgplayerId(holding)
+  const priceMap = await getPriceMapOfSeries([tcgplayerId], startDate, endDate)
+  const priceSeries = priceMap.get(tcgplayerId) as df.Series
+
+  // get market value
+  const marketValueSeries = getHoldingMarketValueSeries(
+    holding, priceSeries, startDate, endDate)
+
+  return dfu.getDatedValuesFromSeries(marketValueSeries)
+}
+
 
 // ---------
 // Portfolio
@@ -964,9 +998,9 @@ async function main(): Promise<number> {
   // const p233232 = await getProductDoc({'tcgplayerId': 233232})
   // const p449558 = await getProductDoc({'tcgplayerId': 449558})
 
-  // const userId = 1234
-  // const portfolioName = 'Beta Investments'
-  // const tcgplayerId = 493975
+  const userId = 1234
+  const portfolioName = 'Delta'
+  const tcgplayerId = 121527
   // const description = 'Washer dryer mechanic'
   // let holdings: IHolding[] = [
   //   {
@@ -997,13 +1031,13 @@ async function main(): Promise<number> {
   //   holdings: [],
   // }
   // const portfolioDoc = await getPortfolioDoc(portfolio) as IPortfolio
-  // const holding = getPortfolioHolding(portoflioDoc, tcgplayerId) as IHolding
-  // const startDate = new Date(Date.parse('2023-06-01'))
-  // const endDate = new Date(Date.parse('2023-10-01'))
-  // const series = getPortfolioTotalCostAsDatedValues(portfolioDoc, startDate, endDate)
-  // console.log(series)
+  // const holding = getPortfolioHolding(portfolioDoc, tcgplayerId) as IHolding
+  // const startDate = new Date(Date.parse('2023-09-01'))
+  // const endDate = new Date(Date.parse('2023-09-14'))
   // const priceMap = await getPriceMapOfSeries([tcgplayerId])
   // const priceSeries = priceMap.get(tcgplayerId) as df.Series
+  // const series = getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate)
+  // console.log(series)
   // const twr = dfu.getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate)
   // console.log(twr)
 
