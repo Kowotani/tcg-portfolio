@@ -44,9 +44,14 @@ function getHoldingFirstTransactionDate(holding) {
     }
     else {
         var firstTxn = _.minBy(holding.transactions, function (txn) {
-            return txn.date.getTime();
+            var date = _.isDate(txn.date)
+                ? txn.date
+                : new Date(txn.date);
+            return date.getTime();
         });
-        return firstTxn.date;
+        return _.isDate(firstTxn.date)
+            ? firstTxn.date
+            : new Date(firstTxn.date);
     }
 }
 exports.getHoldingFirstTransactionDate = getHoldingFirstTransactionDate;

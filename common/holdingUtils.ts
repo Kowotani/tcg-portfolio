@@ -54,9 +54,14 @@ export function getHoldingFirstTransactionDate(
 
   } else {
     const firstTxn = _.minBy(holding.transactions, (txn: ITransaction) => {
-      return txn.date.getTime()
+      const date = _.isDate(txn.date)
+        ? txn.date
+        : new Date(txn.date)
+      return date.getTime()
     })
-    return firstTxn.date
+    return _.isDate(firstTxn.date)
+      ? firstTxn.date
+      : new Date(firstTxn.date)
   }
 }
 
