@@ -28,11 +28,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hasValidTransactions = exports.areValidHoldings = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingCostOfGoodsSoldSeries = exports.getHoldingMarketValueSeries = exports.getIMHoldingsFromIHoldings = void 0;
+exports.hasValidTransactions = exports.areValidHoldings = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTotalCostAsDatedValues = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingCostOfGoodsSoldSeries = exports.getHoldingMarketValueSeries = exports.getHoldingMarketValueAsDatedValues = exports.getIMHoldingsFromIHoldings = void 0;
 const common_1 = require("common");
 const danfo_1 = require("./danfo");
 const _ = __importStar(require("lodash"));
 const Product_1 = require("../mongo/dbi/Product");
+const Price_1 = require("../mongo/dbi/Price");
 const Product_2 = require("./Product");
 // ==========
 // converters
@@ -65,6 +66,27 @@ exports.getIMHoldingsFromIHoldings = getIMHoldingsFromIHoldings;
 // =======
 // getters
 // =======
+/*
+DESC
+  Returns the market value of the input Portfolio between the startDate and
+  endDate
+INPUT
+  holding: A IHolding
+  startDate: The start date for market value calculation
+  endDate: The end date for market value calculation
+*/
+function getHoldingMarketValueAsDatedValues(holding, startDate, endDate) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get price map
+        const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
+        const priceMap = yield (0, Price_1.getPriceMapOfSeries)([tcgplayerId], startDate, endDate);
+        const priceSeries = priceMap.get(tcgplayerId);
+        // get market value
+        const marketValueSeries = getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate);
+        return (0, danfo_1.getDatedValuesFromSeries)(marketValueSeries);
+    });
+}
+exports.getHoldingMarketValueAsDatedValues = getHoldingMarketValueAsDatedValues;
 /*
 DESC
   Returns a series of daily market values for the input IHolding between the
@@ -250,6 +272,23 @@ function getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate, 
         : timeWeightedReturn;
 }
 exports.getHoldingTimeWeightedReturn = getHoldingTimeWeightedReturn;
+/*
+DESC
+  Returns the total cost of the input Holding between the startDate and
+  endDate
+INPUT
+  holding: An IHolding
+  startDate: The start date for market value calculation
+  endDate: The end date for market value calculation
+*/
+function getHoldingTotalCostAsDatedValues(holding, startDate, endDate) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get total cost
+        const totalCostSeries = getHoldingTotalCostSeries(holding, startDate, endDate);
+        return (0, danfo_1.getDatedValuesFromSeries)(totalCostSeries);
+    });
+}
+exports.getHoldingTotalCostAsDatedValues = getHoldingTotalCostAsDatedValues;
 /*
 DESC
   Returns a series of total cost for the input IHolding between the input

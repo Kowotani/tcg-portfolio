@@ -2,18 +2,20 @@ import {
   IHolding, IPopulatedHolding, ITransaction, TDatedValue,
 
   getHoldingAggregatedPurchases, getHoldingAggregatedSales, getHoldingQuantity, 
-  getHoldingPurchases, getHoldingSales,
+  getHoldingPurchases, getHoldingSales, getHoldingTcgplayerId,
 
   assert, getDaysBetween, isDateAfter, isDateBefore
 } from 'common'
 import { 
-  densifyAndFillSeries, getSeriesFromDatedValues, sortSeriesByIndex 
+  densifyAndFillSeries, getDatedValuesFromSeries, getSeriesFromDatedValues, 
+  sortSeriesByIndex 
 } from './danfo'
 import * as df from 'danfojs-node'
 import * as _ from 'lodash'
 import { IMHolding } from '../mongo/models/holdingSchema'
 import { IMProduct } from '../mongo/models/productSchema'
 import { getProductDocs } from '../mongo/dbi/Product'
+import { getPriceMapOfSeries } from '../mongo/dbi/Price'
 import { isProductDoc, genProductNotFoundError } from './Product'
 
 
@@ -60,6 +62,33 @@ export async function getIMHoldingsFromIHoldings(
 // =======
 // getters
 // =======
+
+/*
+DESC
+  Returns the market value of the input Portfolio between the startDate and
+  endDate
+INPUT
+  holding: A IHolding
+  startDate: The start date for market value calculation
+  endDate: The end date for market value calculation
+*/
+export async function getHoldingMarketValueAsDatedValues(
+  holding: IHolding | IPopulatedHolding,
+  startDate: Date,
+  endDate: Date
+): Promise<TDatedValue[]> {
+
+  // get price map
+  const tcgplayerId = getHoldingTcgplayerId(holding)
+  const priceMap = await getPriceMapOfSeries([tcgplayerId], startDate, endDate)
+  const priceSeries = priceMap.get(tcgplayerId) as df.Series
+
+  // get market value
+  const marketValueSeries = getHoldingMarketValueSeries(
+    holding, priceSeries, startDate, endDate)
+
+  return getDatedValuesFromSeries(marketValueSeries)
+}
 
 /*
 DESC
@@ -327,6 +356,28 @@ export function getHoldingTimeWeightedReturn(
         365 / getDaysBetween(startDate, endDate)
       ) - 1
     : timeWeightedReturn
+}
+
+/*
+DESC
+  Returns the total cost of the input Holding between the startDate and
+  endDate
+INPUT
+  holding: An IHolding
+  startDate: The start date for market value calculation
+  endDate: The end date for market value calculation
+*/
+export async function getHoldingTotalCostAsDatedValues(
+  holding: IHolding | IPopulatedHolding,
+  startDate: Date,
+  endDate: Date
+): Promise<TDatedValue[]> {
+
+  // get total cost
+  const totalCostSeries = getHoldingTotalCostSeries(
+    holding, startDate, endDate)
+
+  return getDatedValuesFromSeries(totalCostSeries)
 }
 
 /*
