@@ -1,16 +1,17 @@
 import { 
-  IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio,
+  IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, TDatedValue,
 
   getHoldingTcgplayerId, getPortfolioFirstTransactionDate, getPortfolioHoldings,
 
   assert, dateSub
 } from 'common'
-import { densifyAndFillSeries } from './danfo'
+import { densifyAndFillSeries, getDatedValuesFromSeries } from './danfo'
 import * as df from 'danfojs-node'
 import { 
   getHoldingMarketValueSeries, getHoldingTotalCostSeries 
 } from './Holding'
 import * as _ from 'lodash'
+import { getPriceMapOfSeries } from '../mongo/dbi/Price'
 import { IMPortfolio, Portfolio } from '../mongo/models/portfolioSchema'
 
 
@@ -64,6 +65,37 @@ export function genPortfolioNotFoundError(
 // =======
 // getters
 // =======
+
+/*
+DESC
+  Returns the market value of the input Portfolio between the startDate and
+  endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate?: The start date for market value calculation
+  endDate?: The end date for market value calculation
+*/
+export async function getPortfolioMarketValueAsDatedValues(
+  portfolio: IPortfolio,
+  startDate?: Date,
+  endDate?: Date
+): Promise<TDatedValue[]> {
+
+  // get price map
+  const holdings = getPortfolioHoldings(portfolio)
+  const tcgplayerIds = holdings.map((holding: IHolding | IPopulatedHolding) => {
+    return getHoldingTcgplayerId(holding)
+  })
+  const priceMap = await getPriceMapOfSeries(tcgplayerIds, startDate, endDate)
+
+  // get market value
+  const marketValueSeries = getPortfolioMarketValueSeries(
+    portfolio, priceMap, startDate, endDate)
+
+  return getDatedValuesFromSeries(marketValueSeries)
+}
+
+
 
 /*
 DESC
@@ -126,6 +158,28 @@ export function getPortfolioMarketValueSeries(
 
 /*
 DESC
+  Returns the total cost of the input Portfolio between the startDate and
+  endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate?: The start date for market value calculation
+  endDate: The end date for market value calculation
+*/
+export async function getPortfolioTotalCostAsDatedValues(
+  portfolio: IPortfolio,
+  startDate?: Date,
+  endDate?: Date
+): Promise<TDatedValue[]> {
+
+  // get total cost
+  const totalCostSeries = getPortfolioTotalCostSeries(
+    portfolio, startDate, endDate)
+
+  return getDatedValuesFromSeries(totalCostSeries)
+}
+
+/*
+DESC
   Returns a series of total costs for the input IPortfolio between the
   input startDate and endDate
 INPUT
@@ -148,9 +202,6 @@ export function getPortfolioTotalCostSeries(
 
   // get total cost series of Holdings
   const totalCosts = holdings.map((holding: IHolding | IPopulatedHolding) => {
-
-    const tcgplayerId = getHoldingTcgplayerId(holding)
-
     return getHoldingTotalCostSeries(
       holding,
       startDt,

@@ -1,36 +1,30 @@
 import { loadImageToS3 } from './aws/s3Manager'
 import {
   // data models 
-  IDatedPriceData, IHolding, IPopulatedPortfolio, IPortfolio, 
-  IPrice, IPriceData, IProduct, TDatedValue, THoldingPerformanceData, 
-  TPerformanceData,
+  IDatedPriceData, IPopulatedPortfolio, IPortfolio, IPrice, IPriceData, 
+  IProduct, TDatedValue, TPerformanceData,
   
   PerformanceMetric, TimeseriesGranularity,
 
   // api response status
-  DeletePortfolioStatus, GetPortfolioHoldingsPerformanceStatus, 
-  GetPortfolioPerformanceStatus, GetPortfoliosStatus, 
+  DeletePortfolioStatus, GetPortfolioPerformanceStatus, GetPortfoliosStatus, 
   GetPricesStatus, GetProductsStatus, PostLatestPriceStatus, 
   PostPortfolioStatus, PostPriceStatus, PostProductStatus, PutPortfolioStatus,
   
   // request / response data models
-  TDataResBody, TDeletePortfolioReqBody, TGetPortfolioHoldingsPerformanceResBody,
-  TGetPortfolioPerformanceResBody, TPostLatestPriceReqBody, 
-  TPostPortfolioReqBody, TPostPriceReqBody, TPutPortfolioReqBody, 
-  TPostProductReqBody, TProductPostResBody, TResBody, 
+  TDataResBody, TDeletePortfolioReqBody, TGetPortfolioPerformanceResBody, 
+  TPostLatestPriceReqBody, TPostPortfolioReqBody, TPostPriceReqBody, 
+  TPutPortfolioReqBody, TPostProductReqBody, TProductPostResBody, TResBody, 
 
   // endpoint URLs
-  LATEST_PRICES_URL, PORTFOLIO_URL, PORTFOLIO_HOLDINGS_PERFORMANCE_URL, 
-  PORTFOLIO_PERFORMANCE_URL, PORTFOLIOS_URL, PRICE_URL, PRODUCT_URL, 
-  PRODUCTS_URL, 
+  LATEST_PRICES_URL, PORTFOLIO_URL, PORTFOLIO_PERFORMANCE_URL, PORTFOLIOS_URL, 
+  PRICE_URL, PRODUCT_URL, PRODUCTS_URL, 
 
   assert
 } from 'common'
 import express from 'express'
 import { 
-  addPortfolio, deletePortfolio, getPortfolioDoc, getPortfolios, 
-  getPortfolioMarketValueAsDatedValues, getPortfolioTotalCostAsDatedValues, 
-  setPortfolio 
+  addPortfolio, deletePortfolio, getPortfolioDoc, getPortfolios, setPortfolio 
 } from './mongo/dbi/Portfolio'
 import { 
   getProductDoc, getProductDocs, insertProducts 
@@ -38,7 +32,10 @@ import {
 import { getLatestPrices, insertPrices } from './mongo/dbi/Price'
 import multer from 'multer'
 import { loadCurrentPrice } from './scraper/scrapeManager'
-import { isPortfolioDoc } from './utils/Portfolio'
+import { 
+  isPortfolioDoc, getPortfolioMarketValueAsDatedValues, 
+  getPortfolioTotalCostAsDatedValues
+} from './utils/Portfolio'
 import { isProductDoc } from './utils/Product'
 
 const upload = multer()
@@ -226,9 +223,10 @@ INPUT
   Request query parameters:
     userId: The userId who owns the Portfolio
     portfolioName: The name of the Portfolio
-    startDate: The start date for performance calculation
-    endDate: The end date for performance calculation
     metrics: An array of PerformanceMetrics
+    startDate?: The start date for performance calculation (default: first 
+      transaction date)
+    endDate?: The end date for performance calculation (default: T-1)
 RETURN
   TGetPortfolioPerformanceResBody response with status codes
 
@@ -247,8 +245,12 @@ app.get(PORTFOLIO_PERFORMANCE_URL, async (req: any, res: any) => {
       holdings: []
     })
     assert(isPortfolioDoc(portfolioDoc), 'Could not find Portfolio')
-    const startDate = new Date(Date.parse(req.query.startDate))
-    const endDate = new Date(Date.parse(req.query.endDate))
+    const startDate = req.query.startDate
+      ? new Date(Date.parse(req.query.startDate))
+      : undefined
+    const endDate = req.query.endDate
+      ? new Date(Date.parse(req.query.endDate))
+      : undefined
     const metrics = String(req.query.metrics).split(',') as PerformanceMetric[]
 
     // create performance data object
@@ -256,7 +258,7 @@ app.get(PORTFOLIO_PERFORMANCE_URL, async (req: any, res: any) => {
 
     for (const metric of metrics) {
 
-      let fn: (a1: IPortfolio, a2: Date, a3: Date) => Promise<TDatedValue[]>
+      let fn: (a1: IPortfolio, a2?: Date, a3?: Date) => Promise<TDatedValue[]>
 
       switch(metric) {
         case PerformanceMetric.MarketValue:

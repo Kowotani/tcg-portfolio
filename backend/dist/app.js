@@ -20,6 +20,7 @@ const Product_1 = require("./mongo/dbi/Product");
 const Price_1 = require("./mongo/dbi/Price");
 const multer_1 = __importDefault(require("multer"));
 const scrapeManager_1 = require("./scraper/scrapeManager");
+const Holding_1 = require("./utils/Holding");
 const Portfolio_2 = require("./utils/Portfolio");
 const Product_2 = require("./utils/Product");
 const upload = (0, multer_1.default)();
@@ -174,6 +175,85 @@ app.put(common_1.PORTFOLIO_URL, upload.none(), (req, res) => __awaiter(void 0, v
         res.status(500);
         const body = {
             message: `${common_1.PutPortfolioStatus.Error}: ${err}`
+        };
+        res.send(body);
+    }
+}));
+/*
+DESC
+  Handle GET request to retrieve performance data for the input Portfolio
+  Holdings and date range
+INPUT
+  Request query parameters:
+    userId: The userId who owns the Portfolio
+    portfolioName: The name of the Portfolio
+    metrics: An array of PerformanceMetrics
+    startDate?: The start date for performance calculation
+    endDate?: The end date for performance calculation
+RETURN
+  TGetPortfolioHoldingsPerformanceResBody response with status codes
+
+  Status Code
+    200: The Portfolio Holdings performance data was retrieved successfully
+    500: An error occurred
+*/
+app.get(common_1.PORTFOLIO_HOLDINGS_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // get portfolio
+        const portfolioDoc = yield (0, Portfolio_1.getPortfolioDoc)({
+            userId: req.query.userId,
+            portfolioName: req.query.portfolioName,
+            holdings: []
+        });
+        (0, common_1.assert)((0, Portfolio_2.isPortfolioDoc)(portfolioDoc), 'Could not find Portfolio');
+        const startDate = req.query.startDate
+            ? new Date(Date.parse(req.query.startDate))
+            : undefined;
+        const endDate = req.query.endDate
+            ? new Date(Date.parse(req.query.endDate))
+            : undefined;
+        const metrics = String(req.query.metrics).split(',');
+        // create performance data object
+        let holdingPerformanceData = [];
+        // iterate through each Holding
+        for (const holding of (0, common_1.getPortfolioHoldings)(portfolioDoc)) {
+            let performanceData = {};
+            // calculate each metric
+            for (const metric of metrics) {
+                let fn;
+                switch (metric) {
+                    case common_1.PerformanceMetric.MarketValue:
+                        fn = Holding_1.getHoldingMarketValueAsDatedValues;
+                        break;
+                    case common_1.PerformanceMetric.TotalCost:
+                        fn = Holding_1.getHoldingTotalCostAsDatedValues;
+                        break;
+                    default:
+                        const err = `Unknown metric: ${metric}`;
+                        throw new Error(err);
+                }
+                const values = yield fn(holding, startDate, endDate);
+                performanceData[metric] = values;
+            }
+            // append performance data
+            holdingPerformanceData.push({
+                tcgplayerId: (0, common_1.getHoldingTcgplayerId)(holding),
+                performanceData: performanceData
+            });
+        }
+        // return performance data
+        res.status(200);
+        const body = {
+            data: holdingPerformanceData,
+            message: common_1.GetPortfolioHoldingsPerformanceStatus.Success
+        };
+        res.send(body);
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: `${common_1.GetPortfolioHoldingsPerformanceStatus.Error}: ${err}`
         };
         res.send(body);
     }
