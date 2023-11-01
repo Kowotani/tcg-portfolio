@@ -1,24 +1,31 @@
 import { loadImageToS3 } from './aws/s3Manager'
 import {
   // data models 
-  IDatedPriceData, IPopulatedPortfolio, IPortfolio, IPrice, IPriceData, 
-  IProduct, TDatedValue, TPerformanceData,
+  IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
+  IPrice, IPriceData, IProduct, TDatedValue, THoldingPerformanceData, 
+  TPerformanceData,
   
   PerformanceMetric, TimeseriesGranularity,
 
   // api response status
-  DeletePortfolioStatus, GetPortfolioPerformanceStatus, GetPortfoliosStatus, 
+  DeletePortfolioStatus, GetPortfolioHoldingsPerformanceStatus, 
+  GetPortfolioPerformanceStatus, GetPortfoliosStatus, 
   GetPricesStatus, GetProductsStatus, PostLatestPriceStatus, 
   PostPortfolioStatus, PostPriceStatus, PostProductStatus, PutPortfolioStatus,
   
   // request / response data models
-  TDataResBody, TDeletePortfolioReqBody, TGetPortfolioPerformanceResBody, 
-  TPostLatestPriceReqBody, TPostPortfolioReqBody, TPostPriceReqBody, 
-  TPutPortfolioReqBody, TPostProductReqBody, TProductPostResBody, TResBody, 
+  TDataResBody, TDeletePortfolioReqBody, TGetPortfolioHoldingsPerformanceResBody,
+  TGetPortfolioPerformanceResBody, TPostLatestPriceReqBody, 
+  TPostPortfolioReqBody, TPostPriceReqBody, TPutPortfolioReqBody, 
+  TPostProductReqBody, TProductPostResBody, TResBody, 
 
   // endpoint URLs
-  LATEST_PRICES_URL, PORTFOLIO_URL, PORTFOLIO_PERFORMANCE_URL, PORTFOLIOS_URL, 
-  PRICE_URL, PRODUCT_URL, PRODUCTS_URL, 
+  LATEST_PRICES_URL, PORTFOLIO_URL, PORTFOLIO_HOLDINGS_PERFORMANCE_URL, 
+  PORTFOLIO_PERFORMANCE_URL, PORTFOLIOS_URL, PRICE_URL, PRODUCT_URL, 
+  PRODUCTS_URL, 
+
+  // model helpers
+  getPortfolioHoldings, getHoldingTcgplayerId,
 
   assert
 } from 'common'
@@ -32,6 +39,9 @@ import {
 import { getLatestPrices, insertPrices } from './mongo/dbi/Price'
 import multer from 'multer'
 import { loadCurrentPrice } from './scraper/scrapeManager'
+import { 
+  getHoldingMarketValueAsDatedValues, getHoldingTotalCostAsDatedValues 
+} from './utils/Holding'
 import { 
   isPortfolioDoc, getPortfolioMarketValueAsDatedValues, 
   getPortfolioTotalCostAsDatedValues
@@ -211,6 +221,98 @@ app.put(PORTFOLIO_URL, upload.none(), async (req: any, res: any) => {
     const body: TResBody = {
       message: `${PutPortfolioStatus.Error}: ${err}`
     }        
+    res.send(body)
+  }
+})
+
+/*
+DESC
+  Handle GET request to retrieve performance data for the input Portfolio 
+  Holdings and date range
+INPUT
+  Request query parameters:
+    userId: The userId who owns the Portfolio
+    portfolioName: The name of the Portfolio
+    metrics: An array of PerformanceMetrics
+    startDate?: The start date for performance calculation (default: first 
+      transaction date)
+    endDate?: The end date for performance calculation (default: T-1)
+RETURN
+  TGetPortfolioHoldingsPerformanceResBody response with status codes
+
+  Status Code
+    200: The Portfolio Holdings performance data was retrieved successfully
+    500: An error occurred
+*/
+app.get(PORTFOLIO_HOLDINGS_PERFORMANCE_URL, async (req: any, res: any) => {
+  
+  try {
+
+    // get portfolio
+    const portfolioDoc = await getPortfolioDoc({
+      userId: req.query.userId,
+      portfolioName: req.query.portfolioName,
+      holdings: []
+    })
+    assert(isPortfolioDoc(portfolioDoc), 'Could not find Portfolio')
+    const startDate = req.query.startDate
+      ? new Date(Date.parse(req.query.startDate))
+      : undefined
+    const endDate = req.query.endDate
+      ? new Date(Date.parse(req.query.endDate))
+      : undefined
+    const metrics = String(req.query.metrics).split(',') as PerformanceMetric[]
+
+    // create performance data object
+    let holdingPerformanceData: THoldingPerformanceData[] = []
+
+    // iterate through each Holding
+    for (const holding of getPortfolioHoldings(portfolioDoc)) {
+
+      let performanceData: TPerformanceData = {}
+
+      // calculate each metric
+      for (const metric of metrics) {
+
+        let fn: (a1: IHolding | IPopulatedHolding, a2?: Date, a3?: Date) => Promise<TDatedValue[]>
+
+        switch(metric) {
+          case PerformanceMetric.MarketValue:
+            fn = getHoldingMarketValueAsDatedValues
+            break
+            case PerformanceMetric.TotalCost:
+              fn = getHoldingTotalCostAsDatedValues
+              break
+          default:
+            const err = `Unknown metric: ${metric}`
+            throw new Error(err)
+        }
+        const values = await fn(holding, startDate, endDate)
+        performanceData[metric] = values
+      }    
+
+      // append performance data
+      holdingPerformanceData.push({
+        tcgplayerId: getHoldingTcgplayerId(holding),
+        performanceData: performanceData
+      } as THoldingPerformanceData)
+    }
+
+    // return performance data
+    res.status(200)
+    
+    const body: TGetPortfolioHoldingsPerformanceResBody = {
+      data: holdingPerformanceData,
+      message: GetPortfolioHoldingsPerformanceStatus.Success
+    }
+    res.send(body)
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: `${GetPortfolioHoldingsPerformanceStatus.Error}: ${err}`
+    }
     res.send(body)
   }
 })

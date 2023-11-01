@@ -188,8 +188,9 @@ INPUT
     userId: The userId who owns the Portfolio
     portfolioName: The name of the Portfolio
     metrics: An array of PerformanceMetrics
-    startDate?: The start date for performance calculation
-    endDate?: The end date for performance calculation
+    startDate?: The start date for performance calculation (default: first
+      transaction date)
+    endDate?: The end date for performance calculation (default: T-1)
 RETURN
   TGetPortfolioHoldingsPerformanceResBody response with status codes
 
@@ -266,9 +267,10 @@ INPUT
   Request query parameters:
     userId: The userId who owns the Portfolio
     portfolioName: The name of the Portfolio
-    startDate: The start date for performance calculation
-    endDate: The end date for performance calculation
     metrics: An array of PerformanceMetrics
+    startDate?: The start date for performance calculation (default: first
+      transaction date)
+    endDate?: The end date for performance calculation (default: T-1)
 RETURN
   TGetPortfolioPerformanceResBody response with status codes
 
@@ -285,8 +287,12 @@ app.get(common_1.PORTFOLIO_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void
             holdings: []
         });
         (0, common_1.assert)((0, Portfolio_2.isPortfolioDoc)(portfolioDoc), 'Could not find Portfolio');
-        const startDate = new Date(Date.parse(req.query.startDate));
-        const endDate = new Date(Date.parse(req.query.endDate));
+        const startDate = req.query.startDate
+            ? new Date(Date.parse(req.query.startDate))
+            : undefined;
+        const endDate = req.query.endDate
+            ? new Date(Date.parse(req.query.endDate))
+            : undefined;
         const metrics = String(req.query.metrics).split(',');
         // create performance data object
         let performanceData = {};
@@ -294,10 +300,10 @@ app.get(common_1.PORTFOLIO_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void
             let fn;
             switch (metric) {
                 case common_1.PerformanceMetric.MarketValue:
-                    fn = Portfolio_1.getPortfolioMarketValueAsDatedValues;
+                    fn = Portfolio_2.getPortfolioMarketValueAsDatedValues;
                     break;
                 case common_1.PerformanceMetric.TotalCost:
-                    fn = Portfolio_1.getPortfolioTotalCostAsDatedValues;
+                    fn = Portfolio_2.getPortfolioTotalCostAsDatedValues;
                     break;
                 default:
                     const err = `Unknown metric: ${metric}`;
