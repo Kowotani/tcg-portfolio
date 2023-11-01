@@ -117,7 +117,10 @@ export function getSeriesFromDatedValues(
 ): df.Series {
 
   const index = datedValues.map((dv: TDatedValue) => {
-    return dv.date.toISOString()
+    const date = _.isDate(dv.date)
+      ? dv.date
+      : new Date(Date.parse(dv.date))
+    return date.toISOString()
   })
 
   const values = datedValues.map((dv: TDatedValue) => {
