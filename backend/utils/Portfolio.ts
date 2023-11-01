@@ -1,9 +1,9 @@
 import { 
   IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio,
 
-  getHoldingTcgplayerId, getPortfolioHoldings,
+  getHoldingTcgplayerId, getPortfolioFirstTransactionDate, getPortfolioHoldings,
 
-  assert
+  assert, dateSub
 } from 'common'
 import { densifyAndFillSeries } from './danfo'
 import * as df from 'danfojs-node'
@@ -72,17 +72,20 @@ DESC
 INPUT
   portfolio: An IPortfolio
   priceSeriesMap: A Map of tcgplayerId => danfo Series of Prices
-  startDate: The start date of the Series
-  endDate: The end date of the Series
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the Series (date: T-1)
 RETURN
   A danfo Series
 */
 export function getPortfolioMarketValueSeries(
   portfolio: IPortfolio | IPopulatedPortfolio,
   priceSeriesMap: Map<number, df.Series>,
-  startDate: Date,
-  endDate: Date
+  startDate?: Date,
+  endDate?: Date
 ): df.Series {
+
+  // get start and end dates
+  const [startDt, endDt] = getStartAndEndDates(portfolio, startDate, endDate)
 
   const holdings = getPortfolioHoldings(portfolio)
 
@@ -100,16 +103,16 @@ export function getPortfolioMarketValueSeries(
     return getHoldingMarketValueSeries(
       holding,
       priceSeries,
-      startDate,
-      endDate
+      startDt,
+      endDt
     )
   })
 
   // create empty Series used for summation
   const emptySeries = densifyAndFillSeries(
-    new df.Series([0], {index: [startDate.toISOString()]}),
-    startDate,
-    endDate,
+    new df.Series([0], {index: [startDt.toISOString()]}),
+    startDt,
+    endDt,
     'value',
     0,
     0
@@ -127,16 +130,19 @@ DESC
   input startDate and endDate
 INPUT
   portfolio: An IPortfolio
-  startDate: The start date of the Series
-  endDate: The end date of the Series
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the Series (default: T-1)
 RETURN
   A danfo Series
 */
 export function getPortfolioTotalCostSeries(
   portfolio: IPortfolio | IPopulatedPortfolio,
-  startDate: Date,
-  endDate: Date
+  startDate?: Date,
+  endDate?: Date
 ): df.Series {
+
+  // get start and end dates
+  const [startDt, endDt] = getStartAndEndDates(portfolio, startDate, endDate)
 
   const holdings = getPortfolioHoldings(portfolio)
 
@@ -147,16 +153,16 @@ export function getPortfolioTotalCostSeries(
 
     return getHoldingTotalCostSeries(
       holding,
-      startDate,
-      endDate
+      startDt,
+      endDt
     )
   })
 
   // create empty Series used for summation
   const emptySeries = densifyAndFillSeries(
-    new df.Series([0], {index: [startDate.toISOString()]}),
-    startDate,
-    endDate,
+    new df.Series([0], {index: [startDt.toISOString()]}),
+    startDt,
+    endDt,
     'value',
     0,
     0
@@ -168,6 +174,34 @@ export function getPortfolioTotalCostSeries(
   }, emptySeries)
 
 }
+
+/*
+DESC
+  Returns the default starting and ending dates for the input Portfolio for use
+  in the various getter functions above
+INPUT
+  portfolio: An IPortfolio
+  startDate?: The start date for the calculation
+  endDate?: The end date for the calculation
+RETURN
+  An array with two elements
+    start: The non-undefined starting date
+    end: The non-undefined ending date
+*/
+function getStartAndEndDates(
+  portfolio: IPortfolio | IPopulatedPortfolio, 
+  startDate?: Date,
+  endDate?: Date
+): [Date, Date] {
+
+  // starting date
+  const start = startDate ?? getPortfolioFirstTransactionDate(portfolio) as Date
+
+  // ending date
+  const end = endDate ?? dateSub(new Date(), {days: 1})
+  
+  return [start, end]
+} 
 
 
 // ===========

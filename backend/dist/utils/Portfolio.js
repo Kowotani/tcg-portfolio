@@ -72,12 +72,14 @@ DESC
 INPUT
   portfolio: An IPortfolio
   priceSeriesMap: A Map of tcgplayerId => danfo Series of Prices
-  startDate: The start date of the Series
-  endDate: The end date of the Series
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the Series (date: T-1)
 RETURN
   A danfo Series
 */
 function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, endDate) {
+    // get start and end dates
+    const [startDt, endDt] = getStartAndEndDates(portfolio, startDate, endDate);
     const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
     // get market value series of Holdings
     const marketValues = holdings.map((holding) => {
@@ -85,10 +87,10 @@ function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, end
         const priceSeries = priceSeriesMap.get(tcgplayerId);
         // verify that prices exist for this tcgplayerId
         (0, common_1.assert)(priceSeries instanceof df.Series, `Could not find prices for tcgplayerId: ${tcgplayerId}`);
-        return (0, Holding_1.getHoldingMarketValueSeries)(holding, priceSeries, startDate, endDate);
+        return (0, Holding_1.getHoldingMarketValueSeries)(holding, priceSeries, startDt, endDt);
     });
     // create empty Series used for summation
-    const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDate.toISOString()] }), startDate, endDate, 'value', 0, 0);
+    const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDt.toISOString()] }), startDt, endDt, 'value', 0, 0);
     // get market value series of Portfolio
     return marketValues.reduce((acc, cur) => {
         return acc = acc.add(cur);
@@ -101,26 +103,48 @@ DESC
   input startDate and endDate
 INPUT
   portfolio: An IPortfolio
-  startDate: The start date of the Series
-  endDate: The end date of the Series
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the Series (default: T-1)
 RETURN
   A danfo Series
 */
 function getPortfolioTotalCostSeries(portfolio, startDate, endDate) {
+    // get start and end dates
+    const [startDt, endDt] = getStartAndEndDates(portfolio, startDate, endDate);
     const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
     // get total cost series of Holdings
     const totalCosts = holdings.map((holding) => {
         const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
-        return (0, Holding_1.getHoldingTotalCostSeries)(holding, startDate, endDate);
+        return (0, Holding_1.getHoldingTotalCostSeries)(holding, startDt, endDt);
     });
     // create empty Series used for summation
-    const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDate.toISOString()] }), startDate, endDate, 'value', 0, 0);
+    const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDt.toISOString()] }), startDt, endDt, 'value', 0, 0);
     // get total cost series of Portfolio
     return totalCosts.reduce((acc, cur) => {
         return acc = acc.add(cur);
     }, emptySeries);
 }
 exports.getPortfolioTotalCostSeries = getPortfolioTotalCostSeries;
+/*
+DESC
+  Returns the default starting and ending dates for the input Portfolio for use
+  in the various getter functions above
+INPUT
+  portfolio: An IPortfolio
+  startDate?: The start date for the calculation
+  endDate?: The end date for the calculation
+RETURN
+  An array with two elements
+    start: The non-undefined starting date
+    end: The non-undefined ending date
+*/
+function getStartAndEndDates(portfolio, startDate, endDate) {
+    // starting date
+    const start = startDate !== null && startDate !== void 0 ? startDate : (0, common_1.getPortfolioFirstTransactionDate)(portfolio);
+    // ending date
+    const end = endDate !== null && endDate !== void 0 ? endDate : (0, common_1.dateSub)(new Date(), { days: 1 });
+    return [start, end];
+}
 // ===========
 // type guards
 // ===========

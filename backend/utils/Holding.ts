@@ -533,16 +533,12 @@ function getStartAndEndDates(
 ): [Date, Date] {
 
   // starting date
-  const start = startDate
-    ? startDate
-    : getHoldingFirstTransactionDate(holding) as Date
+  const start = startDate ?? getHoldingFirstTransactionDate(holding) as Date
 
   // ending date
-  const end = endDate
-    ? endDate
-    : dateSub(new Date(), {days: 1})
+  const end = endDate ?? dateSub(new Date(), {days: 1})
   
-    return [start, end]
+  return [start, end]
 } 
 
 
