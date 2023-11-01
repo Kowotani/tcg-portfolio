@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -72,8 +76,8 @@ DESC
   endDate
 INPUT
   holding: A IHolding
-  startDate: The start date for market value calculation
-  endDate: The end date for market value calculation
+  startDate?: The start date for market value calculation
+  endDate?: The end date for market value calculation
 */
 function getHoldingMarketValueAsDatedValues(holding, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -94,29 +98,31 @@ DESC
 INPUT
   holding: An IHolding
   priceSeries: A danfo Series of prices
-  startDate: The start date of the Series
-  endDate: The end date of the Series
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the Series (default: T-1)
 RETURN
   A danfo Series
 */
 function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
+    // get start and end dates
+    const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate);
     // align price series
-    const prices = (0, danfo_1.densifyAndFillSeries)(priceSeries, startDate, endDate, 'locf', undefined, 0);
+    const prices = (0, danfo_1.densifyAndFillSeries)(priceSeries, startDt, endDt, 'locf', undefined, 0);
     // -- get holding value series
     const transactionSeries = getHoldingTransactionQuantitySeries(holding);
     const cumTransactionSeries = transactionSeries.cumSum();
-    const quantitySeries = (0, danfo_1.densifyAndFillSeries)(cumTransactionSeries, startDate, endDate, 'locf', undefined, 0);
+    const quantitySeries = (0, danfo_1.densifyAndFillSeries)(cumTransactionSeries, startDt, endDt, 'locf', undefined, 0);
     const pricesIx = prices.index.map((ix) => {
-        return String(ix) >= startDate.toISOString()
-            && String(ix) <= endDate.toISOString();
+        return String(ix) >= startDt.toISOString()
+            && String(ix) <= endDt.toISOString();
     });
     const holdingValueSeries = quantitySeries.mul(prices.loc(pricesIx));
     // -- get revenue series
-    const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDate, endDate);
+    const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDt, endDt);
     const cumRevenueSeries = dailyRevenueSeries.count()
         ? dailyRevenueSeries.cumSum()
         : dailyRevenueSeries;
-    const revenueSeries = (0, danfo_1.densifyAndFillSeries)(cumRevenueSeries, startDate, endDate, 'locf', undefined, 0);
+    const revenueSeries = (0, danfo_1.densifyAndFillSeries)(cumRevenueSeries, startDt, endDt, 'locf', undefined, 0);
     // -- get market value series
     return holdingValueSeries.add(revenueSeries);
 }
@@ -182,17 +188,19 @@ DESC
   input startDate and endDate
 INPUT
   holding: An IHolding
-  startDate: The start date of the Series
-  endDate: The end date of the Series
+  startDate?: The start date of the  (default: first transaction date)
+  endDate?: The end date of the Series (default: T-1)
 RETURN
   A danfo Series
 */
 function getHoldingPurchaseCostSeries(holding, startDate, endDate) {
+    // get start and end dates
+    const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate);
     // get dated values of daily purchase costs
     const allPurchases = (0, common_1.getHoldingPurchases)(holding);
     const purchases = allPurchases.filter((txn) => {
-        return (0, common_1.isDateAfter)(txn.date, startDate, true)
-            && (0, common_1.isDateBefore)(txn.date, endDate, true);
+        return (0, common_1.isDateAfter)(txn.date, startDt, true)
+            && (0, common_1.isDateBefore)(txn.date, endDt, true);
     });
     const datedValues = purchases.map((txn) => {
         return {
@@ -209,24 +217,26 @@ DESC
   startDate and endDate using the input priceSeries, annualized if input
 INPUT
   holding: An IHolding
-  priceSeries: A danfo Series of prices\
-  startDate: The start date of the Series
-  endDate: The end date of the Series
+  priceSeries: A danfo Series of prices
+  startDate: The start date of the Series (default: first transaction date)
+  endDate: The end date of the  (default: T-1)
   annualized?: TRUE if the return should be annualized, FALSE otherwise
 RETURN
   The time-weighted return
 */
 function getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate, annualized) {
+    // get start and end dates
+    const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate);
     // get market value series
-    const marketValueSeries = getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate);
+    const marketValueSeries = getHoldingMarketValueSeries(holding, priceSeries, startDt, endDate);
     // get daily purchase cost series
-    const dailyPurchaseSeries = getHoldingPurchaseCostSeries(holding, startDate, endDate);
+    const dailyPurchaseSeries = getHoldingPurchaseCostSeries(holding, startDt, endDate);
     // get daily revenue series
-    const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDate, endDate);
+    const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDt, endDt);
     // get cost of goods sold series
     const costOfGoodsSoldSeries = getHoldingCostOfGoodsSoldSeries(holding);
     // create index for return calculations
-    const index = _.uniq(_.concat(dailyPurchaseSeries.index, costOfGoodsSoldSeries.index, [endDate.toISOString()])).sort();
+    const index = _.uniq(_.concat(dailyPurchaseSeries.index, costOfGoodsSoldSeries.index, [endDt.toISOString()])).sort();
     // create numerator array
     // since returns are defined as t / (t-1), ignore the first element
     const numerators = _.slice(index, 1).map((date) => {
@@ -268,7 +278,7 @@ function getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate, 
     }, 1) - 1;
     // annualize if necessary
     return annualized
-        ? Math.pow((1 + timeWeightedReturn), 365 / (0, common_1.getDaysBetween)(startDate, endDate)) - 1
+        ? Math.pow((1 + timeWeightedReturn), 365 / (0, common_1.getDaysBetween)(startDt, endDt)) - 1
         : timeWeightedReturn;
 }
 exports.getHoldingTimeWeightedReturn = getHoldingTimeWeightedReturn;
@@ -278,8 +288,8 @@ DESC
   endDate
 INPUT
   holding: An IHolding
-  startDate: The start date for market value calculation
-  endDate: The end date for market value calculation
+  startDate?: The start date for market value calculation
+  endDate?: The end date for market value calculation
 */
 function getHoldingTotalCostAsDatedValues(holding, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -295,12 +305,14 @@ DESC
   startDate and endDate
 INPUT
   holding: An IHolding
-  startDate: The start date of the Series
-  endDate: The end date of the Series
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the Series (default: T-1)
 RETURN
   A danfo Series
 */
 function getHoldingTotalCostSeries(holding, startDate, endDate) {
+    // get start and end dates
+    const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate);
     // get dated values of daily purchase costs
     const purchases = (0, common_1.getHoldingPurchases)(holding);
     const datedValues = purchases.map((txn) => {
@@ -311,7 +323,7 @@ function getHoldingTotalCostSeries(holding, startDate, endDate) {
     });
     // align daily purchase costs to date index
     const dailyPurchaseSeries = (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(datedValues));
-    const purchaseSeries = (0, danfo_1.densifyAndFillSeries)(dailyPurchaseSeries, startDate, endDate, 'value', 0);
+    const purchaseSeries = (0, danfo_1.densifyAndFillSeries)(dailyPurchaseSeries, startDt, endDt, 'value', 0);
     return purchaseSeries.cumSum();
 }
 exports.getHoldingTotalCostSeries = getHoldingTotalCostSeries;
@@ -355,16 +367,18 @@ DESC
   startDate and endDate
 INPUT
   holding: An IHolding
-  startDate: The start date of the Series
-  endDate: The end date of the Series
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the Series (default: T-1)
 RETURN
   A danfo Series
 */
 function getHoldingRevenueSeries(holding, startDate, endDate) {
+    // get start and end dates
+    const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate);
     const allSales = (0, common_1.getHoldingSales)(holding);
     const sales = allSales.filter((txn) => {
-        return (0, common_1.isDateAfter)(txn.date, startDate, true)
-            && (0, common_1.isDateBefore)(txn.date, endDate, true);
+        return (0, common_1.isDateAfter)(txn.date, startDt, true)
+            && (0, common_1.isDateBefore)(txn.date, endDt, true);
     });
     const datedValues = sales.map((txn) => {
         return {
@@ -375,6 +389,30 @@ function getHoldingRevenueSeries(holding, startDate, endDate) {
     return (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(datedValues));
 }
 exports.getHoldingRevenueSeries = getHoldingRevenueSeries;
+/*
+DESC
+  Returns the default starting and ending dates for the input Holding for use
+  in the various getter functions above
+INPUT
+  holding: An IHolding
+  startDate?: The start date for the calculation
+  endDate?: The end date for the calculation
+RETURN
+  An array with two elements
+    start: The non-undefined starting date
+    end: The non-undefined ending date
+*/
+function getStartAndEndDates(holding, startDate, endDate) {
+    // starting date
+    const start = startDate
+        ? startDate
+        : (0, common_1.getHoldingFirstTransactionDate)(holding);
+    // ending date
+    const end = endDate
+        ? endDate
+        : (0, common_1.dateSub)(new Date(), { days: 1 });
+    return [start, end];
+}
 // ==========
 // validators
 // ==========
