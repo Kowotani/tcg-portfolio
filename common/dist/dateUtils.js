@@ -175,7 +175,7 @@ RETURN
   The number of calendar days between the two dates
 */
 function getDaysBetween(startDate, endDate) {
-    return (0, date_fns_1.differenceInCalendarDays)(startDate, endDate);
+    return (0, date_fns_1.differenceInCalendarDays)(endDate, startDate);
 }
 exports.getDaysBetween = getDaysBetween;
 /*

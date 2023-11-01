@@ -219,7 +219,7 @@ export function getDaysBetween(
   startDate: Date,
   endDate: Date
 ): number {
-  return differenceInCalendarDays(startDate, endDate)
+  return differenceInCalendarDays(endDate, startDate)
 }
 
 /*
