@@ -83,12 +83,14 @@ export function getChartDataFromDatedValues(
 ): TChartDataPoint[] {
 
   const dataMap = new Map<number, {[key: string]: number}>()
-
   // populated dataMap
   datedValuesMap.forEach((datedValues, seriesName) => {
     datedValues.forEach((datedValue: TDatedValue) => {
-
-      const dateAsNumber = datedValue.date.getTime()
+      
+      const date = _.isDate(datedValue.date)
+        ? datedValue.date
+        : new Date(Date.parse(datedValue.date))
+      const dateAsNumber = date.getTime()
       let values = dataMap.get(dateAsNumber)
       
       // set in existing object
@@ -100,7 +102,7 @@ export function getChartDataFromDatedValues(
         values = {[seriesName]: datedValue.value}
       }
 
-      dataMap.set(datedValue.date.getTime(), values)
+      dataMap.set(date.getTime(), values)
     })
   })
 
