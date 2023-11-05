@@ -264,7 +264,7 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
   return (
     <>
-      <Box height={props.height} minWidth={props.minWidth}>
+      <Box height={props.height} minWidth={props.minWidth} width='100%'>
         <ResponsiveContainer 
           height='100%'
           width='100%' 
