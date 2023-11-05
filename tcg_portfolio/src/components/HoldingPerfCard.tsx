@@ -164,7 +164,7 @@ export const HoldingPerfCard = (
                   data={props.chartDataMap}
                   dataKeys={props.chartDataKeys}
                   dateRange={props.chartDateRange}
-                  enableRadio={false}
+                  isControlled={true}
                   height={200}
                   minWidth={200}
                 />

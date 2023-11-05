@@ -64,6 +64,7 @@ export const PortfolioPerformance = (
   const [ holdingsData, setHoldingsData ] = useState([] as THoldingPerformanceData[])
   const [ portfolioData, setPortfolioData ] = useState({} as TPerformanceData)
   const [ isLoaded, setIsLoaded ] = useState(false)
+  const [ chartDateRange, setChartDateRange ] = useState(ChartDateRange.All)
 
   // -----
   // Price
@@ -201,10 +202,11 @@ export const PortfolioPerformance = (
         <PriceChart
           data={portfolioDataMap}
           dataKeys={dataKeys}
-          dateRange={ChartDateRange.All}
-          enableRadio={true}
+          dateRange={chartDateRange}
+          isControlled={false}
           height={300}
           minWidth={400}
+          setParentDateRange={setChartDateRange}
         />
       }
 
@@ -249,7 +251,7 @@ export const PortfolioPerformance = (
                   populatedHolding={holding}
                   chartDataKeys={dataKeys}
                   chartDataMap={isLoaded ? holdingDataMap : undefined}
-                  chartDateRange={ChartDateRange.All}
+                  chartDateRange={chartDateRange}
                 />
               </Box>
             </CascadingSlideFade>

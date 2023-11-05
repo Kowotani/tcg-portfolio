@@ -169,28 +169,30 @@ type TPriceChartProps = {
   data: Map<string, TDatedValue[]>,
   dataKeys: {[key: string]: string},
   dateRange: ChartDateRange,
-  enableRadio: boolean,
+  isControlled: boolean,
   height: number,
-  minWidth: number
+  minWidth: number,
+  setParentDateRange?: (dateRange: ChartDateRange) => void,
 }
 export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
-  // -----
+  // =====
   // state
-  // -----
+  // =====
 
-  const [dateRange, setDateRange] = useState(props.dateRange)
+  const [ internalDateRange, setInternalDateRange] = useState(props.dateRange)
 
 
-  // ----------
+  // ==========
   // chart data
-  // ----------
+  // ==========
+
+  const dateRange = props.isControlled ? props.dateRange : internalDateRange
 
   // get dataKeys
   const { primaryKey, referenceKey } = getChartDataKeys(props.dataKeys)
   const primaryDataKey = `values.${primaryKey}`
   const referenceDataKey = referenceKey ? `values.${referenceKey}`: undefined
-
   const chartData = getChartDataFromDatedValues(props.data) 
 
   // get start date and end date
@@ -235,9 +237,17 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
   const ticks = getDateAxisTicks(startDate, endDate, dateRange)
 
 
-  // ----------------
+  // ================
   // date range radio
-  // ----------------
+  // ================
+
+  function onRadioChange(value: string): void {
+    const dateRange = dateRangeMap.get(value) as ChartDateRange
+    setInternalDateRange(dateRange)
+    if (props.setParentDateRange) {
+      props.setParentDateRange(dateRange)
+    }
+  }
 
   const dateRangeMap = new Map<string, ChartDateRange>([
     ['1M', ChartDateRange.OneMonth],
@@ -252,7 +262,7 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: 'dateRange',
     defaultValue: 'All',
-    onChange: (value) => setDateRange(dateRangeMap.get(value) as ChartDateRange)
+    onChange: (value) => onRadioChange(value)
   })
 
   const group = getRootProps()
@@ -320,7 +330,7 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
           </AreaChart>
         </ResponsiveContainer>
       </Box>
-      {props.enableRadio && (
+      {!props.isControlled && (
         <Box minWidth={props.minWidth} marginTop={2}>
         <HStack display='flex' justifyContent='space-evenly' {...group}>
           {dateRangeOptions.map((value: any) => {
