@@ -9,8 +9,7 @@ import {
   useRadioGroup
 } from '@chakra-ui/react'
 import { 
-  TDatedValue, 
-  assert, dateSub, formatInTimeZone, isDate
+  TDatedValue, formatInTimeZone
 } from 'common'
 import * as _ from 'lodash'
 import { 
@@ -23,8 +22,8 @@ import {
 import { 
   ChartDateRange, TChartDataPoint, 
 
-  dateAxisTickFormatter, getChartDataFromDatedValues, 
-  getChartDataKeys, getDateAxisTicks, priceAxisTickFormatter
+  dateAxisTickFormatter, getChartDataFromDatedValues, getChartDataKeys, 
+  getDateAxisTicks, getStartDateFromChartDateRange, priceAxisTickFormatter
 } from '../utils/Chart'
 import { getBrowserLocale } from '../utils/generic'
 import { getFormattedPrice } from '../utils/Price'
@@ -195,45 +194,15 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
   const referenceDataKey = referenceKey ? `values.${referenceKey}`: undefined
   const chartData = getChartDataFromDatedValues(props.data) 
 
-  // get start date and end date
-  let startDate
+  // get start and end dates
   const endDate = new Date()
 
-  // use input data to find start date
-  if (dateRange === ChartDateRange.All) {
-    const startDateAsNumber = _.minBy(chartData, 
-      (dataPoint: TChartDataPoint) => {
+  const startDate = dateRange === ChartDateRange.All
+    ? new Date(Number(_.minBy(chartData, (dataPoint: TChartDataPoint) => {
         return dataPoint.date
-    })?.date
-    startDate = new Date(Number(startDateAsNumber))
-  
-  // use input date range to find start date
-  } else {
+      })?.date))
+    : getStartDateFromChartDateRange(dateRange)
 
-    // one month
-    if (dateRange === ChartDateRange.OneMonth) {
-      startDate = dateSub(endDate, {days: 30})
-
-    // three months
-    } else if (dateRange === ChartDateRange.ThreeMonths) {
-      startDate = dateSub(endDate, {months: 3})
-
-    // six months
-    } else if (dateRange === ChartDateRange.SixMonths) {
-      startDate = dateSub(endDate, {months: 6})
-
-    // one year
-    } else if (dateRange === ChartDateRange.OneYear) {
-      startDate = dateSub(endDate, {years: 1})
-
-    // default to three months
-    } else {
-      startDate = dateSub(endDate, {months: 3})
-    }
-  }
-
-  
-  assert(isDate(startDate), 'startDate is not a Date')
   const ticks = getDateAxisTicks(startDate, endDate, dateRange)
 
 

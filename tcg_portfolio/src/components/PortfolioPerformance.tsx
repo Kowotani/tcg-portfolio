@@ -15,9 +15,11 @@ import {
   // endpoint URLs
   PORTFOLIO_HOLDINGS_PERFORMANCE_URL, PORTFOLIO_PERFORMANCE_URL,
 
-  dateSub, formatAsISO, getPortfolioFirstTransactionDate, genDateRange, getDaysBetween, getHoldingTcgplayerId,
+  getPortfolioFirstTransactionDate, getHoldingTcgplayerId,
+
+  // date helpers
+  isDateAfter, isDateBefore
 } from 'common'
-import * as df from 'danfojs'
 import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { PriceChart } from './Charts'
@@ -25,11 +27,10 @@ import { HoldingPerfCard } from './HoldingPerfCard'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { UserContext } from '../state/UserContext'
 import { CascadingSlideFade } from './Transitions'
-import { ChartDateRange } from '../utils/Chart'
+import { ChartDateRange, getStartDateFromChartDateRange } from '../utils/Chart'
 import { 
   ILatestPricesContext, getIPriceDataMapFromIDatedPriceDataMap 
 } from '../utils/Price'
-import { densifyAndFillSeries, getDatedValuesFromSeries, getSeriesFromDatedValues } from '../utils/danfo'
 import { IUserContext } from '../utils/User'
 
 
@@ -38,6 +39,44 @@ import { IUserContext } from '../utils/User'
 // =========
 
 const DEFAULT_METRICS = ['Market Value', 'Total Cost']
+
+
+// =========
+// functions
+// =========
+
+/*
+DESC
+  Clamps the input datedValues to fall within the input dateRange
+INPUT
+  datedValues: A TDatedValue[]
+  dateRange: A ChartDateRange
+RETURN
+  The dated values that are within the date range
+*/
+function clampDatedValues(
+  datedValues: TDatedValue[], 
+  dateRange: ChartDateRange
+): TDatedValue[] {
+
+  // return all if dateRange is all
+  if (dateRange === ChartDateRange.All) {
+    return datedValues
+  }
+
+  // get start and end dates
+  const startDate = getStartDateFromChartDateRange(dateRange)
+  const endDate = new Date()
+
+  // return filtered values
+  return datedValues.filter((dv: TDatedValue) => {
+    const date = _.isDate(dv.date)
+      ? dv.date
+      : new Date(Date.parse(dv.date))
+    return isDateAfter(date, startDate, true) 
+      && isDateBefore(date, endDate, true)
+  })
+}
 
 
 // ==============
@@ -51,8 +90,8 @@ type TPortfolioPerformanceProps = {
 export const PortfolioPerformance = (
   props: PropsWithChildren<TPortfolioPerformanceProps>
 ) => {
-
   
+
   // =====
   // state
   // =====
@@ -79,7 +118,6 @@ export const PortfolioPerformance = (
   // ----
 
   const { user } = useContext(UserContext) as IUserContext
-
 
   // =====
   // hooks
@@ -172,8 +210,14 @@ export const PortfolioPerformance = (
     referenceKey: 'Total Cost'
   }
 
-  const portfolioMarketValue = portfolioData['Market Value'] as TDatedValue[]
-  const portfolioTotalCost = portfolioData['Total Cost'] as TDatedValue[]
+  const portfolioMarketValue = clampDatedValues(
+    portfolioData['Market Value'] as TDatedValue[], 
+    chartDateRange
+  )
+  const portfolioTotalCost = clampDatedValues(
+    portfolioData['Total Cost'] as TDatedValue[],
+    chartDateRange
+  )
   const portfolioDataMap = new Map<string, TDatedValue[]>([
     ['Market Value', portfolioMarketValue],
     ['Total Cost', portfolioTotalCost],
@@ -227,11 +271,14 @@ export const PortfolioPerformance = (
             holdingsData.filter((data: THoldingPerformanceData) => {
               return data.tcgplayerId === tcgplayerId
           }))
-          const holdingMarketValue 
-            = holdingData?.performanceData['Market Value'] as TDatedValue[]
-          const holdingTotalCost 
-            = holdingData?.performanceData['Total Cost'] as TDatedValue[]
-
+          const holdingMarketValue = clampDatedValues(
+            holdingData?.performanceData['Market Value'] as TDatedValue[],
+            chartDateRange
+          )
+          const holdingTotalCost = clampDatedValues(
+            holdingData?.performanceData['Total Cost'] as TDatedValue[],
+            chartDateRange
+          )
           const holdingDataMap = new Map<string, TDatedValue[]>([
             ['Market Value', holdingMarketValue],
             ['Total Cost', holdingTotalCost],
