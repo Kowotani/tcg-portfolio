@@ -4,8 +4,8 @@ import {
   genFirstOfMonthDateRange, genFirstOfQuarterDateRange, genFirstOfYearDateRange,
   genSundayOfWeekDateRange, getDaysBetween,
 
-  formatInTimeZone, genDateRange
-
+  formatInTimeZone, genDateRange, getDateOneMonthAgo, getDateThreeMonthsAgo, 
+  getDateSixMonthsAgo, getDateOneYearAgo
 } from 'common'
 import { getBrowserLocale } from './generic'
 import * as _ from 'lodash'
@@ -188,6 +188,41 @@ export function getDateAxisTicks(
   return dates.map((date: Date) => {
     return date.getTime()
   })
+}
+
+/*
+DESC
+  Returns the start date based on the input ChartDateRange
+INPUT
+  dateRange: A ChartDateRange
+RETURN
+  The start date
+*/
+export function getStartDateFromChartDateRange(
+  dateRange: ChartDateRange
+): Date {
+
+  // one month
+  if (dateRange === ChartDateRange.OneMonth) {
+    return getDateOneMonthAgo()
+
+  // three months
+  } else if (dateRange === ChartDateRange.ThreeMonths) {
+    return getDateThreeMonthsAgo()
+
+  // six months
+  } else if (dateRange === ChartDateRange.SixMonths) {
+    return getDateSixMonthsAgo()
+
+  // one year
+  } else if (dateRange === ChartDateRange.OneYear) {
+    return getDateOneYearAgo()
+
+  // default to one year ago
+  } else {
+    return getDateOneYearAgo()
+  }
+
 }
 
 /*
