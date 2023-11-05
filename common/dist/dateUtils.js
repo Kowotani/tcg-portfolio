@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isDateBefore = exports.isDateAfter = exports.getDaysBetween = exports.getClampedDate = exports.formatInTimeZone = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getDaysBetween = exports.getClampedDate = exports.formatInTimeZone = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 var date_fns_tz_1 = require("date-fns-tz");
 // ==========
@@ -212,3 +212,56 @@ function isDateBefore(first, second, orEqual) {
         : (0, date_fns_1.isBefore)(first, second);
 }
 exports.isDateBefore = isDateBefore;
+// =====================
+// n periods ago helpers
+// =====================
+/*
+DESC
+  Returns a date that is 30 days ago
+RETURN
+  The date that is 30 days ago
+*/
+function getDateThirtyDaysAgo() {
+    return dateSub((0, date_fns_1.startOfToday)(), { days: 30 });
+}
+exports.getDateThirtyDaysAgo = getDateThirtyDaysAgo;
+/*
+DESC
+  Returns a date that is 1 month ago
+RETURN
+  The date that is 1 month ago
+*/
+function getDateOneMonthAgo() {
+    return dateSub((0, date_fns_1.startOfToday)(), { months: 1 });
+}
+exports.getDateOneMonthAgo = getDateOneMonthAgo;
+/*
+DESC
+  Returns a date that is 3 months ago
+RETURN
+  The date that is 3 months ago
+*/
+function getDateThreeMonthsAgo() {
+    return dateSub((0, date_fns_1.startOfToday)(), { months: 3 });
+}
+exports.getDateThreeMonthsAgo = getDateThreeMonthsAgo;
+/*
+DESC
+  Returns a date that is 6 months ago
+RETURN
+  The date that is 6 months ago
+*/
+function getDateSixMonthsAgo() {
+    return dateSub((0, date_fns_1.startOfToday)(), { months: 6 });
+}
+exports.getDateSixMonthsAgo = getDateSixMonthsAgo;
+/*
+DESC
+  Returns a date that is 1 year ago
+RETURN
+  The date that is 1 year ago
+*/
+function getDateOneYearAgo() {
+    return dateSub((0, date_fns_1.startOfToday)(), { years: 1 });
+}
+exports.getDateOneYearAgo = getDateOneYearAgo;

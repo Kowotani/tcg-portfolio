@@ -11,6 +11,11 @@ export declare function getClampedDate(date: Date, startDate: Date, endDate: Dat
 export declare function getDaysBetween(startDate: Date, endDate: Date): number;
 export declare function isDateAfter(first: Date, second: Date, orEqual?: boolean): boolean;
 export declare function isDateBefore(first: Date, second: Date, orEqual?: boolean): boolean;
+export declare function getDateThirtyDaysAgo(): Date;
+export declare function getDateOneMonthAgo(): Date;
+export declare function getDateThreeMonthsAgo(): Date;
+export declare function getDateSixMonthsAgo(): Date;
+export declare function getDateOneYearAgo(): Date;
 declare type TDateMathDuration = {
     years?: number;
     months?: number;

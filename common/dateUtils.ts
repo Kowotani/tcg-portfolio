@@ -1,7 +1,7 @@
 import { 
   add, clamp, differenceInCalendarDays, eachMonthOfInterval, 
   eachQuarterOfInterval, eachWeekOfInterval, eachYearOfInterval, isAfter, 
-  isBefore, isEqual, sub
+  isBefore, isEqual, startOfToday, sub
 } from 'date-fns'
 import { format, utcToZonedTime } from 'date-fns-tz'
 
@@ -262,6 +262,61 @@ export function isDateBefore(
   return orEqual 
     ? isBefore(first, second) || isEqual(first, second)
     : isBefore(first, second)
+}
+
+
+// =====================
+// n periods ago helpers
+// =====================
+
+/*
+DESC
+  Returns a date that is 30 days ago
+RETURN
+  The date that is 30 days ago
+*/
+export function getDateThirtyDaysAgo(): Date {
+  return dateSub(startOfToday(), {days: 30})
+}
+
+/*
+DESC
+  Returns a date that is 1 month ago
+RETURN
+  The date that is 1 month ago
+*/
+export function getDateOneMonthAgo(): Date {
+  return dateSub(startOfToday(), {months: 1})
+}
+
+/*
+DESC
+  Returns a date that is 3 months ago
+RETURN
+  The date that is 3 months ago
+*/
+export function getDateThreeMonthsAgo(): Date {
+  return dateSub(startOfToday(), {months: 3})
+}
+
+/*
+DESC
+  Returns a date that is 6 months ago
+RETURN
+  The date that is 6 months ago
+*/
+export function getDateSixMonthsAgo(): Date {
+  return dateSub(startOfToday(), {months: 6})
+}
+
+/*
+DESC
+  Returns a date that is 1 year ago
+RETURN
+  The date that is 1 year ago
+*/
+export function getDateOneYearAgo(): Date {
+  return dateSub(startOfToday(), {years: 1})
 }
 
 
