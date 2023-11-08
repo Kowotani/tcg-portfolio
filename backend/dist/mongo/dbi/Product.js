@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = void 0;
+exports.getTcgplayerIdsForHistoricalScrape = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = void 0;
 const common_1 = require("common");
 const mongoose_1 = __importDefault(require("mongoose"));
 const productSchema_1 = require("../models/productSchema");
+const Chart_1 = require("../../utils/Chart");
 const Product_1 = require("../../utils/Product");
 // =======
 // globals
@@ -121,6 +122,150 @@ function setProductProperty(tcgplayerId, key, value) {
     });
 }
 exports.setProductProperty = setProductProperty;
+/*
+DESC
+  Returns the TcgplayerIds that should be scraped for historical prices based
+  on the input date range. A TcgplayerId should be scraped if it:
+    - was released in the past
+    - has no price data in the earliest month of the requested date range
+      (eg. for a date range of 1Y, scrape if there is no data 12M ago)
+INPUT
+  dateRange: A TcgPlayerChartDateRange
+RETURN
+  An array of TcgplayerIds that should be scraped for historical prices based
+  on the input date range
+*/
+function getTcgplayerIdsForHistoricalScrape(dateRange) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        // get priceDate lower bound
+        let priceDateLowerBound;
+        // 3M
+        if (dateRange === Chart_1.TcgPlayerChartDateRange.ThreeMonths) {
+            priceDateLowerBound = (0, common_1.getDateThreeMonthsAgo)();
+            // 6M
+        }
+        else if (dateRange === Chart_1.TcgPlayerChartDateRange.SixMonths) {
+            priceDateLowerBound = (0, common_1.getDateSixMonthsAgo)();
+            // 1Y
+        }
+        else if (dateRange === Chart_1.TcgPlayerChartDateRange.OneYear) {
+            priceDateLowerBound = (0, common_1.getDateOneYearAgo)();
+            // default to 1Y
+        }
+        else {
+            priceDateLowerBound = (0, common_1.getDateOneYearAgo)();
+        }
+        // pipeline
+        const pipeline = [
+            // include only released products
+            {
+                $match: {
+                    $expr: {
+                        $lte: [
+                            '$releaseDate',
+                            new Date()
+                        ],
+                    }
+                }
+            },
+            // join to Price documents
+            {
+                $lookup: {
+                    from: 'prices',
+                    localField: 'tcgplayerId',
+                    foreignField: 'tcgplayerId',
+                    as: 'priceDocs'
+                }
+            },
+            // only consider Price documents within the scraping date range 
+            {
+                $addFields: {
+                    filteredPriceDocs: {
+                        $filter: {
+                            input: '$priceDocs',
+                            cond: {
+                                $gte: ['$$this.priceDate', priceDateLowerBound]
+                            }
+                        }
+                    }
+                }
+            },
+            // create array of priceDate month
+            {
+                $addFields: {
+                    priceMonths: {
+                        $reduce: {
+                            input: '$filteredPriceDocs',
+                            initialValue: [],
+                            in: {
+                                $concatArrays: [
+                                    '$$value',
+                                    [{
+                                            $month: '$$this.priceDate'
+                                        }]
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            // determine unique price months and expected price months
+            {
+                $addFields: {
+                    uniquePriceMonths: {
+                        $setUnion: ['$priceMonths', []]
+                    },
+                    expectedPriceMonths: {
+                        $toInt: {
+                            $dateDiff: {
+                                startDate: {
+                                    $max: [priceDateLowerBound, '$releaseDate']
+                                },
+                                endDate: new Date(),
+                                unit: 'month'
+                            }
+                        }
+                    }
+                }
+            },
+            // group by tcgplayerId
+            {
+                $group: {
+                    _id: '$tcgplayerId',
+                    tcgplayerId: { $max: '$tcgplayerId' },
+                    numPriceMonths: { $max: { $size: '$uniquePriceMonths' } },
+                    expectedPriceMonths: { $max: '$expectedPriceMonths' }
+                }
+            },
+            // filter to documents with fewer price months than expected
+            {
+                $match: {
+                    $expr: {
+                        $lt: ['$numPriceMonths', '$expectedPriceMonths']
+                    }
+                }
+            },
+            // return tcgplayerIds
+            {
+                $project: {
+                    _id: 0,
+                    tcgplayerId: 1
+                }
+            }
+        ];
+        // execute pipeline
+        const res = yield productSchema_1.Product.aggregate(pipeline).exec();
+        return res.length
+            ? res.map((doc) => {
+                (0, common_1.assert)('tcgplayerId' in doc, 'tcgplayerId not found in document');
+                return doc.tcgplayerId;
+            }).sort()
+            : [];
+    });
+}
+exports.getTcgplayerIdsForHistoricalScrape = getTcgplayerIdsForHistoricalScrape;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let res;
@@ -146,6 +291,8 @@ function main() {
         // }
         // const p233232 = await getProductDoc({'tcgplayerId': 233232})
         // const p449558 = await getProductDoc({'tcgplayerId': 449558})
+        res = yield getTcgplayerIdsForHistoricalScrape(Chart_1.TcgPlayerChartDateRange.OneYear);
+        console.log(res);
         return 0;
     });
 }
