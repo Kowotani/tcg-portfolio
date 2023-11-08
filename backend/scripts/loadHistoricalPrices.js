@@ -1,8 +1,8 @@
 const scrapeManager = require('../dist/scraper/scrapeManager')
-const utils = require("../dist/utils")
+const chartUtils = require('../dist/utils/Chart')
 
 scrapeManager
-  .loadHistoricalPrices(utils.TcgPlayerChartDateRange.ThreeMonths)
+  .loadHistoricalPrices(chartUtils.TcgPlayerChartDateRange.OneYear)
   .then(res => {
     console.log(`${res} price documents were loaded`) 
   })
