@@ -15,6 +15,10 @@ const Price_1 = require("../mongo/dbi/Price");
 const Product_1 = require("../mongo/dbi/Product");
 const scraper_1 = require("./scraper");
 // =========
+// constants
+// =========
+const BATCH_SIZE = 50;
+// =========
 // functions
 // =========
 /*
@@ -118,16 +122,14 @@ RETURN
 */
 function loadHistoricalPrices(dateRange) {
     return __awaiter(this, void 0, void 0, function* () {
-        // get all Products
+        // get TcgplayerIds that are missing data
+        const tcgplayerIds = yield (0, Product_1.getTcgplayerIdsForHistoricalScrape)(dateRange);
+        // get Product docs for relevant TcgplayerIds
         const allProductDocs = yield (0, Product_1.getProductDocs)();
-        // exclude unreleased Products
-        const productDocs = allProductDocs.filter((product) => {
-            return (0, common_1.formatAsISO)(product.releaseDate) <= (0, common_1.formatAsISO)(new Date());
+        const productDocs = allProductDocs.filter((productDoc) => {
+            return tcgplayerIds.includes(productDoc.tcgplayerId);
         });
-        // scrape price data
-        const tcgplayerIds = productDocs.map((productDoc) => {
-            return productDoc.tcgplayerId;
-        });
+        // scrape historical data
         const scrapedPrices = yield (0, scraper_1.scrapeHistorical)(tcgplayerIds, dateRange);
         let priceDocs = [];
         // iterate through each Product
@@ -167,7 +169,7 @@ function main() {
         // console.log(res)
         // const numInserted = await loadCurrentPrices()
         // console.log(`Inserted ${numInserted} docs`)
-        // const numInserted = await loadHistoricalPrices()
+        // const numInserted = await loadHistoricalPrices(TcgPlayerChartDateRange.OneYear)
         // console.log(`Inserted ${numInserted} docs`)
     });
 }

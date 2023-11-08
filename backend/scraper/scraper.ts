@@ -243,13 +243,8 @@ export async function scrapeHistorical(
     // get empty page
     const emptyPage = await getPage()
 
-    let counter = 1
-
     // iterate through ids
     for (const tcgplayerId of tcgplayerIds) {
-
-      console.log(counter)
-      counter += 1
 
       // navigate to the url
       const url = URL_BASE + tcgplayerId + '/'

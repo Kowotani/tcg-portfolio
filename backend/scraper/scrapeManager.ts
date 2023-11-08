@@ -3,11 +3,21 @@ import {
 
   formatAsISO
 } from 'common'
+import * as _ from 'lodash'
 import { IMProduct } from '../mongo/models/productSchema'
 import { insertPrices } from '../mongo/dbi/Price'
-import { getProductDocs } from '../mongo/dbi/Product'
+import { 
+  getProductDocs, getTcgplayerIdsForHistoricalScrape 
+} from '../mongo/dbi/Product'
 import { scrapeCurrent, scrapeHistorical } from './scraper'
 import { TcgPlayerChartDateRange } from '../utils/Chart'
+
+
+// =========
+// constants
+// =========
+
+const BATCH_SIZE = 50
 
 
 // =========
@@ -135,20 +145,17 @@ export async function loadHistoricalPrices(
   dateRange: TcgPlayerChartDateRange
 ): Promise<number> {
 
-  // get all Products
+  // get TcgplayerIds that are missing data
+  const tcgplayerIds = await getTcgplayerIdsForHistoricalScrape(dateRange)
+
+  // get Product docs for relevant TcgplayerIds
   const allProductDocs = await getProductDocs()
-
-  // exclude unreleased Products
-  const productDocs = allProductDocs.filter((product: IMProduct) => {
-    return formatAsISO(product.releaseDate) <= formatAsISO(new Date())
+  const productDocs = allProductDocs.filter((productDoc: IMProduct) => {
+    return tcgplayerIds.includes(productDoc.tcgplayerId)
   })
 
-  // scrape price data
-  const tcgplayerIds = productDocs.map((productDoc: IMProduct) => {
-    return productDoc.tcgplayerId
-  })
-  const scrapedPrices 
-    = await scrapeHistorical(tcgplayerIds, dateRange)
+  // scrape historical data
+  const scrapedPrices = await scrapeHistorical(tcgplayerIds, dateRange)
 
   let priceDocs: IPrice[] = []
 
@@ -198,7 +205,7 @@ async function main() {
   // const numInserted = await loadCurrentPrices()
   // console.log(`Inserted ${numInserted} docs`)
 
-  // const numInserted = await loadHistoricalPrices()
+  // const numInserted = await loadHistoricalPrices(TcgPlayerChartDateRange.OneYear)
   // console.log(`Inserted ${numInserted} docs`)
 }
 

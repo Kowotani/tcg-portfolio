@@ -220,11 +220,8 @@ function scrapeHistorical(tcgplayerIds, dateRange) {
         try {
             // get empty page
             const emptyPage = yield getPage();
-            let counter = 1;
             // iterate through ids
             for (const tcgplayerId of tcgplayerIds) {
-                console.log(counter);
-                counter += 1;
                 // navigate to the url
                 const url = URL_BASE + tcgplayerId + '/';
                 const page = yield navigatePage(emptyPage, url);
