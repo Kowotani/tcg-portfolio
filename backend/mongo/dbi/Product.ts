@@ -19,9 +19,9 @@ import { genProductNotFoundError, isProductDoc } from '../../utils/Product'
 const url = 'mongodb://localhost:27017/tcgPortfolio'
 
 
-// =========
-// functions
-// =========
+// =======
+// getters
+// =======
 
 /*
 DESC
@@ -81,77 +81,6 @@ export async function getProductDocs(): Promise<HydratedDocument<IMProduct>[]> {
   } catch(err) {
 
     const errMsg = `An error occurred in getProductDocs(): ${err}`
-    throw new Error(errMsg)
-  }
-}
-
-
-/*
-DESC
-  Constructs Price documents from the input data and inserts them
-INPUT 
-  An array of IProducts
-RETURN
-  The number of documents inserted
-*/
-export async function insertProducts(docs: IProduct[]): Promise<number> {
-
-  // connect to db
-  await mongoose.connect(url)
-
-  try {
-
-    const res = await Product.insertMany(docs)
-    return res.length
-    
-  } catch(err) {
-  
-    const errMsg = `An error occurred in insertProducts(): ${err}`
-    throw new Error(errMsg)
-  }
-}
-
-/*
-DESC
-  Sets a property on a Product document to the input value using the
-  tcgplayerId to find the Product
-INPUT 
-  tcgplayerId: TCGPlayerId identifying the product
-  key: The property name to set
-  value: The property value to set
-RETURN
-  TRUE if the property was successfully set, FALSE otherwise
-*/
-export async function setProductProperty(
-  tcgplayerId: number,
-  key: string,
-  value: any
-): Promise<boolean> {
-  
-  // connect to db
-  await mongoose.connect(url)
-
-  try {
-
-    // check if Product exists
-    const productDoc = await getProductDoc({tcgplayerId: tcgplayerId})
-    if (!isProductDoc(productDoc)) {
-      throw genProductNotFoundError('setProductProperty()', tcgplayerId)
-    }
-    assert(
-      isProductDoc(productDoc),
-      genProductNotFoundError('setProductProperty()', tcgplayerId).toString()
-    )
-
-    // update Product
-    productDoc.set(key, value)
-    await productDoc.save()
-
-    return true
-
-  } catch(err) {
-
-    const errMsg = `An error occurred in setProductProperty(): ${err}`
     throw new Error(errMsg)
   }
 }
@@ -314,6 +243,82 @@ export async function getTcgplayerIdsForHistoricalScrape(
 }
 
 
+
+// =======
+// setters
+// =======
+
+/*
+DESC
+  Constructs Price documents from the input data and inserts them
+INPUT 
+  An array of IProducts
+RETURN
+  The number of documents inserted
+*/
+export async function insertProducts(docs: IProduct[]): Promise<number> {
+
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    const res = await Product.insertMany(docs)
+    return res.length
+    
+  } catch(err) {
+  
+    const errMsg = `An error occurred in insertProducts(): ${err}`
+    throw new Error(errMsg)
+  }
+}
+
+/*
+DESC
+  Sets a property on a Product document to the input value using the
+  tcgplayerId to find the Product
+INPUT 
+  tcgplayerId: TCGPlayerId identifying the product
+  key: The property name to set
+  value: The property value to set
+RETURN
+  TRUE if the property was successfully set, FALSE otherwise
+*/
+export async function setProductProperty(
+  tcgplayerId: number,
+  key: string,
+  value: any
+): Promise<boolean> {
+  
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    // check if Product exists
+    const productDoc = await getProductDoc({tcgplayerId: tcgplayerId})
+    if (!isProductDoc(productDoc)) {
+      throw genProductNotFoundError('setProductProperty()', tcgplayerId)
+    }
+    assert(
+      isProductDoc(productDoc),
+      genProductNotFoundError('setProductProperty()', tcgplayerId).toString()
+    )
+
+    // update Product
+    productDoc.set(key, value)
+    await productDoc.save()
+
+    return true
+
+  } catch(err) {
+
+    const errMsg = `An error occurred in setProductProperty(): ${err}`
+    throw new Error(errMsg)
+  }
+}
+
+
 async function main(): Promise<number> {  
 
   let res
@@ -346,7 +351,7 @@ async function main(): Promise<number> {
   // const p449558 = await getProductDoc({'tcgplayerId': 449558})
 
   // res = await getTcgplayerIdsForHistoricalScrape(TcgPlayerChartDateRange.OneYear)
-  // console.log(res)
+  console.log(res)
 
   return 0
 }

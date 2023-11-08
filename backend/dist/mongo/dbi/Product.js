@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTcgplayerIdsForHistoricalScrape = exports.setProductProperty = exports.insertProducts = exports.getProductDocs = exports.getProductDoc = void 0;
+exports.setProductProperty = exports.insertProducts = exports.getTcgplayerIdsForHistoricalScrape = exports.getProductDocs = exports.getProductDoc = void 0;
 const common_1 = require("common");
 const mongoose_1 = __importDefault(require("mongoose"));
 const productSchema_1 = require("../models/productSchema");
@@ -65,63 +65,6 @@ function getProductDocs() {
     });
 }
 exports.getProductDocs = getProductDocs;
-/*
-DESC
-  Constructs Price documents from the input data and inserts them
-INPUT
-  An array of IProducts
-RETURN
-  The number of documents inserted
-*/
-function insertProducts(docs) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // connect to db
-        yield mongoose_1.default.connect(url);
-        try {
-            const res = yield productSchema_1.Product.insertMany(docs);
-            return res.length;
-        }
-        catch (err) {
-            const errMsg = `An error occurred in insertProducts(): ${err}`;
-            throw new Error(errMsg);
-        }
-    });
-}
-exports.insertProducts = insertProducts;
-/*
-DESC
-  Sets a property on a Product document to the input value using the
-  tcgplayerId to find the Product
-INPUT
-  tcgplayerId: TCGPlayerId identifying the product
-  key: The property name to set
-  value: The property value to set
-RETURN
-  TRUE if the property was successfully set, FALSE otherwise
-*/
-function setProductProperty(tcgplayerId, key, value) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // connect to db
-        yield mongoose_1.default.connect(url);
-        try {
-            // check if Product exists
-            const productDoc = yield getProductDoc({ tcgplayerId: tcgplayerId });
-            if (!(0, Product_1.isProductDoc)(productDoc)) {
-                throw (0, Product_1.genProductNotFoundError)('setProductProperty()', tcgplayerId);
-            }
-            (0, common_1.assert)((0, Product_1.isProductDoc)(productDoc), (0, Product_1.genProductNotFoundError)('setProductProperty()', tcgplayerId).toString());
-            // update Product
-            productDoc.set(key, value);
-            yield productDoc.save();
-            return true;
-        }
-        catch (err) {
-            const errMsg = `An error occurred in setProductProperty(): ${err}`;
-            throw new Error(errMsg);
-        }
-    });
-}
-exports.setProductProperty = setProductProperty;
 /*
 DESC
   Returns the TcgplayerIds that should be scraped for historical prices based
@@ -266,6 +209,66 @@ function getTcgplayerIdsForHistoricalScrape(dateRange) {
     });
 }
 exports.getTcgplayerIdsForHistoricalScrape = getTcgplayerIdsForHistoricalScrape;
+// =======
+// setters
+// =======
+/*
+DESC
+  Constructs Price documents from the input data and inserts them
+INPUT
+  An array of IProducts
+RETURN
+  The number of documents inserted
+*/
+function insertProducts(docs) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            const res = yield productSchema_1.Product.insertMany(docs);
+            return res.length;
+        }
+        catch (err) {
+            const errMsg = `An error occurred in insertProducts(): ${err}`;
+            throw new Error(errMsg);
+        }
+    });
+}
+exports.insertProducts = insertProducts;
+/*
+DESC
+  Sets a property on a Product document to the input value using the
+  tcgplayerId to find the Product
+INPUT
+  tcgplayerId: TCGPlayerId identifying the product
+  key: The property name to set
+  value: The property value to set
+RETURN
+  TRUE if the property was successfully set, FALSE otherwise
+*/
+function setProductProperty(tcgplayerId, key, value) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            // check if Product exists
+            const productDoc = yield getProductDoc({ tcgplayerId: tcgplayerId });
+            if (!(0, Product_1.isProductDoc)(productDoc)) {
+                throw (0, Product_1.genProductNotFoundError)('setProductProperty()', tcgplayerId);
+            }
+            (0, common_1.assert)((0, Product_1.isProductDoc)(productDoc), (0, Product_1.genProductNotFoundError)('setProductProperty()', tcgplayerId).toString());
+            // update Product
+            productDoc.set(key, value);
+            yield productDoc.save();
+            return true;
+        }
+        catch (err) {
+            const errMsg = `An error occurred in setProductProperty(): ${err}`;
+            throw new Error(errMsg);
+        }
+    });
+}
+exports.setProductProperty = setProductProperty;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let res;
@@ -291,7 +294,7 @@ function main() {
         // }
         // const p233232 = await getProductDoc({'tcgplayerId': 233232})
         // const p449558 = await getProductDoc({'tcgplayerId': 449558})
-        res = yield getTcgplayerIdsForHistoricalScrape(Chart_1.TcgPlayerChartDateRange.OneYear);
+        // res = await getTcgplayerIdsForHistoricalScrape(TcgPlayerChartDateRange.OneYear)
         console.log(res);
         return 0;
     });
