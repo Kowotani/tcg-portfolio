@@ -1,6 +1,6 @@
-const mongoManager = require('../dist/mongo/mongoManager')
+const priceDbi = require('../dist/mongo/dbi/Price')
 
-mongoManager
+priceDbi
   .updateHistoricalPrices()
   .then(res => {
     if (res) {
