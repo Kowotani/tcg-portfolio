@@ -6,8 +6,8 @@ import { getProductDocs } from './Product'
 import * as _ from 'lodash'
 import mongoose from 'mongoose'
 import { HistoricalPrice, IMHistoricalPrice } from '../models/historicalPriceSchema'
-import { Price } from '../models/priceSchema'
-import { IMProduct } from '../models/productSchema'
+import { Price, priceSchema } from '../models/priceSchema'
+import { IMProduct, Product } from '../models/productSchema'
 import * as dfu from '../../utils/danfo'
 import { getIMPricesFromIPrices } from '../../utils/Price'
 import { isProductDoc } from '../../utils/Product'
@@ -20,9 +20,9 @@ import { isProductDoc } from '../../utils/Product'
 const url = 'mongodb://localhost:27017/tcgPortfolio'
 
 
-// =========
-// functions
-// =========
+// =======
+// getters
+// =======
 
 /*
 DESC
@@ -211,6 +211,105 @@ export async function getPriceMapOfSeries(
     })
 
   return seriesMap
+}
+
+
+// =======
+// setters
+// =======
+
+/*
+DESC
+  Inserts a Price document corresponding to the Product MSRP, if there is no
+  Price doc on release date
+RETURN
+  TRUE if the insertion was sucessful
+*/
+export async function insertMissingReleaseDatePrices(): Promise<number> {
+ 
+  // connect to db
+  await mongoose.connect(url)  
+
+  try {
+
+    const pipeline = [
+      
+        // filter to Products with MSRP
+        {
+          $match: {
+            msrp: {
+              $ne: null
+            }
+          }
+        },
+
+        // join to Prices
+        {
+          $lookup: {
+            from: 'prices',
+            localField: 'tcgplayerId',
+            foreignField: 'tcgplayerId',
+            as: 'priceDocs'
+          }
+        },
+
+        // add fields required in a Price document
+        // and also a field to find missing prices on releaseDate
+        {
+          $addFields: {
+            releaseDatePrices: {
+              $filter: {
+                input: '$priceDocs',
+                cond: {
+                  $eq: [
+                    '$$this.priceDate',
+                    '$releaseDate'
+                  ]
+                }
+              }
+            },
+            priceDate: '$releaseDate',
+            prices: { marketPrice: '$msrp' },
+            product: '$_id',
+            granularity: 'hours'
+          }
+        },
+
+        // filter to documents without a Price doc on releaseDate
+        {
+          $match: {
+            $expr: {
+              $eq: [ { $size: '$releaseDatePrices' }, 0]
+            }
+          }
+        },
+
+        // create the Price document
+        {
+          $project: {
+            _id: false,
+            tcgplayerId: true,
+            priceDate: true,
+            prices: true,
+            product: true,
+            granularity: true
+          }
+        } 
+    ]
+
+    // query Product documents
+    const prices = await Product.aggregate(pipeline).exec() as IPrice[]
+    
+    // insert into Prices
+    const res = await insertPrices(prices)
+    return res
+
+  } catch(err) {
+    
+    const errMsg = `An error occurred in insertMissingReleaseDatePrices(): ${err}`
+    throw new Error(errMsg)
+  }
+  
 }
 
 /*
@@ -487,6 +586,8 @@ async function main(): Promise<number> {
   // )
   // // console.log('-- price series')
   // // console.log(priceSeries)
+
+  // res = await insertMissingReleaseDatePrices()
 
   return 0
 }

@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -35,12 +31,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateHistoricalPrices = exports.resetPrices = exports.insertPrices = exports.getPriceMapOfSeries = exports.getPriceMapOfDatedValues = exports.getLatestPrices = void 0;
+exports.updateHistoricalPrices = exports.resetPrices = exports.insertPrices = exports.insertMissingReleaseDatePrices = exports.getPriceMapOfSeries = exports.getPriceMapOfDatedValues = exports.getLatestPrices = void 0;
 const common_1 = require("common");
 const Product_1 = require("./Product");
 const mongoose_1 = __importDefault(require("mongoose"));
 const historicalPriceSchema_1 = require("../models/historicalPriceSchema");
 const priceSchema_1 = require("../models/priceSchema");
+const productSchema_1 = require("../models/productSchema");
 const dfu = __importStar(require("../../utils/danfo"));
 const Price_1 = require("../../utils/Price");
 const Product_2 = require("../../utils/Product");
@@ -48,9 +45,9 @@ const Product_2 = require("../../utils/Product");
 // globals
 // =======
 const url = 'mongodb://localhost:27017/tcgPortfolio';
-// =========
-// functions
-// =========
+// =======
+// getters
+// =======
 /*
 DESC
   Retrieves the latest market Prices for all Products
@@ -214,6 +211,93 @@ function getPriceMapOfSeries(tcgplayerIds, startDate, endDate) {
     });
 }
 exports.getPriceMapOfSeries = getPriceMapOfSeries;
+// =======
+// setters
+// =======
+/*
+DESC
+  Inserts a Price document corresponding to the Product MSRP, if there is no
+  Price doc on release date
+RETURN
+  TRUE if the insertion was sucessful
+*/
+function insertMissingReleaseDatePrices() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            const pipeline = [
+                // filter to Products with MSRP
+                {
+                    $match: {
+                        msrp: {
+                            $ne: null
+                        }
+                    }
+                },
+                // join to Prices
+                {
+                    $lookup: {
+                        from: 'prices',
+                        localField: 'tcgplayerId',
+                        foreignField: 'tcgplayerId',
+                        as: 'priceDocs'
+                    }
+                },
+                // add fields required in a Price document
+                // and also a field to find missing prices on releaseDate
+                {
+                    $addFields: {
+                        releaseDatePrices: {
+                            $filter: {
+                                input: '$priceDocs',
+                                cond: {
+                                    $eq: [
+                                        '$$this.priceDate',
+                                        '$releaseDate'
+                                    ]
+                                }
+                            }
+                        },
+                        priceDate: '$releaseDate',
+                        prices: { marketPrice: '$msrp' },
+                        product: '$_id',
+                        granularity: 'hours'
+                    }
+                },
+                // filter to documents without a Price doc on releaseDate
+                {
+                    $match: {
+                        $expr: {
+                            $eq: [{ $size: '$releaseDatePrices' }, 0]
+                        }
+                    }
+                },
+                // create the Price document
+                {
+                    $project: {
+                        _id: false,
+                        tcgplayerId: true,
+                        priceDate: true,
+                        prices: true,
+                        product: true,
+                        granularity: true
+                    }
+                }
+            ];
+            // query Product documents
+            const prices = yield productSchema_1.Product.aggregate(pipeline).exec();
+            // insert into Prices
+            const res = yield insertPrices(prices);
+            return res;
+        }
+        catch (err) {
+            const errMsg = `An error occurred in insertMissingReleaseDatePrices(): ${err}`;
+            throw new Error(errMsg);
+        }
+    });
+}
+exports.insertMissingReleaseDatePrices = insertMissingReleaseDatePrices;
 /*
 DESC
   Constructs Price documents from the input data and inserts them
@@ -443,6 +527,7 @@ function main() {
         // )
         // // console.log('-- price series')
         // // console.log(priceSeries)
+        // res = await insertMissingReleaseDatePrices()
         return 0;
     });
 }
