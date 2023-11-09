@@ -3,6 +3,7 @@ import axios from 'axios'
 import { 
   Box,
   Button,
+  Spinner
 } from '@chakra-ui/react'
 import { 
   // data models
@@ -15,7 +16,7 @@ import {
   // endpoint URLs
   PORTFOLIO_HOLDINGS_PERFORMANCE_URL, PORTFOLIO_PERFORMANCE_URL,
 
-  getPortfolioFirstTransactionDate, getHoldingTcgplayerId,
+  getHoldingTcgplayerId,
 
   // date helpers
   isDateAfter, isDateBefore
@@ -157,9 +158,6 @@ export const PortfolioPerformance = (
     })
   }, [user, props.portfolio])
 
-  const firstTxnDate
-    = getPortfolioFirstTransactionDate(props.portfolio) as Date
-
   // set Portfolio performance data
   useEffect(() => {
 
@@ -242,6 +240,22 @@ export const PortfolioPerformance = (
       </Box>
 
       {/* Portfolio Market Value Chart */}
+      {!isLoaded && 
+        <Box 
+          display='flex'
+          alignItems='center'
+          justifyContent='center'
+          height={300} 
+          width='100%' 
+        >
+          <Spinner 
+            color='blue.500'
+            height={100}
+            width={100}
+            thickness='10px'
+          />
+        </Box>
+      }
       {isLoaded && 
         <PriceChart
           data={portfolioDataMap}
