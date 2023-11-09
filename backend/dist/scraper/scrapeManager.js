@@ -15,10 +15,6 @@ const Price_1 = require("../mongo/dbi/Price");
 const Product_1 = require("../mongo/dbi/Product");
 const scraper_1 = require("./scraper");
 // =========
-// constants
-// =========
-const BATCH_SIZE = 50;
-// =========
 // functions
 // =========
 /*

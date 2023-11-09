@@ -14,13 +14,6 @@ import { TcgPlayerChartDateRange } from '../utils/Chart'
 
 
 // =========
-// constants
-// =========
-
-const BATCH_SIZE = 50
-
-
-// =========
 // functions
 // =========
 
