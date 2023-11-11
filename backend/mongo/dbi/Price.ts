@@ -3,12 +3,11 @@ import {
 } from 'common'
 import * as df from 'danfojs-node'
 import { getProductDocs } from './Product'
-import * as _ from 'lodash'
 import mongoose from 'mongoose'
 import { HistoricalPrice, IMHistoricalPrice } from '../models/historicalPriceSchema'
-import { Price, priceSchema } from '../models/priceSchema'
+import { Price } from '../models/priceSchema'
 import { IMProduct, Product } from '../models/productSchema'
-import * as dfu from '../../utils/danfo'
+import { getSeriesFromDatedValues } from '../../utils/danfo'
 import { getIMPricesFromIPrices } from '../../utils/Price'
 import { isProductDoc } from '../../utils/Product'
 
@@ -206,11 +205,61 @@ export async function getPriceMapOfSeries(
   // convert TDatedValue[] to Series
   const seriesMap = new Map<number, df.Series>()
     datedValueMap.forEach((value, key) => {
-      const series = dfu.getSeriesFromDatedValues(value)
+      const series = getSeriesFromDatedValues(value)
       seriesMap.set(key, series)
     })
 
   return seriesMap
+}
+
+/*
+DESC
+  Retrieves the Prices for the input tcgplayerId as dated values. The data can  
+  be sliced by the optional startDate and endDate, otherwise it  will return all 
+  data found
+INPUT
+  tcgplayerId: The tcgplayerId
+  startDate?: The starting date for the Price series
+  endDate?: The ending date for the Price series
+RETURN
+  A TDatedValue[]
+*/
+export async function getPricesAsDatedValues(
+  tcgplayerId: number,
+  startDate?: Date,
+  endDate?: Date
+): Promise<TDatedValue[]> {
+
+  // get dated value map
+  const datedValueMap
+    = await getPriceMapOfDatedValues([tcgplayerId], startDate, endDate)
+
+  return datedValueMap.get(tcgplayerId) as TDatedValue[]
+}
+
+/*
+DESC
+  Retrieves the Prices for the input tcgplayerId as a danfo Series. The data can  
+  be sliced by the optional startDate and endDate, otherwise it  will return all 
+  data found
+INPUT
+  tcgplayerId: The tcgplayerId
+  startDate?: The starting date for the Price series
+  endDate?: The ending date for the Price series
+RETURN
+  A danfo Series
+*/
+export async function getPriceSeries(
+  tcgplayerId: number,
+  startDate?: Date,
+  endDate?: Date
+): Promise<df.Series> {
+
+  // get dated values
+  const datedValues 
+    = await getPricesAsDatedValues(tcgplayerId, startDate, endDate)
+
+  return getSeriesFromDatedValues(datedValues) as df.Series
 }
 
 
@@ -554,6 +603,12 @@ export async function updateHistoricalPrices(): Promise<boolean> {
 async function main(): Promise<number> {  
 
   let res
+
+  // const tcgplayerId = 493975
+  // const startDate = new Date(Date.parse('2023-06-01'))
+  // const endDate = new Date(Date.parse('2023-07-01'))
+  // res = await getPricesAsDatedValues(tcgplayerId, startDate, endDate)
+  // console.log(res)
 
   // res = await getLatestPrices()
   // if (res) {

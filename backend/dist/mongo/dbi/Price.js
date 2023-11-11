@@ -1,23 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -31,14 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateHistoricalPrices = exports.resetPrices = exports.insertPrices = exports.insertMissingReleaseDatePrices = exports.getPriceMapOfSeries = exports.getPriceMapOfDatedValues = exports.getLatestPrices = void 0;
+exports.updateHistoricalPrices = exports.resetPrices = exports.insertPrices = exports.insertMissingReleaseDatePrices = exports.getPriceSeries = exports.getPricesAsDatedValues = exports.getPriceMapOfSeries = exports.getPriceMapOfDatedValues = exports.getLatestPrices = void 0;
 const common_1 = require("common");
 const Product_1 = require("./Product");
 const mongoose_1 = __importDefault(require("mongoose"));
 const historicalPriceSchema_1 = require("../models/historicalPriceSchema");
 const priceSchema_1 = require("../models/priceSchema");
 const productSchema_1 = require("../models/productSchema");
-const dfu = __importStar(require("../../utils/danfo"));
+const danfo_1 = require("../../utils/danfo");
 const Price_1 = require("../../utils/Price");
 const Product_2 = require("../../utils/Product");
 // =======
@@ -204,13 +185,53 @@ function getPriceMapOfSeries(tcgplayerIds, startDate, endDate) {
         // convert TDatedValue[] to Series
         const seriesMap = new Map();
         datedValueMap.forEach((value, key) => {
-            const series = dfu.getSeriesFromDatedValues(value);
+            const series = (0, danfo_1.getSeriesFromDatedValues)(value);
             seriesMap.set(key, series);
         });
         return seriesMap;
     });
 }
 exports.getPriceMapOfSeries = getPriceMapOfSeries;
+/*
+DESC
+  Retrieves the Prices for the input tcgplayerId as dated values. The data can
+  be sliced by the optional startDate and endDate, otherwise it  will return all
+  data found
+INPUT
+  tcgplayerId: The tcgplayerId
+  startDate?: The starting date for the Price series
+  endDate?: The ending date for the Price series
+RETURN
+  A TDatedValue[]
+*/
+function getPricesAsDatedValues(tcgplayerId, startDate, endDate) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get dated value map
+        const datedValueMap = yield getPriceMapOfDatedValues([tcgplayerId], startDate, endDate);
+        return datedValueMap.get(tcgplayerId);
+    });
+}
+exports.getPricesAsDatedValues = getPricesAsDatedValues;
+/*
+DESC
+  Retrieves the Prices for the input tcgplayerId as a danfo Series. The data can
+  be sliced by the optional startDate and endDate, otherwise it  will return all
+  data found
+INPUT
+  tcgplayerId: The tcgplayerId
+  startDate?: The starting date for the Price series
+  endDate?: The ending date for the Price series
+RETURN
+  A danfo Series
+*/
+function getPriceSeries(tcgplayerId, startDate, endDate) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get dated values
+        const datedValues = yield getPricesAsDatedValues(tcgplayerId, startDate, endDate);
+        return (0, danfo_1.getSeriesFromDatedValues)(datedValues);
+    });
+}
+exports.getPriceSeries = getPriceSeries;
 // =======
 // setters
 // =======
@@ -499,6 +520,11 @@ exports.updateHistoricalPrices = updateHistoricalPrices;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let res;
+        // const tcgplayerId = 493975
+        // const startDate = new Date(Date.parse('2023-06-01'))
+        // const endDate = new Date(Date.parse('2023-07-01'))
+        // res = await getPricesAsDatedValues(tcgplayerId, startDate, endDate)
+        // console.log(res)
         // res = await getLatestPrices()
         // if (res) {
         //   logObject(res)
