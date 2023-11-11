@@ -232,6 +232,50 @@ export function getHoldingCostOfGoodsSoldSeries(
 
 /*
 DESC
+  Returns a series of cumulative PnL for the input IHolding between the
+  input startDate and endDate using the input priceSeries. This can be
+  calculated as the Market Value - Total Cost
+INPUT
+  holding: An IHolding
+  priceSeries: A danfo Series of prices
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the Series (default: T-1)
+RETURN
+  A danfo Series
+*/
+export function getHoldingPnLSeries(
+  holding: IHolding | IPopulatedHolding,
+  priceSeries: df.Series,
+  startDate?: Date,
+  endDate?: Date
+): df.Series {
+
+  // get start and end dates
+  const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate)
+
+  // align price series
+  const prices = densifyAndFillSeries(
+    priceSeries,
+    startDt,
+    endDt,
+    'locf',
+    undefined,
+    0
+  )
+
+  // get market value series
+  const marketValueSeries 
+    = getHoldingMarketValueSeries(holding, prices, startDt, endDt)
+
+  // get total cost series
+  const totalCostSeries = getHoldingTotalCostSeries(holding, startDt, endDt)
+
+  // return market value - total cost
+  return marketValueSeries.sub(totalCostSeries) as df.Series
+}
+
+/*
+DESC
   Returns a series of purchase costs for the input IHolding between the
   input startDate and endDate
 INPUT
