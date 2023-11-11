@@ -66,7 +66,7 @@ export async function getIMHoldingsFromIHoldings(
 
 /*
 DESC
-  Returns the market value of the input Portfolio between the startDate and
+  Returns the market value of the input Holding between the startDate and
   endDate
 INPUT
   holding: A IHolding
@@ -228,6 +228,33 @@ export function getHoldingCostOfGoodsSoldSeries(
 
   // return COGS as Danfo Series
   return sortSeriesByIndex(getSeriesFromDatedValues(cogs))
+}
+
+/*
+DESC
+  Returns the cumulative PnL of the input Holding between the startDate and
+  endDate
+INPUT
+  holding: A IHolding
+  startDate?: The start date for PnL calculation
+  endDate?: The end date for PnL calculation
+*/
+export async function getHoldingPnLAsDatedValues(
+  holding: IHolding | IPopulatedHolding,
+  startDate?: Date,
+  endDate?: Date
+): Promise<TDatedValue[]> {
+
+  // get price map
+  const tcgplayerId = getHoldingTcgplayerId(holding)
+  const priceMap = await getPriceMapOfSeries([tcgplayerId], startDate, endDate)
+  const priceSeries = priceMap.get(tcgplayerId) as df.Series
+
+  // get PnL
+  const pnlSeries 
+    = getHoldingPnLSeries(holding, priceSeries, startDate, endDate)
+
+  return getDatedValuesFromSeries(pnlSeries)
 }
 
 /*
