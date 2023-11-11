@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -138,7 +142,7 @@ function getHoldingMarketValueAsDatedValues(holding, startDate, endDate) {
         const priceSeries = priceMap.get(tcgplayerId);
         // get market value
         const marketValueSeries = getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate);
-        return (0, danfo_1.getDatedValuesFromSeries)(marketValueSeries);
+        return (0, danfo_1.getDatedValuesFromSeries)(marketValueSeries, 2);
     });
 }
 exports.getHoldingMarketValueAsDatedValues = getHoldingMarketValueAsDatedValues;
@@ -195,7 +199,7 @@ function getHoldingPnLAsDatedValues(holding, startDate, endDate) {
         const priceSeries = priceMap.get(tcgplayerId);
         // get PnL
         const pnlSeries = getHoldingPnLSeries(holding, priceSeries, startDate, endDate);
-        return (0, danfo_1.getDatedValuesFromSeries)(pnlSeries);
+        return (0, danfo_1.getDatedValuesFromSeries)(pnlSeries, 2);
     });
 }
 exports.getHoldingPnLAsDatedValues = getHoldingPnLAsDatedValues;
@@ -338,7 +342,7 @@ function getHoldingTotalCostAsDatedValues(holding, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
         // get total cost
         const totalCostSeries = getHoldingTotalCostSeries(holding, startDate, endDate);
-        return (0, danfo_1.getDatedValuesFromSeries)(totalCostSeries);
+        return (0, danfo_1.getDatedValuesFromSeries)(totalCostSeries, 2);
     });
 }
 exports.getHoldingTotalCostAsDatedValues = getHoldingTotalCostAsDatedValues;

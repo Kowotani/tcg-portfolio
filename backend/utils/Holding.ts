@@ -159,7 +159,7 @@ export async function getHoldingMarketValueAsDatedValues(
   const marketValueSeries = getHoldingMarketValueSeries(
     holding, priceSeries, startDate, endDate)
 
-  return getDatedValuesFromSeries(marketValueSeries)
+  return getDatedValuesFromSeries(marketValueSeries, 2)
 }
 
 /*
@@ -254,7 +254,7 @@ export async function getHoldingPnLAsDatedValues(
   const pnlSeries 
     = getHoldingPnLSeries(holding, priceSeries, startDate, endDate)
 
-  return getDatedValuesFromSeries(pnlSeries)
+  return getDatedValuesFromSeries(pnlSeries, 2)
 }
 
 /*
@@ -458,7 +458,7 @@ export async function getHoldingTotalCostAsDatedValues(
   const totalCostSeries = getHoldingTotalCostSeries(
     holding, startDate, endDate)
 
-  return getDatedValuesFromSeries(totalCostSeries)
+  return getDatedValuesFromSeries(totalCostSeries, 2)
 }
 
 /*

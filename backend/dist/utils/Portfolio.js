@@ -22,12 +22,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isPortfolioDoc = exports.getPortfolioTotalCostSeries = exports.getPortfolioMarketValueSeries = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = void 0;
+exports.isPortfolioDoc = exports.getPortfolioTotalCostSeries = exports.getPortfolioTotalCostAsDatedValues = exports.getPortfolioMarketValueSeries = exports.getPortfolioMarketValueAsDatedValues = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = void 0;
 const common_1 = require("common");
 const danfo_1 = require("./danfo");
 const df = __importStar(require("danfojs-node"));
 const Holding_1 = require("./Holding");
+const Price_1 = require("../mongo/dbi/Price");
 const portfolioSchema_1 = require("../mongo/models/portfolioSchema");
 // ======
 // errors
@@ -71,6 +81,29 @@ exports.genPortfolioNotFoundError = genPortfolioNotFoundError;
 // =======
 /*
 DESC
+  Returns the market value of the input Portfolio between the startDate and
+  endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate?: The start date for market value calculation
+  endDate?: The end date for market value calculation
+*/
+function getPortfolioMarketValueAsDatedValues(portfolio, startDate, endDate) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get price map
+        const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
+        const tcgplayerIds = holdings.map((holding) => {
+            return (0, common_1.getHoldingTcgplayerId)(holding);
+        });
+        const priceMap = yield (0, Price_1.getPriceMapOfSeries)(tcgplayerIds, startDate, endDate);
+        // get market value
+        const marketValueSeries = getPortfolioMarketValueSeries(portfolio, priceMap, startDate, endDate);
+        return (0, danfo_1.getDatedValuesFromSeries)(marketValueSeries, 2);
+    });
+}
+exports.getPortfolioMarketValueAsDatedValues = getPortfolioMarketValueAsDatedValues;
+/*
+DESC
   Returns a series of daily market values for the input IPortfolio between the
   input startDate and endDate using prices in the input priceSeriesMap
 INPUT
@@ -103,6 +136,23 @@ function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, end
 exports.getPortfolioMarketValueSeries = getPortfolioMarketValueSeries;
 /*
 DESC
+  Returns the total cost of the input Portfolio between the startDate and
+  endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate?: The start date for market value calculation
+  endDate: The end date for market value calculation
+*/
+function getPortfolioTotalCostAsDatedValues(portfolio, startDate, endDate) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get total cost
+        const totalCostSeries = getPortfolioTotalCostSeries(portfolio, startDate, endDate);
+        return (0, danfo_1.getDatedValuesFromSeries)(totalCostSeries, 2);
+    });
+}
+exports.getPortfolioTotalCostAsDatedValues = getPortfolioTotalCostAsDatedValues;
+/*
+DESC
   Returns a series of total costs for the input IPortfolio between the
   input startDate and endDate
 INPUT
@@ -118,7 +168,6 @@ function getPortfolioTotalCostSeries(portfolio, startDate, endDate) {
     const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
     // get total cost series of Holdings
     const totalCosts = holdings.map((holding) => {
-        const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
         return (0, Holding_1.getHoldingTotalCostSeries)(holding, startDt, endDt);
     });
     // create empty Series used for summation

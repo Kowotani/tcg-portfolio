@@ -79,11 +79,13 @@ DESC
   Converts the input danfo Seeries into a TDatedValue[]
 INPUT
   series: A danfo Series
+  precision?: The precision of the values
 RETURN
   A TDatedValue[]
 */
 export function getDatedValuesFromSeries(
-  series: df.Series
+  series: df.Series,
+  precision?: number
 ): TDatedValue[] {
 
   const datedValues = series.index.map((index: string | number) => {
@@ -96,9 +98,13 @@ export function getDatedValuesFromSeries(
       ? Number(series.iat(index))
       : Number(series.at(index))
 
+    const roundedValue = precision
+      ? _.round(value, precision)
+      : value
+
     return {
       date: date,
-      value: value
+      value: roundedValue
     }
   })
 

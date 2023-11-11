@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -84,10 +88,11 @@ DESC
   Converts the input danfo Seeries into a TDatedValue[]
 INPUT
   series: A danfo Series
+  precision?: The precision of the values
 RETURN
   A TDatedValue[]
 */
-function getDatedValuesFromSeries(series) {
+function getDatedValuesFromSeries(series, precision) {
     const datedValues = series.index.map((index) => {
         const date = _.isNumber(index)
             ? new Date(index)
@@ -95,9 +100,12 @@ function getDatedValuesFromSeries(series) {
         const value = _.isNumber(index)
             ? Number(series.iat(index))
             : Number(series.at(index));
+        const roundedValue = precision
+            ? _.round(value, precision)
+            : value;
         return {
             date: date,
-            value: value
+            value: roundedValue
         };
     });
     return datedValues;

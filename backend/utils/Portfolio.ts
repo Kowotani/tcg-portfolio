@@ -92,7 +92,7 @@ export async function getPortfolioMarketValueAsDatedValues(
   const marketValueSeries = getPortfolioMarketValueSeries(
     portfolio, priceMap, startDate, endDate)
 
-  return getDatedValuesFromSeries(marketValueSeries)
+  return getDatedValuesFromSeries(marketValueSeries, 2)
 }
 
 
@@ -175,7 +175,7 @@ export async function getPortfolioTotalCostAsDatedValues(
   const totalCostSeries = getPortfolioTotalCostSeries(
     portfolio, startDate, endDate)
 
-  return getDatedValuesFromSeries(totalCostSeries)
+  return getDatedValuesFromSeries(totalCostSeries, 2)
 }
 
 /*
