@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -32,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hasValidTransactions = exports.areValidHoldings = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTotalCostAsDatedValues = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingPnLSeries = exports.getHoldingPnLAsDatedValues = exports.getHoldingCostOfGoodsSoldSeries = exports.getHoldingMarketValueSeries = exports.getHoldingMarketValueAsDatedValues = exports.getIMHoldingsFromIHoldings = void 0;
+exports.hasValidTransactions = exports.areValidHoldings = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTotalCostAsDatedValues = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingPnLSeries = exports.getHoldingPnLAsDatedValues = exports.getHoldingMarketValueSeries = exports.getHoldingMarketValueAsDatedValues = exports.getHoldingCostOfGoodsSoldSeries = exports.getIMHoldingsFromIHoldings = void 0;
 const common_1 = require("common");
 const danfo_1 = require("./danfo");
 const _ = __importStar(require("lodash"));
@@ -70,6 +66,61 @@ exports.getIMHoldingsFromIHoldings = getIMHoldingsFromIHoldings;
 // =======
 // getters
 // =======
+/*
+DESC
+  Returns a series of cost of goods sold for the input IHolding. The index of
+  the returned Series will correspond to each date with a Sale
+INPUT
+  holding: An IHolding
+RETURN
+  A danfo Series
+*/
+function getHoldingCostOfGoodsSoldSeries(holding) {
+    // get Purchase and Sales
+    const purchases = (0, common_1.getHoldingAggregatedPurchases)(holding);
+    const sales = (0, common_1.getHoldingAggregatedSales)(holding);
+    // sort Purchases and Sales
+    let sortedPurchases = _.sortBy(purchases, [(txn) => txn.date]);
+    const sortedSales = _.sortBy(sales, [(txn) => txn.date]);
+    // store datedValues of COGS
+    let cogs = [];
+    // create datedValues of cost of goods sold for each Sale transaction date
+    sortedSales.map((sale) => {
+        // accumulate price and quantity of COGS
+        let price = 0;
+        let quantity = 0;
+        // calculate COGS
+        while (quantity < sale.quantity && sortedPurchases.length) {
+            // get first remaining Purchase
+            const purchase = sortedPurchases.shift();
+            (0, common_1.assert)(purchase, 'sortedPurchases is empty');
+            (0, common_1.assert)((0, common_1.isDateBefore)(purchase.date, sale.date, true), 'Insufficient Purchases to calculate COGS');
+            // calculate the portion of the Purchase used (eg. sold)
+            const usedQuantity = Math.min(sale.quantity - quantity, purchase.quantity);
+            // update COGS
+            price = (price * quantity + purchase.price * usedQuantity)
+                / (quantity + usedQuantity);
+            quantity = quantity + usedQuantity;
+            // add back unused portion of the Purchase
+            if (usedQuantity < purchase.quantity) {
+                sortedPurchases.unshift({
+                    date: purchase.date,
+                    price: purchase.price,
+                    quantity: purchase.quantity - usedQuantity,
+                    type: purchase.type
+                });
+            }
+        }
+        // set the COGS
+        cogs.push({
+            date: sale.date,
+            value: price * quantity
+        });
+    });
+    // return COGS as Danfo Series
+    return (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(cogs));
+}
+exports.getHoldingCostOfGoodsSoldSeries = getHoldingCostOfGoodsSoldSeries;
 /*
 DESC
   Returns the market value of the input Holding between the startDate and
@@ -127,61 +178,6 @@ function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
     return holdingValueSeries.add(revenueSeries);
 }
 exports.getHoldingMarketValueSeries = getHoldingMarketValueSeries;
-/*
-DESC
-  Returns a series of cost of goods sold for the input IHolding. The index of
-  the returned Series will correspond to each date with a Sale
-INPUT
-  holding: An IHolding
-RETURN
-  A danfo Series
-*/
-function getHoldingCostOfGoodsSoldSeries(holding) {
-    // get Purchase and Sales
-    const purchases = (0, common_1.getHoldingAggregatedPurchases)(holding);
-    const sales = (0, common_1.getHoldingAggregatedSales)(holding);
-    // sort Purchases and Sales
-    let sortedPurchases = _.sortBy(purchases, [(txn) => txn.date]);
-    const sortedSales = _.sortBy(sales, [(txn) => txn.date]);
-    // store datedValues of COGS
-    let cogs = [];
-    // create datedValues of cost of goods sold for each Sale transaction date
-    sortedSales.map((sale) => {
-        // accumulate price and quantity of COGS
-        let price = 0;
-        let quantity = 0;
-        // calculate COGS
-        while (quantity < sale.quantity && sortedPurchases.length) {
-            // get first remaining Purchase
-            const purchase = sortedPurchases.shift();
-            (0, common_1.assert)(purchase, 'sortedPurchases is empty');
-            (0, common_1.assert)((0, common_1.isDateBefore)(purchase.date, sale.date, true), 'Insufficient Purchases to calculate COGS');
-            // calculate the portion of the Purchase used (eg. sold)
-            const usedQuantity = Math.min(sale.quantity - quantity, purchase.quantity);
-            // update COGS
-            price = (price * quantity + purchase.price * usedQuantity)
-                / (quantity + usedQuantity);
-            quantity = quantity + usedQuantity;
-            // add back unused portion of the Purchase
-            if (usedQuantity < purchase.quantity) {
-                sortedPurchases.unshift({
-                    date: purchase.date,
-                    price: purchase.price,
-                    quantity: purchase.quantity - usedQuantity,
-                    type: purchase.type
-                });
-            }
-        }
-        // set the COGS
-        cogs.push({
-            date: sale.date,
-            value: price * quantity
-        });
-    });
-    // return COGS as Danfo Series
-    return (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(cogs));
-}
-exports.getHoldingCostOfGoodsSoldSeries = getHoldingCostOfGoodsSoldSeries;
 /*
 DESC
   Returns the cumulative PnL of the input Holding between the startDate and
