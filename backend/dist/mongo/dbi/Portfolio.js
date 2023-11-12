@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,14 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setPortfolio = exports.getPortfolios = exports.getPortfolioTotalCostAsDatedValues = exports.getPortfolioMarketValueAsDatedValues = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
+exports.setPortfolio = exports.getPortfolioTcgplayerIds = exports.getPortfolios = exports.getPortfolioDocs = exports.getPortfolioDoc = exports.deletePortfolio = exports.addPortfolio = void 0;
 // imports
 const common_1 = require("common");
-const Price_1 = require("./Price");
 const Holding_1 = require("../../utils/Holding");
 const mongoose_1 = __importDefault(require("mongoose"));
 const portfolioSchema_1 = require("../models/portfolioSchema");
-const dfu = __importStar(require("../../utils/danfo"));
 const Portfolio_1 = require("../../utils/Portfolio");
 // =======
 // globals
@@ -182,46 +157,6 @@ function getPortfolioDocs(userId) {
 exports.getPortfolioDocs = getPortfolioDocs;
 /*
 DESC
-  Returns the market value of the input Portfolio between the startDate and
-  endDate
-INPUT
-  portfolio: An IPortfolio
-  startDate: The start date for market value calculation
-  endDate: The end date for market value calculation
-*/
-function getPortfolioMarketValueAsDatedValues(portfolio, startDate, endDate) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // get price map
-        const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
-        const tcgplayerIds = holdings.map((holding) => {
-            return (0, common_1.getHoldingTcgplayerId)(holding);
-        });
-        const priceMap = yield (0, Price_1.getPriceMapOfSeries)(tcgplayerIds, startDate, endDate);
-        // get market value
-        const marketValueSeries = (0, Portfolio_1.getPortfolioMarketValueSeries)(portfolio, priceMap, startDate, endDate);
-        return dfu.getDatedValuesFromSeries(marketValueSeries);
-    });
-}
-exports.getPortfolioMarketValueAsDatedValues = getPortfolioMarketValueAsDatedValues;
-/*
-DESC
-  Returns the total cost of the input Portfolio between the startDate and
-  endDate
-INPUT
-  portfolio: An IPortfolio
-  startDate: The start date for market value calculation
-  endDate: The end date for market value calculation
-*/
-function getPortfolioTotalCostAsDatedValues(portfolio, startDate, endDate) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // get total cost
-        const totalCostSeries = (0, Portfolio_1.getPortfolioTotalCostSeries)(portfolio, startDate, endDate);
-        return dfu.getDatedValuesFromSeries(totalCostSeries);
-    });
-}
-exports.getPortfolioTotalCostAsDatedValues = getPortfolioTotalCostAsDatedValues;
-/*
-DESC
   Retrieves all IPopulatedPortfolios for the input userId
 INPUT
   userId: The associated userId
@@ -263,6 +198,32 @@ function getPortfolios(userId) {
     });
 }
 exports.getPortfolios = getPortfolios;
+/*
+DESC
+  Returns the tcpglayerIds found in the input Portfolio
+INPUT
+  portfolio: An IPortfolio
+RETURN
+  A number[]
+*/
+function getPortfolioTcgplayerIds(portfolio) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            const portfolioDoc = yield getPortfolioDoc(portfolio);
+            const holdings = (0, common_1.getPortfolioHoldings)(portfolioDoc);
+            return holdings.map((holding) => {
+                return (0, common_1.getHoldingTcgplayerId)(holding);
+            });
+        }
+        catch (err) {
+            const errMsg = `An error occurred in getPortfolioTcgplayerIds(): ${err}`;
+            throw new Error(errMsg);
+        }
+    });
+}
+exports.getPortfolioTcgplayerIds = getPortfolioTcgplayerIds;
 /*
 DESC
   Sets an existing Portfolio to be equal to a new Portfolio
@@ -311,7 +272,7 @@ function main() {
         let res;
         // const userId = 1234
         // const portfolioName = 'Delta'
-        // const tcgplayerId = 121527
+        // const tcgplayerId = 493975
         // const description = 'Washer dryer mechanic'
         // let holdings: IHolding[] = [
         //   {
@@ -332,7 +293,7 @@ function main() {
         //     ],
         //   },
         // ]
-        // // -- Set Portfolio
+        // -- Set Portfolio
         // const portfolio: IPortfolio = {
         //   userId: userId, 
         //   portfolioName: portfolioName,
@@ -340,12 +301,19 @@ function main() {
         // }
         // const portfolioDoc = await getPortfolioDoc(portfolio) as IPortfolio
         // const holding = getPortfolioHolding(portfolioDoc, tcgplayerId) as IHolding
-        // const startDate = new Date(Date.parse('2023-09-01'))
-        // const endDate = new Date(Date.parse('2023-09-14'))
+        // const startDate = new Date(Date.parse('2023-06-09'))
+        // const endDate = new Date(Date.parse('2023-07-31'))
+        // const series = await getHoldingPnLAsDatedValues(holding, startDate, endDate)
         // const priceMap = await getPriceMapOfSeries([tcgplayerId])
         // const priceSeries = priceMap.get(tcgplayerId) as df.Series
-        // const series = getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate)
-        // console.log(series)
+        // const pnl = getHoldingPnLSeries(holding, priceSeries, startDate, endDate)
+        // const mv = getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate)
+        // const tc = getHoldingTotalCostSeries(holding, startDate, endDate)
+        // console.log('pnl: ', pnl)
+        // console.log('mv: ', mv)
+        // console.log('tc: ', tc)
+        // const tcgplayerIds = await getPortfolioTcgplayerIds(portfolio)
+        // console.log(tcgplayerIds)
         // const twr = dfu.getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate)
         // console.log(twr)
         // const newPortfolio: IPortfolio = {
@@ -481,7 +449,7 @@ function main() {
         //       date: new Date(),
         //       price: 4.99,
         //       quantity: 100
-        //     }]
+        //     }]ma
         //   }    
         // ]
         // res = await addPortfolioHoldings(

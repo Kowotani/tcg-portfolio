@@ -1,9 +1,9 @@
 // imports
 import { 
-  IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
+  IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
   IPortfolioMethods, 
 
-  assert, isIPopulatedHolding
+  assert, getHoldingTcgplayerId, getPortfolioHoldings, isIPopulatedHolding
 } from 'common'
 import { areValidHoldings, getIMHoldingsFromIHoldings } from '../../utils/Holding'
 import * as _ from 'lodash'
@@ -231,6 +231,36 @@ export async function getPortfolios(
 
 /*
 DESC
+  Returns the tcpglayerIds found in the input Portfolio
+INPUT
+  portfolio: An IPortfolio
+RETURN
+  A number[]
+*/
+export async function getPortfolioTcgplayerIds(
+  portfolio: IPortfolio
+): Promise<number[]> {
+ 
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    const portfolioDoc = await getPortfolioDoc(portfolio)
+    const holdings = getPortfolioHoldings(portfolioDoc as IMPortfolio)
+    return holdings.map((holding: IHolding | IPopulatedHolding) => {
+      return getHoldingTcgplayerId(holding)
+    })
+
+  } catch(err) {
+
+    const errMsg = `An error occurred in getPortfolioTcgplayerIds(): ${err}`
+    throw new Error(errMsg)
+  } 
+}
+
+/*
+DESC
   Sets an existing Portfolio to be equal to a new Portfolio
 INPUT 
   existingPortfolio: The Portfolio to update
@@ -297,7 +327,7 @@ async function main(): Promise<number> {
 
   // const userId = 1234
   // const portfolioName = 'Delta'
-  // const tcgplayerId = 121527
+  // const tcgplayerId = 493975
   // const description = 'Washer dryer mechanic'
   // let holdings: IHolding[] = [
   //   {
@@ -321,7 +351,7 @@ async function main(): Promise<number> {
 
 
 
-  // // -- Set Portfolio
+  // -- Set Portfolio
   // const portfolio: IPortfolio = {
   //   userId: userId, 
   //   portfolioName: portfolioName,
@@ -329,12 +359,19 @@ async function main(): Promise<number> {
   // }
   // const portfolioDoc = await getPortfolioDoc(portfolio) as IPortfolio
   // const holding = getPortfolioHolding(portfolioDoc, tcgplayerId) as IHolding
-  // const startDate = new Date(Date.parse('2023-09-01'))
-  // const endDate = new Date(Date.parse('2023-09-14'))
+  // const startDate = new Date(Date.parse('2023-06-09'))
+  // const endDate = new Date(Date.parse('2023-07-31'))
+  // const series = await getHoldingPnLAsDatedValues(holding, startDate, endDate)
   // const priceMap = await getPriceMapOfSeries([tcgplayerId])
   // const priceSeries = priceMap.get(tcgplayerId) as df.Series
-  // const series = getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate)
-  // console.log(series)
+  // const pnl = getHoldingPnLSeries(holding, priceSeries, startDate, endDate)
+  // const mv = getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate)
+  // const tc = getHoldingTotalCostSeries(holding, startDate, endDate)
+  // console.log('pnl: ', pnl)
+  // console.log('mv: ', mv)
+  // console.log('tc: ', tc)
+  // const tcgplayerIds = await getPortfolioTcgplayerIds(portfolio)
+  // console.log(tcgplayerIds)
   // const twr = dfu.getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate)
   // console.log(twr)
 
@@ -489,7 +526,7 @@ async function main(): Promise<number> {
   //       date: new Date(),
   //       price: 4.99,
   //       quantity: 100
-  //     }]
+  //     }]ma
   //   }    
   // ]
 
