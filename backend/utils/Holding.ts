@@ -16,7 +16,7 @@ import * as _ from 'lodash'
 import { IMHolding } from '../mongo/models/holdingSchema'
 import { IMProduct } from '../mongo/models/productSchema'
 import { getProductDocs } from '../mongo/dbi/Product'
-import { getPriceMapOfSeries } from '../mongo/dbi/Price'
+import { getPriceSeries } from '../mongo/dbi/Price'
 import { isProductDoc, genProductNotFoundError } from './Product'
 
 
@@ -150,14 +150,9 @@ export async function getHoldingMarketValueAsDatedValues(
   endDate?: Date
 ): Promise<TDatedValue[]> {
 
-  // get price map
-  const tcgplayerId = getHoldingTcgplayerId(holding)
-  const priceMap = await getPriceMapOfSeries([tcgplayerId], startDate, endDate)
-  const priceSeries = priceMap.get(tcgplayerId) as df.Series
-
   // get market value
-  const marketValueSeries = getHoldingMarketValueSeries(
-    holding, priceSeries, startDate, endDate)
+  const marketValueSeries = 
+    await getHoldingMarketValueSeries(holding, undefined, startDate, endDate)
 
   return getDatedValuesFromSeries(marketValueSeries, 2)
 }
@@ -168,25 +163,30 @@ DESC
   input startDate and endDate using the input priceSeries
 INPUT
   holding: An IHolding
-  priceSeries: A danfo Series of prices
+  priceSeries?: A danfo Series of prices
   startDate?: The start date of the Series (default: first transaction date)
   endDate?: The end date of the Series (default: T-1)
 RETURN
   A danfo Series
 */
-export function getHoldingMarketValueSeries(
+export async function getHoldingMarketValueSeries(
   holding: IHolding | IPopulatedHolding,
-  priceSeries: df.Series,
+  priceSeries?: df.Series,
   startDate?: Date,
   endDate?: Date
-): df.Series {
+): Promise<df.Series> {
 
   // get start and end dates
   const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate)
 
+  // get prices if necessary
+  const thePriceSeries = priceSeries
+    ? priceSeries
+    : await getPriceSeries(getHoldingTcgplayerId(holding), startDt, endDt)
+
   // align price series
   const prices = densifyAndFillSeries(
-    priceSeries,
+    thePriceSeries,
     startDt,
     endDt,
     'locf',
@@ -245,14 +245,9 @@ export async function getHoldingPnLAsDatedValues(
   endDate?: Date
 ): Promise<TDatedValue[]> {
 
-  // get price map
-  const tcgplayerId = getHoldingTcgplayerId(holding)
-  const priceMap = await getPriceMapOfSeries([tcgplayerId], startDate, endDate)
-  const priceSeries = priceMap.get(tcgplayerId) as df.Series
-
   // get PnL
-  const pnlSeries 
-    = getHoldingPnLSeries(holding, priceSeries, startDate, endDate)
+  const pnlSeries = 
+    await getHoldingPnLSeries(holding, undefined, startDate, endDate)
 
   return getDatedValuesFromSeries(pnlSeries, 2)
 }
@@ -264,25 +259,30 @@ DESC
   calculated as the Market Value - Total Cost
 INPUT
   holding: An IHolding
-  priceSeries: A danfo Series of prices
+  priceSeries?: A danfo Series of prices
   startDate?: The start date of the Series (default: first transaction date)
   endDate?: The end date of the Series (default: T-1)
 RETURN
   A danfo Series
 */
-export function getHoldingPnLSeries(
+export async function getHoldingPnLSeries(
   holding: IHolding | IPopulatedHolding,
-  priceSeries: df.Series,
+  priceSeries?: df.Series,
   startDate?: Date,
   endDate?: Date
-): df.Series {
+): Promise<df.Series> {
 
   // get start and end dates
   const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate)
 
+  // get prices if necessary
+  const thePriceSeries = priceSeries
+    ? priceSeries
+    : await getPriceSeries(getHoldingTcgplayerId(holding), startDt, endDt)
+
   // align price series
   const prices = densifyAndFillSeries(
-    priceSeries,
+    thePriceSeries,
     startDt,
     endDt,
     'locf',
@@ -292,7 +292,7 @@ export function getHoldingPnLSeries(
 
   // get market value series
   const marketValueSeries 
-    = getHoldingMarketValueSeries(holding, prices, startDt, endDt)
+    = await getHoldingMarketValueSeries(holding, prices, startDt, endDt)
 
   // get total cost series
   const totalCostSeries = getHoldingTotalCostSeries(holding, startDt, endDt)
@@ -343,27 +343,27 @@ DESC
   startDate and endDate using the input priceSeries, annualized if input
 INPUT
   holding: An IHolding
-  priceSeries: A danfo Series of prices
-  startDate: The start date of the Series (default: first transaction date)
-  endDate: The end date of the  (default: T-1)
+  priceSeries?: A danfo Series of prices
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the  (default: T-1)
   annualized?: TRUE if the return should be annualized, FALSE otherwise
 RETURN
   The time-weighted return
 */
-export function getHoldingTimeWeightedReturn(
+export async function getHoldingTimeWeightedReturn(
   holding: IHolding | IPopulatedHolding,
-  priceSeries: df.Series,
+  priceSeries?: df.Series,
   startDate?: Date,
   endDate?: Date,
   annualized?: boolean
-): number {
+): Promise<number> {
 
   // get start and end dates
   const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate)
 
   // get market value series
   const marketValueSeries 
-    = getHoldingMarketValueSeries(holding, priceSeries, startDt, endDate)
+    = await getHoldingMarketValueSeries(holding, priceSeries, startDt, endDate)
 
   // get daily purchase cost series
   const dailyPurchaseSeries 
@@ -455,8 +455,7 @@ export async function getHoldingTotalCostAsDatedValues(
 ): Promise<TDatedValue[]> {
 
   // get total cost
-  const totalCostSeries = getHoldingTotalCostSeries(
-    holding, startDate, endDate)
+  const totalCostSeries = getHoldingTotalCostSeries(holding, startDate, endDate)
 
   return getDatedValuesFromSeries(totalCostSeries, 2)
 }

@@ -97,7 +97,7 @@ function getPortfolioMarketValueAsDatedValues(portfolio, startDate, endDate) {
         });
         const priceMap = yield (0, Price_1.getPriceMapOfSeries)(tcgplayerIds, startDate, endDate);
         // get market value
-        const marketValueSeries = getPortfolioMarketValueSeries(portfolio, priceMap, startDate, endDate);
+        const marketValueSeries = yield getPortfolioMarketValueSeries(portfolio, priceMap, startDate, endDate);
         return (0, danfo_1.getDatedValuesFromSeries)(marketValueSeries, 2);
     });
 }
@@ -115,23 +115,27 @@ RETURN
   A danfo Series
 */
 function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, endDate) {
-    // get start and end dates
-    const [startDt, endDt] = getStartAndEndDates(portfolio, startDate, endDate);
-    const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
-    // get market value series of Holdings
-    const marketValues = holdings.map((holding) => {
-        const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
-        const priceSeries = priceSeriesMap.get(tcgplayerId);
-        // verify that prices exist for this tcgplayerId
-        (0, common_1.assert)(priceSeries instanceof df.Series, `Could not find prices for tcgplayerId: ${tcgplayerId}`);
-        return (0, Holding_1.getHoldingMarketValueSeries)(holding, priceSeries, startDt, endDt);
+    return __awaiter(this, void 0, void 0, function* () {
+        // get start and end dates
+        const [startDt, endDt] = getStartAndEndDates(portfolio, startDate, endDate);
+        const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
+        // get market value series of Holdings
+        let marketValues = [];
+        for (const holding of holdings) {
+            const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
+            const priceSeries = priceSeriesMap.get(tcgplayerId);
+            // verify that prices exist for this tcgplayerId
+            (0, common_1.assert)(priceSeries instanceof df.Series, `Could not find prices for tcgplayerId: ${tcgplayerId}`);
+            const marketValueSeries = yield (0, Holding_1.getHoldingMarketValueSeries)(holding, priceSeries, startDt, endDt);
+            marketValues.push(marketValueSeries);
+        }
+        // create empty Series used for summation
+        const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDt.toISOString()] }), startDt, endDt, 'value', 0, 0);
+        // get market value series of Portfolio
+        return marketValues.reduce((acc, cur) => {
+            return acc = acc.add(cur);
+        }, emptySeries);
     });
-    // create empty Series used for summation
-    const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDt.toISOString()] }), startDt, endDt, 'value', 0, 0);
-    // get market value series of Portfolio
-    return marketValues.reduce((acc, cur) => {
-        return acc = acc.add(cur);
-    }, emptySeries);
 }
 exports.getPortfolioMarketValueSeries = getPortfolioMarketValueSeries;
 /*

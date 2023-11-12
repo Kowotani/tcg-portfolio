@@ -89,8 +89,8 @@ export async function getPortfolioMarketValueAsDatedValues(
   const priceMap = await getPriceMapOfSeries(tcgplayerIds, startDate, endDate)
 
   // get market value
-  const marketValueSeries = getPortfolioMarketValueSeries(
-    portfolio, priceMap, startDate, endDate)
+  const marketValueSeries = 
+    await getPortfolioMarketValueSeries(portfolio, priceMap, startDate, endDate)
 
   return getDatedValuesFromSeries(marketValueSeries, 2)
 }
@@ -109,12 +109,12 @@ INPUT
 RETURN
   A danfo Series
 */
-export function getPortfolioMarketValueSeries(
+export async function getPortfolioMarketValueSeries(
   portfolio: IPortfolio | IPopulatedPortfolio,
   priceSeriesMap: Map<number, df.Series>,
   startDate?: Date,
   endDate?: Date
-): df.Series {
+): Promise<df.Series> {
 
   // get start and end dates
   const [startDt, endDt] = getStartAndEndDates(portfolio, startDate, endDate)
@@ -122,7 +122,8 @@ export function getPortfolioMarketValueSeries(
   const holdings = getPortfolioHoldings(portfolio)
 
   // get market value series of Holdings
-  const marketValues = holdings.map((holding: IHolding | IPopulatedHolding) => {
+  let marketValues: df.Series[] = []
+  for (const holding of holdings) {
 
     const tcgplayerId = getHoldingTcgplayerId(holding)
     const priceSeries = priceSeriesMap.get(tcgplayerId)
@@ -132,13 +133,11 @@ export function getPortfolioMarketValueSeries(
       priceSeries instanceof df.Series,
       `Could not find prices for tcgplayerId: ${tcgplayerId}`)
 
-    return getHoldingMarketValueSeries(
-      holding,
-      priceSeries,
-      startDt,
-      endDt
-    )
-  })
+    const marketValueSeries = 
+      await getHoldingMarketValueSeries(holding, priceSeries, startDt, endDt)
+
+    marketValues.push(marketValueSeries)
+  }
 
   // create empty Series used for summation
   const emptySeries = densifyAndFillSeries(
