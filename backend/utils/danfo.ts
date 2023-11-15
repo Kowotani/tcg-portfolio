@@ -70,6 +70,33 @@ export function densifyAndFillSeries(
   return new df.Series(values, {index})
 }
 
+/*
+  DESC
+    Trims or extends the input series depending on the input start and end dates
+    If start date < first date, fill with zeros
+    If end date > last date, fill with last observed value
+  INPUTDepending on the start
+    series: A danfo Series
+    startDate: The starting date
+    endDate: The ending date
+  RETURN
+    The trimmed or extended danfo Series according to the above
+*/
+export function defaultTrimOrExtendSeries(
+  series: df.Series,
+  startDate: Date,
+  endDate: Date,  
+): df.Series {
+  return densifyAndFillSeries(
+    series,
+    startDate,
+    endDate,
+    'locf',
+    undefined,
+    0
+  )
+}
+
 
 // ==========
 // converters

@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -23,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.densifyAndFillSeries = void 0;
+exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.defaultTrimOrExtendSeries = exports.densifyAndFillSeries = void 0;
 const common_1 = require("common");
 const df = __importStar(require("danfojs-node"));
 const _ = __importStar(require("lodash"));
@@ -32,7 +28,8 @@ const _ = __importStar(require("lodash"));
 // =======
 /*
 DESC
-  Converts the input danfo Seeries into a TDatedValue[]
+  Transforms the input danfo Series by slicing / extending the date range and
+  filling any gaps according to the input parameters
 INPUT
   series: A danfo Series
   startDate: The starting date
@@ -80,6 +77,22 @@ function densifyAndFillSeries(series, startDate, endDate, fillMode, fillValue, i
     return new df.Series(values, { index });
 }
 exports.densifyAndFillSeries = densifyAndFillSeries;
+/*
+  DESC
+    Trims or extends the input series depending on the input start and end dates
+    If start date < first date, fill with zeros
+    If end date > last date, fill with last observed value
+  INPUTDepending on the start
+    series: A danfo Series
+    startDate: The starting date
+    endDate: The ending date
+  RETURN
+    The trimmed or extended danfo Series according to the above
+*/
+function defaultTrimOrExtendSeries(series, startDate, endDate) {
+    return densifyAndFillSeries(series, startDate, endDate, 'locf', undefined, 0);
+}
+exports.defaultTrimOrExtendSeries = defaultTrimOrExtendSeries;
 // ==========
 // converters
 // ==========
