@@ -8,7 +8,7 @@ import {
   isDateAfter, isDateBefore
 } from 'common'
 import { 
-  densifyAndFillSeries, getDatedValuesFromSeries, getSeriesFromDatedValues, 
+  defaultTrimOrExtendSeries, getDatedValuesFromSeries, getSeriesFromDatedValues, 
   sortSeriesByIndex 
 } from './danfo'
 import * as df from 'danfojs-node'
@@ -176,35 +176,22 @@ export async function getHoldingMarketValueSeries(
   endDate?: Date
 ): Promise<df.Series> {
 
-  // get start and end dates
+  // get output series start and end dates
   const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate)
 
   // get prices if necessary
   const thePriceSeries = priceSeries
     ? priceSeries
-    : await getPriceSeries(getHoldingTcgplayerId(holding), startDt, endDt)
+    : await getPriceSeries(getHoldingTcgplayerId(holding), startDate, endDate)
 
   // align price series
-  const prices = densifyAndFillSeries(
-    thePriceSeries,
-    startDt,
-    endDt,
-    'locf',
-    undefined,
-    0
-  )
+  const prices = defaultTrimOrExtendSeries(thePriceSeries, startDt, endDt)
 
   // -- get holding value series
   const transactionSeries = getHoldingTransactionQuantitySeries(holding)
   const cumTransactionSeries = transactionSeries.cumSum() as df.Series
-  const quantitySeries = densifyAndFillSeries(
-    cumTransactionSeries,
-    startDt,
-    endDt,
-    'locf',
-    undefined,
-    0
-  )
+  const quantitySeries 
+    = defaultTrimOrExtendSeries(cumTransactionSeries, startDt, endDt)
   const pricesIx = prices.index.map((ix: string | number) => {
     return String(ix) >= startDt.toISOString()
       && String(ix) <= endDt.toISOString()
@@ -213,18 +200,12 @@ export async function getHoldingMarketValueSeries(
 
   // -- get revenue series
   const dailyRevenueSeries 
-    = getHoldingRevenueSeries(holding, startDt, endDt)
+    = getHoldingRevenueSeries(holding, startDate, endDate)
   const cumRevenueSeries = dailyRevenueSeries.count() 
     ? dailyRevenueSeries.cumSum() as df.Series
     : dailyRevenueSeries
-  const revenueSeries = densifyAndFillSeries(
-    cumRevenueSeries,
-    startDt,
-    endDt,
-    'locf',
-    undefined,
-    0
-  )
+  const revenueSeries 
+    = defaultTrimOrExtendSeries(cumRevenueSeries, startDt, endDt)
 
   // -- get market value series
   return holdingValueSeries.add(revenueSeries) as df.Series
@@ -272,30 +253,28 @@ export async function getHoldingPnLSeries(
   endDate?: Date
 ): Promise<df.Series> {
 
-  // get start and end dates
+  // get output series start and end dates
   const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate)
 
   // get prices if necessary
   const thePriceSeries = priceSeries
     ? priceSeries
-    : await getPriceSeries(getHoldingTcgplayerId(holding), startDt, endDt)
+    : await getPriceSeries(getHoldingTcgplayerId(holding), startDate, endDate)
 
   // align price series
-  const prices = densifyAndFillSeries(
-    thePriceSeries,
-    startDt,
-    endDt,
-    'locf',
-    undefined,
-    0
-  )
+  const prices = defaultTrimOrExtendSeries(thePriceSeries, startDt, endDt)
 
   // get market value series
+  const entireMarketValueSeries 
+    = await getHoldingMarketValueSeries(holding, prices, startDate, endDate)
   const marketValueSeries 
-    = await getHoldingMarketValueSeries(holding, prices, startDt, endDt)
+    = defaultTrimOrExtendSeries(entireMarketValueSeries, startDt, endDt)
 
   // get total cost series
-  const totalCostSeries = getHoldingTotalCostSeries(holding, startDt, endDt)
+  const entireTotalCostSeries 
+    = getHoldingTotalCostSeries(holding, startDate, endDate)
+  const totalCostSeries
+    = defaultTrimOrExtendSeries(entireTotalCostSeries, startDt, endDt)
 
   // return market value - total cost
   return marketValueSeries.sub(totalCostSeries) as df.Series
@@ -362,16 +341,18 @@ export async function getHoldingTimeWeightedReturn(
   const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate)
 
   // get market value series
+  const entireMarketValueSeries 
+    = await getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate)
   const marketValueSeries 
-    = await getHoldingMarketValueSeries(holding, priceSeries, startDt, endDate)
+    = defaultTrimOrExtendSeries(entireMarketValueSeries, startDt, endDt)
 
   // get daily purchase cost series
   const dailyPurchaseSeries 
-    = getHoldingPurchaseCostSeries(holding, startDt, endDate)
+    = getHoldingPurchaseCostSeries(holding, startDate, endDate)
 
   // get daily revenue series
   const dailyRevenueSeries 
-    = getHoldingRevenueSeries(holding, startDt, endDt)
+    = getHoldingRevenueSeries(holding, startDate, endDate)
 
   // get cost of goods sold series
   const costOfGoodsSoldSeries = getHoldingCostOfGoodsSoldSeries(holding)
@@ -528,13 +509,8 @@ export function getHoldingTotalCostSeries(
   // align daily purchase costs to date index
   const dailyPurchaseSeries 
     = sortSeriesByIndex(getSeriesFromDatedValues(datedValues))
-  const purchaseSeries = densifyAndFillSeries(
-    dailyPurchaseSeries, 
-    startDt,
-    endDt,
-    'value',
-    0
-  )
+  const purchaseSeries 
+    = defaultTrimOrExtendSeries(dailyPurchaseSeries, startDt, endDt)
 
   return purchaseSeries.cumSum() as df.Series
 }

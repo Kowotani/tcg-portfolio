@@ -152,29 +152,29 @@ RETURN
 */
 function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
-        // get start and end dates
+        // get output series start and end dates
         const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate);
         // get prices if necessary
         const thePriceSeries = priceSeries
             ? priceSeries
-            : yield (0, Price_1.getPriceSeries)((0, common_1.getHoldingTcgplayerId)(holding), startDt, endDt);
+            : yield (0, Price_1.getPriceSeries)((0, common_1.getHoldingTcgplayerId)(holding), startDate, endDate);
         // align price series
-        const prices = (0, danfo_1.densifyAndFillSeries)(thePriceSeries, startDt, endDt, 'locf', undefined, 0);
+        const prices = (0, danfo_1.defaultTrimOrExtendSeries)(thePriceSeries, startDt, endDt);
         // -- get holding value series
         const transactionSeries = getHoldingTransactionQuantitySeries(holding);
         const cumTransactionSeries = transactionSeries.cumSum();
-        const quantitySeries = (0, danfo_1.densifyAndFillSeries)(cumTransactionSeries, startDt, endDt, 'locf', undefined, 0);
+        const quantitySeries = (0, danfo_1.defaultTrimOrExtendSeries)(cumTransactionSeries, startDt, endDt);
         const pricesIx = prices.index.map((ix) => {
             return String(ix) >= startDt.toISOString()
                 && String(ix) <= endDt.toISOString();
         });
         const holdingValueSeries = quantitySeries.mul(prices.loc(pricesIx));
         // -- get revenue series
-        const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDt, endDt);
+        const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDate, endDate);
         const cumRevenueSeries = dailyRevenueSeries.count()
             ? dailyRevenueSeries.cumSum()
             : dailyRevenueSeries;
-        const revenueSeries = (0, danfo_1.densifyAndFillSeries)(cumRevenueSeries, startDt, endDt, 'locf', undefined, 0);
+        const revenueSeries = (0, danfo_1.defaultTrimOrExtendSeries)(cumRevenueSeries, startDt, endDt);
         // -- get market value series
         return holdingValueSeries.add(revenueSeries);
     });
@@ -212,18 +212,20 @@ RETURN
 */
 function getHoldingPnLSeries(holding, priceSeries, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
-        // get start and end dates
+        // get output series start and end dates
         const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate);
         // get prices if necessary
         const thePriceSeries = priceSeries
             ? priceSeries
-            : yield (0, Price_1.getPriceSeries)((0, common_1.getHoldingTcgplayerId)(holding), startDt, endDt);
+            : yield (0, Price_1.getPriceSeries)((0, common_1.getHoldingTcgplayerId)(holding), startDate, endDate);
         // align price series
-        const prices = (0, danfo_1.densifyAndFillSeries)(thePriceSeries, startDt, endDt, 'locf', undefined, 0);
+        const prices = (0, danfo_1.defaultTrimOrExtendSeries)(thePriceSeries, startDt, endDt);
         // get market value series
-        const marketValueSeries = yield getHoldingMarketValueSeries(holding, prices, startDt, endDt);
+        const entireMarketValueSeries = yield getHoldingMarketValueSeries(holding, prices, startDate, endDate);
+        const marketValueSeries = (0, danfo_1.defaultTrimOrExtendSeries)(entireMarketValueSeries, startDt, endDt);
         // get total cost series
-        const totalCostSeries = getHoldingTotalCostSeries(holding, startDt, endDt);
+        const entireTotalCostSeries = getHoldingTotalCostSeries(holding, startDate, endDate);
+        const totalCostSeries = (0, danfo_1.defaultTrimOrExtendSeries)(entireTotalCostSeries, startDt, endDt);
         // return market value - total cost
         return marketValueSeries.sub(totalCostSeries);
     });
@@ -276,11 +278,12 @@ function getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate, 
         // get start and end dates
         const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate);
         // get market value series
-        const marketValueSeries = yield getHoldingMarketValueSeries(holding, priceSeries, startDt, endDate);
+        const entireMarketValueSeries = yield getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate);
+        const marketValueSeries = (0, danfo_1.defaultTrimOrExtendSeries)(entireMarketValueSeries, startDt, endDt);
         // get daily purchase cost series
-        const dailyPurchaseSeries = getHoldingPurchaseCostSeries(holding, startDt, endDate);
+        const dailyPurchaseSeries = getHoldingPurchaseCostSeries(holding, startDate, endDate);
         // get daily revenue series
-        const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDt, endDt);
+        const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDate, endDate);
         // get cost of goods sold series
         const costOfGoodsSoldSeries = getHoldingCostOfGoodsSoldSeries(holding);
         // create index for return calculations
@@ -400,7 +403,7 @@ function getHoldingTotalCostSeries(holding, startDate, endDate) {
     });
     // align daily purchase costs to date index
     const dailyPurchaseSeries = (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(datedValues));
-    const purchaseSeries = (0, danfo_1.densifyAndFillSeries)(dailyPurchaseSeries, startDt, endDt, 'value', 0);
+    const purchaseSeries = (0, danfo_1.defaultTrimOrExtendSeries)(dailyPurchaseSeries, startDt, endDt);
     return purchaseSeries.cumSum();
 }
 exports.getHoldingTotalCostSeries = getHoldingTotalCostSeries;
