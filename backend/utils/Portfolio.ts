@@ -84,13 +84,9 @@ export async function getPortfolioMarketValueAsDatedValues(
   endDate?: Date
 ): Promise<TDatedValue[]> {
 
-  // get price map
-  const tcgplayerIds = await getPortfolioTcgplayerIds(portfolio)
-  const priceMap = await getPriceMapOfSeries(tcgplayerIds, startDate, endDate)
-
   // get market value
   const marketValueSeries = 
-    await getPortfolioMarketValueSeries(portfolio, priceMap, startDate, endDate)
+    await getPortfolioMarketValueSeries(portfolio, undefined, startDate, endDate)
 
   return getDatedValuesFromSeries(marketValueSeries, 2)
 }
@@ -101,7 +97,7 @@ DESC
   input startDate and endDate using prices in the input priceSeriesMap
 INPUT
   portfolio: An IPortfolio
-  priceSeriesMap: A Map of tcgplayerId => danfo Series of Prices
+  priceSeriesMap?: A Map of tcgplayerId => danfo Series of Prices
   startDate?: The start date of the Series (default: first transaction date)
   endDate?: The end date of the Series (date: T-1)
 RETURN
@@ -109,7 +105,7 @@ RETURN
 */
 export async function getPortfolioMarketValueSeries(
   portfolio: IPortfolio | IPopulatedPortfolio,
-  priceSeriesMap: Map<number, df.Series>,
+  priceSeriesMap?: Map<number, df.Series>,
   startDate?: Date,
   endDate?: Date
 ): Promise<df.Series> {
@@ -119,12 +115,22 @@ export async function getPortfolioMarketValueSeries(
 
   const holdings = getPortfolioHoldings(portfolio)
 
+  // get prices map, if necessary
+  let thePriceSeriesMap: Map<number, df.Series>
+  if (priceSeriesMap) {
+    thePriceSeriesMap = priceSeriesMap
+  } else {
+    const tcgplayerIds = await getPortfolioTcgplayerIds(portfolio as IPortfolio)
+    thePriceSeriesMap 
+      = await getPriceMapOfSeries(tcgplayerIds, startDate, endDate)
+  }
+
   // get market value series of Holdings
   let marketValues: df.Series[] = []
   for (const holding of holdings) {
 
     const tcgplayerId = getHoldingTcgplayerId(holding)
-    const priceSeries = priceSeriesMap.get(tcgplayerId)
+    const priceSeries = thePriceSeriesMap.get(tcgplayerId)
 
     // verify that prices exist for this tcgplayerId
     assert(
@@ -170,13 +176,9 @@ export async function getPortfolioPnLAsDatedValues(
   endDate?: Date
 ): Promise<TDatedValue[]> {
 
-  // get price map
-  const tcgplayerIds = await getPortfolioTcgplayerIds(portfolio)
-  const priceMap = await getPriceMapOfSeries(tcgplayerIds, startDate, endDate)
-
   // get pnl series
   const pnlSeries = 
-    await getPortfolioPnLSeries(portfolio, priceMap, startDate, endDate)
+    await getPortfolioPnLSeries(portfolio, undefined, startDate, endDate)
 
   return getDatedValuesFromSeries(pnlSeries, 2)
 }
@@ -187,7 +189,7 @@ DESC
   input startDate and endDate using prices in the input priceSeriesMap
 INPUT
   portfolio: An IPortfolio
-  priceSeriesMap: A Map of tcgplayerId => danfo Series of Prices
+  priceSeriesMap?: A Map of tcgplayerId => danfo Series of Prices
   startDate?: The start date of the Series (default: first transaction date)
   endDate?: The end date of the Series (date: T-1)
 RETURN
@@ -195,7 +197,7 @@ RETURN
 */
 export async function getPortfolioPnLSeries(
   portfolio: IPortfolio | IPopulatedPortfolio,
-  priceSeriesMap: Map<number, df.Series>,
+  priceSeriesMap?: Map<number, df.Series>,
   startDate?: Date,
   endDate?: Date
 ): Promise<df.Series> {
@@ -205,12 +207,22 @@ export async function getPortfolioPnLSeries(
 
   const holdings = getPortfolioHoldings(portfolio)
 
+  // get prices map, if necessary
+  let thePriceSeriesMap: Map<number, df.Series>
+  if (priceSeriesMap) {
+    thePriceSeriesMap = priceSeriesMap
+  } else {
+    const tcgplayerIds = await getPortfolioTcgplayerIds(portfolio as IPortfolio)
+    thePriceSeriesMap 
+      = await getPriceMapOfSeries(tcgplayerIds, startDate, endDate)
+  }
+
   // get pnl series of Holdings
   let pnls: df.Series[] = []
   for (const holding of holdings) {
 
     const tcgplayerId = getHoldingTcgplayerId(holding)
-    const priceSeries = priceSeriesMap.get(tcgplayerId)
+    const priceSeries = thePriceSeriesMap.get(tcgplayerId)
 
     // verify that prices exist for this tcgplayerId
     assert(

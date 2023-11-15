@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -93,11 +89,8 @@ RETURN
 */
 function getPortfolioMarketValueAsDatedValues(portfolio, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
-        // get price map
-        const tcgplayerIds = yield (0, Portfolio_1.getPortfolioTcgplayerIds)(portfolio);
-        const priceMap = yield (0, Price_1.getPriceMapOfSeries)(tcgplayerIds, startDate, endDate);
         // get market value
-        const marketValueSeries = yield getPortfolioMarketValueSeries(portfolio, priceMap, startDate, endDate);
+        const marketValueSeries = yield getPortfolioMarketValueSeries(portfolio, undefined, startDate, endDate);
         return (0, danfo_1.getDatedValuesFromSeries)(marketValueSeries, 2);
     });
 }
@@ -108,7 +101,7 @@ DESC
   input startDate and endDate using prices in the input priceSeriesMap
 INPUT
   portfolio: An IPortfolio
-  priceSeriesMap: A Map of tcgplayerId => danfo Series of Prices
+  priceSeriesMap?: A Map of tcgplayerId => danfo Series of Prices
   startDate?: The start date of the Series (default: first transaction date)
   endDate?: The end date of the Series (date: T-1)
 RETURN
@@ -119,11 +112,21 @@ function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, end
         // get start and end dates
         const [startDt, endDt] = getStartAndEndDates(portfolio, startDate, endDate);
         const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
+        // get prices map, if necessary
+        let thePriceSeriesMap;
+        if (priceSeriesMap) {
+            thePriceSeriesMap = priceSeriesMap;
+        }
+        else {
+            const tcgplayerIds = yield (0, Portfolio_1.getPortfolioTcgplayerIds)(portfolio);
+            thePriceSeriesMap
+                = yield (0, Price_1.getPriceMapOfSeries)(tcgplayerIds, startDate, endDate);
+        }
         // get market value series of Holdings
         let marketValues = [];
         for (const holding of holdings) {
             const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
-            const priceSeries = priceSeriesMap.get(tcgplayerId);
+            const priceSeries = thePriceSeriesMap.get(tcgplayerId);
             // verify that prices exist for this tcgplayerId
             (0, common_1.assert)(priceSeries instanceof df.Series, `Could not find prices for tcgplayerId: ${tcgplayerId}`);
             const marketValueSeries = yield (0, Holding_1.getHoldingMarketValueSeries)(holding, priceSeries, startDt, endDt);
@@ -151,11 +154,8 @@ RETURN
 */
 function getPortfolioPnLAsDatedValues(portfolio, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
-        // get price map
-        const tcgplayerIds = yield (0, Portfolio_1.getPortfolioTcgplayerIds)(portfolio);
-        const priceMap = yield (0, Price_1.getPriceMapOfSeries)(tcgplayerIds, startDate, endDate);
         // get pnl series
-        const pnlSeries = yield getPortfolioPnLSeries(portfolio, priceMap, startDate, endDate);
+        const pnlSeries = yield getPortfolioPnLSeries(portfolio, undefined, startDate, endDate);
         return (0, danfo_1.getDatedValuesFromSeries)(pnlSeries, 2);
     });
 }
@@ -166,7 +166,7 @@ DESC
   input startDate and endDate using prices in the input priceSeriesMap
 INPUT
   portfolio: An IPortfolio
-  priceSeriesMap: A Map of tcgplayerId => danfo Series of Prices
+  priceSeriesMap?: A Map of tcgplayerId => danfo Series of Prices
   startDate?: The start date of the Series (default: first transaction date)
   endDate?: The end date of the Series (date: T-1)
 RETURN
@@ -177,11 +177,21 @@ function getPortfolioPnLSeries(portfolio, priceSeriesMap, startDate, endDate) {
         // get start and end dates
         const [startDt, endDt] = getStartAndEndDates(portfolio, startDate, endDate);
         const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
+        // get prices map, if necessary
+        let thePriceSeriesMap;
+        if (priceSeriesMap) {
+            thePriceSeriesMap = priceSeriesMap;
+        }
+        else {
+            const tcgplayerIds = yield (0, Portfolio_1.getPortfolioTcgplayerIds)(portfolio);
+            thePriceSeriesMap
+                = yield (0, Price_1.getPriceMapOfSeries)(tcgplayerIds, startDate, endDate);
+        }
         // get pnl series of Holdings
         let pnls = [];
         for (const holding of holdings) {
             const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
-            const priceSeries = priceSeriesMap.get(tcgplayerId);
+            const priceSeries = thePriceSeriesMap.get(tcgplayerId);
             // verify that prices exist for this tcgplayerId
             (0, common_1.assert)(priceSeries instanceof df.Series, `Could not find prices for tcgplayerId: ${tcgplayerId}`);
             const pnlSeries = yield (0, Holding_1.getHoldingPnLSeries)(holding, priceSeries, startDt, endDt);
