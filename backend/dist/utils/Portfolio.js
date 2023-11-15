@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -37,6 +33,7 @@ const common_1 = require("common");
 const danfo_1 = require("./danfo");
 const df = __importStar(require("danfojs-node"));
 const Holding_1 = require("./Holding");
+const Portfolio_1 = require("../mongo/dbi/Portfolio");
 const Price_1 = require("../mongo/dbi/Price");
 const portfolioSchema_1 = require("../mongo/models/portfolioSchema");
 // ======
@@ -91,10 +88,7 @@ INPUT
 function getPortfolioMarketValueAsDatedValues(portfolio, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
         // get price map
-        const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
-        const tcgplayerIds = holdings.map((holding) => {
-            return (0, common_1.getHoldingTcgplayerId)(holding);
-        });
+        const tcgplayerIds = yield (0, Portfolio_1.getPortfolioTcgplayerIds)(portfolio);
         const priceMap = yield (0, Price_1.getPriceMapOfSeries)(tcgplayerIds, startDate, endDate);
         // get market value
         const marketValueSeries = yield getPortfolioMarketValueSeries(portfolio, priceMap, startDate, endDate);

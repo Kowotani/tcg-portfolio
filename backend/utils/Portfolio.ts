@@ -11,6 +11,7 @@ import {
   getHoldingMarketValueSeries, getHoldingTotalCostSeries 
 } from './Holding'
 import * as _ from 'lodash'
+import { getPortfolioTcgplayerIds } from '../mongo/dbi/Portfolio'
 import { getPriceMapOfSeries } from '../mongo/dbi/Price'
 import { IMPortfolio, Portfolio } from '../mongo/models/portfolioSchema'
 
@@ -82,10 +83,7 @@ export async function getPortfolioMarketValueAsDatedValues(
 ): Promise<TDatedValue[]> {
 
   // get price map
-  const holdings = getPortfolioHoldings(portfolio)
-  const tcgplayerIds = holdings.map((holding: IHolding | IPopulatedHolding) => {
-    return getHoldingTcgplayerId(holding)
-  })
+  const tcgplayerIds = await getPortfolioTcgplayerIds(portfolio)
   const priceMap = await getPriceMapOfSeries(tcgplayerIds, startDate, endDate)
 
   // get market value
