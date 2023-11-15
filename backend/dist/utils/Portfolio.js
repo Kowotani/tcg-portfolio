@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isPortfolioDoc = exports.getPortfolioTotalCostSeries = exports.getPortfolioTotalCostAsDatedValues = exports.getPortfolioPnLSeries = exports.getPortfolioMarketValueSeries = exports.getPortfolioMarketValueAsDatedValues = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = void 0;
+exports.isPortfolioDoc = exports.getPortfolioTotalCostSeries = exports.getPortfolioTotalCostAsDatedValues = exports.getPortfolioPnLSeries = exports.getPortfolioPnLAsDatedValues = exports.getPortfolioMarketValueSeries = exports.getPortfolioMarketValueAsDatedValues = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = void 0;
 const common_1 = require("common");
 const danfo_1 = require("./danfo");
 const df = __importStar(require("danfojs-node"));
@@ -88,6 +88,8 @@ INPUT
   portfolio: An IPortfolio
   startDate?: The start date for market value calculation
   endDate?: The end date for market value calculation
+RETURN
+  A TDatedValue[]
 */
 function getPortfolioMarketValueAsDatedValues(portfolio, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -138,6 +140,28 @@ function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, end
 exports.getPortfolioMarketValueSeries = getPortfolioMarketValueSeries;
 /*
 DESC
+  Returns the cumulative pnl of the input Portfolio between the startDate and
+  endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate?: The start date for market value calculation
+  endDate?: The end date for market value calculation
+RETURN
+  A TDatedValue[]
+*/
+function getPortfolioPnLAsDatedValues(portfolio, startDate, endDate) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get price map
+        const tcgplayerIds = yield (0, Portfolio_1.getPortfolioTcgplayerIds)(portfolio);
+        const priceMap = yield (0, Price_1.getPriceMapOfSeries)(tcgplayerIds, startDate, endDate);
+        // get pnl series
+        const pnlSeries = yield getPortfolioPnLSeries(portfolio, priceMap, startDate, endDate);
+        return (0, danfo_1.getDatedValuesFromSeries)(pnlSeries, 2);
+    });
+}
+exports.getPortfolioPnLAsDatedValues = getPortfolioPnLAsDatedValues;
+/*
+DESC
   Returns a series of cumulative PnL for the input IPortfolio between the
   input startDate and endDate using prices in the input priceSeriesMap
 INPUT
@@ -180,6 +204,8 @@ INPUT
   portfolio: An IPortfolio
   startDate?: The start date for market value calculation
   endDate: The end date for market value calculation
+RETURN
+  A TDatedValue[]
 */
 function getPortfolioTotalCostAsDatedValues(portfolio, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {

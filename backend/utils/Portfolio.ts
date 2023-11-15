@@ -75,6 +75,8 @@ INPUT
   portfolio: An IPortfolio
   startDate?: The start date for market value calculation
   endDate?: The end date for market value calculation
+RETURN
+  A TDatedValue[]
 */
 export async function getPortfolioMarketValueAsDatedValues(
   portfolio: IPortfolio,
@@ -92,8 +94,6 @@ export async function getPortfolioMarketValueAsDatedValues(
 
   return getDatedValuesFromSeries(marketValueSeries, 2)
 }
-
-
 
 /*
 DESC
@@ -151,6 +151,34 @@ export async function getPortfolioMarketValueSeries(
   return marketValues.reduce((acc: df.Series, cur: df.Series) => {
     return acc = acc.add(cur) as df.Series
   }, emptySeries)
+}
+
+/*
+DESC
+  Returns the cumulative pnl of the input Portfolio between the startDate and
+  endDate
+INPUT
+  portfolio: An IPortfolio
+  startDate?: The start date for market value calculation
+  endDate?: The end date for market value calculation
+RETURN
+  A TDatedValue[]
+*/
+export async function getPortfolioPnLAsDatedValues(
+  portfolio: IPortfolio,
+  startDate?: Date,
+  endDate?: Date
+): Promise<TDatedValue[]> {
+
+  // get price map
+  const tcgplayerIds = await getPortfolioTcgplayerIds(portfolio)
+  const priceMap = await getPriceMapOfSeries(tcgplayerIds, startDate, endDate)
+
+  // get pnl series
+  const pnlSeries = 
+    await getPortfolioPnLSeries(portfolio, priceMap, startDate, endDate)
+
+  return getDatedValuesFromSeries(pnlSeries, 2)
 }
 
 /*
@@ -219,6 +247,8 @@ INPUT
   portfolio: An IPortfolio
   startDate?: The start date for market value calculation
   endDate: The end date for market value calculation
+RETURN
+  A TDatedValue[]
 */
 export async function getPortfolioTotalCostAsDatedValues(
   portfolio: IPortfolio,
