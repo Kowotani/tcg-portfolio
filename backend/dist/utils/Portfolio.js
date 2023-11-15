@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -28,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isPortfolioDoc = exports.getPortfolioTotalCostSeries = exports.getPortfolioTotalCostAsDatedValues = exports.getPortfolioMarketValueSeries = exports.getPortfolioMarketValueAsDatedValues = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = void 0;
+exports.isPortfolioDoc = exports.getPortfolioTotalCostSeries = exports.getPortfolioTotalCostAsDatedValues = exports.getPortfolioPnLSeries = exports.getPortfolioMarketValueSeries = exports.getPortfolioMarketValueAsDatedValues = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = void 0;
 const common_1 = require("common");
 const danfo_1 = require("./danfo");
 const df = __importStar(require("danfojs-node"));
@@ -132,6 +136,42 @@ function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, end
     });
 }
 exports.getPortfolioMarketValueSeries = getPortfolioMarketValueSeries;
+/*
+DESC
+  Returns a series of cumulative PnL for the input IPortfolio between the
+  input startDate and endDate using prices in the input priceSeriesMap
+INPUT
+  portfolio: An IPortfolio
+  priceSeriesMap: A Map of tcgplayerId => danfo Series of Prices
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the Series (date: T-1)
+RETURN
+  A danfo Series
+*/
+function getPortfolioPnLSeries(portfolio, priceSeriesMap, startDate, endDate) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get start and end dates
+        const [startDt, endDt] = getStartAndEndDates(portfolio, startDate, endDate);
+        const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
+        // get pnl series of Holdings
+        let pnls = [];
+        for (const holding of holdings) {
+            const tcgplayerId = (0, common_1.getHoldingTcgplayerId)(holding);
+            const priceSeries = priceSeriesMap.get(tcgplayerId);
+            // verify that prices exist for this tcgplayerId
+            (0, common_1.assert)(priceSeries instanceof df.Series, `Could not find prices for tcgplayerId: ${tcgplayerId}`);
+            const pnlSeries = yield (0, Holding_1.getHoldingPnLSeries)(holding, priceSeries, startDt, endDt);
+            pnls.push(pnlSeries);
+        }
+        // create empty Series used for summation
+        const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDt.toISOString()] }), startDt, endDt, 'value', 0, 0);
+        // get pnl series of Portfolio
+        return pnls.reduce((acc, cur) => {
+            return acc = acc.add(cur);
+        }, emptySeries);
+    });
+}
+exports.getPortfolioPnLSeries = getPortfolioPnLSeries;
 /*
 DESC
   Returns the total cost of the input Portfolio between the startDate and

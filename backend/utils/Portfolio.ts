@@ -8,7 +8,7 @@ import {
 import { densifyAndFillSeries, getDatedValuesFromSeries } from './danfo'
 import * as df from 'danfojs-node'
 import { 
-  getHoldingMarketValueSeries, getHoldingTotalCostSeries 
+  getHoldingMarketValueSeries, getHoldingPnLSeries, getHoldingTotalCostSeries
 } from './Holding'
 import * as _ from 'lodash'
 import { getPortfolioTcgplayerIds } from '../mongo/dbi/Portfolio'
@@ -149,6 +149,64 @@ export async function getPortfolioMarketValueSeries(
 
   // get market value series of Portfolio
   return marketValues.reduce((acc: df.Series, cur: df.Series) => {
+    return acc = acc.add(cur) as df.Series
+  }, emptySeries)
+}
+
+/*
+DESC
+  Returns a series of cumulative PnL for the input IPortfolio between the
+  input startDate and endDate using prices in the input priceSeriesMap
+INPUT
+  portfolio: An IPortfolio
+  priceSeriesMap: A Map of tcgplayerId => danfo Series of Prices
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the Series (date: T-1)
+RETURN
+  A danfo Series
+*/
+export async function getPortfolioPnLSeries(
+  portfolio: IPortfolio | IPopulatedPortfolio,
+  priceSeriesMap: Map<number, df.Series>,
+  startDate?: Date,
+  endDate?: Date
+): Promise<df.Series> {
+
+  // get start and end dates
+  const [startDt, endDt] = getStartAndEndDates(portfolio, startDate, endDate)
+
+  const holdings = getPortfolioHoldings(portfolio)
+
+  // get pnl series of Holdings
+  let pnls: df.Series[] = []
+  for (const holding of holdings) {
+
+    const tcgplayerId = getHoldingTcgplayerId(holding)
+    const priceSeries = priceSeriesMap.get(tcgplayerId)
+
+    // verify that prices exist for this tcgplayerId
+    assert(
+      priceSeries instanceof df.Series,
+      `Could not find prices for tcgplayerId: ${tcgplayerId}`)
+
+    const pnlSeries = 
+      await getHoldingPnLSeries(holding, priceSeries, startDt, endDt)
+
+    pnls.push(pnlSeries)
+  }
+
+  // create empty Series used for summation
+  const emptySeries = densifyAndFillSeries(
+    new df.Series([0], {index: [startDt.toISOString()]}),
+    startDt,
+    endDt,
+    'value',
+    0,
+    0
+  )
+
+  // get pnl series of Portfolio
+  return pnls.reduce((acc: df.Series, cur: df.Series) => {
     return acc = acc.add(cur) as df.Series
   }, emptySeries)
 }
