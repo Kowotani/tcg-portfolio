@@ -441,6 +441,42 @@ export async function getHoldingTimeWeightedReturn(
 
 /*
 DESC
+  Returns a series of daily revenue for the input IHolding between the input
+  startDate and endDate
+INPUT
+  holding: An IHolding
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the Series (default: T-1)
+RETURN
+  A danfo Series
+*/
+export function getHoldingRevenueSeries(
+  holding: IHolding | IPopulatedHolding,
+  startDate?: Date,
+  endDate?: Date
+): df.Series {
+
+  // get start and end dates
+  const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate)
+
+  const allSales = getHoldingSales(holding)
+  const sales = allSales.filter((txn: ITransaction) => {
+    return isDateAfter(txn.date, startDt, true) 
+      && isDateBefore(txn.date, endDt, true)
+  })
+
+  const datedValues: TDatedValue[] = sales.map((txn: ITransaction) => {
+    return {
+      date: txn.date,
+      value: txn.price * txn.quantity
+    }
+  })
+
+  return sortSeriesByIndex(getSeriesFromDatedValues(datedValues))
+}
+
+/*
+DESC
   Returns the total cost of the input Holding between the startDate and
   endDate
 INPUT
@@ -477,8 +513,8 @@ export function getHoldingTotalCostSeries(
   endDate?: Date
 ): df.Series {
 
-    // get start and end dates
-    const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate)
+  // get start and end dates
+  const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate)
 
   // get dated values of daily purchase costs
   const purchases = getHoldingPurchases(holding)
@@ -541,42 +577,6 @@ export function getHoldingTransactionQuantitySeries(
         date: new Date(Date.parse(key)),
         value: value
       })
-    }
-  })
-
-  return sortSeriesByIndex(getSeriesFromDatedValues(datedValues))
-}
-
-/*
-DESC
-  Returns a series of daily revenue for the input IHolding between the input
-  startDate and endDate
-INPUT
-  holding: An IHolding
-  startDate?: The start date of the Series (default: first transaction date)
-  endDate?: The end date of the Series (default: T-1)
-RETURN
-  A danfo Series
-*/
-export function getHoldingRevenueSeries(
-  holding: IHolding | IPopulatedHolding,
-  startDate?: Date,
-  endDate?: Date
-): df.Series {
-
-  // get start and end dates
-  const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate)
-
-  const allSales = getHoldingSales(holding)
-  const sales = allSales.filter((txn: ITransaction) => {
-    return isDateAfter(txn.date, startDt, true) 
-      && isDateBefore(txn.date, endDt, true)
-  })
-
-  const datedValues: TDatedValue[] = sales.map((txn: ITransaction) => {
-    return {
-      date: txn.date,
-      value: txn.price * txn.quantity
     }
   })
 

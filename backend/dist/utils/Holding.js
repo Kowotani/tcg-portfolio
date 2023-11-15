@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -32,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hasValidTransactions = exports.areValidHoldings = exports.getHoldingRevenueSeries = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTotalCostAsDatedValues = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingPnLSeries = exports.getHoldingPnLAsDatedValues = exports.getHoldingMarketValueSeries = exports.getHoldingMarketValueAsDatedValues = exports.getHoldingCostOfGoodsSoldSeries = exports.getIMHoldingsFromIHoldings = void 0;
+exports.hasValidTransactions = exports.areValidHoldings = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTotalCostAsDatedValues = exports.getHoldingRevenueSeries = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingPnLSeries = exports.getHoldingPnLAsDatedValues = exports.getHoldingMarketValueSeries = exports.getHoldingMarketValueAsDatedValues = exports.getHoldingCostOfGoodsSoldSeries = exports.getIMHoldingsFromIHoldings = void 0;
 const common_1 = require("common");
 const danfo_1 = require("./danfo");
 const _ = __importStar(require("lodash"));
@@ -337,6 +333,34 @@ function getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate, 
 exports.getHoldingTimeWeightedReturn = getHoldingTimeWeightedReturn;
 /*
 DESC
+  Returns a series of daily revenue for the input IHolding between the input
+  startDate and endDate
+INPUT
+  holding: An IHolding
+  startDate?: The start date of the Series (default: first transaction date)
+  endDate?: The end date of the Series (default: T-1)
+RETURN
+  A danfo Series
+*/
+function getHoldingRevenueSeries(holding, startDate, endDate) {
+    // get start and end dates
+    const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate);
+    const allSales = (0, common_1.getHoldingSales)(holding);
+    const sales = allSales.filter((txn) => {
+        return (0, common_1.isDateAfter)(txn.date, startDt, true)
+            && (0, common_1.isDateBefore)(txn.date, endDt, true);
+    });
+    const datedValues = sales.map((txn) => {
+        return {
+            date: txn.date,
+            value: txn.price * txn.quantity
+        };
+    });
+    return (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(datedValues));
+}
+exports.getHoldingRevenueSeries = getHoldingRevenueSeries;
+/*
+DESC
   Returns the total cost of the input Holding between the startDate and
   endDate
 INPUT
@@ -414,34 +438,6 @@ function getHoldingTransactionQuantitySeries(holding) {
     return (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(datedValues));
 }
 exports.getHoldingTransactionQuantitySeries = getHoldingTransactionQuantitySeries;
-/*
-DESC
-  Returns a series of daily revenue for the input IHolding between the input
-  startDate and endDate
-INPUT
-  holding: An IHolding
-  startDate?: The start date of the Series (default: first transaction date)
-  endDate?: The end date of the Series (default: T-1)
-RETURN
-  A danfo Series
-*/
-function getHoldingRevenueSeries(holding, startDate, endDate) {
-    // get start and end dates
-    const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate);
-    const allSales = (0, common_1.getHoldingSales)(holding);
-    const sales = allSales.filter((txn) => {
-        return (0, common_1.isDateAfter)(txn.date, startDt, true)
-            && (0, common_1.isDateBefore)(txn.date, endDt, true);
-    });
-    const datedValues = sales.map((txn) => {
-        return {
-            date: txn.date,
-            value: txn.price * txn.quantity
-        };
-    });
-    return (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(datedValues));
-}
-exports.getHoldingRevenueSeries = getHoldingRevenueSeries;
 /*
 DESC
   Returns the default starting and ending dates for the input Holding for use
