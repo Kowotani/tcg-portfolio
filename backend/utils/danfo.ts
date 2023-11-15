@@ -9,7 +9,8 @@ import * as _ from 'lodash'
 
 /*
 DESC
-  Converts the input danfo Seeries into a TDatedValue[]
+  Transforms the input danfo Series by slicing / extending the date range and
+  filling any gaps according to the input parameters
 INPUT
   series: A danfo Series
   startDate: The starting date
