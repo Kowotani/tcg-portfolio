@@ -138,10 +138,11 @@ export async function getPriceMapOfDatedValues(
 
     // create filter
     let filter: any = {tcgplayerId: {$in: tcgplayerIds}}
-    if (startDate) {
+    if (startDate && endDate) {
+      filter['date'] = {$gte: startDate, $lte: endDate}
+    } else if (startDate) {
       filter['date'] = {$gte: startDate}
-    }
-    if (endDate) {
+    } else if (endDate) {
       filter['date'] = {$lte: endDate}
     }
 
@@ -170,7 +171,6 @@ export async function getPriceMapOfDatedValues(
         datedValueMap.set(tcgplayerId, [datedValue])
       }
     })
-
     return datedValueMap
     
   } catch(err) {

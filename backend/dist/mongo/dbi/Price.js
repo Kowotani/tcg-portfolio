@@ -129,10 +129,13 @@ function getPriceMapOfDatedValues(tcgplayerIds, startDate, endDate) {
         try {
             // create filter
             let filter = { tcgplayerId: { $in: tcgplayerIds } };
-            if (startDate) {
+            if (startDate && endDate) {
+                filter['date'] = { $gte: startDate, $lte: endDate };
+            }
+            else if (startDate) {
                 filter['date'] = { $gte: startDate };
             }
-            if (endDate) {
+            else if (endDate) {
                 filter['date'] = { $lte: endDate };
             }
             // query data
