@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.genZeroSeries = exports.densifyAndFillSeries = exports.defaultTrimOrExtendSeries = void 0;
+exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.genZeroSeries = exports.densifyAndFillSeries = exports.defaultTrimOrExtendSeries = exports.accumulateAndDensifySeries = void 0;
 const common_1 = require("common");
 const df = __importStar(require("danfojs-node"));
 const _ = __importStar(require("lodash"));
@@ -28,10 +28,28 @@ const _ = __importStar(require("lodash"));
 // =======
 /*
   DESC
+    Cumulatively sums the input series and then densifies to daily values
+    between the input start and end dates
+  INPUT
+    series: A danfo Series
+    startDate: The starting date
+    endDate: The ending date
+  RETURN
+    A danfo Series with daily values after a cumulative sum
+*/
+function accumulateAndDensifySeries(series, startDate, endDate) {
+    const theSeries = series.count()
+        ? series.cumSum()
+        : new df.Series();
+    return densifyAndFillSeries(theSeries, startDate, endDate, 'locf', undefined, 0);
+}
+exports.accumulateAndDensifySeries = accumulateAndDensifySeries;
+/*
+  DESC
     Trims or extends the input series depending on the input start and end dates
     If start date < first date, fill with zeros
     If end date > last date, fill with last observed value
-  INPUTDepending on the start
+  INPUT
     series: A danfo Series
     startDate: The starting date
     endDate: The ending date

@@ -9,10 +9,41 @@ import * as _ from 'lodash'
 
 /*
   DESC
+    Cumulatively sums the input series and then densifies to daily values
+    between the input start and end dates
+  INPUT
+    series: A danfo Series
+    startDate: The starting date
+    endDate: The ending date    
+  RETURN
+    A danfo Series with daily values after a cumulative sum
+*/
+export function accumulateAndDensifySeries(
+  series: df.Series,
+  startDate: Date,
+  endDate: Date,    
+): df.Series {
+
+  const theSeries = series.count()
+    ? series.cumSum() as df.Series
+    : new df.Series()
+
+  return densifyAndFillSeries(
+    theSeries,
+    startDate,
+    endDate,
+    'locf',
+    undefined,
+    0
+  )
+}
+
+/*
+  DESC
     Trims or extends the input series depending on the input start and end dates
     If start date < first date, fill with zeros
     If end date > last date, fill with last observed value
-  INPUTDepending on the start
+  INPUT
     series: A danfo Series
     startDate: The starting date
     endDate: The ending date
