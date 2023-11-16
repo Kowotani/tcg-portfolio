@@ -165,11 +165,8 @@ function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
         // -- get holding value series
         const transactionSeries = getHoldingTransactionQuantitySeries(holding);
         const dailyCumHoldingQuantitySeries = (0, danfo_1.accumulateAndDensifySeries)(transactionSeries, startDt, endDt);
-        const pricesIx = thePriceSeries.index.map((ix) => {
-            return String(ix) >= startDt.toISOString()
-                && String(ix) <= endDt.toISOString();
-        });
-        const holdingValueSeries = dailyCumHoldingQuantitySeries.mul(thePriceSeries.loc(pricesIx));
+        const prices = (0, danfo_1.defaultTrimOrExtendSeries)(thePriceSeries, startDt, endDt);
+        const holdingValueSeries = dailyCumHoldingQuantitySeries.mul(prices);
         // -- get revenue series
         const revenueSeries = getHoldingRevenueSeries(holding, startDate, endDate);
         const dailyCumRevenueSeries = (0, danfo_1.accumulateAndDensifySeries)(revenueSeries, startDt, endDt);

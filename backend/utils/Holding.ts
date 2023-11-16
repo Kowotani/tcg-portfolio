@@ -188,12 +188,8 @@ export async function getHoldingMarketValueSeries(
   const transactionSeries = getHoldingTransactionQuantitySeries(holding)
   const dailyCumHoldingQuantitySeries = 
     accumulateAndDensifySeries(transactionSeries, startDt, endDt)
-  const pricesIx = thePriceSeries.index.map((ix: string | number) => {
-    return String(ix) >= startDt.toISOString()
-      && String(ix) <= endDt.toISOString()
-  })
-  const holdingValueSeries = 
-    dailyCumHoldingQuantitySeries.mul(thePriceSeries.loc(pricesIx))
+  const prices = defaultTrimOrExtendSeries(thePriceSeries, startDt, endDt)
+  const holdingValueSeries = dailyCumHoldingQuantitySeries.mul(prices)
 
   // -- get revenue series
   const revenueSeries = 
