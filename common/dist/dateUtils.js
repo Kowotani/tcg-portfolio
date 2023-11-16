@@ -21,13 +21,6 @@ function genDateRange(startDate, endDate) {
     while (endDate >= accumulator) {
         days.push(accumulator);
         accumulator = (0, date_fns_1.add)(accumulator, { hours: 24 });
-        console.log(accumulator);
-        // DST ajustments
-        // if (accumulator.getHours() === 1) {
-        //   accumulator = sub(accumulator, {hours: 1})
-        // } else if (accumulator.getHours() === 23) {
-        //   accumulator = add(accumulator, {hours: 1})
-        // }
     }
     return days;
 }
