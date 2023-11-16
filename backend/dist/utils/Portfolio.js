@@ -133,12 +133,10 @@ function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, end
             const marketValueSeries = (0, danfo_1.defaultTrimOrExtendSeries)(entireMarketValueSeries, startDt, endDt);
             marketValues.push(marketValueSeries);
         }
-        // create empty Series used for summation
-        const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDt.toISOString()] }), startDt, endDt, 'value', 0, 0);
         // get market value series of Portfolio
         return marketValues.reduce((acc, cur) => {
             return acc = acc.add(cur);
-        }, emptySeries);
+        }, (0, danfo_1.genZeroSeries)(startDt, endDt));
     });
 }
 exports.getPortfolioMarketValueSeries = getPortfolioMarketValueSeries;
@@ -199,12 +197,10 @@ function getPortfolioPnLSeries(portfolio, priceSeriesMap, startDate, endDate) {
             const pnlSeries = (0, danfo_1.defaultTrimOrExtendSeries)(entirePnlSeries, startDt, endDt);
             pnls.push(pnlSeries);
         }
-        // create empty Series used for summation
-        const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDt.toISOString()] }), startDt, endDt, 'value', 0, 0);
         // get pnl series of Portfolio
         return pnls.reduce((acc, cur) => {
             return acc = acc.add(cur);
-        }, emptySeries);
+        }, (0, danfo_1.genZeroSeries)(startDt, endDt));
     });
 }
 exports.getPortfolioPnLSeries = getPortfolioPnLSeries;
@@ -247,12 +243,10 @@ function getPortfolioTotalCostSeries(portfolio, startDate, endDate) {
         const totalCostSeries = (0, Holding_1.getHoldingTotalCostSeries)(holding, startDate, endDate);
         return (0, danfo_1.defaultTrimOrExtendSeries)(totalCostSeries, startDt, endDt);
     });
-    // create empty Series used for summation
-    const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDt.toISOString()] }), startDt, endDt, 'value', 0, 0);
     // get total cost series of Portfolio
     return totalCosts.reduce((acc, cur) => {
         return acc = acc.add(cur);
-    }, emptySeries);
+    }, (0, danfo_1.genZeroSeries)(startDt, endDt));
 }
 exports.getPortfolioTotalCostSeries = getPortfolioTotalCostSeries;
 /*

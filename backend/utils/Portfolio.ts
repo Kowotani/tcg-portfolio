@@ -6,7 +6,7 @@ import {
   assert, dateSub
 } from 'common'
 import { 
-  densifyAndFillSeries, defaultTrimOrExtendSeries, getDatedValuesFromSeries 
+  defaultTrimOrExtendSeries, genZeroSeries, getDatedValuesFromSeries 
 } from './danfo'
 import * as df from 'danfojs-node'
 import { 
@@ -147,20 +147,10 @@ export async function getPortfolioMarketValueSeries(
     marketValues.push(marketValueSeries)
   }
 
-  // create empty Series used for summation
-  const emptySeries = densifyAndFillSeries(
-    new df.Series([0], {index: [startDt.toISOString()]}),
-    startDt,
-    endDt,
-    'value',
-    0,
-    0
-  )
-
   // get market value series of Portfolio
   return marketValues.reduce((acc: df.Series, cur: df.Series) => {
     return acc = acc.add(cur) as df.Series
-  }, emptySeries)
+  }, genZeroSeries(startDt, endDt))
 }
 
 /*
@@ -241,20 +231,10 @@ export async function getPortfolioPnLSeries(
     pnls.push(pnlSeries)
   }
 
-  // create empty Series used for summation
-  const emptySeries = densifyAndFillSeries(
-    new df.Series([0], {index: [startDt.toISOString()]}),
-    startDt,
-    endDt,
-    'value',
-    0,
-    0
-  )
-
   // get pnl series of Portfolio
   return pnls.reduce((acc: df.Series, cur: df.Series) => {
     return acc = acc.add(cur) as df.Series
-  }, emptySeries)
+  }, genZeroSeries(startDt, endDt))
 }
 
 /*
@@ -313,21 +293,10 @@ export function getPortfolioTotalCostSeries(
     return defaultTrimOrExtendSeries(totalCostSeries, startDt, endDt)
   })
 
-  // create empty Series used for summation
-  const emptySeries = densifyAndFillSeries(
-    new df.Series([0], {index: [startDt.toISOString()]}),
-    startDt,
-    endDt,
-    'value',
-    0,
-    0
-  )
-
   // get total cost series of Portfolio
   return totalCosts.reduce((acc: df.Series, cur: df.Series) => {
     return acc = acc.add(cur) as df.Series
-  }, emptySeries)
-
+  }, genZeroSeries(startDt, endDt))
 }
 
 /*
