@@ -129,7 +129,8 @@ function getPortfolioMarketValueSeries(portfolio, priceSeriesMap, startDate, end
             const priceSeries = thePriceSeriesMap.get(tcgplayerId);
             // verify that prices exist for this tcgplayerId
             (0, common_1.assert)(priceSeries instanceof df.Series, `Could not find prices for tcgplayerId: ${tcgplayerId}`);
-            const marketValueSeries = yield (0, Holding_1.getHoldingMarketValueSeries)(holding, priceSeries, startDt, endDt);
+            const entireMarketValueSeries = yield (0, Holding_1.getHoldingMarketValueSeries)(holding, priceSeries, startDate, endDate);
+            const marketValueSeries = (0, danfo_1.defaultTrimOrExtendSeries)(entireMarketValueSeries, startDt, endDt);
             marketValues.push(marketValueSeries);
         }
         // create empty Series used for summation
@@ -184,8 +185,8 @@ function getPortfolioPnLSeries(portfolio, priceSeriesMap, startDate, endDate) {
         }
         else {
             const tcgplayerIds = yield (0, Portfolio_1.getPortfolioTcgplayerIds)(portfolio);
-            thePriceSeriesMap
-                = yield (0, Price_1.getPriceMapOfSeries)(tcgplayerIds, startDate, endDate);
+            thePriceSeriesMap =
+                yield (0, Price_1.getPriceMapOfSeries)(tcgplayerIds, startDate, endDate);
         }
         // get pnl series of Holdings
         let pnls = [];
@@ -194,7 +195,8 @@ function getPortfolioPnLSeries(portfolio, priceSeriesMap, startDate, endDate) {
             const priceSeries = thePriceSeriesMap.get(tcgplayerId);
             // verify that prices exist for this tcgplayerId
             (0, common_1.assert)(priceSeries instanceof df.Series, `Could not find prices for tcgplayerId: ${tcgplayerId}`);
-            const pnlSeries = yield (0, Holding_1.getHoldingPnLSeries)(holding, priceSeries, startDt, endDt);
+            const entirePnlSeries = yield (0, Holding_1.getHoldingPnLSeries)(holding, priceSeries, startDate, endDate);
+            const pnlSeries = (0, danfo_1.defaultTrimOrExtendSeries)(entirePnlSeries, startDt, endDt);
             pnls.push(pnlSeries);
         }
         // create empty Series used for summation
@@ -242,7 +244,8 @@ function getPortfolioTotalCostSeries(portfolio, startDate, endDate) {
     const holdings = (0, common_1.getPortfolioHoldings)(portfolio);
     // get total cost series of Holdings
     const totalCosts = holdings.map((holding) => {
-        return (0, Holding_1.getHoldingTotalCostSeries)(holding, startDt, endDt);
+        const totalCostSeries = (0, Holding_1.getHoldingTotalCostSeries)(holding, startDate, endDate);
+        return (0, danfo_1.defaultTrimOrExtendSeries)(totalCostSeries, startDt, endDt);
     });
     // create empty Series used for summation
     const emptySeries = (0, danfo_1.densifyAndFillSeries)(new df.Series([0], { index: [startDt.toISOString()] }), startDt, endDt, 'value', 0, 0);
@@ -276,7 +279,7 @@ function getStartAndEndDates(portfolio, startDate, endDate) {
 // type guards
 // ===========
 /*
-DESC
+DESCtotalCostSeries
   Returns whether or not the input is a Portfolio doc
 INPUT
   arg: An object that might be a Portfolio doc

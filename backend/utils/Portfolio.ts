@@ -5,7 +5,9 @@ import {
 
   assert, dateSub
 } from 'common'
-import { densifyAndFillSeries, getDatedValuesFromSeries } from './danfo'
+import { 
+  densifyAndFillSeries, defaultTrimOrExtendSeries, getDatedValuesFromSeries 
+} from './danfo'
 import * as df from 'danfojs-node'
 import { 
   getHoldingMarketValueSeries, getHoldingPnLSeries, getHoldingTotalCostSeries
@@ -137,8 +139,10 @@ export async function getPortfolioMarketValueSeries(
       priceSeries instanceof df.Series,
       `Could not find prices for tcgplayerId: ${tcgplayerId}`)
 
+    const entireMarketValueSeries = 
+      await getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate)
     const marketValueSeries = 
-      await getHoldingMarketValueSeries(holding, priceSeries, startDt, endDt)
+      defaultTrimOrExtendSeries(entireMarketValueSeries, startDt, endDt)
 
     marketValues.push(marketValueSeries)
   }
@@ -213,8 +217,8 @@ export async function getPortfolioPnLSeries(
     thePriceSeriesMap = priceSeriesMap
   } else {
     const tcgplayerIds = await getPortfolioTcgplayerIds(portfolio as IPortfolio)
-    thePriceSeriesMap 
-      = await getPriceMapOfSeries(tcgplayerIds, startDate, endDate)
+    thePriceSeriesMap = 
+      await getPriceMapOfSeries(tcgplayerIds, startDate, endDate)
   }
 
   // get pnl series of Holdings
@@ -229,8 +233,10 @@ export async function getPortfolioPnLSeries(
       priceSeries instanceof df.Series,
       `Could not find prices for tcgplayerId: ${tcgplayerId}`)
 
-    const pnlSeries = 
-      await getHoldingPnLSeries(holding, priceSeries, startDt, endDt)
+    const entirePnlSeries = 
+      await getHoldingPnLSeries(holding, priceSeries, startDate, endDate)
+    const pnlSeries =
+      defaultTrimOrExtendSeries(entirePnlSeries, startDt, endDt)
 
     pnls.push(pnlSeries)
   }
@@ -299,11 +305,12 @@ export function getPortfolioTotalCostSeries(
 
   // get total cost series of Holdings
   const totalCosts = holdings.map((holding: IHolding | IPopulatedHolding) => {
-    return getHoldingTotalCostSeries(
+    const totalCostSeries = getHoldingTotalCostSeries(
       holding,
-      startDt,
-      endDt
+      startDate,
+      endDate
     )
+    return defaultTrimOrExtendSeries(totalCostSeries, startDt, endDt)
   })
 
   // create empty Series used for summation
@@ -357,7 +364,7 @@ function getStartAndEndDates(
 // ===========
 
 /*
-DESC
+DESCtotalCostSeries
   Returns whether or not the input is a Portfolio doc
 INPUT
   arg: An object that might be a Portfolio doc
