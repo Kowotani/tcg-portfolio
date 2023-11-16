@@ -103,77 +103,77 @@ export function densifyAndFillSeries(
     // get value from series, if available
     const seriesValue = series.at(date)
 
-   // matched
-   if (seriesValue) {
-    values.push(Number(seriesValue))
+    // matched
+    if (seriesValue) {
+      values.push(Number(seriesValue))
 
-  // unmatched
-  } else {
+    // unmatched
+    } else {
 
-    // first value
-    if (ix === 0) {
+      // first value
+      if (ix === 0) {
 
-      // ix.date < series start date
-      if (date < (_.head(series.index) as string)) {
+        // ix.date < series start date
+        if (date < (_.head(series.index) as string)) {
 
-        // initial value
-        if (initialValue) {
-          values.push(initialValue)
+          // initial value
+          if (initialValue) {
+            values.push(initialValue)
 
-        // fill value
-        } else if (fillMode === 'value' && fillValue) {
-          values.push(fillValue)
+          // fill value
+          } else if (fillMode === 'value' && fillValue) {
+            values.push(fillValue)
 
-        // default
+          // default
+          } else {
+            values.push(0)
+          }
+
+        // ix.date > series start date
+        } else if (date > (_.last(series.index) as string)) {
+          values.push(_.last(series.values as number[]) as number)
+        
+        // ix.date between start date and end date
         } else {
-          values.push(0)
+
+          // locf
+          if (fillMode === 'locf' && series.count()) {
+            let seriesIndex = 0
+            while (seriesIndex + 1 < series.index.length 
+              && series.index[seriesIndex + 1] < date) {
+                seriesIndex += 1
+            }
+            values.push(series.iat(seriesIndex) as number)
+
+          // fill value
+          } else if (fillMode === 'value' && fillValue) {
+            values.push(fillValue)
+
+          // default
+          } else {
+            values.push(0)
+          }
         }
 
-      // ix.date > series start date
-      } else if (date > (_.last(series.index) as string)) {
-        values.push(_.last(series.values as number[]) as number)
-      
-      // ix.date between start date and end date
+      // subsequent values
       } else {
 
         // locf
-        if (fillMode === 'locf' && series.count()) {
-          let seriesIndex = 0
-          while (seriesIndex + 1 < series.index.length 
-            && series.index[seriesIndex + 1] < date) {
-              seriesIndex += 1
-          }
-          values.push(series.iat(seriesIndex) as number)
+        if (fillMode === 'locf') {
+          values.push(values[ix - 1])
 
         // fill value
         } else if (fillMode === 'value' && fillValue) {
           values.push(fillValue)
-
+        
         // default
         } else {
           values.push(0)
         }
       }
-
-    // subsequent values
-    } else {
-
-      // locf
-      if (fillMode === 'locf') {
-        values.push(values[ix - 1])
-
-      // fill value
-      } else if (fillMode === 'value' && fillValue) {
-        values.push(fillValue)
-      
-      // default
-      } else {
-        values.push(0)
-      }
     }
-  }
 
-})
+  })
 
   return new df.Series(values, {index})
 }
