@@ -8,6 +8,33 @@ import * as _ from 'lodash'
 // =======
 
 /*
+  DESC
+    Trims or extends the input series depending on the input start and end dates
+    If start date < first date, fill with zeros
+    If end date > last date, fill with last observed value
+  INPUTDepending on the start
+    series: A danfo Series
+    startDate: The starting date
+    endDate: The ending date
+  RETURN
+    The trimmed or extended danfo Series according to the above
+*/
+export function defaultTrimOrExtendSeries(
+  series: df.Series,
+  startDate: Date,
+  endDate: Date,  
+): df.Series {
+  return densifyAndFillSeries(
+    series,
+    startDate,
+    endDate,
+    'locf',
+    undefined,
+    0
+  )
+}
+
+/*
 DESC
   Transforms the input danfo Series by slicing / extending the date range and
   filling any gaps according to the input parameters
@@ -72,27 +99,24 @@ export function densifyAndFillSeries(
 
 /*
   DESC
-    Trims or extends the input series depending on the input start and end dates
-    If start date < first date, fill with zeros
-    If end date > last date, fill with last observed value
-  INPUTDepending on the start
-    series: A danfo Series
+    Generate a series of zeros with date index between the input start date 
+    and end date
+  INPUT
     startDate: The starting date
     endDate: The ending date
   RETURN
-    The trimmed or extended danfo Series according to the above
+    A danfo Series of zeros
 */
-export function defaultTrimOrExtendSeries(
-  series: df.Series,
+export function genZeroSeries(
   startDate: Date,
-  endDate: Date,  
+  endDate: Date
 ): df.Series {
   return densifyAndFillSeries(
-    series,
+    new df.Series([0], {index: [startDate.toISOString()]}),
     startDate,
     endDate,
-    'locf',
-    undefined,
+    'value',
+    0,
     0
   )
 }

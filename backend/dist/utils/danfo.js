@@ -19,13 +19,29 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.defaultTrimOrExtendSeries = exports.densifyAndFillSeries = void 0;
+exports.sortSeriesByIndex = exports.getSeriesFromDatedValues = exports.getDatedValuesFromSeries = exports.genZeroSeries = exports.densifyAndFillSeries = exports.defaultTrimOrExtendSeries = void 0;
 const common_1 = require("common");
 const df = __importStar(require("danfojs-node"));
 const _ = __importStar(require("lodash"));
 // =======
 // generic
 // =======
+/*
+  DESC
+    Trims or extends the input series depending on the input start and end dates
+    If start date < first date, fill with zeros
+    If end date > last date, fill with last observed value
+  INPUTDepending on the start
+    series: A danfo Series
+    startDate: The starting date
+    endDate: The ending date
+  RETURN
+    The trimmed or extended danfo Series according to the above
+*/
+function defaultTrimOrExtendSeries(series, startDate, endDate) {
+    return densifyAndFillSeries(series, startDate, endDate, 'locf', undefined, 0);
+}
+exports.defaultTrimOrExtendSeries = defaultTrimOrExtendSeries;
 /*
 DESC
   Transforms the input danfo Series by slicing / extending the date range and
@@ -79,20 +95,18 @@ function densifyAndFillSeries(series, startDate, endDate, fillMode, fillValue, i
 exports.densifyAndFillSeries = densifyAndFillSeries;
 /*
   DESC
-    Trims or extends the input series depending on the input start and end dates
-    If start date < first date, fill with zeros
-    If end date > last date, fill with last observed value
-  INPUTDepending on the start
-    series: A danfo Series
+    Generate a series of zeros with date index between the input start date
+    and end date
+  INPUT
     startDate: The starting date
     endDate: The ending date
   RETURN
-    The trimmed or extended danfo Series according to the above
+    A danfo Series of zeros
 */
-function defaultTrimOrExtendSeries(series, startDate, endDate) {
-    return densifyAndFillSeries(series, startDate, endDate, 'locf', undefined, 0);
+function genZeroSeries(startDate, endDate) {
+    return densifyAndFillSeries(new df.Series([0], { index: [startDate.toISOString()] }), startDate, endDate, 'value', 0, 0);
 }
-exports.defaultTrimOrExtendSeries = defaultTrimOrExtendSeries;
+exports.genZeroSeries = genZeroSeries;
 // ==========
 // converters
 // ==========
