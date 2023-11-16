@@ -26,7 +26,7 @@ export function genDateRange(startDate: Date, endDate: Date): Date[] {
 
   while (endDate >= accumulator) {
     days.push(accumulator)
-    accumulator = add(accumulator, {days: 1})
+    accumulator = add(accumulator, {hours: 24})
   }
 
   return days
