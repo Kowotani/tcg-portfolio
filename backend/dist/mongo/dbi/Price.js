@@ -229,9 +229,9 @@ RETURN
 */
 function getPriceSeries(tcgplayerId, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
-        // get dated values
-        const datedValues = yield getPricesAsDatedValues(tcgplayerId, startDate, endDate);
-        return (0, danfo_1.getSeriesFromDatedValues)(datedValues);
+        // get prices
+        const priceMap = yield getPriceMapOfSeries([tcgplayerId], startDate, endDate);
+        return priceMap.get(tcgplayerId);
     });
 }
 exports.getPriceSeries = getPriceSeries;

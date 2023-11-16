@@ -255,11 +255,10 @@ export async function getPriceSeries(
   endDate?: Date
 ): Promise<df.Series> {
 
-  // get dated values
-  const datedValues 
-    = await getPricesAsDatedValues(tcgplayerId, startDate, endDate)
+  // get prices
+  const priceMap = await getPriceMapOfSeries([tcgplayerId], startDate, endDate)
 
-  return getSeriesFromDatedValues(datedValues) as df.Series
+  return priceMap.get(tcgplayerId) as df.Series
 }
 
 
