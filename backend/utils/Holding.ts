@@ -8,8 +8,8 @@ import {
   isDateAfter, isDateBefore
 } from 'common'
 import { 
-  defaultTrimOrExtendSeries, getDatedValuesFromSeries, getSeriesFromDatedValues, 
-  sortSeriesByIndex 
+  accumulateAndDensifySeries, defaultTrimOrExtendSeries, 
+  getDatedValuesFromSeries, getSeriesFromDatedValues, sortSeriesByIndex 
 } from './danfo'
 import * as df from 'danfojs-node'
 import * as _ from 'lodash'
@@ -184,31 +184,25 @@ export async function getHoldingMarketValueSeries(
     ? priceSeries
     : await getPriceSeries(getHoldingTcgplayerId(holding), startDate, endDate)
 
-  // align price series
-  const prices = defaultTrimOrExtendSeries(thePriceSeries, startDt, endDt)
-
   // -- get holding value series
   const transactionSeries = getHoldingTransactionQuantitySeries(holding)
-  const cumTransactionSeries = transactionSeries.cumSum() as df.Series
-  const quantitySeries 
-    = defaultTrimOrExtendSeries(cumTransactionSeries, startDt, endDt)
-  const pricesIx = prices.index.map((ix: string | number) => {
+  const dailyCumHoldingQuantitySeries = 
+    accumulateAndDensifySeries(transactionSeries, startDt, endDt)
+  const pricesIx = thePriceSeries.index.map((ix: string | number) => {
     return String(ix) >= startDt.toISOString()
       && String(ix) <= endDt.toISOString()
   })
-  const holdingValueSeries = quantitySeries.mul(prices.loc(pricesIx))
+  const holdingValueSeries = 
+    dailyCumHoldingQuantitySeries.mul(thePriceSeries.loc(pricesIx))
 
   // -- get revenue series
-  const dailyRevenueSeries 
-    = getHoldingRevenueSeries(holding, startDate, endDate)
-  const cumRevenueSeries = dailyRevenueSeries.count() 
-    ? dailyRevenueSeries.cumSum() as df.Series
-    : dailyRevenueSeries
-  const revenueSeries 
-    = defaultTrimOrExtendSeries(cumRevenueSeries, startDt, endDt)
+  const revenueSeries = 
+    getHoldingRevenueSeries(holding, startDate, endDate)
+  const dailyCumRevenueSeries = 
+    accumulateAndDensifySeries(revenueSeries, startDt, endDt)
 
   // -- get market value series
-  return holdingValueSeries.add(revenueSeries) as df.Series
+  return holdingValueSeries.add(dailyCumRevenueSeries) as df.Series
 }
 
 /*
@@ -507,12 +501,10 @@ export function getHoldingTotalCostSeries(
   })
 
   // align daily purchase costs to date index
-  const dailyPurchaseSeries 
-    = sortSeriesByIndex(getSeriesFromDatedValues(datedValues))
-  const purchaseSeries 
-    = defaultTrimOrExtendSeries(dailyPurchaseSeries, startDt, endDt)
+  const dailyPurchaseSeries = 
+    sortSeriesByIndex(getSeriesFromDatedValues(datedValues))
 
-  return purchaseSeries.cumSum() as df.Series
+  return accumulateAndDensifySeries(dailyPurchaseSeries, startDt, endDt)
 }
 
 /*

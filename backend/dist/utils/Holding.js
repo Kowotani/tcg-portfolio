@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -158,25 +162,19 @@ function getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate) {
         const thePriceSeries = priceSeries
             ? priceSeries
             : yield (0, Price_1.getPriceSeries)((0, common_1.getHoldingTcgplayerId)(holding), startDate, endDate);
-        // align price series
-        const prices = (0, danfo_1.defaultTrimOrExtendSeries)(thePriceSeries, startDt, endDt);
         // -- get holding value series
         const transactionSeries = getHoldingTransactionQuantitySeries(holding);
-        const cumTransactionSeries = transactionSeries.cumSum();
-        const quantitySeries = (0, danfo_1.defaultTrimOrExtendSeries)(cumTransactionSeries, startDt, endDt);
-        const pricesIx = prices.index.map((ix) => {
+        const dailyCumHoldingQuantitySeries = (0, danfo_1.accumulateAndDensifySeries)(transactionSeries, startDt, endDt);
+        const pricesIx = thePriceSeries.index.map((ix) => {
             return String(ix) >= startDt.toISOString()
                 && String(ix) <= endDt.toISOString();
         });
-        const holdingValueSeries = quantitySeries.mul(prices.loc(pricesIx));
+        const holdingValueSeries = dailyCumHoldingQuantitySeries.mul(thePriceSeries.loc(pricesIx));
         // -- get revenue series
-        const dailyRevenueSeries = getHoldingRevenueSeries(holding, startDate, endDate);
-        const cumRevenueSeries = dailyRevenueSeries.count()
-            ? dailyRevenueSeries.cumSum()
-            : dailyRevenueSeries;
-        const revenueSeries = (0, danfo_1.defaultTrimOrExtendSeries)(cumRevenueSeries, startDt, endDt);
+        const revenueSeries = getHoldingRevenueSeries(holding, startDate, endDate);
+        const dailyCumRevenueSeries = (0, danfo_1.accumulateAndDensifySeries)(revenueSeries, startDt, endDt);
         // -- get market value series
-        return holdingValueSeries.add(revenueSeries);
+        return holdingValueSeries.add(dailyCumRevenueSeries);
     });
 }
 exports.getHoldingMarketValueSeries = getHoldingMarketValueSeries;
@@ -403,8 +401,7 @@ function getHoldingTotalCostSeries(holding, startDate, endDate) {
     });
     // align daily purchase costs to date index
     const dailyPurchaseSeries = (0, danfo_1.sortSeriesByIndex)((0, danfo_1.getSeriesFromDatedValues)(datedValues));
-    const purchaseSeries = (0, danfo_1.defaultTrimOrExtendSeries)(dailyPurchaseSeries, startDt, endDt);
-    return purchaseSeries.cumSum();
+    return (0, danfo_1.accumulateAndDensifySeries)(dailyPurchaseSeries, startDt, endDt);
 }
 exports.getHoldingTotalCostSeries = getHoldingTotalCostSeries;
 /*
