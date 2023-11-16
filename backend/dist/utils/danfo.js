@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -88,24 +92,68 @@ function densifyAndFillSeries(series, startDate, endDate, fillMode, fillValue, i
         // get value from series, if available
         const seriesValue = series.at(date);
         // matched
-        if (seriesValue !== undefined) {
+        if (seriesValue) {
             values.push(Number(seriesValue));
-            // unmatched, initial value
-        }
-        else if (ix === 0 && initialValue) {
-            values.push(initialValue);
-            // unmatched, fill value
-        }
-        else if (fillMode === 'value' && fillValue) {
-            values.push(fillValue);
-            // unmatched, locf
-        }
-        else if (fillMode === 'locf' && ix > 0) {
-            values.push(values[ix - 1]);
-            // default to 0
+            // unmatched
         }
         else {
-            values.push(0);
+            // first value
+            if (ix === 0) {
+                // ix.date < series start date
+                if (date < _.head(series.index)) {
+                    // initial value
+                    if (initialValue) {
+                        values.push(initialValue);
+                        // fill value
+                    }
+                    else if (fillMode === 'value' && fillValue) {
+                        values.push(fillValue);
+                        // default
+                    }
+                    else {
+                        values.push(0);
+                    }
+                    // ix.date > series start date
+                }
+                else if (date > _.last(series.index)) {
+                    values.push(_.last(series.values));
+                    // ix.date between start date and end date
+                }
+                else {
+                    // locf
+                    if (fillMode === 'locf' && series.count()) {
+                        let seriesIndex = 0;
+                        while (seriesIndex + 1 < series.index.length
+                            && series.index[seriesIndex + 1] < date) {
+                            seriesIndex += 1;
+                        }
+                        values.push(series.iat(seriesIndex));
+                        // fill value
+                    }
+                    else if (fillMode === 'value' && fillValue) {
+                        values.push(fillValue);
+                        // default
+                    }
+                    else {
+                        values.push(0);
+                    }
+                }
+                // subsequent values
+            }
+            else {
+                // locf
+                if (fillMode === 'locf') {
+                    values.push(values[ix - 1]);
+                    // fill value
+                }
+                else if (fillMode === 'value' && fillValue) {
+                    values.push(fillValue);
+                    // default
+                }
+                else {
+                    values.push(0);
+                }
+            }
         }
     });
     return new df.Series(values, { index });

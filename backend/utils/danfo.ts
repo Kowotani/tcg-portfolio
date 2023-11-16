@@ -103,27 +103,77 @@ export function densifyAndFillSeries(
     // get value from series, if available
     const seriesValue = series.at(date)
 
-    // matched
-    if (seriesValue !== undefined) {
-      values.push(Number(seriesValue))
-    
-    // unmatched, initial value
-    } else if (ix === 0 && initialValue) {
-      values.push(initialValue)
+   // matched
+   if (seriesValue) {
+    values.push(Number(seriesValue))
 
-    // unmatched, fill value
-    } else if (fillMode === 'value' && fillValue) {
-      values.push(fillValue)
+  // unmatched
+  } else {
 
-    // unmatched, locf
-    } else if (fillMode === 'locf' && ix > 0) {
-      values.push(values[ix - 1])
-    
-    // default to 0
+    // first value
+    if (ix === 0) {
+
+      // ix.date < series start date
+      if (date < (_.head(series.index) as string)) {
+
+        // initial value
+        if (initialValue) {
+          values.push(initialValue)
+
+        // fill value
+        } else if (fillMode === 'value' && fillValue) {
+          values.push(fillValue)
+
+        // default
+        } else {
+          values.push(0)
+        }
+
+      // ix.date > series start date
+      } else if (date > (_.last(series.index) as string)) {
+        values.push(_.last(series.values as number[]) as number)
+      
+      // ix.date between start date and end date
+      } else {
+
+        // locf
+        if (fillMode === 'locf' && series.count()) {
+          let seriesIndex = 0
+          while (seriesIndex + 1 < series.index.length 
+            && series.index[seriesIndex + 1] < date) {
+              seriesIndex += 1
+          }
+          values.push(series.iat(seriesIndex) as number)
+
+        // fill value
+        } else if (fillMode === 'value' && fillValue) {
+          values.push(fillValue)
+
+        // default
+        } else {
+          values.push(0)
+        }
+      }
+
+    // subsequent values
     } else {
-      values.push(0)
+
+      // locf
+      if (fillMode === 'locf') {
+        values.push(values[ix - 1])
+
+      // fill value
+      } else if (fillMode === 'value' && fillValue) {
+        values.push(fillValue)
+      
+      // default
+      } else {
+        values.push(0)
+      }
     }
-  })
+  }
+
+})
 
   return new df.Series(values, {index})
 }
