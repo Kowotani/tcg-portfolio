@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import { 
   Badge,
   Box,
@@ -22,9 +22,8 @@ import { EditTransactionsModal } from './EditTransactionsModal'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
-import { LatestPricesContext } from '../state/LatestPricesContext'
 import { getBrowserLocale } from '../utils/generic'
-import { ILatestPricesContext, getFormattedPrice } from '../utils/Price'
+import { getFormattedPrice } from '../utils/Price'
 import { getProductNameWithLanguage } from '../utils/Product'
 
 
@@ -48,8 +47,6 @@ export const HoldingInputCard = (
 
   const [ holding, setHolding ] = useState(props.populatedHolding)
   const [ transactions, setTransactions ] = useState(holding.transactions)
-  const { latestPrices } 
-    = useContext(LatestPricesContext) as ILatestPricesContext
 
     
   // =========
