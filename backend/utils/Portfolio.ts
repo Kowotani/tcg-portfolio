@@ -10,7 +10,7 @@ import {
 } from './danfo'
 import * as df from 'danfojs-node'
 import { 
-  getHoldingMarketValueSeries, getHoldingPnLSeries, getHoldingTotalCostSeries
+  getHoldingMarketValueSeries, getHoldingCumPnLSeries, getHoldingTotalCostSeries
 } from './Holding'
 import * as _ from 'lodash'
 import { getPortfolioTcgplayerIds } from '../mongo/dbi/Portfolio'
@@ -164,7 +164,7 @@ INPUT
 RETURN
   A TDatedValue[]
 */
-export async function getPortfolioPnLAsDatedValues(
+export async function getPortfolioCumPnLAsDatedValues(
   portfolio: IPortfolio,
   startDate?: Date,
   endDate?: Date
@@ -172,7 +172,7 @@ export async function getPortfolioPnLAsDatedValues(
 
   // get pnl series
   const pnlSeries = 
-    await getPortfolioPnLSeries(portfolio, undefined, startDate, endDate)
+    await getPortfolioCumPnLSeries(portfolio, undefined, startDate, endDate)
 
   return getDatedValuesFromSeries(pnlSeries, 2)
 }
@@ -189,7 +189,7 @@ INPUT
 RETURN
   A danfo Series
 */
-export async function getPortfolioPnLSeries(
+export async function getPortfolioCumPnLSeries(
   portfolio: IPortfolio | IPopulatedPortfolio,
   priceSeriesMap?: Map<number, df.Series>,
   startDate?: Date,
@@ -224,7 +224,7 @@ export async function getPortfolioPnLSeries(
       `Could not find prices for tcgplayerId: ${tcgplayerId}`)
 
     const entirePnlSeries = 
-      await getHoldingPnLSeries(holding, priceSeries, startDate, endDate)
+      await getHoldingCumPnLSeries(holding, priceSeries, startDate, endDate)
     const pnlSeries =
       defaultTrimOrExtendSeries(entirePnlSeries, startDt, endDt)
 

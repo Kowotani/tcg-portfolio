@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isPortfolioDoc = exports.getPortfolioTotalCostSeries = exports.getPortfolioTotalCostAsDatedValues = exports.getPortfolioPnLSeries = exports.getPortfolioPnLAsDatedValues = exports.getPortfolioMarketValueSeries = exports.getPortfolioMarketValueAsDatedValues = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = void 0;
+exports.isPortfolioDoc = exports.getPortfolioTotalCostSeries = exports.getPortfolioTotalCostAsDatedValues = exports.getPortfolioCumPnLSeries = exports.getPortfolioCumPnLAsDatedValues = exports.getPortfolioMarketValueSeries = exports.getPortfolioMarketValueAsDatedValues = exports.genPortfolioNotFoundError = exports.genPortfolioAlreadyExistsError = void 0;
 const common_1 = require("common");
 const danfo_1 = require("./danfo");
 const df = __importStar(require("danfojs-node"));
@@ -151,14 +151,14 @@ INPUT
 RETURN
   A TDatedValue[]
 */
-function getPortfolioPnLAsDatedValues(portfolio, startDate, endDate) {
+function getPortfolioCumPnLAsDatedValues(portfolio, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
         // get pnl series
-        const pnlSeries = yield getPortfolioPnLSeries(portfolio, undefined, startDate, endDate);
+        const pnlSeries = yield getPortfolioCumPnLSeries(portfolio, undefined, startDate, endDate);
         return (0, danfo_1.getDatedValuesFromSeries)(pnlSeries, 2);
     });
 }
-exports.getPortfolioPnLAsDatedValues = getPortfolioPnLAsDatedValues;
+exports.getPortfolioCumPnLAsDatedValues = getPortfolioCumPnLAsDatedValues;
 /*
 DESC
   Returns a series of cumulative PnL for the input IPortfolio between the
@@ -171,7 +171,7 @@ INPUT
 RETURN
   A danfo Series
 */
-function getPortfolioPnLSeries(portfolio, priceSeriesMap, startDate, endDate) {
+function getPortfolioCumPnLSeries(portfolio, priceSeriesMap, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
         // get start and end dates
         const [startDt, endDt] = getStartAndEndDates(portfolio, startDate, endDate);
@@ -193,7 +193,7 @@ function getPortfolioPnLSeries(portfolio, priceSeriesMap, startDate, endDate) {
             const priceSeries = thePriceSeriesMap.get(tcgplayerId);
             // verify that prices exist for this tcgplayerId
             (0, common_1.assert)(priceSeries instanceof df.Series, `Could not find prices for tcgplayerId: ${tcgplayerId}`);
-            const entirePnlSeries = yield (0, Holding_1.getHoldingPnLSeries)(holding, priceSeries, startDate, endDate);
+            const entirePnlSeries = yield (0, Holding_1.getHoldingCumPnLSeries)(holding, priceSeries, startDate, endDate);
             const pnlSeries = (0, danfo_1.defaultTrimOrExtendSeries)(entirePnlSeries, startDt, endDt);
             pnls.push(pnlSeries);
         }
@@ -203,7 +203,7 @@ function getPortfolioPnLSeries(portfolio, priceSeriesMap, startDate, endDate) {
         }, (0, danfo_1.genZeroSeries)(startDt, endDt));
     });
 }
-exports.getPortfolioPnLSeries = getPortfolioPnLSeries;
+exports.getPortfolioCumPnLSeries = getPortfolioCumPnLSeries;
 /*
 DESC
   Returns the total cost of the input Portfolio between the startDate and

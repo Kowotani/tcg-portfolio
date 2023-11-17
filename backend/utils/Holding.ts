@@ -210,7 +210,7 @@ INPUT
   startDate?: The start date for PnL calculation
   endDate?: The end date for PnL calculation
 */
-export async function getHoldingPnLAsDatedValues(
+export async function getHoldingCumPnLAsDatedValues(
   holding: IHolding | IPopulatedHolding,
   startDate?: Date,
   endDate?: Date
@@ -218,7 +218,7 @@ export async function getHoldingPnLAsDatedValues(
 
   // get PnL
   const pnlSeries = 
-    await getHoldingPnLSeries(holding, undefined, startDate, endDate)
+    await getHoldingCumPnLSeries(holding, undefined, startDate, endDate)
 
   return getDatedValuesFromSeries(pnlSeries, 2)
 }
@@ -236,7 +236,7 @@ INPUT
 RETURN
   A danfo Series
 */
-export async function getHoldingPnLSeries(
+export async function getHoldingCumPnLSeries(
   holding: IHolding | IPopulatedHolding,
   priceSeries?: df.Series,
   startDate?: Date,

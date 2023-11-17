@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -32,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hasValidTransactions = exports.areValidHoldings = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTotalCostAsDatedValues = exports.getHoldingRevenueSeries = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingPnLSeries = exports.getHoldingPnLAsDatedValues = exports.getHoldingMarketValueSeries = exports.getHoldingMarketValueAsDatedValues = exports.getHoldingCostOfGoodsSoldSeries = exports.getIMHoldingsFromIHoldings = void 0;
+exports.hasValidTransactions = exports.areValidHoldings = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTotalCostAsDatedValues = exports.getHoldingRevenueSeries = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingCumPnLSeries = exports.getHoldingCumPnLAsDatedValues = exports.getHoldingMarketValueSeries = exports.getHoldingMarketValueAsDatedValues = exports.getHoldingCostOfGoodsSoldSeries = exports.getIMHoldingsFromIHoldings = void 0;
 const common_1 = require("common");
 const danfo_1 = require("./danfo");
 const _ = __importStar(require("lodash"));
@@ -184,14 +180,14 @@ INPUT
   startDate?: The start date for PnL calculation
   endDate?: The end date for PnL calculation
 */
-function getHoldingPnLAsDatedValues(holding, startDate, endDate) {
+function getHoldingCumPnLAsDatedValues(holding, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
         // get PnL
-        const pnlSeries = yield getHoldingPnLSeries(holding, undefined, startDate, endDate);
+        const pnlSeries = yield getHoldingCumPnLSeries(holding, undefined, startDate, endDate);
         return (0, danfo_1.getDatedValuesFromSeries)(pnlSeries, 2);
     });
 }
-exports.getHoldingPnLAsDatedValues = getHoldingPnLAsDatedValues;
+exports.getHoldingCumPnLAsDatedValues = getHoldingCumPnLAsDatedValues;
 /*
 DESC
   Returns a series of cumulative PnL for the input IHolding between the
@@ -205,7 +201,7 @@ INPUT
 RETURN
   A danfo Series
 */
-function getHoldingPnLSeries(holding, priceSeries, startDate, endDate) {
+function getHoldingCumPnLSeries(holding, priceSeries, startDate, endDate) {
     return __awaiter(this, void 0, void 0, function* () {
         // get output series start and end dates
         const [startDt, endDt] = getStartAndEndDates(holding, startDate, endDate);
@@ -225,7 +221,7 @@ function getHoldingPnLSeries(holding, priceSeries, startDate, endDate) {
         return marketValueSeries.sub(totalCostSeries);
     });
 }
-exports.getHoldingPnLSeries = getHoldingPnLSeries;
+exports.getHoldingCumPnLSeries = getHoldingCumPnLSeries;
 /*
 DESC
   Returns a series of purchase costs for the input IHolding between the
