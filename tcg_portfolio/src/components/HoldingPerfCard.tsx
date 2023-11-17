@@ -112,6 +112,7 @@ export const HoldingPerfCard = (
             <ProductImage 
               product={props.populatedHolding.product} 
               boxSize='100px'
+              externalUrl={true}
             />
 
             {/* Market Price */}
