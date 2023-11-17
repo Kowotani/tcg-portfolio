@@ -40,11 +40,12 @@ import { getLatestPrices, insertPrices } from './mongo/dbi/Price'
 import multer from 'multer'
 import { loadCurrentPrice } from './scraper/scrapeManager'
 import { 
-  getHoldingMarketValueAsDatedValues, getHoldingTotalCostAsDatedValues 
+  getHoldingCumPnLAsDatedValues, getHoldingMarketValueAsDatedValues, 
+  getHoldingTotalCostAsDatedValues 
 } from './utils/Holding'
 import { 
-  isPortfolioDoc, getPortfolioMarketValueAsDatedValues, 
-  getPortfolioTotalCostAsDatedValues
+  isPortfolioDoc, getPortfolioCumPnLAsDatedValues, 
+  getPortfolioMarketValueAsDatedValues, getPortfolioTotalCostAsDatedValues
 } from './utils/Portfolio'
 import { isProductDoc } from './utils/Product'
 
@@ -277,10 +278,13 @@ app.get(PORTFOLIO_HOLDINGS_PERFORMANCE_URL, async (req: any, res: any) => {
         let fn: (a1: IHolding | IPopulatedHolding, a2?: Date, a3?: Date) => Promise<TDatedValue[]>
 
         switch(metric) {
+          case PerformanceMetric.CumPnL:
+            fn = getHoldingCumPnLAsDatedValues
+            break
           case PerformanceMetric.MarketValue:
             fn = getHoldingMarketValueAsDatedValues
             break
-            case PerformanceMetric.TotalCost:
+          case PerformanceMetric.TotalCost:
               fn = getHoldingTotalCostAsDatedValues
               break
           default:
@@ -363,10 +367,13 @@ app.get(PORTFOLIO_PERFORMANCE_URL, async (req: any, res: any) => {
       let fn: (a1: IPortfolio, a2?: Date, a3?: Date) => Promise<TDatedValue[]>
 
       switch(metric) {
+        case PerformanceMetric.CumPnL:
+          fn = getPortfolioCumPnLAsDatedValues
+          break        
         case PerformanceMetric.MarketValue:
           fn = getPortfolioMarketValueAsDatedValues
           break
-          case PerformanceMetric.TotalCost:
+        case PerformanceMetric.TotalCost:
             fn = getPortfolioTotalCostAsDatedValues
             break
         default:

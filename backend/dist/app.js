@@ -223,6 +223,9 @@ app.get(common_1.PORTFOLIO_HOLDINGS_PERFORMANCE_URL, (req, res) => __awaiter(voi
             for (const metric of metrics) {
                 let fn;
                 switch (metric) {
+                    case common_1.PerformanceMetric.CumPnL:
+                        fn = Holding_1.getHoldingCumPnLAsDatedValues;
+                        break;
                     case common_1.PerformanceMetric.MarketValue:
                         fn = Holding_1.getHoldingMarketValueAsDatedValues;
                         break;
@@ -299,6 +302,9 @@ app.get(common_1.PORTFOLIO_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void
         for (const metric of metrics) {
             let fn;
             switch (metric) {
+                case common_1.PerformanceMetric.CumPnL:
+                    fn = Portfolio_2.getPortfolioCumPnLAsDatedValues;
+                    break;
                 case common_1.PerformanceMetric.MarketValue:
                     fn = Portfolio_2.getPortfolioMarketValueAsDatedValues;
                     break;
