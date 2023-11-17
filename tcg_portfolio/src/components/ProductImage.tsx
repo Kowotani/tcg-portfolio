@@ -1,6 +1,32 @@
 import { PropsWithChildren } from 'react'
-import { BoxProps, Image } from '@chakra-ui/react'
+import { 
+  BoxProps, 
+  Image, 
+  LinkBox,
+  LinkOverlay,
+} from '@chakra-ui/react'
 import { IProduct } from 'common'
+
+
+// =============
+// Sub Component
+// =============
+
+type TUrlWrapperProps = {
+  tcgplayerId: number
+}
+export const UrlWrapper = (props: PropsWithChildren<TUrlWrapperProps>) => {
+
+  const TCGPLAYER_URL = `https://www.tcgplayer.com/product/${props.tcgplayerId}/`
+
+  return (
+    <LinkBox>
+      <LinkOverlay href={TCGPLAYER_URL} isExternal={true}>
+        {props.children}
+      </LinkOverlay>
+    </LinkBox>
+  )
+}
 
 
 // ==============
@@ -8,7 +34,8 @@ import { IProduct } from 'common'
 // ==============
 
 type TProductImageProps = BoxProps & {
-  product: IProduct
+  product: IProduct,
+  externalUrl?: boolean
 }
 export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
 
@@ -17,10 +44,23 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
   const placeholderUrl = 'placeholder.jpeg'
 
   return (
-    <Image 
-      boxSize={props.boxSize}
-      src={imageUrl}
-      fallbackSrc={placeholderUrl}
-    />
+    <>
+      {props.externalUrl
+        ? (
+          <UrlWrapper tcgplayerId={props.product.tcgplayerId}>
+            <Image 
+              boxSize={props.boxSize}
+              src={imageUrl}
+              fallbackSrc={placeholderUrl}
+            />            
+          </UrlWrapper>
+        ) : (
+          <Image 
+            boxSize={props.boxSize}
+            src={imageUrl}
+            fallbackSrc={placeholderUrl}
+          />       
+      )}
+    </>
   )
 }

@@ -7,6 +7,8 @@ import {
   CardBody,
   CloseButton,
   HStack,
+  LinkBox,
+  LinkOverlay,
   StackDivider,
   Text,
   useDisclosure,
@@ -39,6 +41,14 @@ export const HoldingInputCard = (
 
   // modal
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+
+  // =========
+  // constants
+  // =========
+
+  const TCGPLAYER_URL = 
+    `https://www.tcgplayer.com/product/${props.populatedHolding.product.tcgplayerId}/`
 
 
   // =====
@@ -129,10 +139,14 @@ export const HoldingInputCard = (
             <VStack minWidth='100px'>
 
               {/* Product Image */}
-              <ProductImage 
-                product={props.populatedHolding.product} 
-                boxSize='100px'
-              />
+              <LinkBox>
+                <LinkOverlay href={TCGPLAYER_URL} isExternal={true}>
+                  <ProductImage 
+                    product={props.populatedHolding.product} 
+                    boxSize='100px'
+                  />
+                </LinkOverlay>
+              </LinkBox>
 
               {/* Market Price */}
               <Text>
