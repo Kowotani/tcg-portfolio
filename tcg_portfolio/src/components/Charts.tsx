@@ -33,8 +33,24 @@ import { getFormattedPrice } from '../utils/Price'
 // constants
 // =========
 
+// ------
+// layout
+// ------
+
 const BLUE = '#3182CE'
 const GRAY = '#718096'
+
+// ----------------
+// date range radio
+// ----------------
+
+const dateRangeMap = new Map<string, ChartDateRange>([
+  ['1M', ChartDateRange.OneMonth],
+  ['3M', ChartDateRange.ThreeMonths],
+  ['6M', ChartDateRange.SixMonths],
+  ['1Y', ChartDateRange.OneYear],
+  ['All', ChartDateRange.All]
+])
 
 
 // =========
@@ -68,6 +84,41 @@ function getPriceAxisWidth(
   const longestValue = _.max([Math.abs(minValue), Math.abs(maxValue)])
 
   return 15 + String(longestValue).length * 13
+}
+
+/*
+  DESC
+    Handles radio button events to update the date range of the chart and,
+    optionally, of the chart's parent date range
+  INPUT
+    value: Value from the radio change event
+    setInternalDateRange: Function to set the chart's internal date range state
+    setParentDateRange?: Function to set the chart's parent date range state
+*/
+function onRadioChange(
+  value: string, 
+  setInternalDateRange: (value: React.SetStateAction<ChartDateRange>) => void,
+  setParentDateRange?: (value: ChartDateRange) => void
+): void {
+  const dateRange = dateRangeMap.get(value) as ChartDateRange
+  setInternalDateRange(dateRange)
+  if (setParentDateRange) {
+    setParentDateRange(dateRange)
+  }
+}
+
+
+// =====
+// types
+// =====
+
+type TChartProps = {
+  dataKeys: {[key: string]: string},
+  dateRange: ChartDateRange,
+  isControlled: boolean,
+  height: number,
+  minWidth: number,
+  setParentDateRange?: (dateRange: ChartDateRange) => void,
 }
 
 
@@ -160,18 +211,12 @@ const RadioCard = (props: any) => {
 }
 
 
-// -----------
+// ===========
 // Price Chart
-// -----------
+// ===========
 
-type TPriceChartProps = {
+type TPriceChartProps = TChartProps & {
   data: Map<string, TDatedValue[]>,
-  dataKeys: {[key: string]: string},
-  dateRange: ChartDateRange,
-  isControlled: boolean,
-  height: number,
-  minWidth: number,
-  setParentDateRange?: (dateRange: ChartDateRange) => void,
 }
 export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
@@ -210,28 +255,13 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
   // date range radio
   // ================
 
-  function onRadioChange(value: string): void {
-    const dateRange = dateRangeMap.get(value) as ChartDateRange
-    setInternalDateRange(dateRange)
-    if (props.setParentDateRange) {
-      props.setParentDateRange(dateRange)
-    }
-  }
-
-  const dateRangeMap = new Map<string, ChartDateRange>([
-    ['1M', ChartDateRange.OneMonth],
-    ['3M', ChartDateRange.ThreeMonths],
-    ['6M', ChartDateRange.SixMonths],
-    ['1Y', ChartDateRange.OneYear],
-    ['All', ChartDateRange.All]
-  ])
-
   const dateRangeOptions = [...dateRangeMap.keys()]
 
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: 'dateRange',
     defaultValue: 'All',
-    onChange: (value) => onRadioChange(value)
+    onChange: (value) => 
+      onRadioChange(value, setInternalDateRange, props.setParentDateRange)
   })
 
   const group = getRootProps()
