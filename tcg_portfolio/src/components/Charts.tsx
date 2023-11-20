@@ -274,11 +274,10 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
   return (
     <>
       <Box height={props.height} minWidth={props.minWidth} width='100%'>
-        <ResponsiveContainer 
-          height='100%'
-          width='100%' 
-        >
+        <ResponsiveContainer height='100%' width='100%'>
           <AreaChart data={chartData}>
+
+            {/* X-Axis */}
             <XAxis 
               dataKey='date' 
               domain={[startDate.getTime(), endDate.getTime()]}
@@ -288,12 +287,18 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
               ticks={ticks}
               type='number'
             />
+
+            {/* Y-Axis */}
             <YAxis 
               tick={{fontSize: 18}}
               tickFormatter={priceAxisTickFormatter}
               width={getPriceAxisWidth(chartData, primaryKey)}
             />
+
+            {/* Grid */}
             <CartesianGrid opacity={0.5} vertical={false}/>
+
+            {/* Tooltip */}
             <Tooltip 
               content={
                 <CustomTooltip 
@@ -302,12 +307,8 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
                 />
               }
             />
-            <defs>
-              <linearGradient id='colorPrice' x1={0} y1={0} x2={0} y2={1}>
-                <stop offset='0%' stopColor={BLUE} stopOpacity={0.8}/>
-                <stop offset='95%' stopColor={BLUE} stopOpacity={0}/>
-              </linearGradient>
-            </defs>
+
+            {/* Primary Value */}
             <Area 
               type='monotone' 
               dataKey={primaryDataKey}
@@ -316,6 +317,14 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
               fill='url(#colorPrice)'
               fillOpacity={1}
             />
+            <defs>
+              <linearGradient id='colorPrice' x1={0} y1={0} x2={0} y2={1}>
+                <stop offset='0%' stopColor={BLUE} stopOpacity={0.8}/>
+                <stop offset='95%' stopColor={BLUE} stopOpacity={0}/>
+              </linearGradient>
+            </defs>            
+
+            {/* Reference Value */}
             {referenceDataKey &&
               <Area 
                 type='monotone'
@@ -329,18 +338,20 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
           </AreaChart>
         </ResponsiveContainer>
       </Box>
+
+      {/* Radio Buttons */}
       {!props.isControlled && (
         <Box minWidth={props.minWidth} marginTop={2}>
-        <HStack display='flex' justifyContent='space-evenly' {...group}>
-          {dateRangeOptions.map((value: any) => {
-            const radio = getRadioProps({ value })
-            return (
-              <RadioCard key={value} {...radio}>
-                {value}
-              </RadioCard>
-            )
-          })}
-        </HStack>
+          <HStack display='flex' justifyContent='space-evenly' {...group}>
+            {dateRangeOptions.map((value: any) => {
+              const radio = getRadioProps({ value })
+              return (
+                <RadioCard key={value} {...radio}>
+                  {value}
+                </RadioCard>
+              )
+            })}
+          </HStack>
         </Box>
       )}
     </>
