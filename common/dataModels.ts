@@ -370,7 +370,13 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
 // types
 // =====
 
-// used for storing timeseries data
+// used for storing timeseries data of an array of values
+export type TDatedArray = {
+  date: Date,
+  values: number[]
+}
+
+// used for storing timeseries data of a single value
 export type TDatedValue = {
   date: Date,
   value: number
