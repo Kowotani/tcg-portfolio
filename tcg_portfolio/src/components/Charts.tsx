@@ -23,7 +23,8 @@ import {
   ChartDateRange, TChartDataPoint, 
 
   dateAxisTickFormatter, getChartDataFromDatedValues, getChartDataKeys, 
-  getDateAxisTicks, getStartDateFromChartDateRange, priceAxisTickFormatter
+  getDateAxisTicks, getPnlChartDataFromDatedValues, 
+  getStartDateFromChartDateRange, priceAxisTickFormatter
 } from '../utils/Chart'
 import { getBrowserLocale } from '../utils/generic'
 import { getFormattedPrice } from '../utils/Price'
@@ -39,6 +40,8 @@ import { getFormattedPrice } from '../utils/Price'
 
 const BLUE = '#3182CE'
 const GRAY = '#718096'
+const GREEN = '#48BB78'
+const RED = '#FC8181'
 
 // ----------------
 // date range radio
@@ -72,14 +75,34 @@ function getPriceAxisWidth(
 ): number {
 
   // get min value
-  const minValue = _.minBy(dataPoints, (dataPoint: TChartDataPoint) => {
-    return dataPoint.values[dataKey]
-  })?.values[dataKey] as number
+  const minDataPoint = _.minBy(dataPoints, (dataPoint: TChartDataPoint) => {
+    return dataPoint.arrayValues && dataPoint.arrayValues[dataKey]
+      ? _.head(dataPoint.arrayValues[dataKey]) as number
+      : dataPoint.values && dataPoint.values[dataKey]
+        ? dataPoint.values[dataKey]
+        : undefined
+  })
+  const minValue = 
+    minDataPoint && minDataPoint.arrayValues && minDataPoint.arrayValues[dataKey]
+      ? _.head(minDataPoint.arrayValues[dataKey]) as number
+      : minDataPoint && minDataPoint.values && minDataPoint.values[dataKey]
+        ? minDataPoint.values[dataKey]
+        : 0
 
   // get max value
-  const maxValue = _.maxBy(dataPoints, (dataPoint: TChartDataPoint) => {
-    return dataPoint.values[dataKey]
-  })?.values[dataKey] as number
+  const maxDataPoint = _.maxBy(dataPoints, (dataPoint: TChartDataPoint) => {
+    return dataPoint.arrayValues && dataPoint.arrayValues[dataKey]
+      ? _.head(dataPoint.arrayValues[dataKey]) as number
+      : dataPoint.values && dataPoint.values[dataKey]
+        ? dataPoint.values[dataKey]
+        : undefined
+  })
+  const maxValue = 
+    maxDataPoint && maxDataPoint.arrayValues && maxDataPoint.arrayValues[dataKey]
+      ? _.head(maxDataPoint.arrayValues[dataKey]) as number
+      : maxDataPoint && maxDataPoint.values && maxDataPoint.values[dataKey]
+        ? maxDataPoint.values[dataKey]
+        : 0
 
   const longestValue = _.max([Math.abs(minValue), Math.abs(maxValue)])
 
@@ -150,14 +173,16 @@ const CustomTooltip = (
     // create variables
     const date = formatInTimeZone(
       new Date(chartDataPoint.date), 'MMM d, yyyy', 'UTC')
-    const primaryValue = getFormattedPrice(
-      chartDataPoint.values[props.primaryKey], getBrowserLocale(), '$', 2
-    )
-    const referenceValue = props.referenceKey
-      ? getFormattedPrice(
-        chartDataPoint.values[props.referenceKey], getBrowserLocale(), '$', 2
+    const primaryValue = chartDataPoint.values 
+      && chartDataPoint.values[props.primaryKey] && getFormattedPrice(
+        chartDataPoint.values[props.primaryKey], getBrowserLocale(), '$', 2
       )
-      : undefined
+    const referenceValue = props.referenceKey && chartDataPoint.values 
+      && chartDataPoint.values[props.referenceKey]
+        ? getFormattedPrice(
+          chartDataPoint.values[props.referenceKey], getBrowserLocale(), '$', 2
+        )
+        : undefined
 
     return (
       <Card>
@@ -207,6 +232,160 @@ const RadioCard = (props: any) => {
         {props.children}
       </Box>
     </Box>
+  )
+}
+
+
+// =========
+// PnL Chart
+// =========
+
+type TPnlChartProps = TChartProps & {
+  data: Map<string, TDatedValue[]>,
+}
+export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
+
+  // =====
+  // state
+  // =====
+
+  const [ internalDateRange, setInternalDateRange] = useState(props.dateRange)
+
+
+  // ==========
+  // chart data
+  // ==========
+
+  const dateRange = props.isControlled ? props.dateRange : internalDateRange
+
+  // get dataKeys
+  const { primaryKey, referenceKey } = getChartDataKeys(props.dataKeys)
+  const referenceDataKey = referenceKey ? `values.${referenceKey}`: undefined
+  const profitDataKey = 'arrayValues.Profit'
+  const lossDataKey = 'arrayValues.Loss'
+
+  const chartData = getPnlChartDataFromDatedValues(props.data) 
+
+  // get start and end dates
+  const endDate = new Date()
+
+  const startDate = dateRange === ChartDateRange.All
+    ? new Date(Number(_.minBy(chartData, (dataPoint: TChartDataPoint) => {
+        return dataPoint.date
+      })?.date))
+    : getStartDateFromChartDateRange(dateRange)
+
+  const ticks = getDateAxisTicks(startDate, endDate, dateRange)
+
+
+  // ================
+  // date range radio
+  // ================
+
+  const dateRangeOptions = [...dateRangeMap.keys()]
+
+  const { getRootProps, getRadioProps } = useRadioGroup({
+    name: 'dateRange',
+    defaultValue: 'All',
+    onChange: (value) => 
+      onRadioChange(value, setInternalDateRange, props.setParentDateRange)
+  })
+
+  const group = getRootProps()
+
+
+  // ==============
+  // main component
+  // ==============
+
+  return (
+    <>
+      <Box height={props.height} minWidth={props.minWidth} width='100%'>
+        <ResponsiveContainer height='100%' width='100%'>
+          <AreaChart data={chartData}>
+
+            {/* X-Axis */}
+            <XAxis 
+              dataKey='date' 
+              domain={[startDate.getTime(), endDate.getTime()]}
+              scale='time'
+              tickFormatter={dateAxisTickFormatter}
+              tick={{fontSize: 18}}
+              ticks={ticks}
+              type='number'
+            />
+
+            {/* Y-Axis */}
+            <YAxis 
+              tick={{fontSize: 18}}
+              tickFormatter={priceAxisTickFormatter}
+              width={getPriceAxisWidth(chartData, primaryKey)}
+            />
+
+            {/* Grid */}
+            <CartesianGrid opacity={0.5} vertical={false}/>
+
+            {/* Tooltip */}
+            <Tooltip 
+              content={
+                <CustomTooltip 
+                  primaryKey={primaryKey}
+                  referenceKey={referenceKey}
+                />
+              }
+            />
+
+            {/* Profit */}
+            <Area 
+              type='monotone' 
+              dataKey={profitDataKey}
+              stroke={GREEN}
+              strokeWidth={3}
+              fill={GREEN}
+              fillOpacity={0.3}
+            />
+
+            {/* Loss */}
+            <Area 
+              type='monotone' 
+              dataKey={lossDataKey}
+              stroke={RED}
+              strokeWidth={3}
+              fill={RED}
+              fillOpacity={0.3}
+            />
+
+            {/* Reference Value */}
+            {referenceDataKey &&
+              <Area 
+                type='monotone'
+                dataKey={referenceDataKey}
+                stroke={GRAY}
+                strokeWidth={2}
+                strokeDasharray='5 5'
+                fillOpacity={0}
+              />
+            }
+          </AreaChart>
+        </ResponsiveContainer>
+      </Box>
+
+      {/* Radio Buttons */}
+      {!props.isControlled && (
+        <Box minWidth={props.minWidth} marginTop={2}>
+          <HStack display='flex' justifyContent='space-evenly' {...group}>
+            {dateRangeOptions.map((value: any) => {
+              const radio = getRadioProps({ value })
+              return (
+                <RadioCard key={value} {...radio}>
+                  {value}
+                </RadioCard>
+              )
+            })}
+          </HStack>
+        </Box>
+      )}
+    </>
   )
 }
 
