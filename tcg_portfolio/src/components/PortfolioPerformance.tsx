@@ -8,7 +8,7 @@ import {
 import { 
   // data models
   IPopulatedHolding, IPopulatedPortfolio, TDatedValue, THoldingPerformanceData,
-  TPerformanceData,
+  TPerformanceData, PerformanceMetric,
 
   // request / response data models
   TGetPortfolioHoldingsPerformanceResBody, TGetPortfolioPerformanceResBody,
@@ -23,7 +23,7 @@ import {
 } from 'common'
 import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
-import { PriceChart } from './Charts'
+import { PnlChart, PriceChart } from './Charts'
 import { HoldingPerfCard } from './HoldingPerfCard'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { UserContext } from '../state/UserContext'
@@ -39,7 +39,11 @@ import { IUserContext } from '../utils/User'
 // constants
 // =========
 
-const DEFAULT_METRICS = ['Market Value', 'Total Cost']
+const DEFAULT_METRICS = [
+  PerformanceMetric.MarketValue,
+  PerformanceMetric.TotalCost,
+  PerformanceMetric.CumPnL
+]
 
 
 // =========
@@ -105,6 +109,7 @@ export const PortfolioPerformance = (
   const [ portfolioData, setPortfolioData ] = useState({} as TPerformanceData)
   const [ isLoaded, setIsLoaded ] = useState(false)
   const [ chartDateRange, setChartDateRange ] = useState(ChartDateRange.All)
+  const [ chartType, setChartType ] = useState(PerformanceMetric.MarketValue)
 
   // -----
   // Price
@@ -200,26 +205,45 @@ export const PortfolioPerformance = (
 
 
   // ==================
-  // market value chart
+  // performance charts
   // ==================
 
-  const dataKeys = {
-    primaryKey: 'Market Value',
-    referenceKey: 'Total Cost'
-  }
+  // -----------
+  // data series
+  // -----------
 
   const portfolioMarketValue = clampDatedValues(
-    portfolioData['Market Value'] as TDatedValue[], 
+    portfolioData[PerformanceMetric.MarketValue] as TDatedValue[], 
     chartDateRange
   )
   const portfolioTotalCost = clampDatedValues(
-    portfolioData['Total Cost'] as TDatedValue[],
+    portfolioData[PerformanceMetric.TotalCost] as TDatedValue[],
     chartDateRange
   )
+  const portfolioCumPnl = clampDatedValues(
+    portfolioData[PerformanceMetric.CumPnL] as TDatedValue[], 
+    chartDateRange
+  )
+
   const portfolioDataMap = new Map<string, TDatedValue[]>([
-    ['Market Value', portfolioMarketValue],
-    ['Total Cost', portfolioTotalCost],
+    [PerformanceMetric.MarketValue, portfolioMarketValue],
+    [PerformanceMetric.TotalCost, portfolioTotalCost],
+    [PerformanceMetric.CumPnL, portfolioCumPnl]
   ])
+
+  // ---------
+  // data keys
+  // ---------
+
+  const marketValueDataKeys = {
+    primaryKey: PerformanceMetric.MarketValue,
+    referenceKey: PerformanceMetric.TotalCost
+  }
+
+  const cumPnlDataKeys = {
+    primaryKey: PerformanceMetric.CumPnL,
+    referenceKey: PerformanceMetric.TotalCost
+  }
 
 
   // ==============
@@ -239,7 +263,24 @@ export const PortfolioPerformance = (
         </Button>
       </Box>
 
-      {/* Portfolio Market Value Chart */}
+      {/* TODO: Remove this */}
+      <Box display='flex' justifyContent='center'>
+        <Button 
+          colorScheme='pink'
+          onClick={() => setChartType(PerformanceMetric.MarketValue)}
+        >
+          {PerformanceMetric.MarketValue}
+        </Button>
+        <Box w={20} />
+        <Button 
+          colorScheme='pink'
+          onClick={() => setChartType(PerformanceMetric.CumPnL)}
+        >
+          {PerformanceMetric.CumPnL}
+        </Button>
+      </Box>
+
+      {/* Portfolio Chart */}
       {!isLoaded && 
         <Box 
           display='flex'
@@ -256,10 +297,21 @@ export const PortfolioPerformance = (
           />
         </Box>
       }
-      {isLoaded && 
+      {isLoaded && chartType === PerformanceMetric.MarketValue &&
         <PriceChart
           data={portfolioDataMap}
-          dataKeys={dataKeys}
+          dataKeys={marketValueDataKeys}
+          dateRange={chartDateRange}
+          isControlled={false}
+          height={300}
+          minWidth={400}
+          setParentDateRange={setChartDateRange}
+        />
+      }
+      {isLoaded && chartType === PerformanceMetric.CumPnL &&
+        <PnlChart
+          data={portfolioDataMap}
+          dataKeys={cumPnlDataKeys}
           dateRange={chartDateRange}
           isControlled={false}
           height={300}
@@ -310,7 +362,7 @@ export const PortfolioPerformance = (
                 <HoldingPerfCard
                   marketPrice={marketPrice}    
                   populatedHolding={holding}
-                  chartDataKeys={dataKeys}
+                  chartDataKeys={marketValueDataKeys}
                   chartDataMap={isLoaded ? holdingDataMap : undefined}
                   chartDateRange={chartDateRange}
                 />
