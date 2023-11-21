@@ -1,11 +1,13 @@
 import { 
-  TDatedValue, 
+  TDatedValue, PerformanceMetric,
 
   genFirstOfMonthDateRange, genFirstOfQuarterDateRange, genFirstOfYearDateRange,
   genSundayOfWeekDateRange, getDaysBetween,
 
   formatInTimeZone, genDateRange, getDateOneMonthAgo, getDateThreeMonthsAgo, 
-  getDateSixMonthsAgo, getDateOneYearAgo
+  getDateSixMonthsAgo, getDateOneYearAgo,
+
+  assert
 } from 'common'
 import { getBrowserLocale } from './generic'
 import * as _ from 'lodash'
@@ -72,18 +74,20 @@ export function getChartDataKeys(
 
 /*
 DESC
-  Returns a TChartDataPoint[] containing all of the input TDatedValue[][]
+  Returns a TChartDataPoint[] containing all of the input TDatedValue[]
 INPUT
-  datedValues: A Map of seriesName
+  datedValues: A Map of seriesName -> TDatedValue[]
 RETURN
-  A TChartDataPoint[]
+  A TChartDataPoint[] with a key in values for each of the input dateValuesMap 
+  keys
 */
 export function getChartDataFromDatedValues(
   datedValuesMap: Map<string, TDatedValue[]>
 ): TChartDataPoint[] {
 
-  const dataMap = new Map<number, {[key: string]: number}>()
-  // populated dataMap
+  let dataMap = new Map<number, {[key: string]: number}>()
+
+  // populate dataMap
   datedValuesMap.forEach((datedValues, seriesName) => {
     datedValues.forEach((datedValue: TDatedValue) => {
       
@@ -114,6 +118,57 @@ export function getChartDataFromDatedValues(
       date: dateAsNumber,
       values: values
     })
+  })
+
+  return _.sortBy(dataPoints, (dataPoint: TChartDataPoint) => {
+    return dataPoint.date
+  })
+}
+
+/*
+DESC
+  Returns a TChartDataPoint[] specifically for a PnlChart using the input 
+  TDatedValue[]. It is expected that one of the datedValuesMap keys is 
+  'Cumulative Profit and Loss' or 'Daily Profit and Loss'
+INPUT
+  datedValues: A Map of seriesName -> TDatedValue[]
+RETURN
+  A TChartDataPoint[] with the following keys:
+    - values['Cumulative Profit and Loss'] or values['Daily Profit and Loss']
+    - values['Total Cost']
+    - arrayValues['Profit']
+    - arrayValues['Loss']
+*/
+export function getPnlChartDataFromDatedValues(
+  datedValuesMap: Map<string, TDatedValue[]>
+): TChartDataPoint[] {
+
+  // get TChartDataPoint[] with populated values
+  const valuesDataPoints = getChartDataFromDatedValues(datedValuesMap)
+  const dataPoints = valuesDataPoints.map((dataPoint: TChartDataPoint) => {
+
+    // assert required data exists
+    assert(dataPoint.values, 'Data point is missing values')
+    assert(dataPoint.values[PerformanceMetric.DailyPnL] 
+      || dataPoint.values[PerformanceMetric.CumPnL], 
+      'Data point is missing pnl value')
+    assert(dataPoint.values[PerformanceMetric.TotalCost], 
+      'Data point is missing total cost value')
+
+    const pnl = dataPoint.values[PerformanceMetric.DailyPnL] 
+      ?? dataPoint.values[PerformanceMetric.CumPnL] 
+    const totalCost = dataPoint.values[PerformanceMetric.TotalCost]
+
+    // calculate pnl
+    const pnlValue: {[key: string]: number[]} = {}
+    if (pnl >= 0) {pnlValue['Profit'] = [totalCost, totalCost + pnl]}
+    if (pnl < 0) {pnlValue['Loss'] = [totalCost + pnl, totalCost]}
+
+    return {
+      date: dataPoint.date,
+      values: dataPoint.values,
+      arrayValues: pnlValue
+    } as TChartDataPoint
   })
 
   return _.sortBy(dataPoints, (dataPoint: TChartDataPoint) => {
@@ -244,7 +299,8 @@ export function priceAxisTickFormatter(tick: number): string {
 
 export type TChartDataPoint = {
   date: number,
-  values: {[key: string]: number}
+  values?: {[key: string]: number},
+  arrayValues?: {[key: string]: number[]}
 }
 
 export type TChartMargins = {
