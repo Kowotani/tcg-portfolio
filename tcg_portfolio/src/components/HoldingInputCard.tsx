@@ -7,8 +7,6 @@ import {
   CardBody,
   CloseButton,
   HStack,
-  LinkBox,
-  LinkOverlay,
   StackDivider,
   Text,
   useDisclosure,
@@ -97,7 +95,7 @@ export const HoldingInputCard = (
     {
       title: 'Return:',
       value: holdingPercentPnl
-        ? holdingPercentPnl * 100
+        ? holdingPercentPnl
         : undefined,
       formattedPrecision: 2,
       formattedSuffix: '%',

@@ -75,7 +75,7 @@ export const HoldingPerfCard = (
     {
       title: 'MWR:',
       value: holdingPercentPnl
-        ? holdingPercentPnl * 100
+        ? holdingPercentPnl
         : undefined,
       formattedPrecision: 2,
       formattedSuffix: '%',
@@ -85,7 +85,7 @@ export const HoldingPerfCard = (
     {
       title: 'TWR:',
       value: holdingPercentPnl
-        ? holdingPercentPnl * 100
+        ? holdingPercentPnl
         : undefined,
       formattedPrecision: 2,
       formattedSuffix: '%',

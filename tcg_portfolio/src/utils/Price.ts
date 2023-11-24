@@ -4,6 +4,7 @@ import {
   assert, isIDatedPriceData 
 } from 'common'
 import * as _ from 'lodash'
+import numeral from 'numeral'
 
 
 // ==========
@@ -76,41 +77,16 @@ export function getFormattedPrice(
   suffix?: string,
 ): string {
 
-  // round trao;omg decimals to handle potential rounding from toLocaleString()
-  const roundedPrice = decimals 
-    ? Math.round(price * Math.pow(10, decimals)) / Math.pow(10, decimals)
-    : Math.round(price)
+  // base format
+  const baseFormat = '0,0'
 
-  let formattedPrice = roundedPrice.toLocaleString(locale)
-  const decimalIx = formattedPrice.indexOf('.')
-  const precision = decimalIx >= 0 
-    ? formattedPrice.toString().length - decimalIx - 1 
-    : 0
+  // precision
+  const precision = decimals ? `.[${_.repeat('0', decimals)}]` : ''
 
-  // precision required
-  if (decimals !== undefined && decimals > 0) {
-    
-    // no existing precision
-    if (precision === 0) {
-      formattedPrice = formattedPrice + '.' + '0'.repeat(decimals)
+  // final format
+  const format = `${prefix}${baseFormat}${precision}${suffix}`
 
-    // existing precision too high
-    } else if (precision > decimals) {
-      formattedPrice = formattedPrice.substring(0, 
-        formattedPrice.length - (precision - decimals))
-
-    // existing precision too low
-    } else if (precision < decimals) {
-      formattedPrice = formattedPrice + '0'.repeat(decimals - precision)
-    }
-  
-  // precision not required
-  } else if (decimalIx >= 0) {
-    formattedPrice = formattedPrice.substring(0, decimalIx)
-  }
-
-  // prefix and suffixe
-  return (prefix ?? '') + formattedPrice + (suffix ?? '')
+  return numeral(price).format(format)
 }
 
 /*
