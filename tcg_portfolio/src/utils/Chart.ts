@@ -136,8 +136,10 @@ RETURN
   A TChartDataPoint[] with the following keys:
     - values['Cumulative Profit and Loss'] or values['Daily Profit and Loss']
     - values['Total Cost']
-    - arrayValues['Profit']
-    - arrayValues['Loss']
+    - arrayValues['Profit Area']
+    - arrayValues['Profit Line']
+    - arrayValues['Loss Line']
+    - arrayValues['Loss Area']
 */
 export function getPnlChartDataFromDatedValues(
   datedValuesMap: Map<string, TDatedValue[]>
@@ -160,14 +162,21 @@ export function getPnlChartDataFromDatedValues(
     const totalCost = dataPoint.values[PerformanceMetric.TotalCost]
 
     // calculate pnl
-    const pnlValue: {[key: string]: number[]} = {}
-    if (pnl >= 0) {pnlValue['Profit'] = [totalCost, totalCost + pnl]}
-    if (pnl < 0) {pnlValue['Loss'] = [totalCost + pnl, totalCost]}
+    let pnlArrayValues: {[key: string]: number[]} = {}
+    let pnlValues: {[key: string]: number} = {...dataPoint.values}
+    if (pnl >= 0) {
+      pnlArrayValues['Profit Area'] = [totalCost, totalCost + pnl]
+      pnlValues['Profit Line'] = totalCost + pnl
+    }
+    if (pnl < 0) {
+      pnlArrayValues['Loss Area'] = [totalCost + pnl, totalCost]
+      pnlValues['Loss Line'] = totalCost + pnl
+    }
 
     return {
       date: dataPoint.date,
-      values: dataPoint.values,
-      arrayValues: pnlValue
+      values: pnlValues,
+      arrayValues: pnlArrayValues
     } as TChartDataPoint
   })
 

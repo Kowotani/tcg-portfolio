@@ -13,8 +13,8 @@ import {
 } from 'common'
 import * as _ from 'lodash'
 import { 
-  Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, TooltipProps,
-  XAxis, YAxis 
+  Area, AreaChart, CartesianGrid, ComposedChart, Line, ResponsiveContainer, 
+  Tooltip, TooltipProps, XAxis, YAxis 
 } from 'recharts'
 import { 
   NameType, ValueType 
@@ -261,10 +261,12 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
   // get dataKeys
   const { primaryKey, referenceKey } = getChartDataKeys(props.dataKeys)
   const referenceDataKey = referenceKey ? `values.${referenceKey}`: undefined
-  const profitDataKey = 'arrayValues.Profit'
-  const lossDataKey = 'arrayValues.Loss'
+  const profitAreaDataKey = 'arrayValues.Profit Area'
+  const profitLineDataKey = 'values.Profit Line'
+  const lossAreaDataKey = 'arrayValues.Loss Area'
+  const lossLineDataKey = 'values.Loss Line'
 
-  const chartData = getPnlChartDataFromDatedValues(props.data) 
+  const chartData = getPnlChartDataFromDatedValues(props.data)
 
   // get start and end dates
   const endDate = new Date()
@@ -302,7 +304,7 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
     <>
       <Box height={props.height} minWidth={props.minWidth} width='100%'>
         <ResponsiveContainer height='100%' width='100%'>
-          <AreaChart data={chartData}>
+          <ComposedChart data={chartData}>
 
             {/* X-Axis */}
             <XAxis 
@@ -335,24 +337,42 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
               }
             />
 
-            {/* Profit */}
+            {/* Profit Area */}
             <Area 
               type='monotone' 
-              dataKey={profitDataKey}
+              dataKey={profitAreaDataKey}
               stroke={GREEN}
-              strokeWidth={3}
+              strokeWidth={0}
               fill={GREEN}
-              fillOpacity={0.3}
+              fillOpacity={0.4}
             />
 
-            {/* Loss */}
+            {/* Profit Line */}
+            <Line
+              type='monotone' 
+              dataKey={profitLineDataKey}
+              dot={false}
+              stroke={GREEN}
+              strokeWidth={3}
+            />
+
+            {/* Loss Area */}
             <Area 
               type='monotone' 
-              dataKey={lossDataKey}
+              dataKey={lossAreaDataKey}
+              stroke={RED}
+              strokeWidth={0}
+              fill={RED}
+              fillOpacity={0.4}
+            />
+
+            {/* Loss Line */}
+            <Line
+              type='monotone' 
+              dataKey={lossLineDataKey}
+              dot={false}
               stroke={RED}
               strokeWidth={3}
-              fill={RED}
-              fillOpacity={0.3}
             />
 
             {/* Reference Value */}
@@ -366,7 +386,7 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
                 fillOpacity={0}
               />
             }
-          </AreaChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </Box>
 
