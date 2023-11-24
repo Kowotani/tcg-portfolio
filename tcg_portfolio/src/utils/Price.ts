@@ -63,7 +63,6 @@ DESC
   of decimal places
 INPUT
   price: The price to format
-  locale: The locale to format against
   decimal?: The number of decimals to format to, defaults to 0
   prefix?: Any prefix to pre-pend to the price
 RETURN
@@ -71,7 +70,6 @@ RETURN
 */
 export function getFormattedPrice(
   price: number, 
-  locale: string,
   prefix?: string,
   decimals?: number,
   suffix?: string,

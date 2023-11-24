@@ -45,7 +45,6 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { MetricSummary, TMetricSummaryItem 
   } from './MetricSummary'
 import { TransactionTable } from './TransactionTable'
-import { getBrowserLocale } from '../utils/generic'
 import { hasNonNegativeQuantity } from '../utils/Holding'
 import { getFormattedPrice } from '../utils/Price'
 import { getProductNameWithLanguage } from '../utils/Product'
@@ -493,8 +492,6 @@ export const EditTransactionsModal = (
     }
   }
 
-  const locale = getBrowserLocale()
-
   const columnHelper = createColumnHelper<IReactTableTransaction>()
 
   const columns = [
@@ -510,8 +507,9 @@ export const EditTransactionsModal = (
     }),
     columnHelper.accessor('quantity', {
       cell: (info) => {
-        const sign = info.row.getValue('type') === TransactionType.Sale ? '-' : ''
-        const strQuantity = sign.concat(info.getValue().toLocaleString(locale))
+        const sign: number = 
+          info.row.getValue('type') === TransactionType.Sale ? -1 : 1
+        const strQuantity = getFormattedPrice(sign * info.getValue())
         return strQuantity
       },
       header: 'Quantity',
@@ -527,7 +525,7 @@ export const EditTransactionsModal = (
       }      
     }),
     columnHelper.accessor('price', {
-      cell: (info) => getFormattedPrice(info.getValue(), locale, '$', 2),
+      cell: (info) => getFormattedPrice(info.getValue(), '$', 2),
       header: 'Price',
       meta: {
         isNumeric: true
@@ -592,7 +590,7 @@ export const EditTransactionsModal = (
 
               {/* Market price */}
               <Text fontSize='large'>
-                {getFormattedPrice(props.marketPrice, getBrowserLocale(), '$', 2)}
+                {getFormattedPrice(props.marketPrice, '$', 2)}
               </Text>
 
               {/* Purchases */}

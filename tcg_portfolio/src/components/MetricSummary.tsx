@@ -8,7 +8,6 @@ import {
   VStack
 } from '@chakra-ui/react'
 import * as _ from 'lodash'
-import { getBrowserLocale } from '../utils/generic'
 import { getFormattedPrice } from '../utils/Price'
 
 
@@ -36,7 +35,6 @@ const MetricSummaryItem = (
     variant,
   } = props
 
-  const locale = getBrowserLocale()
   const isNegative = value 
     ? value < 0 
       ? '-' 
@@ -46,7 +44,7 @@ const MetricSummaryItem = (
     ? Math.abs(value) 
     : undefined
   const formattedPrice = absValue 
-    ? getFormattedPrice(absValue, locale, formattedPrefix, formattedPrecision, 
+    ? getFormattedPrice(absValue, formattedPrefix, formattedPrecision, 
         formattedSuffix)
     : undefined
 

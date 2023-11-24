@@ -22,7 +22,6 @@ import { EditTransactionsModal } from './EditTransactionsModal'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
-import { getBrowserLocale } from '../utils/generic'
 import { getFormattedPrice } from '../utils/Price'
 import { getProductNameWithLanguage } from '../utils/Product'
 
@@ -137,7 +136,7 @@ export const HoldingInputCard = (
 
               {/* Market Price */}
               <Text>
-                {getFormattedPrice(props.marketPrice, getBrowserLocale(), '$', 2)}
+                {getFormattedPrice(props.marketPrice, '$', 2)}
               </Text>
             </VStack>
             <VStack spacing={0} width='100%'>
