@@ -268,7 +268,8 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
   // get dataKeys
   const { primaryKey, referenceKey } = getChartDataKeys(props.dataKeys)
   const primaryKeyAlt = 
-    primaryKey.includes('Profit and Loss') ? 'Profit / Loss' : undefined
+    primaryKey.includes('Profit and Loss') ? 'Profit / Loss' 
+    : undefined
   const referenceDataKey = referenceKey ? `values.${referenceKey}`: undefined
   const profitAreaDataKey = 'arrayValues.Profit Area'
   const profitLineDataKey = 'values.Profit Line'
