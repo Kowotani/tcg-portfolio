@@ -156,7 +156,8 @@ type TChartProps = {
 type TCustomTooltipProps<MyValue extends ValueType, MyName extends NameType> =
   TooltipProps<MyValue, MyName> & {
   primaryKey: string,
-  referenceKey?: string
+  primaryKeyAlt?: string,
+  referenceKey?: string,
 }
 const CustomTooltip = (
   props: PropsWithChildren<TCustomTooltipProps<ValueType, NameType>>
@@ -188,11 +189,17 @@ const CustomTooltip = (
       <Card>
         <CardBody p={2}>
           <Text as='b' fontSize='medium'>{date}</Text>
+
           {/* Primary */}
-          <Text fontSize='medium'>{props.primaryKey}: {primaryValue}</Text>
+          <Text fontSize='medium'>
+            {props.primaryKeyAlt ?? props.primaryKey}: {primaryValue}
+          </Text>
+
           {/* Reference */}
           {referenceValue &&
-            <Text fontSize='medium'>{props.referenceKey}: {referenceValue}</Text>
+            <Text fontSize='medium'>
+              {props.referenceKey}: {referenceValue}
+            </Text>
           }
         </CardBody>
       </Card>
@@ -260,6 +267,8 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
 
   // get dataKeys
   const { primaryKey, referenceKey } = getChartDataKeys(props.dataKeys)
+  const primaryKeyAlt = 
+    primaryKey.includes('Profit and Loss') ? 'Profit / Loss' : undefined
   const referenceDataKey = referenceKey ? `values.${referenceKey}`: undefined
   const profitAreaDataKey = 'arrayValues.Profit Area'
   const profitLineDataKey = 'values.Profit Line'
@@ -333,6 +342,7 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
                 <CustomTooltip 
                   primaryKey={primaryKey}
                   referenceKey={referenceKey}
+                  primaryKeyAlt={primaryKeyAlt}
                 />
               }
             />
