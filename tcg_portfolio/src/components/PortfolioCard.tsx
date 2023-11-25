@@ -159,7 +159,7 @@ export const PortfolioCard = (
       value: getPortfolioTotalCost(portfolio),
       formattedPrefix: '$',
       formattedPrecision: 2,
-      placeholder: '$ -',
+      placeholder: ' -',
       titleStyle: {},
     },
     {
@@ -167,7 +167,7 @@ export const PortfolioCard = (
       value: getPortfolioMarketValue(portfolio, prices),
       formattedPrefix: '$',
       formattedPrecision: 2,
-      placeholder: '$ -',
+      placeholder: ' -',
       titleStyle: {},
     },
   ]
@@ -178,17 +178,17 @@ export const PortfolioCard = (
       value: getPortfolioTotalPnl(portfolio, prices),
       formattedPrefix: '$',
       formattedPrecision: 2,
-      placeholder: '$ -',
+      placeholder: ' -',
       titleStyle: {},
     },
     {
       title: 'Return:',
       value: portfolioPercentPnl
-        ? portfolioPercentPnl * 100
+        ? portfolioPercentPnl
         : undefined,
       formattedPrecision: 2,
       formattedSuffix: '%',
-      placeholder: '- %',
+      placeholder: '- ',
       titleStyle: {},
     },
   ]

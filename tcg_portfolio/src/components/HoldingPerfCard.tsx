@@ -19,7 +19,7 @@ import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
 import { ChartDateRange } from '../utils/Chart'
-import { getFormattedPrice } from '../utils/Price'
+import { formatDefaultPrice } from '../utils/Price'
 import { getProductNameWithLanguage } from '../utils/Product'
 
 
@@ -49,7 +49,7 @@ export const HoldingPerfCard = (
       value: getHoldingTotalCost(props.populatedHolding),
       formattedPrefix: '$',
       formattedPrecision: 2,
-      placeholder: '$ -',
+      placeholder: ' -',
       titleStyle: {},
     },
     {
@@ -57,7 +57,7 @@ export const HoldingPerfCard = (
       value: getHoldingMarketValue(props.populatedHolding, props.marketPrice),
       formattedPrefix: '$',
       formattedPrecision: 2,
-      placeholder: '$ -',
+      placeholder: ' -',
       titleStyle: {},
     },
     {
@@ -65,7 +65,7 @@ export const HoldingPerfCard = (
       value: getHoldingTotalPnl(props.populatedHolding, props.marketPrice),
       formattedPrefix: '$',
       formattedPrecision: 2,
-      placeholder: '$ -',
+      placeholder: ' -',
       titleStyle: {},
     },  
   ]
@@ -78,7 +78,7 @@ export const HoldingPerfCard = (
         : undefined,
       formattedPrecision: 2,
       formattedSuffix: '%',
-      placeholder: '- %',
+      placeholder: '- ',
       titleStyle: {},
     },
     {
@@ -88,7 +88,7 @@ export const HoldingPerfCard = (
         : undefined,
       formattedPrecision: 2,
       formattedSuffix: '%',
-      placeholder: '- %',
+      placeholder: '- ',
       titleStyle: {},
     },    
   ]
@@ -116,7 +116,7 @@ export const HoldingPerfCard = (
 
             {/* Market Price */}
             <Text>
-              {getFormattedPrice(props.marketPrice, '$', 2)}
+              {formatDefaultPrice(props.marketPrice)}
             </Text>
           </VStack>
           <VStack spacing={0} width='100%'>

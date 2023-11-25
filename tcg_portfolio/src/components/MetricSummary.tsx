@@ -8,7 +8,7 @@ import {
   VStack
 } from '@chakra-ui/react'
 import * as _ from 'lodash'
-import { getFormattedPrice } from '../utils/Price'
+import { getFormattedNumber } from '../utils/generic'
 
 
 // --------------
@@ -27,26 +27,14 @@ const MetricSummaryItem = (
   const {
     title,
     value,
-    formattedPrefix = '',
-    formattedPrecision = 0,
-    formattedSuffix = '',
+    formattedPrefix,
+    formattedPrecision,
+    formattedSuffix,
     placeholder,
     titleStyle,
     variant,
   } = props
 
-  const isNegative = value 
-    ? value < 0 
-      ? '-' 
-      : '' 
-    : undefined
-  const absValue = value 
-    ? Math.abs(value) 
-    : undefined
-  const formattedPrice = absValue 
-    ? getFormattedPrice(absValue, formattedPrefix, formattedPrecision, 
-        formattedSuffix)
-    : undefined
 
   return (
     <>
@@ -64,9 +52,13 @@ const MetricSummaryItem = (
             }
             <Spacer minWidth={4}/>
             <Text>
-              {value 
-                ? (isNegative ? '-' : '') + formattedPrice
-                : placeholder}
+              {getFormattedNumber({
+                value: value,
+                prefix: formattedPrefix,
+                suffix: formattedSuffix,
+                precision: formattedPrecision,
+                placeholder: placeholder
+              })}
             </Text>
           </Box>
 
@@ -78,9 +70,13 @@ const MetricSummaryItem = (
               : <Text as='b' align='center'>{title}</Text>
             }
             <Text align='center'>
-              {value 
-                ? (isNegative ? '-' : '') + formattedPrice
-                : placeholder}
+              {getFormattedNumber({
+                  value: value,
+                  prefix: formattedPrefix,
+                  suffix: formattedSuffix,
+                  precision: formattedPrecision,
+                  placeholder: placeholder
+                })}
             </Text>
           </Box>
 

@@ -10,7 +10,7 @@ import {
   assert
 } from 'common'
 import * as _ from 'lodash'
-import { getFormattedPrice } from './Price'
+import { getFormattedNumber } from './generic'
 
 
 // =====
@@ -297,7 +297,7 @@ RETURN
   A string with readable dates
 */
 export function priceAxisTickFormatter(tick: number): string {
-  return getFormattedPrice(tick, '$', 0)
+  return getFormattedNumber({value: tick, prefix: '$'})
 }
 
 

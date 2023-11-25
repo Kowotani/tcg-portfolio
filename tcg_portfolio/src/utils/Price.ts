@@ -3,6 +3,7 @@ import {
   
   assert, isIDatedPriceData 
 } from 'common'
+import { getFormattedNumber } from './generic'
 import * as _ from 'lodash'
 import numeral from 'numeral'
 
@@ -20,6 +21,22 @@ export interface ILatestPricesContext {
 // =========
 // functions
 // =========
+
+/*
+DESC
+  Returns the input number formatted as a price (eg. $1,234.56)
+INPUT
+  value: The value to format
+RETURN
+  The formatted number
+*/
+export function formatDefaultPrice(value: number): string {
+  return getFormattedNumber({
+    value: value,
+    prefix: '$',
+    precision: 2
+  })
+}
 
 /*
 DESC
@@ -55,36 +72,6 @@ export function getIPriceDataMapFromIDatedPriceDataMap(
     priceMap.set(k, v.prices)
   })
   return priceMap
-}
-
-/*
-DESC
-  Returns the input price formatted according to the locale and the number
-  of decimal places
-INPUT
-  price: The price to format
-  decimal?: The number of decimals to format to, defaults to 0
-  prefix?: Any prefix to pre-pend to the price
-RETURN
-  The price formatted to the locale with the prfeix and number of decimal places
-*/
-export function getFormattedPrice(
-  price: number, 
-  prefix?: string,
-  decimals?: number,
-  suffix?: string,
-): string {
-
-  // base format
-  const baseFormat = '0,0'
-
-  // precision
-  const precision = decimals ? `.[${_.repeat('0', decimals)}]` : ''
-
-  // final format
-  const format = `${prefix}${baseFormat}${precision}${suffix}`
-
-  return numeral(price).format(format)
 }
 
 /*

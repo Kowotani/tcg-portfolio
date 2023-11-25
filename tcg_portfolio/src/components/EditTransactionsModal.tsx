@@ -46,8 +46,9 @@ import { MetricSummary, TMetricSummaryItem
   } from './MetricSummary'
 import { TransactionTable } from './TransactionTable'
 import { hasNonNegativeQuantity } from '../utils/Holding'
-import { getFormattedPrice } from '../utils/Price'
+import { formatDefaultPrice } from '../utils/Price'
 import { getProductNameWithLanguage } from '../utils/Product'
+import { getFormattedNumber } from '../utils/generic'
 
 
 // ==============
@@ -509,7 +510,7 @@ export const EditTransactionsModal = (
       cell: (info) => {
         const sign: number = 
           info.row.getValue('type') === TransactionType.Sale ? -1 : 1
-        const strQuantity = getFormattedPrice(sign * info.getValue())
+        const strQuantity = getFormattedNumber({value: sign * info.getValue()})
         return strQuantity
       },
       header: 'Quantity',
@@ -525,7 +526,7 @@ export const EditTransactionsModal = (
       }      
     }),
     columnHelper.accessor('price', {
-      cell: (info) => getFormattedPrice(info.getValue(), '$', 2),
+      cell: (info) => formatDefaultPrice(info.getValue()),
       header: 'Price',
       meta: {
         isNumeric: true
@@ -590,7 +591,7 @@ export const EditTransactionsModal = (
 
               {/* Market price */}
               <Text fontSize='large'>
-                {getFormattedPrice(props.marketPrice, '$', 2)}
+                {formatDefaultPrice(props.marketPrice)}
               </Text>
 
               {/* Purchases */}

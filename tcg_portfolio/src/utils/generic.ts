@@ -1,3 +1,7 @@
+import * as _ from 'lodash'
+import numeral from 'numeral'
+
+
 // =========
 // functions
 // =========
@@ -28,7 +32,35 @@ export function getBrowserLocale(): string {
 
 /*
 DESC
-  Checks if the input is a valid HTTP URL
+  Returns the input number formatted according to the input parameters
+INPUT
+  value?: The value to format
+  prefix?: Any prefix to pre-pend to the number
+  suffix?: Any suffix to post-pend to the number
+  precision?: The number of desired decimal places (default: 0)
+  placeholder?: The placeholder to use if value is undefined
+RETURN
+  The formatted number
+*/
+export function getFormattedNumber(
+  {value, prefix, suffix, precision, placeholder}: IFormattedNumber
+): string {
+
+  // base format
+  const baseFormat = '0,0'
+
+  // precision
+  const decimals = precision ? `.${_.repeat('0', precision)}` : ''
+
+  // final format
+  const format = `(${prefix ?? ''}${baseFormat}${decimals}${suffix ?? ''})`
+
+  return numeral(value ?? placeholder).format(format)
+}
+
+/*
+DESC
+  Checkdecimalss if the input is a valid HTTP URL
 INPUT
   input: a string that may be a URL
 RETURN
@@ -46,4 +78,17 @@ export function isHttpUrl(input: string): boolean {
   }
   
   return url.protocol === "http:" || url.protocol === "https:"
+}
+
+
+// ==========
+// interfaces
+// ==========
+
+interface IFormattedNumber {
+  value?: number,
+  prefix?: string,
+  suffix?: string,
+  precision?: number,
+  placeholder?: string
 }
