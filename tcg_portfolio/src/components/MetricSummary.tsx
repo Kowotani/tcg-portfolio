@@ -8,7 +8,7 @@ import {
   VStack
 } from '@chakra-ui/react'
 import * as _ from 'lodash'
-import { getFormattedNumber } from '../utils/generic'
+import { formatNumber } from '../utils/generic'
 
 
 // --------------
@@ -52,7 +52,7 @@ const MetricSummaryItem = (
             }
             <Spacer minWidth={4}/>
             <Text>
-              {getFormattedNumber({
+              {formatNumber({
                 value: value,
                 prefix: formattedPrefix,
                 suffix: formattedSuffix,
@@ -70,7 +70,7 @@ const MetricSummaryItem = (
               : <Text as='b' align='center'>{title}</Text>
             }
             <Text align='center'>
-              {getFormattedNumber({
+              {formatNumber({
                   value: value,
                   prefix: formattedPrefix,
                   suffix: formattedSuffix,

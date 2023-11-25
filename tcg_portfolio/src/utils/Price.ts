@@ -3,7 +3,7 @@ import {
   
   assert, isIDatedPriceData 
 } from 'common'
-import { getFormattedNumber } from './generic'
+import { formatNumber } from './generic'
 import * as _ from 'lodash'
 import numeral from 'numeral'
 
@@ -30,8 +30,8 @@ INPUT
 RETURN
   The formatted number
 */
-export function formatDefaultPrice(value: number): string {
-  return getFormattedNumber({
+export function formatAsPrice(value: number): string {
+  return formatNumber({
     value: value,
     prefix: '$',
     precision: 2

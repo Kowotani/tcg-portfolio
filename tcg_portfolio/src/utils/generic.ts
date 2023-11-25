@@ -8,6 +8,34 @@ import numeral from 'numeral'
 
 /*
 DESC
+  Formats the input number according to the input parameters
+INPUT
+  value?: The value to format
+  prefix?: Any prefix to pre-pend to the number
+  suffix?: Any suffix to post-pend to the number
+  precision?: The number of desired decimal places (default: 0)
+  placeholder?: The placeholder to use if value is undefined
+RETURN
+  The formatted number
+*/
+export function formatNumber(
+  {value, prefix, suffix, precision, placeholder}: IFormattedNumber
+): string {
+
+  // base format
+  const baseFormat = '0,0'
+
+  // precision
+  const decimals = precision ? `.${_.repeat('0', precision)}` : ''
+
+  // final format
+  const format = `(${prefix ?? ''}${baseFormat}${decimals}${suffix ?? ''})`
+
+  return numeral(value ?? placeholder).format(format)
+}
+
+/*
+DESC
   Returns the first locale detected from the browser (ie. navigator.languages). 
   Defaults to 'en-US' if none are found
 RETURN
@@ -28,34 +56,6 @@ export function getBrowserLocale(): string {
   }
 
   return browserLocales[0].trim()
-}
-
-/*
-DESC
-  Returns the input number formatted according to the input parameters
-INPUT
-  value?: The value to format
-  prefix?: Any prefix to pre-pend to the number
-  suffix?: Any suffix to post-pend to the number
-  precision?: The number of desired decimal places (default: 0)
-  placeholder?: The placeholder to use if value is undefined
-RETURN
-  The formatted number
-*/
-export function getFormattedNumber(
-  {value, prefix, suffix, precision, placeholder}: IFormattedNumber
-): string {
-
-  // base format
-  const baseFormat = '0,0'
-
-  // precision
-  const decimals = precision ? `.${_.repeat('0', precision)}` : ''
-
-  // final format
-  const format = `(${prefix ?? ''}${baseFormat}${decimals}${suffix ?? ''})`
-
-  return numeral(value ?? placeholder).format(format)
 }
 
 /*

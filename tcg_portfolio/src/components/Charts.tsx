@@ -26,7 +26,7 @@ import {
   getDateAxisTicks, getPnlChartDataFromDatedValues, 
   getStartDateFromChartDateRange, priceAxisTickFormatter
 } from '../utils/Chart'
-import { formatDefaultPrice } from '../utils/Price'
+import { formatAsPrice } from '../utils/Price'
 
 
 // =========
@@ -175,10 +175,10 @@ const CustomTooltip = (
       new Date(chartDataPoint.date), 'MMM d, yyyy', 'UTC')
     const primaryValue = chartDataPoint.values 
       && chartDataPoint.values[props.primaryKey] 
-      && formatDefaultPrice(chartDataPoint.values[props.primaryKey])
+      && formatAsPrice(chartDataPoint.values[props.primaryKey])
     const referenceValue = props.referenceKey && chartDataPoint.values 
       && chartDataPoint.values[props.referenceKey]
-        ? formatDefaultPrice(chartDataPoint.values[props.referenceKey])
+        ? formatAsPrice(chartDataPoint.values[props.referenceKey])
         : undefined
 
     return (
