@@ -4,7 +4,6 @@ import {
   Card,
   CardBody,
   HStack,
-  Spacer,
   Text,
   useColorMode,
   useRadio,
@@ -200,11 +199,11 @@ const CustomTooltip = (
           <Text as='b' fontSize='medium'>{date}</Text>
 
           {/* Primary */}
-          <Box display='flex'>
+          <Box display='flex' justifyContent='center'>
             <Text fontSize='medium'>
               {props.primaryKeyAlt ?? props.primaryKey}: 
             </Text>
-            <Spacer width={1}/>
+            <Box width={1}/>
             <Text fontSize='medium' color={color}> 
               {primaryText} 
             </Text>
@@ -283,7 +282,7 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
   // get dataKeys
   const { primaryKey, referenceKey } = getChartDataKeys(props.dataKeys)
   const primaryKeyAlt = 
-    primaryKey.includes('Profit and Loss') ? 'Profit / Loss' 
+    primaryKey.includes('Profit and Loss') ? 'Profit' 
     : undefined
   const referenceDataKey = referenceKey ? `values.${referenceKey}`: undefined
   const profitAreaDataKey = 'arrayValues.Profit Area'
