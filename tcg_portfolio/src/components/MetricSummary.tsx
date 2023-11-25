@@ -5,10 +5,11 @@ import {
   Spacer,
   StackDivider,
   Text,
+  useColorMode,
   VStack
 } from '@chakra-ui/react'
 import * as _ from 'lodash'
-import { formatNumber } from '../utils/generic'
+import { formatNumber, getColorForNumber } from '../utils/generic'
 
 
 // --------------
@@ -35,6 +36,9 @@ const MetricSummaryItem = (
     variant,
   } = props
 
+  // get colorMode
+  const { colorMode } = useColorMode()
+  const color = getColorForNumber(colorMode, value)
 
   return (
     <>
@@ -50,8 +54,8 @@ const MetricSummaryItem = (
               ? <Text style={titleStyle}>{title}</Text>
               : <Text as='b'>{title}</Text>
             }
-            <Spacer minWidth={4}/>
-            <Text>
+            <Spacer minWidth={2}/>
+            <Text color={color}>
               {formatNumber({
                 value: value,
                 prefix: formattedPrefix,
@@ -69,7 +73,7 @@ const MetricSummaryItem = (
               ? <Text style={titleStyle}>{title}</Text>
               : <Text as='b' align='center'>{title}</Text>
             }
-            <Text align='center'>
+            <Text align='center' color={color}>
               {formatNumber({
                   value: value,
                   prefix: formattedPrefix,

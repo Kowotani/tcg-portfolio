@@ -4,7 +4,9 @@ import {
   Card,
   CardBody,
   HStack,
+  Spacer,
   Text,
+  useColorMode,
   useRadio,
   useRadioGroup
 } from '@chakra-ui/react'
@@ -26,6 +28,7 @@ import {
   getDateAxisTicks, getPnlChartDataFromDatedValues, 
   getStartDateFromChartDateRange, priceAxisTickFormatter
 } from '../utils/Chart'
+import { getColorForNumber } from '../utils/generic'
 import { formatAsPrice } from '../utils/Price'
 
 
@@ -162,6 +165,9 @@ const CustomTooltip = (
   props: PropsWithChildren<TCustomTooltipProps<ValueType, NameType>>
 ) => {
 
+  // get colorMode
+  const { colorMode } = useColorMode()
+
   if (props.active) {
 
     // parse payload
@@ -175,11 +181,18 @@ const CustomTooltip = (
       new Date(chartDataPoint.date), 'MMM d, yyyy', 'UTC')
     const primaryValue = chartDataPoint.values 
       && chartDataPoint.values[props.primaryKey] 
-      && formatAsPrice(chartDataPoint.values[props.primaryKey])
-    const referenceValue = props.referenceKey && chartDataPoint.values 
+    const primaryText = primaryValue 
+      ? formatAsPrice(primaryValue) 
+      : undefined
+    const referenceValue = props.referenceKey 
+      && chartDataPoint.values 
       && chartDataPoint.values[props.referenceKey]
-        ? formatAsPrice(chartDataPoint.values[props.referenceKey])
-        : undefined
+    const referenceText = referenceValue 
+      ? formatAsPrice(referenceValue) 
+      : undefined
+
+    // positive + negative, light + dark color
+    const color = getColorForNumber(colorMode, primaryValue)
 
     return (
       <Card>
@@ -187,14 +200,20 @@ const CustomTooltip = (
           <Text as='b' fontSize='medium'>{date}</Text>
 
           {/* Primary */}
-          <Text fontSize='medium'>
-            {props.primaryKeyAlt ?? props.primaryKey}: {primaryValue}
-          </Text>
+          <Box display='flex'>
+            <Text fontSize='medium'>
+              {props.primaryKeyAlt ?? props.primaryKey}: 
+            </Text>
+            <Spacer width={1}/>
+            <Text fontSize='medium' color={color}> 
+              {primaryText} 
+            </Text>
+          </Box>
 
           {/* Reference */}
-          {referenceValue &&
+          {referenceText &&
             <Text fontSize='medium'>
-              {props.referenceKey}: {referenceValue}
+              {props.referenceKey}: {referenceText}
             </Text>
           }
         </CardBody>
