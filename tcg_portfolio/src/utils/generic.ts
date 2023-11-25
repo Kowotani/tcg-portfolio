@@ -58,9 +58,51 @@ export function getBrowserLocale(): string {
   return browserLocales[0].trim()
 }
 
+
 /*
 DESC
-  Checkdecimalss if the input is a valid HTTP URL
+  Get the appropriate color to style the input number based on the app colorMode
+  and the sign of the input
+INPUT
+  colorMode: Either light or dark
+  value: The value to be styled
+RETURN
+  The Chakra color to style the value
+*/
+export function getColorForNumber(
+  colorMode: 'light' | 'dark',
+  value: number | undefined
+): 'black' | 'white' | 'red.600' | 'red.300' {
+
+  // undefined value
+  if (value === undefined) {
+    return 'black'
+
+  // light, positive
+  } else if (colorMode === 'light' && value >= 0) {
+    return 'black'
+
+  // light, negative
+  } else if (colorMode === 'light' && value < 0) {
+    return 'red.600'
+
+  // dark, positive
+  } else if (colorMode === 'dark' && value >= 0) {
+      return 'white'
+
+  // dark, negative
+  } else if (colorMode === 'dark' && value < 0) {
+    return 'red.300'
+
+  // default
+  } else {
+    return 'black'
+  }
+}
+
+/*
+DESC
+  Check if the input is a valid HTTP URL
 INPUT
   input: a string that may be a URL
 RETURN
