@@ -390,7 +390,7 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
                 stroke={GRAY}
                 strokeWidth={2}
                 strokeDasharray='5 5'
-                fillOpacity={0}
+                fillOpacity={0.2}
               />
             }
           </ComposedChart>
