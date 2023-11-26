@@ -49,12 +49,14 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
         ? (
           <UrlWrapper tcgplayerId={tcgplayerId}>
             <Image 
+              borderRadius={12}
               boxSize={props.boxSize}
               src={imageUrl}
             />            
           </UrlWrapper>
         ) : (
-          <Image 
+          <Image
+            borderRadius={12} 
             boxSize={props.boxSize}
             src={imageUrl}
           />       
