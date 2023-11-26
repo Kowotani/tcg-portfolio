@@ -76,23 +76,15 @@ export function getColorForNumber(
 
   // undefined value
   if (value === undefined) {
-    return 'black'
+    return colorMode === 'light' ? 'black' : 'white'
 
-  // light, positive
-  } else if (colorMode === 'light' && value >= 0) {
-    return 'black'
+  // positive value
+  } else if (value >= 0) {
+    return colorMode === 'light' ? 'black' : 'white'
 
-  // light, negative
-  } else if (colorMode === 'light' && value < 0) {
-    return 'red.600'
-
-  // dark, positive
-  } else if (colorMode === 'dark' && value >= 0) {
-      return 'white'
-
-  // dark, negative
-  } else if (colorMode === 'dark' && value < 0) {
-    return 'red.300'
+  // negative value
+  } else if (value < 0) {
+    return colorMode === 'light' ? 'red.600' : 'red.300'
 
   // default
   } else {
