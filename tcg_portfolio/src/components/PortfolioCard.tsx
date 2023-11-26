@@ -29,7 +29,6 @@ import {
   getPortfolioMarketValue, getPortfolioPercentPnl, getPortfolioTotalCost, 
   getPortfolioTotalPnl
 } from 'common'
-import * as _ from 'lodash'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { 
@@ -94,8 +93,7 @@ export const PortfolioCard = (
     })
     .then(res => {
 
-      // TODO: type check
-      const resData = res.data
+      // TODO: type check res
 
       // portfolio deleted
       if (res.status === 200) {

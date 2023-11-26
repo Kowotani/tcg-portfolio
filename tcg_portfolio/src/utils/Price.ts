@@ -5,7 +5,6 @@ import {
 } from 'common'
 import { formatNumber } from './generic'
 import * as _ from 'lodash'
-import numeral from 'numeral'
 
 
 // ==========
