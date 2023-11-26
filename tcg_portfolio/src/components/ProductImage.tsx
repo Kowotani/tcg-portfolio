@@ -39,26 +39,24 @@ type TProductImageProps = BoxProps & {
 }
 export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
 
-  // TODO: Get image filename with extension
-  const imageUrl = `${props.product.tcgplayerId}.jpeg`
-  const placeholderUrl = 'placeholder.jpeg'
+  const tcgplayerId = props.product.tcgplayerId
+  const imageUrl = 
+    `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_200w.jpg`
 
   return (
     <>
       {props.externalUrl
         ? (
-          <UrlWrapper tcgplayerId={props.product.tcgplayerId}>
+          <UrlWrapper tcgplayerId={tcgplayerId}>
             <Image 
               boxSize={props.boxSize}
               src={imageUrl}
-              fallbackSrc={placeholderUrl}
             />            
           </UrlWrapper>
         ) : (
           <Image 
             boxSize={props.boxSize}
             src={imageUrl}
-            fallbackSrc={placeholderUrl}
           />       
       )}
     </>
