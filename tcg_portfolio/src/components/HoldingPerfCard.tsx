@@ -1,5 +1,5 @@
 import { 
-  IPopulatedHolding, TDatedValue,
+  IPopulatedHolding, PerformanceMetric, TDatedValue,
 
   getHoldingMarketValue, getHoldingPercentPnl, getHoldingTotalCost, 
   getHoldingTotalPnl
@@ -10,11 +10,12 @@ import {
   Card,
   CardBody,
   HStack,
+  Spinner,
   StackDivider,
   Text,
   VStack
 } from '@chakra-ui/react'
-import { PriceChart } from './Charts'
+import { PnlChart, PriceChart } from './Charts'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
@@ -29,6 +30,7 @@ type THoldingPerformanceCardProps = {
   chartDataKeys?: {[key: string]: string}
   chartDataMap?: Map<string, TDatedValue[]>
   chartDateRange?: ChartDateRange,
+  chartType?: PerformanceMetric
 }
 export const HoldingPerfCard = (
   props: PropsWithChildren<THoldingPerformanceCardProps>
@@ -158,9 +160,35 @@ export const HoldingPerfCard = (
                 />
               </Box>
 
+              {/* Spinner */}
+              {!props.chartDataMap &&
+                <Box display='flex' alignItems='center' justifyContent='center' height='100%' width='100%'>
+                  <Spinner 
+                    color='blue.500'
+                    height={75}
+                    width={75}
+                    thickness='7px'
+                  />
+                </Box>
+              }
+
               {/* Holding Market Value Chart */}
               {props.chartDataKeys && props.chartDataMap && props.chartDateRange 
+                && props.chartType === PerformanceMetric.MarketValue 
                 && <PriceChart
+                  data={props.chartDataMap}
+                  dataKeys={props.chartDataKeys}
+                  dateRange={props.chartDateRange}
+                  isControlled={true}
+                  height={200}
+                  minWidth={200}
+                />
+              }
+
+              {/* Cum Pnl Chart */}
+              {props.chartDataKeys && props.chartDataMap && props.chartDateRange 
+                && props.chartType === PerformanceMetric.CumPnL 
+                && <PnlChart
                   data={props.chartDataMap}
                   dataKeys={props.chartDataKeys}
                   dateRange={props.chartDateRange}

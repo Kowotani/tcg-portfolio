@@ -19,7 +19,10 @@ import {
   getHoldingTcgplayerId,
 
   // date helpers
-  isDateAfter, isDateBefore
+  isDateAfter, isDateBefore,
+
+  // rest
+  assert
 } from 'common'
 import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
@@ -150,6 +153,7 @@ export const PortfolioPerformance = (
         // set performance data
         const data = resData.data
         setHoldingsData(data)
+        console.log(data)
     
       // error
       } else {
@@ -263,23 +267,6 @@ export const PortfolioPerformance = (
         </Button>
       </Box>
 
-      {/* TODO: Remove this */}
-      <Box display='flex' justifyContent='center'>
-        <Button 
-          colorScheme='pink'
-          onClick={() => setChartType(PerformanceMetric.MarketValue)}
-        >
-          {PerformanceMetric.MarketValue}
-        </Button>
-        <Box w={20} />
-        <Button 
-          colorScheme='pink'
-          onClick={() => setChartType(PerformanceMetric.CumPnL)}
-        >
-          {PerformanceMetric.CumPnL}
-        </Button>
-      </Box>
-
       {/* Portfolio Chart */}
       {!isLoaded && 
         <Box 
@@ -320,6 +307,24 @@ export const PortfolioPerformance = (
         />
       }
 
+      {/* TODO: Improve this UI */}
+      <Box height={4}/>
+      <Box display='flex' justifyContent='center'>
+        <Button 
+          colorScheme='pink'
+          onClick={() => setChartType(PerformanceMetric.MarketValue)}
+        >
+          {PerformanceMetric.MarketValue}
+        </Button>
+        <Box w={20} />
+        <Button 
+          colorScheme='pink'
+          onClick={() => setChartType(PerformanceMetric.CumPnL)}
+        >
+          {PerformanceMetric.CumPnL}
+        </Button>
+      </Box>
+
       {/* Holdings */}
       <SectionHeader header='Holdings'/>
 
@@ -337,18 +342,32 @@ export const PortfolioPerformance = (
             holdingsData.filter((data: THoldingPerformanceData) => {
               return data.tcgplayerId === tcgplayerId
           }))
+
+          const perfData = isLoaded && holdingData 
+            ? holdingData.performanceData
+            : {} as TPerformanceData
           const holdingMarketValue = clampDatedValues(
-            holdingData?.performanceData['Market Value'] as TDatedValue[],
+            perfData[PerformanceMetric.MarketValue] as TDatedValue[],
             chartDateRange
           )
           const holdingTotalCost = clampDatedValues(
-            holdingData?.performanceData['Total Cost'] as TDatedValue[],
+            perfData[PerformanceMetric.TotalCost] as TDatedValue[],
+            chartDateRange
+          )
+          const holdingCumPnl = clampDatedValues(
+            perfData[PerformanceMetric.CumPnL] as TDatedValue[],
             chartDateRange
           )
           const holdingDataMap = new Map<string, TDatedValue[]>([
-            ['Market Value', holdingMarketValue],
-            ['Total Cost', holdingTotalCost],
+            [PerformanceMetric.MarketValue, holdingMarketValue],
+            [PerformanceMetric.TotalCost, holdingTotalCost],
+            [PerformanceMetric.CumPnL, holdingCumPnl],
           ]) 
+
+          // chart type dependent props
+          const chartDataKeys = chartType === PerformanceMetric.MarketValue
+            ? marketValueDataKeys
+            : cumPnlDataKeys
 
           return (
             <CascadingSlideFade
@@ -362,9 +381,10 @@ export const PortfolioPerformance = (
                 <HoldingPerfCard
                   marketPrice={marketPrice}    
                   populatedHolding={holding}
-                  chartDataKeys={marketValueDataKeys}
+                  chartDataKeys={chartDataKeys}
                   chartDataMap={isLoaded ? holdingDataMap : undefined}
                   chartDateRange={chartDateRange}
+                  chartType={chartType}
                 />
               </Box>
             </CascadingSlideFade>
