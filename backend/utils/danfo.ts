@@ -104,7 +104,7 @@ export function densifyAndFillSeries(
     const seriesValue = series.at(date)
 
     // matched
-    if (seriesValue) {
+    if (seriesValue !== undefined) {
       values.push(Number(seriesValue))
 
     // unmatched
