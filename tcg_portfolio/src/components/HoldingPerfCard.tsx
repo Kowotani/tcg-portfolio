@@ -47,6 +47,14 @@ export const HoldingPerfCard = (
 
   const valueSummary: TMetricSummaryItem[] = [
     {
+      title: 'Market Value:',
+      value: getHoldingMarketValue(props.populatedHolding, props.marketPrice),
+      formattedPrefix: '$',
+      formattedPrecision: 2,
+      placeholder: ' -',
+      titleStyle: {},
+    },
+    {
       title: 'Book Value:',
       value: getHoldingTotalCost(props.populatedHolding),
       formattedPrefix: '$',
@@ -55,12 +63,8 @@ export const HoldingPerfCard = (
       titleStyle: {},
     },
     {
-      title: 'Market Value:',
-      value: getHoldingMarketValue(props.populatedHolding, props.marketPrice),
-      formattedPrefix: '$',
-      formattedPrecision: 2,
-      placeholder: ' -',
-      titleStyle: {},
+      title: '',
+      isListSpacer: true
     },
     {
       title: 'Profit:',
@@ -70,11 +74,8 @@ export const HoldingPerfCard = (
       placeholder: ' -',
       titleStyle: {},
     },  
-  ]
-
-  const returnSummary: TMetricSummaryItem[] = [
     {
-      title: 'MWR:',
+      title: 'Return:',
       value: holdingPercentPnl
         ? holdingPercentPnl
         : undefined,
@@ -83,16 +84,6 @@ export const HoldingPerfCard = (
       placeholder: '- ',
       titleStyle: {},
     },
-    {
-      title: 'TWR:',
-      value: holdingPercentPnl
-        ? holdingPercentPnl
-        : undefined,
-      formattedPrecision: 2,
-      formattedSuffix: '%',
-      placeholder: '- ',
-      titleStyle: {},
-    },    
   ]
 
 
@@ -122,6 +113,8 @@ export const HoldingPerfCard = (
             </Text>
           </VStack>
           <VStack spacing={0} width='100%'>
+
+            {/* Header */}
             <Box display='flex' justifyContent='space-between' width='100%'>
 
               {/* Product Name */}
@@ -130,6 +123,7 @@ export const HoldingPerfCard = (
               </Text>
             </Box>
 
+            {/* Content */}
             <HStack
               width='100%'
               divider={<StackDivider color='gray.200'/>}
@@ -144,7 +138,6 @@ export const HoldingPerfCard = (
                 width='fit-content'
               />
 
-              {/* Value */}
               <Box fontSize='large'>
                 <MetricSummary 
                   summaryItems={valueSummary}
@@ -152,51 +145,50 @@ export const HoldingPerfCard = (
                 />
               </Box>
 
-              {/* Return */}
-              <Box fontSize='large'>
-                <MetricSummary 
-                  summaryItems={returnSummary}
-                  variant='list'
-                />
+              { /* Chart */ }
+              <Box width='50%'>
+                {props.chartDataKeys && props.chartDataMap && props.chartDateRange
+                  ? (props.chartType === PerformanceMetric.MarketValue 
+                    ? (
+                      <PriceChart
+                        data={props.chartDataMap}
+                        dataKeys={props.chartDataKeys}
+                        dateRange={props.chartDateRange}
+                        isControlled={true}
+                        height={200}
+                        minWidth={200}
+                      />
+                    ) : (
+                      props.chartType === PerformanceMetric.CumPnL
+                        ? (
+                          <PnlChart
+                            data={props.chartDataMap}
+                            dataKeys={props.chartDataKeys}
+                            dateRange={props.chartDateRange}
+                            isControlled={true}
+                            height={200}
+                            minWidth={200}
+                          />
+                        ) 
+                        : undefined
+                    )
+                  ) : (                  
+                    <Box 
+                      display='flex' 
+                      alignItems='center' 
+                      justifyContent='center' 
+                      height='100%' 
+                      width='100%'
+                    >
+                      <Spinner 
+                        color='blue.500'
+                        height={75}
+                        width={75}
+                        thickness='7px'
+                      />
+                    </Box>
+                )}  
               </Box>
-
-              {/* Spinner */}
-              {!props.chartDataMap &&
-                <Box display='flex' alignItems='center' justifyContent='center' height='100%' width='100%'>
-                  <Spinner 
-                    color='blue.500'
-                    height={75}
-                    width={75}
-                    thickness='7px'
-                  />
-                </Box>
-              }
-
-              {/* Holding Market Value Chart */}
-              {props.chartDataKeys && props.chartDataMap && props.chartDateRange 
-                && props.chartType === PerformanceMetric.MarketValue 
-                && <PriceChart
-                  data={props.chartDataMap}
-                  dataKeys={props.chartDataKeys}
-                  dateRange={props.chartDateRange}
-                  isControlled={true}
-                  height={200}
-                  minWidth={200}
-                />
-              }
-
-              {/* Cum Pnl Chart */}
-              {props.chartDataKeys && props.chartDataMap && props.chartDateRange 
-                && props.chartType === PerformanceMetric.CumPnL 
-                && <PnlChart
-                  data={props.chartDataMap}
-                  dataKeys={props.chartDataKeys}
-                  dateRange={props.chartDateRange}
-                  isControlled={true}
-                  height={200}
-                  minWidth={200}
-                />
-              }
             </HStack>
           </VStack>
         </HStack>
