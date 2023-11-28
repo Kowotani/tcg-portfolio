@@ -101,6 +101,7 @@ export type TMetricSummaryItem = {
   formattedPrefix?: string,
   formattedPrecision?: number,
   formattedSuffix?: string,
+  isListSpacer?: boolean,
   placeholder?: string,
   titleStyle?: {[key: string]: string},
 }
@@ -164,12 +165,17 @@ export const MetricSummary = (
         >
           {summaryItems.map(
             (item: TMetricSummaryItem) => {
+              
               return (
-                <MetricSummaryItem
-                  {...item}
-                  key={item.title}
-                  variant={variant}
-                />
+                item.isListSpacer 
+                ? <Box height={4}/>
+                : ( 
+                  <MetricSummaryItem
+                    {...item}
+                    key={item.title}
+                    variant={variant}
+                  />
+                )
               )
             }
           )}
