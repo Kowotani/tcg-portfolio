@@ -31,7 +31,9 @@ export function formatNumber(
   // final format
   const format = `(${prefix ?? ''}${baseFormat}${decimals}${suffix ?? ''})`
 
-  return numeral(value ?? placeholder).format(format)
+  return value 
+    ? numeral(value).format(format)
+    : placeholder ?? ''
 }
 
 /*
