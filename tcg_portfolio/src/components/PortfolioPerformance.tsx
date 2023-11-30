@@ -3,6 +3,7 @@ import axios from 'axios'
 import { 
   Box,
   Button,
+  HStack,
   Spinner
 } from '@chakra-ui/react'
 import { 
@@ -16,18 +17,17 @@ import {
   // endpoint URLs
   PORTFOLIO_HOLDINGS_PERFORMANCE_URL, PORTFOLIO_PERFORMANCE_URL,
 
-  getHoldingTcgplayerId,
-
   // date helpers
   isDateAfter, isDateBefore,
 
   // rest
-  assert
+  getHoldingTcgplayerId
 } from 'common'
 import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { PnlChart, PriceChart } from './Charts'
 import { HoldingPerfCard } from './HoldingPerfCard'
+import { PortfolioPerfCard } from './PortfolioPerfCard'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { UserContext } from '../state/UserContext'
 import { CascadingSlideFade } from './Transitions'
@@ -153,17 +153,14 @@ export const PortfolioPerformance = (
         // set performance data
         const data = resData.data
         setHoldingsData(data)
-        console.log(data)
     
       // error
       } else {
         const errMsg = `Error fetching from PORTFOLIO_HOLDINGS_PERFORMANCE_URL: ${resData.message}`
-        console.log(errMsg)
       }
     })
     .catch(err => {
       const errMsg = `Error fetching from PORTFOLIO_HOLDINGS_PERFORMANCE_URL: ${err.message}`
-      console.log(errMsg)
     })
   }, [user, props.portfolio])
 
@@ -193,12 +190,10 @@ export const PortfolioPerformance = (
       // error
       } else {
         const errMsg = `Error fetching from PORTFOLIO_PERFORMANCE_URL: ${resData.message}`
-        console.log(errMsg)
       }
     })
     .catch(err => {
       const errMsg = `Error fetching from PORTFOLIO_PERFORMANCE_URL: ${err.message}`
-      console.log(errMsg)
     })
   }, [user, props.portfolio])
 
@@ -267,45 +262,56 @@ export const PortfolioPerformance = (
         </Button>
       </Box>
 
-      {/* Portfolio Chart */}
-      {!isLoaded && 
-        <Box 
-          display='flex'
-          alignItems='center'
-          justifyContent='center'
-          height={300} 
-          width='100%' 
-        >
-          <Spinner 
-            color='blue.500'
-            height={100}
-            width={100}
-            thickness='10px'
-          />
+      {/* Portfolio Summary and Chart */}
+      <HStack display='flex' alignItems='flex-start' height='100%' width='100%'>
+
+        {/* Portfolio Chart */}
+        <Box height='100%' width='50%'>
+          <PortfolioPerfCard populatedPortfolio={props.portfolio}/>
         </Box>
-      }
-      {isLoaded && chartType === PerformanceMetric.MarketValue &&
-        <PriceChart
-          data={portfolioDataMap}
-          dataKeys={marketValueDataKeys}
-          dateRange={chartDateRange}
-          isControlled={false}
-          height={300}
-          minWidth={400}
-          setParentDateRange={setChartDateRange}
-        />
-      }
-      {isLoaded && chartType === PerformanceMetric.CumPnL &&
-        <PnlChart
-          data={portfolioDataMap}
-          dataKeys={cumPnlDataKeys}
-          dateRange={chartDateRange}
-          isControlled={false}
-          height={300}
-          minWidth={400}
-          setParentDateRange={setChartDateRange}
-        />
-      }
+
+        {/* Portfolio Chart */}
+        <Box width='50%'>
+          {!isLoaded && 
+            <Box 
+              display='flex'
+              alignItems='center'
+              justifyContent='center'
+              height={300} 
+              width='100%' 
+            >
+              <Spinner 
+                color='blue.500'
+                height={100}
+                width={100}
+                thickness='10px'
+              />
+            </Box>
+          }
+          {isLoaded && chartType === PerformanceMetric.MarketValue &&
+            <PriceChart
+              data={portfolioDataMap}
+              dataKeys={marketValueDataKeys}
+              dateRange={chartDateRange}
+              isControlled={false}
+              height={300}
+              minWidth={400}
+              setParentDateRange={setChartDateRange}
+            />
+          }
+          {isLoaded && chartType === PerformanceMetric.CumPnL &&
+            <PnlChart
+              data={portfolioDataMap}
+              dataKeys={cumPnlDataKeys}
+              dateRange={chartDateRange}
+              isControlled={false}
+              height={300}
+              minWidth={400}
+              setParentDateRange={setChartDateRange}
+            />
+          }
+        </Box>
+      </HStack>
 
       {/* TODO: Improve this UI */}
       <Box height={4}/>
