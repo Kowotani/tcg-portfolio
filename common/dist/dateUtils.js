@@ -1,8 +1,10 @@
 "use strict";
 exports.__esModule = true;
-exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getDaysBetween = exports.getClampedDate = exports.formatInTimeZone = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getDaysBetween = exports.getClampedDate = exports.formatInTimeZone = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 var date_fns_tz_1 = require("date-fns-tz");
+var _ = require("lodash");
+var utils_1 = require("./utils");
 // ==========
 // generators
 // ==========
@@ -132,6 +134,41 @@ function formatAsISO(date) {
     return formatInTimeZone(date, 'yyyy-MM-dd', 'UTC');
 }
 exports.formatAsISO = formatAsISO;
+/*
+DESC
+  Calculates the difference between the input start date and end date and
+  returns the difference formatted as 'X years, Y months, Z days'
+INPUT
+  startDate: The start date
+  endDate: The end date
+RETURN
+  The date difference formatted as 'X years, Y months, Z days'
+*/
+function formatDateDiffAsYearsMonthsDays(startDate, endDate) {
+    (0, utils_1.assert)((0, date_fns_1.isBefore)(startDate, endDate), 'startDate is not before endDate');
+    // initialize variables
+    var date = startDate;
+    var components = [];
+    // determine years
+    var years = (0, date_fns_1.differenceInYears)(endDate, date);
+    if (years > 0) {
+        components.push(years > 1 ? "".concat(years, " years") : '1 year');
+    }
+    // determine months
+    date = dateAdd(date, { years: years });
+    var months = (0, date_fns_1.differenceInMonths)(endDate, date);
+    if (months > 0) {
+        components.push(months > 1 ? "".concat(months, " months") : '1 month');
+    }
+    // determine days
+    date = dateAdd(date, { months: months });
+    var days = (0, date_fns_1.differenceInDays)(endDate, date);
+    if (days > 0) {
+        components.push(days > 1 ? "".concat(days, " days") : '1 day');
+    }
+    return _.join(components, ', ');
+}
+exports.formatDateDiffAsYearsMonthsDays = formatDateDiffAsYearsMonthsDays;
 /*
 DESC
   Formats the input date in the input time zone as per the input dateFormat

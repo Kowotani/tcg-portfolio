@@ -1,9 +1,12 @@
 import { 
-  add, clamp, differenceInCalendarDays, eachMonthOfInterval, 
-  eachQuarterOfInterval, eachWeekOfInterval, eachYearOfInterval, isAfter, 
-  isBefore, isEqual, startOfToday, sub
+  add, clamp, differenceInCalendarDays, differenceInDays, differenceInMonths, 
+  differenceInYears, eachMonthOfInterval, eachQuarterOfInterval, 
+  eachWeekOfInterval, eachYearOfInterval, isAfter, isBefore, isEqual, 
+  startOfToday, sub
 } from 'date-fns'
 import { format, utcToZonedTime } from 'date-fns-tz'
+import * as _ from 'lodash'
+import { assert } from './utils'
 
 
 // ==========
@@ -157,6 +160,50 @@ RETURN
 */
 export function formatAsISO(date: Date): string {
   return formatInTimeZone(date, 'yyyy-MM-dd', 'UTC')
+}
+
+/*
+DESC
+  Calculates the difference between the input start date and end date and 
+  returns the difference formatted as 'X years, Y months, Z days'
+INPUT
+  startDate: The start date
+  endDate: The end date
+RETURN
+  The date difference formatted as 'X years, Y months, Z days'
+*/
+export function formatDateDiffAsYearsMonthsDays(
+  startDate: Date, 
+  endDate: Date
+): string {
+
+  assert(isBefore(startDate, endDate), 'startDate is not before endDate')
+
+  // initialize variables
+  let date = startDate
+  let components: string[] = []
+
+  // determine years
+  const years = differenceInYears(endDate, date)
+  if (years > 0) {
+    components.push(years > 1 ? `${years} years` : '1 year')
+  }
+
+  // determine months
+  date = dateAdd(date, {years: years})
+  const months = differenceInMonths(endDate, date)
+  if (months > 0) {
+    components.push(months > 1 ? `${months} months` : '1 month')
+  }
+
+  // determine days
+  date = dateAdd(date, {months: months})
+  const days = differenceInDays(endDate, date)
+  if (days > 0) {
+    components.push(days > 1 ? `${days} days` : '1 day')
+  }
+
+  return _.join(components, ', ')
 }
 
 /*

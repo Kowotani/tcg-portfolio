@@ -6,6 +6,7 @@ export declare function genSundayOfWeekDateRange(startDate: Date, endDate: Date)
 export declare function dateAdd(date: Date, duration: TDateMathDuration): Date;
 export declare function dateSub(date: Date, duration: TDateMathDuration): Date;
 export declare function formatAsISO(date: Date): string;
+export declare function formatDateDiffAsYearsMonthsDays(startDate: Date, endDate: Date): string;
 export declare function formatInTimeZone(date: Date, dateFormat: string, timezone: string): string;
 export declare function getClampedDate(date: Date, startDate: Date, endDate: Date): Date;
 export declare function getDaysBetween(startDate: Date, endDate: Date): number;
