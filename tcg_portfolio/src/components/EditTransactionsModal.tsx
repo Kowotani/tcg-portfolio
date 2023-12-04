@@ -24,6 +24,7 @@ import {
   Radio,
   RadioGroup,
   Text,
+  useColorMode,
   useToast,
   VStack
 } from '@chakra-ui/react'
@@ -48,7 +49,7 @@ import { TransactionTable } from './TransactionTable'
 import { hasNonNegativeQuantity } from '../utils/Holding'
 import { formatAsPrice } from '../utils/Price'
 import { getProductNameWithLanguage } from '../utils/Product'
-import { formatNumber } from '../utils/generic'
+import { formatNumber, getColorForNumber } from '../utils/generic'
 
 
 // ==============
@@ -73,7 +74,9 @@ const AddTransactionForm = (
   props: PropsWithChildren<TAddTransactionFormProps>
 ) => {
 
+  // =========
   // functions
+  // =========
 
   // -- validation functions
 
@@ -164,7 +167,10 @@ const AddTransactionForm = (
     props.handleAddTransaction(txn)
   }
 
-  // component
+
+  // ==============
+  // main component
+  // ==============
 
   // defaults
   const DEFAULT_DATE = new Date()
@@ -368,14 +374,14 @@ export const EditTransactionsModal = (
 ) => {
 
   // =====
-  // State
+  // state
   // =====
 
   const [ transactions, setTransactions ] = useState(props.transactions)
 
 
   // ===================
-  // Transaction Summary
+  // transaction summary
   // ===================
 
   const holding: IHolding = {
@@ -429,7 +435,7 @@ export const EditTransactionsModal = (
 
 
   // =========
-  // Functions
+  // functions
   // =========
 
   // add transaction to local state only
@@ -475,9 +481,11 @@ export const EditTransactionsModal = (
   }
 
 
-  // ================
-  // TransactionTable
-  // ================
+  // =================
+  // transaction table
+  // =================
+
+  const { colorMode } = useColorMode()
 
   function handleDeleteTransaction(txn: ITransaction): void {
     const ix = transactions.findIndex((t: ITransaction) => (
@@ -510,8 +518,10 @@ export const EditTransactionsModal = (
       cell: (info) => {
         const sign: number = 
           info.row.getValue('type') === TransactionType.Sale ? -1 : 1
-        const strQuantity = formatNumber({value: sign * info.getValue()})
-        return strQuantity
+        const quantity = sign * info.getValue()
+        const strQuantity = formatNumber({value: quantity}) 
+        const color = getColorForNumber(colorMode, quantity)
+        return <Text color={color}>{strQuantity}</Text>
       },
       header: 'Quantity',
       meta: {
@@ -558,7 +568,7 @@ export const EditTransactionsModal = (
 
 
   // ==============
-  // Main Component
+  // main component
   // ==============
 
   return (
