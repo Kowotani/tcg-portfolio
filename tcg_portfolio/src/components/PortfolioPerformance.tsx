@@ -4,6 +4,8 @@ import {
   Box,
   Button,
   HStack,
+  Radio,
+  RadioGroup,
   Spinner
 } from '@chakra-ui/react'
 import { 
@@ -112,7 +114,7 @@ export const PortfolioPerformance = (
   const [ portfolioData, setPortfolioData ] = useState({} as TPerformanceData)
   const [ isLoaded, setIsLoaded ] = useState(false)
   const [ chartDateRange, setChartDateRange ] = useState(ChartDateRange.All)
-  const [ chartType, setChartType ] = useState(PerformanceMetric.MarketValue)
+  const [ chartType, setChartType ] = useState(PerformanceMetric.CumPnL)
 
   // -----
   // Price
@@ -203,6 +205,28 @@ export const PortfolioPerformance = (
   }, [portfolioData, holdingsData])
 
 
+  // =========
+  // functions
+  // =========
+
+  /*
+    DESC
+      Handles the onChange event to update the chart type
+    INPUT
+      value: The onChange event value
+  */
+  function onRadioChange(value: string): void {
+    switch (value) {
+      case PerformanceMetric.MarketValue:
+        setChartType(PerformanceMetric.MarketValue)
+        break
+      case PerformanceMetric.CumPnL:
+        setChartType(PerformanceMetric.CumPnL)
+        break
+    }
+  }
+
+
   // ==================
   // performance charts
   // ==================
@@ -265,13 +289,13 @@ export const PortfolioPerformance = (
       {/* Portfolio Summary and Chart */}
       <HStack display='flex' alignItems='flex-start' height='100%' width='100%'>
 
-        {/* Portfolio Chart */}
-        <Box height='100%' width='50%'>
+        {/* Portfolio Summary */}
+        <Box width='50%'>
           <PortfolioPerfCard populatedPortfolio={props.portfolio}/>
         </Box>
 
         {/* Portfolio Chart */}
-        <Box width='50%'>
+        <Box display='flex' flexDirection='column' width='50%'>
           {!isLoaded && 
             <Box 
               display='flex'
@@ -310,26 +334,21 @@ export const PortfolioPerformance = (
               setParentDateRange={setChartDateRange}
             />
           }
+          {/* Portoflio Chart Radio */}
+          <Box width='100%' paddingTop={4}>
+            <RadioGroup onChange={onRadioChange} value={chartType}>
+              <Box display='flex' justifyContent='space-evenly'>
+                <Radio size='lg' value={PerformanceMetric.CumPnL}>
+                  Profit and Loss
+                </Radio>
+                <Radio size='lg' value={PerformanceMetric.MarketValue}>
+                  Market Value
+                </Radio>
+              </Box>
+            </RadioGroup>
+          </Box>
         </Box>
       </HStack>
-
-      {/* TODO: Improve this UI */}
-      <Box height={4}/>
-      <Box display='flex' justifyContent='center'>
-        <Button 
-          colorScheme='pink'
-          onClick={() => setChartType(PerformanceMetric.MarketValue)}
-        >
-          {PerformanceMetric.MarketValue}
-        </Button>
-        <Box w={20} />
-        <Button 
-          colorScheme='pink'
-          onClick={() => setChartType(PerformanceMetric.CumPnL)}
-        >
-          {PerformanceMetric.CumPnL}
-        </Button>
-      </Box>
 
       {/* Holdings */}
       <SectionHeader header='Holdings'/>
