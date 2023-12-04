@@ -23,21 +23,36 @@ import {
 // https://chakra-ui.com/getting-started/with-react-table
 
 
-// ---------------
-// table variables
-// ---------------
+// =========
+// constants
+// =========
+
+const DEFAULT_SORT = [{
+  id: 'date',
+  desc: false
+}]
+
+
+// =====
+// types
+// =====
 
 export type TTransactionTableProps<Data extends object> = {
   data: Data[];
   columns: ColumnDef<Data, any>[];
   hiddenColumns?: string[];
-};
+}
+
+
+// ==============
+// main component
+// ==============
 
 export const TransactionTable = (
   props: PropsWithChildren<TTransactionTableProps<IReactTableTransaction>>
 ) => {
 
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>(DEFAULT_SORT);
 
   // default column visibility
   const [columnVisibility, setColumnVisibility] = useState(
