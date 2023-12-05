@@ -274,6 +274,22 @@ export function hasIProductKeys(arg: any): boolean {
 
 /*
 DESC
+  Returns whether or not the input has all ITransaction keys
+INPUT
+  arg: An object that might be an ITransaction
+RETURN
+  TRUE if the input has all ITransaction keys, FALSE otherwise
+*/
+export function hasITransactionKeys(arg: any): boolean {
+  return arg 
+  && arg.type
+  && arg.date
+  && arg.price
+  && arg.quantity
+}
+
+/*
+DESC
   Returns whether or not the input has all IPortfolio keys
 INPUT
   arg: An object that might be an IPortfolio 
@@ -547,10 +563,11 @@ RETURN
 */
 export function isITransaction(arg: any): arg is ITransaction {
   return arg
-    && arg.type && _.values(TransactionType).includes(arg.type)
-    && arg.date && isDate(arg.date)
-    && arg.price && typeof(arg.price) === 'number'
-    && arg.quantity && typeof(arg.quantity) === 'number'
+    && hasITransactionKeys(arg)
+    && _.values(TransactionType).includes(arg.type)
+    && isDate(arg.date)
+    && typeof(arg.price) === 'number'
+    && typeof(arg.quantity) === 'number'
 }
 
 /*
