@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getDaysBetween = exports.getClientTimezone = exports.getClampedDate = exports.formatInTimeZone = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getLocalDateFromISOString = exports.getClientTimezone = exports.formatInTimeZone = exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getDaysBetween = exports.getClampedDate = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 var date_fns_tz_1 = require("date-fns-tz");
 var _ = require("lodash");
@@ -171,22 +171,6 @@ function formatDateDiffAsYearsMonthsDays(startDate, endDate) {
 exports.formatDateDiffAsYearsMonthsDays = formatDateDiffAsYearsMonthsDays;
 /*
 DESC
-  Formats the input date in the input time zone as per the input dateFormat
-INPUT
-  date: The date to format
-  dateFormat: The format following date-fns standard
-  timezone: The timezone for the formatted date
-RETURN
-  The formatted date
-REF
-  https://stackoverflow.com/questions/58561169/date-fns-how-do-i-format-to-utc
-*/
-function formatInTimeZone(date, dateFormat, timezone) {
-    return (0, date_fns_tz_1.format)((0, date_fns_tz_1.utcToZonedTime)(date, timezone), dateFormat, { timeZone: timezone });
-}
-exports.formatInTimeZone = formatInTimeZone;
-/*
-DESC
   Returns the input Date clamped between the startDate and endDate inclusive
 INPUT
   date: A Date
@@ -202,16 +186,6 @@ function getClampedDate(date, startDate, endDate) {
     });
 }
 exports.getClampedDate = getClampedDate;
-/*
-DESC
-  Returns the client's timezone (eg. America/Toronto)
-RETURN
-  The client's timezone
-*/
-function getClientTimezone() {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-exports.getClientTimezone = getClientTimezone;
 /*
 DESC
   Returns the number of calendar days between two dates
@@ -312,3 +286,53 @@ function getDateOneYearAgo() {
     return dateSub((0, date_fns_1.startOfToday)(), { years: 1 });
 }
 exports.getDateOneYearAgo = getDateOneYearAgo;
+// =========
+// time zone
+// =========
+/*
+DESC
+  Formats the input date in the input time zone as per the input dateFormat
+INPUT
+  date: The date to format
+  dateFormat: The format following date-fns standard
+  timezone: The timezone for the formatted date
+RETURN
+  The formatted date
+REF
+  https://stackoverflow.com/questions/58561169/date-fns-how-do-i-format-to-utc
+*/
+function formatInTimeZone(date, dateFormat, timezone) {
+    return (0, date_fns_tz_1.format)((0, date_fns_tz_1.utcToZonedTime)(date, timezone), dateFormat, { timeZone: timezone });
+}
+exports.formatInTimeZone = formatInTimeZone;
+/*
+DESC
+  Returns the client's timezone (eg. America/Toronto)
+RETURN
+  The client's timezone
+*/
+function getClientTimezone() {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+exports.getClientTimezone = getClientTimezone;
+/*
+DESC
+  Returns a date in the input timezone with the same year, month, and day as
+  the input ISOString. This function does preserve the date to be equivalent
+  to the input date (unless the timezone is UTC)
+INPUT
+  ISOString: A date in ISO string format (eg. 2020-01-01T:00:00:00.000Z)
+RETURN
+  A new date in the timezone (eg. 2020-01-01T:00:00:00.000 in local)
+*/
+function getLocalDateFromISOString(ISOString) {
+    // verify format
+    var format = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+    (0, utils_1.assert)(format.test(ISOString), 'ISOString is not in correct format');
+    // date parameters
+    var year = Number(ISOString.substring(0, 4));
+    var month = Number(ISOString.substring(5, 7)) - 1; // 0-indexed
+    var day = Number(ISOString.substring(8, 10));
+    return new Date(year, month, day);
+}
+exports.getLocalDateFromISOString = getLocalDateFromISOString;

@@ -4,7 +4,7 @@ import {
   eachWeekOfInterval, eachYearOfInterval, isAfter, isBefore, isEqual, 
   startOfToday, sub
 } from 'date-fns'
-import { format, utcToZonedTime } from 'date-fns-tz'
+import { format, utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz'
 import * as _ from 'lodash'
 import { assert } from './utils'
 
@@ -208,30 +208,6 @@ export function formatDateDiffAsYearsMonthsDays(
 
 /*
 DESC
-  Formats the input date in the input time zone as per the input dateFormat
-INPUT
-  date: The date to format
-  dateFormat: The format following date-fns standard
-  timezone: The timezone for the formatted date
-RETURN
-  The formatted date
-REF
-  https://stackoverflow.com/questions/58561169/date-fns-how-do-i-format-to-utc
-*/
-export function formatInTimeZone(
-  date: Date,
-  dateFormat: string,
-  timezone: string
-): string {
-  return format(
-    utcToZonedTime(date, timezone),
-    dateFormat,
-    {timeZone: timezone}
-  )
-}
-
-/*
-DESC
   Returns the input Date clamped between the startDate and endDate inclusive
 INPUT
   date: A Date
@@ -253,15 +229,7 @@ export function getClampedDate(
     })
 }
 
-/*
-DESC
-  Returns the client's timezone (eg. America/Toronto)
-RETURN
-  The client's timezone
-*/
-export function getClientTimezone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone
-}
+
 
 /*
 DESC
@@ -374,6 +342,69 @@ RETURN
 */
 export function getDateOneYearAgo(): Date {
   return dateSub(startOfToday(), {years: 1})
+}
+
+
+// =========
+// time zone
+// =========
+
+/*
+DESC
+  Formats the input date in the input time zone as per the input dateFormat
+INPUT
+  date: The date to format
+  dateFormat: The format following date-fns standard
+  timezone: The timezone for the formatted date
+RETURN
+  The formatted date
+REF
+  https://stackoverflow.com/questions/58561169/date-fns-how-do-i-format-to-utc
+*/
+export function formatInTimeZone(
+  date: Date,
+  dateFormat: string,
+  timezone: string
+): string {
+  return format(
+    utcToZonedTime(date, timezone),
+    dateFormat,
+    {timeZone: timezone}
+  )
+}
+
+/*
+DESC
+  Returns the client's timezone (eg. America/Toronto)
+RETURN
+  The client's timezone
+*/
+export function getClientTimezone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone
+}
+
+/*
+DESC
+  Returns a date in the input timezone with the same year, month, and day as 
+  the input ISOString. This function does preserve the date to be equivalent
+  to the input date (unless the timezone is UTC)
+INPUT
+  ISOString: A date in ISO string format (eg. 2020-01-01T:00:00:00.000Z)
+RETURN
+  A new date in the timezone (eg. 2020-01-01T:00:00:00.000 in local)
+*/
+export function getLocalDateFromISOString(ISOString: string): Date {
+
+  // verify format
+  const format = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+  assert(format.test(ISOString), 'ISOString is not in correct format')
+
+  // date parameters
+  const year = Number(ISOString.substring(0,4))
+  const month = Number(ISOString.substring(5,7)) - 1  // 0-indexed
+  const day = Number(ISOString.substring(8,10))
+
+  return new Date(year, month, day)
 }
 
 
