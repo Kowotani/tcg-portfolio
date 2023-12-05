@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.hasIPortfolioKeys = exports.hasIProductKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 var util_1 = require("util");
@@ -237,6 +237,24 @@ function hasIPortfolioBaseKeys(arg) {
         && arg.portfolioName;
 }
 exports.hasIPortfolioBaseKeys = hasIPortfolioBaseKeys;
+/*
+DESC
+  Returns whether or not the input has all IProduct keys
+INPUT
+  arg: An object that might be an IProduct
+RETURN
+  TRUE if the input has all IProduct keys, FALSE otherwise
+*/
+function hasIProductKeys(arg) {
+    return arg
+        && arg.tcgplayerId
+        && arg.tcg
+        && arg.releaseDate
+        && arg.name
+        && arg.type
+        && arg.language;
+}
+exports.hasIProductKeys = hasIProductKeys;
 /*
 DESC
   Returns whether or not the input has all IPortfolio keys
@@ -482,13 +500,14 @@ RETURN
 */
 function isIProduct(arg) {
     return arg
-        // require
-        && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
-        && arg.tcg && _.values(dataModels_1.TCG).includes(arg.tcg)
-        && arg.releaseDate && isDate(arg.releaseDate)
-        && arg.name && typeof (arg.name) === 'string'
-        && arg.type && _.values(dataModels_1.ProductType).includes(arg.type)
-        && arg.language && _.values(dataModels_1.ProductLanguage).includes(arg.language)
+        // required
+        && hasIProductKeys(arg)
+        && typeof (arg.tcgplayerId) === 'number'
+        && _.values(dataModels_1.TCG).includes(arg.tcg)
+        && isDate(arg.releaseDate)
+        && typeof (arg.name) === 'string'
+        && _.values(dataModels_1.ProductType).includes(arg.type)
+        && _.values(dataModels_1.ProductLanguage).includes(arg.language)
         // optional
         && arg.msrp ? typeof (arg.msrp) === 'number' : true
         && arg.subtype ? _.values(dataModels_1.ProductSubtype).includes(arg.subtype) : true

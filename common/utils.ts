@@ -256,6 +256,24 @@ export function hasIPortfolioBaseKeys(arg: any): boolean {
 
 /*
 DESC
+  Returns whether or not the input has all IProduct keys
+INPUT
+  arg: An object that might be an IProduct
+RETURN
+  TRUE if the input has all IProduct keys, FALSE otherwise
+*/
+export function hasIProductKeys(arg: any): boolean {
+  return arg 
+    && arg.tcgplayerId 
+    && arg.tcg 
+    && arg.releaseDate
+    && arg.name
+    && arg.type
+    && arg.language
+}
+
+/*
+DESC
   Returns whether or not the input has all IPortfolio keys
 INPUT
   arg: An object that might be an IPortfolio 
@@ -504,13 +522,14 @@ RETURN
 */
 export function isIProduct(arg: any): arg is IProduct {
   return arg
-    // require
-    && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
-    && arg.tcg && _.values(TCG).includes(arg.tcg)
-    && arg.releaseDate && isDate(arg.releaseDate)
-    && arg.name && typeof(arg.name) === 'string'
-    && arg.type && _.values(ProductType).includes(arg.type)
-    && arg.language && _.values(ProductLanguage).includes(arg.language)
+    // required
+    && hasIProductKeys(arg)
+    && typeof(arg.tcgplayerId) === 'number'
+    && _.values(TCG).includes(arg.tcg)
+    && isDate(arg.releaseDate)
+    && typeof(arg.name) === 'string'
+    && _.values(ProductType).includes(arg.type)
+    && _.values(ProductLanguage).includes(arg.language)
 
     // optional
     && arg.msrp ? typeof(arg.msrp) === 'number' : true

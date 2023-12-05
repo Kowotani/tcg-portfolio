@@ -19,6 +19,7 @@ export declare function hasIHoldingKeys(arg: any): boolean;
 export declare function hasIPopulatedHoldingKeys(arg: any): boolean;
 export declare function hasIPopulatedPortfolioKeys(arg: any): boolean;
 export declare function hasIPortfolioBaseKeys(arg: any): boolean;
+export declare function hasIProductKeys(arg: any): boolean;
 export declare function hasIPortfolioKeys(arg: any): boolean;
 export declare function isDate(arg: any): arg is Date;
 export declare function isIDatedPriceData(arg: any): arg is IDatedPriceData;
