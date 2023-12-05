@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 var util_1 = require("util");
@@ -167,6 +167,48 @@ exports.sortFnDateDesc = sortFnDateDesc;
 // ===========
 /*
 DESC
+  Returns whether or not the input has all IPopulatedPortfolio keys
+INPUT
+  arg: An object that might be an IPopulatedPortfolio
+RETURN
+  TRUE if the input has all IPopulatedPortfolio keys, FALSE otherwise
+*/
+function hasIPopulatedPortfolioKeys(arg) {
+    return arg
+        && hasIPortfolioBaseKeys(arg)
+        && arg.populatedHoldings;
+}
+exports.hasIPopulatedPortfolioKeys = hasIPopulatedPortfolioKeys;
+/*
+DESC
+  Returns whether or not the input has all IPortfolioBase keys
+INPUT
+  arg: An object that might be an IPortfolioBase
+RETURN
+  TRUE if the input has all IPortfolioBase keys, FALSE otherwise
+*/
+function hasIPortfolioBaseKeys(arg) {
+    return arg
+        && arg.userId
+        && arg.portfolioName;
+}
+exports.hasIPortfolioBaseKeys = hasIPortfolioBaseKeys;
+/*
+DESC
+  Returns whether or not the input has all IPortfolio keys
+INPUT
+  arg: An object that might be an IPortfolio
+RETURN
+  TRUE if the input has all IPortfolio keys, FALSE otherwise
+*/
+function hasIPortfolioKeys(arg) {
+    return arg
+        && hasIPortfolioBaseKeys(arg)
+        && arg.holdings;
+}
+exports.hasIPortfolioKeys = hasIPortfolioKeys;
+/*
+DESC
   Returns whether or not the input is a Date
 INPUT
   arg: An object that might be a Date
@@ -252,9 +294,10 @@ RETURN
 */
 function isIPopulatedPortfolio(arg) {
     return arg
-        && arg.userId && typeof (arg.userId) === 'number'
-        && arg.portfolioName && typeof (arg.portfolioName) === 'string'
-        && arg.populatedHoldings && Array.isArray(arg.populatedHoldings)
+        && hasIPopulatedPortfolioKeys(arg)
+        && typeof (arg.userId) === 'number'
+        && typeof (arg.portfolioName) === 'string'
+        && Array.isArray(arg.populatedHoldings)
         && _.every(arg.populatedHoldings.map(function (el) {
             return isIPopulatedHolding(el);
         }));
@@ -286,9 +329,10 @@ RETURN
 */
 function isIPortfolio(arg) {
     return arg
-        && arg.userId && typeof (arg.userId) === 'number'
-        && arg.portfolioName && typeof (arg.portfolioName) === 'string'
-        && arg.holdings && Array.isArray(arg.holdings)
+        && hasIPortfolioKeys(arg)
+        && typeof (arg.userId) === 'number'
+        && typeof (arg.portfolioName) === 'string'
+        && Array.isArray(arg.holdings)
         && _.every(arg.holdings.map(function (el) {
             return isIHolding(el);
         }));

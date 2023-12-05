@@ -182,6 +182,48 @@ export function sortFnDateDesc(a: Date, b: Date): number {
 
 /*
 DESC
+  Returns whether or not the input has all IPopulatedPortfolio keys
+INPUT
+  arg: An object that might be an IPopulatedPortfolio 
+RETURN
+  TRUE if the input has all IPopulatedPortfolio keys, FALSE otherwise
+*/
+export function hasIPopulatedPortfolioKeys(arg: any): boolean {
+  return arg 
+    && hasIPortfolioBaseKeys(arg)
+    && arg.populatedHoldings
+}
+
+/*
+DESC
+  Returns whether or not the input has all IPortfolioBase keys
+INPUT
+  arg: An object that might be an IPortfolioBase
+RETURN
+  TRUE if the input has all IPortfolioBase keys, FALSE otherwise
+*/
+export function hasIPortfolioBaseKeys(arg: any): boolean {
+  return arg 
+    && arg.userId
+    && arg.portfolioName
+}
+
+/*
+DESC
+  Returns whether or not the input has all IPortfolio keys
+INPUT
+  arg: An object that might be an IPortfolio 
+RETURN
+  TRUE if the input has all IPortfolio keys, FALSE otherwise
+*/
+export function hasIPortfolioKeys(arg: any): boolean {
+  return arg 
+    && hasIPortfolioBaseKeys(arg)
+    && arg.holdings
+}
+
+/*
+DESC
   Returns whether or not the input is a Date
 INPUT
   arg: An object that might be a Date 
@@ -267,9 +309,10 @@ RETURN
 */
 export function isIPopulatedPortfolio(arg: any): arg is IPopulatedPortfolio {
   return arg
-    && arg.userId && typeof(arg.userId) === 'number'
-    && arg.portfolioName && typeof(arg.portfolioName) === 'string'
-    && arg.populatedHoldings && Array.isArray(arg.populatedHoldings)
+    && hasIPopulatedPortfolioKeys(arg)
+    && typeof(arg.userId) === 'number'
+    && typeof(arg.portfolioName) === 'string'
+    && Array.isArray(arg.populatedHoldings)
       && _.every(arg.populatedHoldings.map((el: any) => {
         return isIPopulatedHolding(el)
       }))
@@ -303,9 +346,10 @@ RETURN
 */
 export function isIPortfolio(arg: any): arg is IPortfolio {
   return arg
-    && arg.userId && typeof(arg.userId) === 'number'
-    && arg.portfolioName && typeof(arg.portfolioName) === 'string'
-    && arg.holdings && Array.isArray(arg.holdings)
+    && hasIPortfolioKeys(arg)
+    && typeof(arg.userId) === 'number'
+    && typeof(arg.portfolioName) === 'string'
+    && Array.isArray(arg.holdings)
       && _.every(arg.holdings.map((el: any) => {
         return isIHolding(el)
       }))
