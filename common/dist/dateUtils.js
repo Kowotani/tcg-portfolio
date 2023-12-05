@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getDaysBetween = exports.getClampedDate = exports.formatInTimeZone = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getDaysBetween = exports.getClientTimezone = exports.getClampedDate = exports.formatInTimeZone = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 var date_fns_tz_1 = require("date-fns-tz");
 var _ = require("lodash");
@@ -202,6 +202,16 @@ function getClampedDate(date, startDate, endDate) {
     });
 }
 exports.getClampedDate = getClampedDate;
+/*
+DESC
+  Returns the client's timezone (eg. America/Toronto)
+RETURN
+  The client's timezone
+*/
+function getClientTimezone() {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+exports.getClientTimezone = getClientTimezone;
 /*
 DESC
   Returns the number of calendar days between two dates

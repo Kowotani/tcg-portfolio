@@ -9,6 +9,7 @@ export declare function formatAsISO(date: Date): string;
 export declare function formatDateDiffAsYearsMonthsDays(startDate: Date, endDate: Date): string;
 export declare function formatInTimeZone(date: Date, dateFormat: string, timezone: string): string;
 export declare function getClampedDate(date: Date, startDate: Date, endDate: Date): Date;
+export declare function getClientTimezone(): string;
 export declare function getDaysBetween(startDate: Date, endDate: Date): number;
 export declare function isDateAfter(first: Date, second: Date, orEqual?: boolean): boolean;
 export declare function isDateBefore(first: Date, second: Date, orEqual?: boolean): boolean;

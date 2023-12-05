@@ -255,6 +255,16 @@ export function getClampedDate(
 
 /*
 DESC
+  Returns the client's timezone (eg. America/Toronto)
+RETURN
+  The client's timezone
+*/
+export function getClientTimezone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone
+}
+
+/*
+DESC
   Returns the number of calendar days between two dates
 INPUT
   startDate: The start date
