@@ -32,7 +32,7 @@ export function parsePortfoliosEndpointResponse(
 
     // parse populatedHoldings
     const holdings = portfolio.populatedHoldings.map((holding: any) => {
-      
+
       // parse product
       const product = {
         ...holding.product,
@@ -54,8 +54,7 @@ export function parsePortfoliosEndpointResponse(
     })
 
     return {
-      userId: portfolio.userId,
-      description: portfolio.description,
+      ...portfolio,
       populatedHoldings: holdings
     } as IPopulatedPortfolio
   }) 
