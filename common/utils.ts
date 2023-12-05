@@ -180,6 +180,52 @@ export function sortFnDateDesc(a: Date, b: Date): number {
 // type guards
 // ===========
 
+
+// ------------------
+// has interface keys
+// ------------------
+
+/*
+DESC
+  Returns whether or not the input has all IHoldingBase keys
+INPUT
+  arg: An object that might be an IHoldingBase
+RETURN
+  TRUE if the input has all IHoldingBase keys, FALSE otherwise
+*/
+export function hasIHoldingBaseKeys(arg: any): boolean {
+  return arg 
+    && arg.transactions
+}
+
+/*
+DESC
+  Returns whether or not the input has all IHolding keys
+INPUT
+  arg: An object that might be an IHolding 
+RETURN
+  TRUE if the input has all IHolding keys, FALSE otherwise
+*/
+export function hasIHoldingKeys(arg: any): boolean {
+  return arg 
+    && hasIHoldingBaseKeys(arg)
+    && arg.tcgplayerId
+}
+
+/*
+DESC
+  Returns whether or not the input has all IPopulatedHolding keys
+INPUT
+  arg: An object that might be an IPopulatedHolding 
+RETURN
+  TRUE if the input has all IPopulatedHolding keys, FALSE otherwise
+*/
+export function hasIPopulatedHoldingKeys(arg: any): boolean {
+  return arg 
+    && hasIHoldingBaseKeys(arg)
+    && arg.product
+}
+
 /*
 DESC
   Returns whether or not the input has all IPopulatedPortfolio keys
@@ -222,6 +268,11 @@ export function hasIPortfolioKeys(arg: any): boolean {
     && arg.holdings
 }
 
+
+// ---------
+// is object
+// ---------
+
 /*
 DESC
   Returns whether or not the input is a Date
@@ -259,8 +310,9 @@ RETURN
 */
 export function isIHolding(arg: any): arg is IHolding {
   return arg
-    && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
-    && arg.transactions && Array.isArray(arg.transactions)
+    && hasIHoldingKeys(arg)
+    && typeof(arg.tcgplayerId) === 'number'
+    && Array.isArray(arg.transactions)
       && _.every(arg.transactions.map((el: any) => {
         return isITransaction(el)
       }))
@@ -292,8 +344,9 @@ RETURN
 */
 export function isIPopulatedHolding(arg: any): arg is IPopulatedHolding {
   return arg
-    && arg.product && isIProduct(arg.product)
-    && arg.transactions && Array.isArray(arg.transactions)
+    && hasIPopulatedHoldingKeys(arg)
+    && isIProduct(arg.product)
+    && Array.isArray(arg.transactions)
       && _.every(arg.transactions.map((el: any) => {
         return isITransaction(el)
       }))

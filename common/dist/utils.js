@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 var util_1 = require("util");
@@ -165,6 +165,50 @@ exports.sortFnDateDesc = sortFnDateDesc;
 // ===========
 // type guards
 // ===========
+// ------------------
+// has interface keys
+// ------------------
+/*
+DESC
+  Returns whether or not the input has all IHoldingBase keys
+INPUT
+  arg: An object that might be an IHoldingBase
+RETURN
+  TRUE if the input has all IHoldingBase keys, FALSE otherwise
+*/
+function hasIHoldingBaseKeys(arg) {
+    return arg
+        && arg.transactions;
+}
+exports.hasIHoldingBaseKeys = hasIHoldingBaseKeys;
+/*
+DESC
+  Returns whether or not the input has all IHolding keys
+INPUT
+  arg: An object that might be an IHolding
+RETURN
+  TRUE if the input has all IHolding keys, FALSE otherwise
+*/
+function hasIHoldingKeys(arg) {
+    return arg
+        && hasIHoldingBaseKeys(arg)
+        && arg.tcgplayerId;
+}
+exports.hasIHoldingKeys = hasIHoldingKeys;
+/*
+DESC
+  Returns whether or not the input has all IPopulatedHolding keys
+INPUT
+  arg: An object that might be an IPopulatedHolding
+RETURN
+  TRUE if the input has all IPopulatedHolding keys, FALSE otherwise
+*/
+function hasIPopulatedHoldingKeys(arg) {
+    return arg
+        && hasIHoldingBaseKeys(arg)
+        && arg.product;
+}
+exports.hasIPopulatedHoldingKeys = hasIPopulatedHoldingKeys;
 /*
 DESC
   Returns whether or not the input has all IPopulatedPortfolio keys
@@ -207,6 +251,9 @@ function hasIPortfolioKeys(arg) {
         && arg.holdings;
 }
 exports.hasIPortfolioKeys = hasIPortfolioKeys;
+// ---------
+// is object
+// ---------
 /*
 DESC
   Returns whether or not the input is a Date
@@ -244,8 +291,9 @@ RETURN
 */
 function isIHolding(arg) {
     return arg
-        && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
-        && arg.transactions && Array.isArray(arg.transactions)
+        && hasIHoldingKeys(arg)
+        && typeof (arg.tcgplayerId) === 'number'
+        && Array.isArray(arg.transactions)
         && _.every(arg.transactions.map(function (el) {
             return isITransaction(el);
         }));
@@ -277,8 +325,9 @@ RETURN
 */
 function isIPopulatedHolding(arg) {
     return arg
-        && arg.product && isIProduct(arg.product)
-        && arg.transactions && Array.isArray(arg.transactions)
+        && hasIPopulatedHoldingKeys(arg)
+        && isIProduct(arg.product)
+        && Array.isArray(arg.transactions)
         && _.every(arg.transactions.map(function (el) {
             return isITransaction(el);
         }));
