@@ -15,9 +15,7 @@ import {
 
   PORTFOLIOS_URL,
 
-  getAggPortfolioMarketValue, getAggPortfolioTotalCost, getPortfolioNames,
-
-  assert, isIPopulatedPortfolioArray
+  getAggPortfolioMarketValue, getAggPortfolioTotalCost, getPortfolioNames
 } from 'common'
 import { FiPlus } from 'react-icons/fi'
 import { PortfolioCard } from './PortfolioCard'
@@ -33,6 +31,7 @@ import {
 } from '../utils/Price'
 import { ISideBarNavContext, SideBarNav } from '../utils/SideBar' 
 import { IUserContext } from '../utils/User'
+import { parsePortfoliosEndpointResponse } from '../utils/api'
 
 
 type TAllPortfoliosProps = {
@@ -169,8 +168,7 @@ export const AllPortfolios = (
       }
     })
     .then(res => {
-      const portfolios = res.data.data
-      assert(isIPopulatedPortfolioArray(portfolios))
+      const portfolios = parsePortfoliosEndpointResponse(res.data.data)
       setPortfolios(portfolios)
     })
     .catch(err => {

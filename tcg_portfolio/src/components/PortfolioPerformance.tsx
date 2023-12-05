@@ -159,10 +159,12 @@ export const PortfolioPerformance = (
       // error
       } else {
         const errMsg = `Error fetching from PORTFOLIO_HOLDINGS_PERFORMANCE_URL: ${resData.message}`
+        console.log(errMsg)
       }
     })
     .catch(err => {
       const errMsg = `Error fetching from PORTFOLIO_HOLDINGS_PERFORMANCE_URL: ${err.message}`
+      console.log(errMsg)
     })
   }, [user, props.portfolio])
 
@@ -192,10 +194,12 @@ export const PortfolioPerformance = (
       // error
       } else {
         const errMsg = `Error fetching from PORTFOLIO_PERFORMANCE_URL: ${resData.message}`
+        console.log(errMsg)
       }
     })
     .catch(err => {
       const errMsg = `Error fetching from PORTFOLIO_PERFORMANCE_URL: ${err.message}`
+      console.log(errMsg)
     })
   }, [user, props.portfolio])
 
