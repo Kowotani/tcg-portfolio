@@ -100,7 +100,7 @@ const AddTransactionForm = (
     let error
     if (!value) {
       return 'Price is required'
-    } else if (!_.isNumber(value)) {
+    } else if (!_.isFinite(Number(value))) {
       return 'Not a number'
     } 
     const numberValue = Number(value)
