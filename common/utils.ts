@@ -187,6 +187,20 @@ export function sortFnDateDesc(a: Date, b: Date): number {
 
 /*
 DESC
+  Returns whether or not the input has all IDatedPriceData keys
+INPUT
+  arg: An object that might be an IDatedPriceData
+RETURN
+  TRUE if the input has all IDatedPriceData keys, FALSE otherwise
+*/
+export function hasIDatedPriceDataKeys(arg: any): boolean {
+  return arg 
+    && arg.priceDate 
+    && arg.prices
+}
+
+/*
+DESC
   Returns whether or not the input has all IHoldingBase keys
 INPUT
   arg: An object that might be an IHoldingBase
@@ -330,8 +344,9 @@ RETURN
 */
 export function isIDatedPriceData(arg: any): arg is IDatedPriceData {
   return arg
-    && arg.priceDate && isDate(arg.priceDate)
-    && arg.prices && isIPriceData(arg.prices)
+    && hasIDatedPriceDataKeys(arg)
+    && isDate(arg.priceDate)
+    && isIPriceData(arg.prices)
 }
 
 /*

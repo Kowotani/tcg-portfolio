@@ -14,6 +14,7 @@ export declare function logObject(arg: Object): void;
 export declare function sleep(ms: number): Promise<any>;
 export declare function sortFnDateAsc(a: Date, b: Date): number;
 export declare function sortFnDateDesc(a: Date, b: Date): number;
+export declare function hasIDatedPriceDataKeys(arg: any): boolean;
 export declare function hasIHoldingBaseKeys(arg: any): boolean;
 export declare function hasIHoldingKeys(arg: any): boolean;
 export declare function hasIPopulatedHoldingKeys(arg: any): boolean;

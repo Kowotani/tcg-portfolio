@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.hasIPortfolioKeys = exports.hasITransactionKeys = exports.hasIProductKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.hasIPortfolioKeys = exports.hasITransactionKeys = exports.hasIProductKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.hasIDatedPriceDataKeys = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 var util_1 = require("util");
@@ -170,6 +170,20 @@ exports.sortFnDateDesc = sortFnDateDesc;
 // ------------------
 /*
 DESC
+  Returns whether or not the input has all IDatedPriceData keys
+INPUT
+  arg: An object that might be an IDatedPriceData
+RETURN
+  TRUE if the input has all IDatedPriceData keys, FALSE otherwise
+*/
+function hasIDatedPriceDataKeys(arg) {
+    return arg
+        && arg.priceDate
+        && arg.prices;
+}
+exports.hasIDatedPriceDataKeys = hasIDatedPriceDataKeys;
+/*
+DESC
   Returns whether or not the input has all IHoldingBase keys
 INPUT
   arg: An object that might be an IHoldingBase
@@ -311,8 +325,9 @@ RETURN
 */
 function isIDatedPriceData(arg) {
     return arg
-        && arg.priceDate && isDate(arg.priceDate)
-        && arg.prices && isIPriceData(arg.prices);
+        && hasIDatedPriceDataKeys(arg)
+        && isDate(arg.priceDate)
+        && isIPriceData(arg.prices);
 }
 exports.isIDatedPriceData = isIDatedPriceData;
 /*
