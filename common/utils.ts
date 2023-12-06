@@ -323,19 +323,6 @@ export function hasIPortfolioKeys(arg: any): boolean {
 
 /*
 DESC
-  Returns whether or not the input is a Date
-INPUT
-  arg: An object that might be a Date 
-RETURN
-  TRUE if the input is a Date, FALSE otherwise
-*/
-export function isDate(arg: any): arg is Date {
-  return arg
-    && !Number.isNaN(Date.parse(arg))
-}
-
-/*
-DESC
   Returns whether or not the input is an IDatedPriceData
 INPUT
   arg: An object that might be an IDatedPriceData 
@@ -345,7 +332,7 @@ RETURN
 export function isIDatedPriceData(arg: any): arg is IDatedPriceData {
   return arg
     && hasIDatedPriceDataKeys(arg)
-    && isDate(arg.priceDate)
+    && _.isDate(arg.priceDate)
     && isIPriceData(arg.prices)
 }
 
@@ -483,7 +470,7 @@ RETURN
 */
 export function isIPrice(arg: any): arg is IPrice {
   return arg
-    && arg.priceDate && isDate(arg.priceData)
+    && arg.priceDate && _.isDate(arg.priceData)
     && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
     && arg.granularity && typeof(arg.granularity) === 'string'
     && arg.prices && isIPriceData(arg.prices)
@@ -557,7 +544,7 @@ export function isIProduct(arg: any): arg is IProduct {
     && hasIProductKeys(arg)
     && typeof(arg.tcgplayerId) === 'number'
     && _.values(TCG).includes(arg.tcg)
-    && isDate(arg.releaseDate)
+    && _.isDate(arg.releaseDate)
     && typeof(arg.name) === 'string'
     && _.values(ProductType).includes(arg.type)
     && _.values(ProductLanguage).includes(arg.language)
@@ -580,7 +567,7 @@ export function isITransaction(arg: any): arg is ITransaction {
   return arg
     && hasITransactionKeys(arg)
     && _.values(TransactionType).includes(arg.type)
-    && isDate(arg.date)
+    && _.isDate(arg.date)
     && typeof(arg.price) === 'number'
     && typeof(arg.quantity) === 'number'
 }

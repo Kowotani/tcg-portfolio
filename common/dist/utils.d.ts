@@ -23,7 +23,6 @@ export declare function hasIPortfolioBaseKeys(arg: any): boolean;
 export declare function hasIProductKeys(arg: any): boolean;
 export declare function hasITransactionKeys(arg: any): boolean;
 export declare function hasIPortfolioKeys(arg: any): boolean;
-export declare function isDate(arg: any): arg is Date;
 export declare function isIDatedPriceData(arg: any): arg is IDatedPriceData;
 export declare function isIHolding(arg: any): arg is IHolding;
 export declare function isIHoldingArray(arg: any): arg is IHolding[];

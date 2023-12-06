@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.isDate = exports.hasIPortfolioKeys = exports.hasITransactionKeys = exports.hasIProductKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.hasIDatedPriceDataKeys = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = exports.isITransactionArray = exports.isITransaction = exports.isIProduct = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.isIDatedPriceData = exports.hasIPortfolioKeys = exports.hasITransactionKeys = exports.hasIProductKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.hasIDatedPriceDataKeys = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isNumeric = exports.isASCII = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 var util_1 = require("util");
@@ -304,19 +304,6 @@ exports.hasIPortfolioKeys = hasIPortfolioKeys;
 // ---------
 /*
 DESC
-  Returns whether or not the input is a Date
-INPUT
-  arg: An object that might be a Date
-RETURN
-  TRUE if the input is a Date, FALSE otherwise
-*/
-function isDate(arg) {
-    return arg
-        && !Number.isNaN(Date.parse(arg));
-}
-exports.isDate = isDate;
-/*
-DESC
   Returns whether or not the input is an IDatedPriceData
 INPUT
   arg: An object that might be an IDatedPriceData
@@ -326,7 +313,7 @@ RETURN
 function isIDatedPriceData(arg) {
     return arg
         && hasIDatedPriceDataKeys(arg)
-        && isDate(arg.priceDate)
+        && _.isDate(arg.priceDate)
         && isIPriceData(arg.prices);
 }
 exports.isIDatedPriceData = isIDatedPriceData;
@@ -462,7 +449,7 @@ RETURN
 */
 function isIPrice(arg) {
     return arg
-        && arg.priceDate && isDate(arg.priceData)
+        && arg.priceDate && _.isDate(arg.priceData)
         && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
         && arg.granularity && typeof (arg.granularity) === 'string'
         && arg.prices && isIPriceData(arg.prices);
@@ -535,7 +522,7 @@ function isIProduct(arg) {
         && hasIProductKeys(arg)
         && typeof (arg.tcgplayerId) === 'number'
         && _.values(dataModels_1.TCG).includes(arg.tcg)
-        && isDate(arg.releaseDate)
+        && _.isDate(arg.releaseDate)
         && typeof (arg.name) === 'string'
         && _.values(dataModels_1.ProductType).includes(arg.type)
         && _.values(dataModels_1.ProductLanguage).includes(arg.language)
@@ -557,7 +544,7 @@ function isITransaction(arg) {
     return arg
         && hasITransactionKeys(arg)
         && _.values(dataModels_1.TransactionType).includes(arg.type)
-        && isDate(arg.date)
+        && _.isDate(arg.date)
         && typeof (arg.price) === 'number'
         && typeof (arg.quantity) === 'number';
 }
