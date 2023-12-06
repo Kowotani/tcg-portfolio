@@ -11,19 +11,17 @@ import { AllPortfolios } from './AllPortfolios'
 import { 
   IPopulatedPortfolio,
 
-  LATEST_PRICES_URL,
-
-  assert
+  LATEST_PRICES_URL
 } from 'common'
 import { EditPortfolioForm } from './EditPortfolioForm'
 import { PortfolioPerformance } from './PortfolioPerformance'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { UserContext } from '../state/UserContext'
+import { parseLatestPricesEndpointResponse } from '../utils/api'
 import { PortfolioPanelNav } from '../utils/PortfolioPanel'
-import { 
-  ILatestPricesContext, getPriceMapFromPriceAPIResponse
-} from '../utils/Price'
+import { ILatestPricesContext } from '../utils/Price'
 import { IUserContext } from '../utils/User'
+
 
 
 export const PortfolioPanelManager = () => {
@@ -152,13 +150,8 @@ export const PortfolioPanelManager = () => {
       // success
       if (res.status === 200) {
 
-        // data check
-        const data = resData.data
-        assert(
-          typeof(data) === 'object',
-          'Unexepcted data type in response body of LATEST_PRICES_URL')
-        
-        const priceMap = getPriceMapFromPriceAPIResponse(data)
+        // parse response
+        const priceMap = parseLatestPricesEndpointResponse(res.data.data)
         setLatestPrices(priceMap)
     
       // error

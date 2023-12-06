@@ -3,15 +3,16 @@ import {
   IPopulatedHolding, IPopulatedPortfolio, IProduct, ITransaction, 
 
   // type guards
-  hasIPopulatedHoldingKeys, hasIPopulatedPortfolioKeys, hasIProductKeys, 
-  hasITransactionKeys, 
+  hasIDatedPriceDataKeys, hasIPopulatedHoldingKeys, hasIPopulatedPortfolioKeys, 
+  hasIProductKeys, hasITransactionKeys, 
   
-  isIPopulatedHolding, isIPopulatedPortfolio, isIPopulatedPortfolioArray, 
-  isIProduct, isITransaction,
+  isIDatedPriceData, isIPopulatedHolding, isIPopulatedPortfolio, 
+  isIPopulatedPortfolioArray, isIProduct, isITransaction,
 
   // generic
-  assert, getLocalDateFromISOString
+  assert, getLocalDateFromISOString, IDatedPriceData
 } from 'common'
+import * as _ from 'lodash'
 
 
 // ========
@@ -19,11 +20,50 @@ import {
 // ========
 
 /*
+EDNPOINT
+  GET:LATEST_PRICES_URL
 DESC
-  Parses the input response object from PORTFOLIOS_URL and returns an
+  Parses the input response object from the endpoint and returns a 
+  Map<number, IDatedPriceData>
+INPUT
+  responresponse: The response corresponding to the return value
+RETURN
+  A map of tcgplayerId => IDatedPriceData
+*/
+export function parseLatestPricesEndpointResponse(
+  response: any[]
+): Map<number, IDatedPriceData> {
+
+  const priceMap = new Map<number, IDatedPriceData>()
+
+  Object.keys(response).forEach((key: any) => {
+
+    // tcgplayerId check
+    const tcgplayerId = Number(key)
+    assert(
+      _.isNumber(tcgplayerId), 
+      'Key is not a number')
+
+    // parse datedPriceData
+    const datedPriceData = parseDatedPriceDataJSON(response[tcgplayerId])
+    assert(
+      isIDatedPriceData(datedPriceData),
+      'Value is not an IDatedPriceData'
+    )
+    
+    priceMap.set(tcgplayerId, datedPriceData)
+  })
+  return priceMap
+}
+
+/*
+ENDPOINT
+  GET:PORTFOLIOS_URL
+DESC
+  Parses the input response object from the endpoint and returns an
   IPopulatedPortfolio[]
 INPUT
-  portfolios: The response corresponding to an IPopulatedPortfolio[]
+  response: The response corresponding to the return value
 RETURN
   An IPopulatedPortfolio[]
 */
@@ -98,6 +138,34 @@ function parsePopulatedPortfolioJSON(json: any): IPopulatedPortfolio {
 
   }
   assert(isIPopulatedPortfolio(obj), 'Object is not an IPopulatedPortfolio')
+  return obj
+}
+
+
+// =====
+// price
+// =====
+
+/*
+  DESC
+    Returns an IDatedPriceData after parsing the input json
+  INPUT
+    json: A JSON representation of an IDatedPriceData
+  RETURN
+    An IDatedPriceData
+*/
+function parseDatedPriceDataJSON(json: any): IDatedPriceData {
+
+  // verify keys exist
+  assert(hasIDatedPriceDataKeys(json), 
+    'JSON is not IDatedPriceData shaped')
+
+  // parse json
+  const obj = {
+    ...json,
+    priceDate: getLocalDateFromISOString(json.priceDate)
+  }
+  assert(isIDatedPriceData(obj), 'Object is not an IDatedPriceData')
   return obj
 }
 
