@@ -4,7 +4,7 @@ import {
   eachWeekOfInterval, eachYearOfInterval, isAfter, isBefore, isEqual, 
   startOfToday, sub
 } from 'date-fns'
-import { format, utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz'
+import { format, utcToZonedTime } from 'date-fns-tz'
 import * as _ from 'lodash'
 import { assert } from './utils'
 
