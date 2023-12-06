@@ -4,6 +4,7 @@ exports.getHoldingUnrealizedPnl = exports.getHoldingTotalRevenue = exports.getHo
 var dateUtils_1 = require("./dateUtils");
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
+var typeguards_1 = require("./typeguards");
 var utils_1 = require("./utils");
 // ==========
 // converters
@@ -64,7 +65,7 @@ RETURN
   The Holding's tcgplayerId
 */
 function getHoldingTcgplayerId(holding) {
-    return (0, utils_1.isIHolding)(holding)
+    return (0, typeguards_1.isIHolding)(holding)
         ? holding.tcgplayerId
         : holding.product.tcgplayerId;
 }

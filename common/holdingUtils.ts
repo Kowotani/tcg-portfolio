@@ -3,7 +3,8 @@ import {
   IHolding, IPopulatedHolding, ITransaction, TransactionType 
 } from './dataModels'
 import * as _ from 'lodash'
-import { assert, isIHolding } from './utils'
+import { isIHolding } from './typeguards'
+import { assert } from './utils'
 
 
 // ==========

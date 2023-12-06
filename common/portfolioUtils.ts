@@ -3,13 +3,14 @@ import {
   IHolding, IPopulatedHolding, IPortfolio, IPortfolioBase, IPopulatedPortfolio, 
   IPriceData
 } from './dataModels'
-import { assert, isIHolding, isIPopulatedPortfolio, isIPortfolio } from './utils'
 import { 
   getHoldingFirstTransactionDate, getHoldingMarketValue,
   getHoldingPurchaseQuantity, getHoldingRealizedPnl, getHoldingSaleQuantity, 
   getHoldingTotalCost, getHoldingTotalRevenue, getHoldingUnrealizedPnl,
   getIHoldingsFromIPopulatedHoldings
 } from './holdingUtils'
+import { isIHolding, isIPopulatedPortfolio, isIPortfolio } from './typeguards'
+import { assert } from './utils'
 
 
 // ==========
