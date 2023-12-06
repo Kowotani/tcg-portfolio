@@ -86,18 +86,6 @@ export function isASCII(value: string): boolean {
 
 /*
 DESC
-  Returns whether the input is a number
-INPUT
-  A value to check
-RETURN
-  TRUE if the input is a number, FALSE otherwise
-*/
-export function isNumeric(value: any): boolean {
-  return !isNaN(value);
-}
-
-/*
-DESC
   Returns whether the input is a valid price string
   The expected unescaped regex format is:
     ^\$\d+\.\d{2}$

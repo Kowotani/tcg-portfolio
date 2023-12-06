@@ -14,7 +14,7 @@ import {
   IProduct, ProductLanguage, ProductType, ProductSubtype, TCG, 
   TCGToProductType, 
   
-  getProductSubtypes, isASCII, isNumeric,
+  getProductSubtypes, isASCII,
 
   PostLatestPriceStatus, PostPriceStatus, PostProductStatus, 
   TPostLatestPriceReqBody, TPostPriceReqBody, TPostProductReqBody, 
@@ -23,6 +23,7 @@ import {
 } from 'common'
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField'
+import * as _ from 'lodash'
 import { SideBarNavContext } from '../state/SideBarNavContext'
 import { isHttpUrl } from '../utils/generic'
 import { ISideBarNavContext, SideBarNav } from '../utils/SideBar'
@@ -494,7 +495,7 @@ export const AddProductForm = () => {
       })
 
     // numeric format
-    } else if (!isNumeric(Number(input))) {
+    } else if (!_.isNumber(Number(input))) {
       setMsrpState({
         msrp: undefined, 
         isInvalid: true, 

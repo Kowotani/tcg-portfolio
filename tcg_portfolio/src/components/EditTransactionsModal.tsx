@@ -35,16 +35,17 @@ import {
   getHoldingAverageRevenue, getHoldingPurchaseQuantity, getHoldingSaleQuantity, 
   getHoldingTotalCost, getHoldingTotalRevenue,
 
-  assert, isNumeric
+  assert
 } from 'common'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
+import * as _ from 'lodash'
+import { MetricSummary, TMetricSummaryItem 
+  } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
 import { FiPlus } from 'react-icons/fi'
 import { createColumnHelper } from '@tanstack/react-table'
-import { MetricSummary, TMetricSummaryItem 
-  } from './MetricSummary'
 import { TransactionTable } from './TransactionTable'
 import { hasNonNegativeQuantity } from '../utils/Holding'
 import { formatAsPrice } from '../utils/Price'
@@ -99,7 +100,7 @@ const AddTransactionForm = (
     let error
     if (!value) {
       return 'Price is required'
-    } else if (!isNumeric(value)) {
+    } else if (!_.isNumber(value)) {
       return 'Not a number'
     } 
     const numberValue = Number(value)
