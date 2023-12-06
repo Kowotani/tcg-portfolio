@@ -26,12 +26,13 @@ import { LatestPricesContext } from '../state/LatestPricesContext'
 import { SideBarNavContext } from '../state/SideBarNavContext'
 import { UserContext } from '../state/UserContext'
 import { CascadingSlideFade } from './Transitions'
+import { parsePortfoliosEndpointResponse } from '../utils/api'
 import { 
   ILatestPricesContext, getIPriceDataMapFromIDatedPriceDataMap 
 } from '../utils/Price'
 import { ISideBarNavContext, SideBarNav } from '../utils/SideBar' 
 import { IUserContext } from '../utils/User'
-import { parsePortfoliosEndpointResponse } from '../utils/api'
+
 
 
 type TAllPortfoliosProps = {
@@ -72,19 +73,6 @@ export const AllPortfolios = (
     })
     setPortfolios(newPortfolios)
   }
-
-  // /*
-  // DESC
-  //   Sets
-  // INPUT
-  //   portfolio: An IPopulatedPortfolio
-  // */
-  // function onEditClick(portfolio: IPopulatedPortfolio): void {
-  //   props.onEditClick(
-  //     portfolio,
-  //     getPortfolioNames(portfolios)
-  //   )
-  // }
 
 
   // ===============
@@ -168,6 +156,7 @@ export const AllPortfolios = (
       }
     })
     .then(res => {
+      // parse response
       const portfolios = parsePortfoliosEndpointResponse(res.data.data)
       setPortfolios(portfolios)
     })
