@@ -1,16 +1,14 @@
 import {
   ChakraProvider,
-  Box,
-  Link,
-  VStack,
+  Flex,
   theme,
-} from "@chakra-ui/react"
-import { ColorModeSwitcher } from "./ColorModeSwitcher"
-import { Logo } from "./Logo"
-import { SideBar } from "./components/SideBar"
-import { LatestPricesProvider } from "./state/LatestPricesContext"
-import { SideBarNavProvider } from "./state/SideBarNavContext"
-import { UserProvider } from "./state/UserContext"
+} from '@chakra-ui/react'
+import { Logo } from './Logo'
+import { Header } from './components/Header'
+import { SideBar } from './components/SideBar'
+import { LatestPricesProvider } from './state/LatestPricesContext'
+import { SideBarNavProvider } from './state/SideBarNavContext'
+import { UserProvider } from './state/UserContext'
 
 
 // ========
@@ -22,23 +20,14 @@ export const App = () => (
     <LatestPricesProvider>
       <SideBarNavProvider>
         <UserProvider>
-      
-          <Box textAlign="center" fontSize="xl">
-            <ColorModeSwitcher justifySelf="flex-end" />
+  
+          <>
+            <Header />
             <SideBar />
-            <VStack spacing={8}>
-              <Logo h="40vmin" pointerEvents="none" />
-              <Link
-                color="teal.500"
-                href="https://chakra-ui.com"
-                fontSize="2xl"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-              Learn Chakra
-            </Link>
-            </VStack>
-          </Box>
+            <Flex justify='center'>
+              <Logo h='30vmin' />
+            </Flex>
+          </>
           
         </UserProvider>
       </SideBarNavProvider>
