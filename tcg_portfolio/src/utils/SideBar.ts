@@ -24,7 +24,7 @@ export const SideBarNav = {
   } as ISideBarNav,
   ADD_PRODUCT: {
     order: 4,
-    name: 'Add Product',
+    name: 'Add',
     authorizedRoles: [UserType.Admin]
   } as ISideBarNav
 }
