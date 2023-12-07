@@ -4,17 +4,23 @@ import {
 } from '@chakra-ui/react'
 
 
+// ==========
+// components
+// ==========
+
 type TSectionHeaderProps = {
   header: string
 }
 export const SectionHeader = (
   props: PropsWithChildren<TSectionHeaderProps>
 ) => {
+
   return (
     <Box 
       bg='teal.500' 
-      color='white' 
-      fontWeight='medium' 
+      color='white'
+      textAlign='center'
+      fontWeight='bold' 
       p='8px'
       m='16px 0px'
     >
