@@ -96,6 +96,20 @@ export function getColorForNumber(
 
 /*
 DESC
+  Get the appropriate color to style text based on the app colorMode
+INPUT
+  colorMode: Either light or dark
+RETURN
+  The Chakra color to style the text
+*/
+export function getColorForText(
+  colorMode: 'light' | 'dark'
+): 'black' | 'white' {
+  return colorMode === 'light' ? 'black' : 'white'
+}
+
+/*
+DESC
   Check if the input is a valid HTTP URL
 INPUT
   input: a string that may be a URL
