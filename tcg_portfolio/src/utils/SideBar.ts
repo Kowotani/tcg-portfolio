@@ -8,22 +8,22 @@ import { UserType } from './User'
 // SideBarNav
 export const SideBarNav = {
   HOME: {
-    order: 1,
+    order: 0,
     name: 'Home',
     authorizedRoles: [UserType.Admin, UserType.User]
   } as ISideBarNav,
   PORTFOLIO: {
-    order: 2, 
+    order: 1, 
     name: 'Portfolio',
     authorizedRoles: [UserType.Admin, UserType.User]
   } as ISideBarNav,
   PRODUCT: {
-    order: 3,
+    order: 2,
     name: 'Product',
     authorizedRoles: [UserType.Admin, UserType.User]
   } as ISideBarNav,
   ADD_PRODUCT: {
-    order: 4,
+    order: 3,
     name: 'Add',
     authorizedRoles: [UserType.Admin]
   } as ISideBarNav

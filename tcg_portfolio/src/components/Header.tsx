@@ -1,9 +1,8 @@
-import { PropsWithChildren, useContext } from 'react'
-import {    
+import { useRef } from 'react'
+import {
   Flex,
-  Icon,
   IconButton,
-  Spacer,
+  Spacer
 } from '@chakra-ui/react'
 import { FaUser } from 'react-icons/fa'
 import { SiWasmer } from 'react-icons/si'
@@ -22,9 +21,9 @@ const UserPanel = () => {
       <IconButton 
         aria-label='User account' 
         icon={<FaUser />} 
-        variant='ghost'
+        fontSize={20}
         size='md'
-        fontSize='lg'
+        variant='ghost'
       />
       <ColorModeSwitcher />
     </Flex>
@@ -37,9 +36,22 @@ const UserPanel = () => {
 
 export const Header = () => {
 
+  const sideBarRef = useRef(null)
+
   return (
-    <Flex direction='row' align='center'>
-      <Icon as={SiWasmer} boxSize={10} margin={4}/>
+    <Flex 
+      align='center'  
+      height={14} 
+      justify='flex-end' 
+      borderBottom='1px solid'
+    >
+      <IconButton 
+        aria-label='Header menu'        
+        icon={<SiWasmer />} 
+        fontSize={40}
+        variant='ghost'
+        margin={2}
+      />
       <Spacer />
       <UserPanel />
     </Flex>
