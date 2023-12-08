@@ -90,7 +90,7 @@ const SideBarOverlay = (props: PropsWithChildren<TSideBarOverlay>) => {
   const backgroundColor = 
     colorMode === 'light'
       ? props.isExpanded
-        ? 'gray.50'
+        ? 'blue.50'
         : 'white'
       : props.isExpanded
         ? 'gray.700'
@@ -107,14 +107,15 @@ const SideBarOverlay = (props: PropsWithChildren<TSideBarOverlay>) => {
       position='absolute'
       onMouseEnter={props.expandOverlay}
       onMouseLeave={props.collapseOverlay}
-      transition='background-color 0.3s'
+      transition='all 0.3s'
       zIndex={1}
+      borderBottomRightRadius={14}
     >
       <Flex 
         align='flex-start'
         direction='column' 
         justify='flex-start' 
-      >
+      > 
         <NavButton 
           sideBarNav={SideBarNav.HOME}
           icon={<Icon as={FaHouse} boxSize={6}/>}
