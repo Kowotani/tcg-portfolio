@@ -7,7 +7,9 @@ import { Logo } from './Logo'
 import { Header } from './components/Header'
 import { SideBar } from './components/SideBar'
 import { LatestPricesProvider } from './state/LatestPricesContext'
+import { MobileModeProvider } from './state/MobileModeContext'
 import { SideBarNavProvider } from './state/SideBarNavContext'
+import { SideBarOverlayProvider } from './state/SideBarOverlayContext'
 import { UserProvider } from './state/UserContext'
 
 
@@ -16,21 +18,27 @@ import { UserProvider } from './state/UserContext'
 // ========
 
 export const App = () => (
+
   <ChakraProvider theme={theme}>
     <LatestPricesProvider>
-      <SideBarNavProvider>
-        <UserProvider>
-  
-          <>
-            <Header />
-            <SideBar />
-            <Flex justify='center'>
-              <Logo h='30vmin' />
-            </Flex>
-          </>
-          
-        </UserProvider>
-      </SideBarNavProvider>
+      <MobileModeProvider>
+        <SideBarNavProvider>
+          <SideBarOverlayProvider>
+            <UserProvider>
+    
+              <>
+                <Header />
+                <SideBar />
+                <Flex justify='center'>
+                  <Logo h='30vmin' />
+                </Flex>
+              </>
+              
+            </UserProvider>
+          </SideBarOverlayProvider>
+        </SideBarNavProvider>
+      </MobileModeProvider>
     </LatestPricesProvider>
   </ChakraProvider>
+  
 )
