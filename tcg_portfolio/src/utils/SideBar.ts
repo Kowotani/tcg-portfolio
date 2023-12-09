@@ -46,3 +46,15 @@ export interface ISideBarNavContext {
   sideBarNav: ISideBarNav,
   setSideBarNav: React.Dispatch<React.SetStateAction<ISideBarNav>>
 }
+
+// SideBarOverlay
+export interface ISideBarOverlay {
+  isExpanded: boolean,
+  isOpen: boolean
+}
+
+// SideBarOverlayContext
+export interface ISideBarOverlayContext {
+  sideBarOverlay: ISideBarOverlay,
+  setSideBarOverlay: React.Dispatch<React.SetStateAction<ISideBarOverlay>>
+}
