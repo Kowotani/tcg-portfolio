@@ -1,5 +1,5 @@
 import { 
-  ReactNode, PropsWithChildren, useContext, useState
+  ReactNode, PropsWithChildren, useContext
 } from 'react'
 import {  
   Box,  
@@ -120,8 +120,7 @@ const NavButton = (props: PropsWithChildren<TNavButtonProps>) => {
 
 
 // -- SideBar Overlay
-type TSideBarOverlay = {}
-const SideBarOverlay = (props: PropsWithChildren<TSideBarOverlay>) => {
+const SideBarOverlay = () => {
 
 
   // =====
@@ -156,7 +155,6 @@ const SideBarOverlay = (props: PropsWithChildren<TSideBarOverlay>) => {
     <Box 
       backgroundColor={backgroundColor}
       borderBottomRightRadius={14}
-      hidden={mobileMode.isActive && !sideBarOverlay.isOpen}
       position='absolute'
       onMouseEnter={() => setSideBarOverlay({
         ...sideBarOverlay, 
@@ -264,12 +262,15 @@ export const SideBar = () => {
   // state
   // =====
 
+  const { mobileMode } = useContext(MobileModeContext) as IMobileModeContext
   const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
+  const { sideBarOverlay } = 
+    useContext(SideBarOverlayContext) as ISideBarOverlayContext
 
+  // overlay variables
+  const displayOverlay = !mobileMode.isActive 
+    || (mobileMode.isActive && sideBarOverlay.isOpen)
 
-  // ========
-  // function
-  // ========
 
   // ==============
   // main component
@@ -277,7 +278,7 @@ export const SideBar = () => {
 
   return (
     <>
-      <SideBarOverlay />
+      {displayOverlay && <SideBarOverlay />}
       <SideBarContent index={sideBarNav.order} />
     </>
   )
