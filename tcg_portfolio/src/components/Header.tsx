@@ -72,7 +72,6 @@ export const Header = () => {
   */
   function onLogoClick(): void {
     if (mobileMode.isActive) {
-      console.log('toggling isOpen')
       setSideBarOverlay({
         ...sideBarOverlay,
         isOpen: !sideBarOverlay.isOpen
@@ -85,6 +84,7 @@ export const Header = () => {
   // hooks
   // =====
 
+  // update mobile mode
   useEffect(() => {
     setMobileMode({
       ...mobileMode,
@@ -92,6 +92,15 @@ export const Header = () => {
     } as IMobileMode)
   }, [width, height])
 
+  // close overlay if entering mobile mode, open if entering desktop mode
+  useEffect(() => {
+      setSideBarOverlay({
+        ...sideBarOverlay,
+        isOpen: !mobileMode.isActive
+      })
+  }, [mobileMode.isActive])
+
+  
   return (
     <Flex 
       align='center'  
