@@ -244,9 +244,9 @@ export const AllPortfolios = (
                   <CascadingSlideFade
                     key={portfolio.portfolioName}
                     index={ix}
-                    initialDelay={0.1}
-                    delay={0.075}
                     duration={0.5}
+                    enterDelay={0.1}
+                    itemDelay={0.075}
                   >
                     <Box m='16px 0px'>
                       <PortfolioCard 

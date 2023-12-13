@@ -402,9 +402,9 @@ export const PortfolioPerformance = (
             <CascadingSlideFade
               key={holding.product.tcgplayerId}
               index={ix}
-              initialDelay={0.1}
-              delay={0.1}
               duration={0.5}
+              enterDelay={0.1}
+              itemDelay={0.1}
             >
               <Box m='16px 0px'>
                 <HoldingPerfCard
