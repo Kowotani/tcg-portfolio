@@ -130,6 +130,7 @@ const SideBarOverlay = () => {
   // =====
 
   const { colorMode } = useColorMode()
+  const { mobileMode } = useContext(MobileModeContext) as IMobileModeContext
   const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
   const { sideBarOverlay, setSideBarOverlay } = 
     useContext(SideBarOverlayContext) as ISideBarOverlayContext
@@ -138,6 +139,31 @@ const SideBarOverlay = () => {
   // =========
   // functions
   // =========
+
+  //  Handle onMouseEnter event for overlay
+  function handleMouseEnter(): void {
+    if (!mobileMode.isActive) {
+      setSideBarOverlay({
+        ...sideBarOverlay, 
+        isExpanded: true
+      })
+    }
+  }
+
+  // Handle onMouseEnter event for overlay
+  function handleMouseLeave(): void {
+    if (!mobileMode.isActive) {
+      setSideBarOverlay({
+        ...sideBarOverlay, 
+        isExpanded: false
+      })
+    }
+  }
+
+
+  // =======
+  // generic
+  // =======
 
   // overlay variables
   const backgroundColor = 
@@ -167,14 +193,8 @@ const SideBarOverlay = () => {
         backgroundColor={backgroundColor}
         borderBottomRightRadius={14}
         position='absolute'
-        onMouseEnter={() => setSideBarOverlay({
-          ...sideBarOverlay, 
-          isExpanded: true
-        })}
-        onMouseLeave={() => setSideBarOverlay({
-          ...sideBarOverlay, 
-          isExpanded: false
-        })}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         ref={nodeRef}
         transition={`all ${TRANSITION_DURATION}ms`}
         zIndex={1}
