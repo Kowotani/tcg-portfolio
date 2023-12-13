@@ -1,0 +1,24 @@
+:root {
+  --sideBarOverlayHeight: 224px;
+  --transitionDelay: 500ms;
+}
+
+/* SideBarOverlay */
+.sidebaroverlay-enter {
+  height: 0px;
+}
+.sidebaroverlay-enter-active {
+  --h: var(--sideBarOverlayHeight);
+  
+  height: 224px;
+  transition: all var(--transitionDelay) ease-in-out;
+}
+.sidebaroverlay-exit {
+  --h: var(--sideBarOverlayHeight);
+  
+  height: 224px;
+}
+.sidebaroverlay-exit-active {
+  height: 0px;
+  transition: all var(--transitionDelay) ease-in-out;
+}

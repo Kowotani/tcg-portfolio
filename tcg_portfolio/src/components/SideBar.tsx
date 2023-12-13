@@ -1,5 +1,5 @@
 import { 
-  ReactNode, PropsWithChildren, useContext
+  createRef, PropsWithChildren, ReactNode, useContext
 } from 'react'
 import {  
   Box,  
@@ -15,6 +15,7 @@ import {
 import { AddProductForm } from './AddProductForm'
 import { PortfolioPanelManager } from './PortfolioPanelManager'
 import { FaBox, FaFolderOpen, FaHouse, FaForward } from 'react-icons/fa6'
+import { CSSTransition } from 'react-transition-group'
 import { MobileModeContext } from '../state/MobileModeContext'
 import { SideBarNavContext } from '../state/SideBarNavContext'
 import { SideBarOverlayContext } from '../state/SideBarOverlayContext'
@@ -23,12 +24,14 @@ import {
   ISideBarNav, ISideBarNavContext, ISideBarOverlayContext, SideBarNav 
 } from '../utils/SideBar'
 
+import '../stylesheets/SideBar.css'
+
 
 // =========
 // constants
 // =========
 
-const TRANSITION_DURATION = '0.3s'
+const TRANSITION_DURATION = 500   // duration in ms
 
 
 // ==============
@@ -68,7 +71,6 @@ const NavButton = (props: PropsWithChildren<TNavButtonProps>) => {
 
   // overlay variables
   const backgroundColor = colorMode === 'light' ? 'blue.200' : 'blue.300'
-  const isExpanded = sideBarOverlay.isExpanded || mobileMode.isActive
 
 
   // =========
@@ -102,11 +104,11 @@ const NavButton = (props: PropsWithChildren<TNavButtonProps>) => {
       <Flex 
         align='center' 
         justify='flex-start'
-        width={isExpanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH}
-        transition={`width ${TRANSITION_DURATION}`}
+        width={sideBarOverlay.isExpanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH}
+        transition={`width ${TRANSITION_DURATION}ms`}
       > 
         {props.icon}
-        {isExpanded && (
+        {sideBarOverlay.isExpanded && (
           <>            
             <Text paddingLeft={2}>
               {props.sideBarNav.name}
@@ -128,7 +130,6 @@ const SideBarOverlay = () => {
   // =====
 
   const { colorMode } = useColorMode()
-  const { mobileMode } = useContext(MobileModeContext) as IMobileModeContext
   const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
   const { sideBarOverlay, setSideBarOverlay } = 
     useContext(SideBarOverlayContext) as ISideBarOverlayContext
@@ -139,61 +140,73 @@ const SideBarOverlay = () => {
   // =========
 
   // overlay variables
-  const isExpanded = sideBarOverlay.isExpanded || mobileMode.isActive
   const backgroundColor = 
     colorMode === 'light'
-      ? isExpanded ? 'blue.50' : 'white'
-      : isExpanded ? 'gray.700' : 'gray.800'
+      ? sideBarOverlay.isExpanded ? 'gray.100' : 'white'
+      : sideBarOverlay.isExpanded ? 'gray.700' : 'gray.800'
 
   
+  const nodeRef = createRef<any>()
+
 
   // ==============
   // main component
   // ==============
 
   return (
-    <Box 
-      backgroundColor={backgroundColor}
-      borderBottomRightRadius={14}
-      position='absolute'
-      onMouseEnter={() => setSideBarOverlay({
-        ...sideBarOverlay, 
-        isExpanded: true
-      })}
-      onMouseLeave={() => setSideBarOverlay({
-        ...sideBarOverlay, 
-        isExpanded: false
-      })}
-      transition={`all ${TRANSITION_DURATION}`}
-      zIndex={1}
+    <CSSTransition<any>
+      appear={true}
+      classNames={'sidebaroverlay'}
+      in={sideBarOverlay.isOpen}
+      mountOnEnter={true}
+      nodeRef={nodeRef}
+      timeout={TRANSITION_DURATION}
+      unmountOnExit={true}
     >
-      <Flex 
-        align='flex-start'
-        direction='column' 
-        justify='flex-start' 
-      > 
-        <NavButton 
-          sideBarNav={SideBarNav.HOME}
-          icon={<Icon as={FaHouse} boxSize={6}/>}
-          isActive={sideBarNav === SideBarNav.HOME}
-        />
-        <NavButton 
-          sideBarNav={SideBarNav.PORTFOLIO} 
-          icon={<Icon as={FaFolderOpen} boxSize={6}/>} 
-          isActive={sideBarNav === SideBarNav.PORTFOLIO}
-        />
-        <NavButton 
-          sideBarNav={SideBarNav.PRODUCT} 
-          icon={<Icon as={FaBox} boxSize={6}/>} 
-          isActive={sideBarNav === SideBarNav.PRODUCT}
-        />
-        <NavButton 
-          sideBarNav={SideBarNav.ADD_PRODUCT} 
-          icon={<Icon as={FaForward} boxSize={6}/>} 
-          isActive={sideBarNav === SideBarNav.ADD_PRODUCT}
-        />
-      </Flex>
-    </Box>
+      <Box 
+        backgroundColor={backgroundColor}
+        borderBottomRightRadius={14}
+        position='absolute'
+        onMouseEnter={() => setSideBarOverlay({
+          ...sideBarOverlay, 
+          isExpanded: true
+        })}
+        onMouseLeave={() => setSideBarOverlay({
+          ...sideBarOverlay, 
+          isExpanded: false
+        })}
+        ref={nodeRef}
+        transition={`all ${TRANSITION_DURATION}ms`}
+        zIndex={1}
+      >
+        <Flex 
+          align='flex-start'
+          direction='column' 
+          justify='flex-start' 
+        > 
+          <NavButton 
+            sideBarNav={SideBarNav.HOME}
+            icon={<Icon as={FaHouse} boxSize={6}/>}
+            isActive={sideBarNav === SideBarNav.HOME}
+          />
+          <NavButton 
+            sideBarNav={SideBarNav.PORTFOLIO} 
+            icon={<Icon as={FaFolderOpen} boxSize={6}/>} 
+            isActive={sideBarNav === SideBarNav.PORTFOLIO}
+          />
+          <NavButton 
+            sideBarNav={SideBarNav.PRODUCT} 
+            icon={<Icon as={FaBox} boxSize={6}/>} 
+            isActive={sideBarNav === SideBarNav.PRODUCT}
+          />
+          <NavButton 
+            sideBarNav={SideBarNav.ADD_PRODUCT} 
+            icon={<Icon as={FaForward} boxSize={6}/>} 
+            isActive={sideBarNav === SideBarNav.ADD_PRODUCT}
+          />
+        </Flex>
+      </Box>
+    </CSSTransition>
   )
 }
 
@@ -262,14 +275,7 @@ export const SideBar = () => {
   // state
   // =====
 
-  const { mobileMode } = useContext(MobileModeContext) as IMobileModeContext
   const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
-  const { sideBarOverlay } = 
-    useContext(SideBarOverlayContext) as ISideBarOverlayContext
-
-  // overlay variables
-  const displayOverlay = !mobileMode.isActive 
-    || (mobileMode.isActive && sideBarOverlay.isOpen)
 
 
   // ==============
@@ -278,7 +284,7 @@ export const SideBar = () => {
 
   return (
     <>
-      {displayOverlay && <SideBarOverlay />}
+      <SideBarOverlay />
       <SideBarContent index={sideBarNav.order} />
     </>
   )

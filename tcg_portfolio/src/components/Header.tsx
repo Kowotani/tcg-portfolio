@@ -73,7 +73,7 @@ export const Header = () => {
   function onLogoClick(): void {
     if (mobileMode.isActive) {
       setSideBarOverlay({
-        ...sideBarOverlay,
+        isExpanded: true,
         isOpen: !sideBarOverlay.isOpen
       })
     }
@@ -95,7 +95,7 @@ export const Header = () => {
   // close overlay if entering mobile mode, open if entering desktop mode
   useEffect(() => {
       setSideBarOverlay({
-        ...sideBarOverlay,
+        isExpanded: false,
         isOpen: !mobileMode.isActive
       })
   }, [mobileMode.isActive])
