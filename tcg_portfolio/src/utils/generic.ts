@@ -60,6 +60,34 @@ export function getBrowserLocale(): string {
   return browserLocales[0].trim()
 }
 
+/*
+DESC
+  Get the appropriate color to style backgrounds based on the app colorMode
+INPUT
+  colorMode: Either light or dark
+RETURN
+  The Chakra color to style the background
+*/
+export function getColorForBackground(
+  colorMode: 'light' | 'dark'
+): 'white' | 'gray.700' {
+  return colorMode === 'light' ? 'white' : 'gray.700'
+}
+
+/*
+DESC
+  Get the appropriate color to style backgrounds when hovered based on the 
+  app colorMode
+INPUT
+  colorMode: Either light or dark
+RETURN
+  The Chakra color to style the background when hovered
+*/
+export function getColorForBackgroundHover(
+  colorMode: 'light' | 'dark'
+): 'gray.200' | 'gray.600' {
+  return colorMode === 'light' ? 'gray.200' : 'gray.600'
+}
 
 /*
 DESC
