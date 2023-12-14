@@ -17,6 +17,8 @@ type TCascadingSlideFade = {
   exitDelay?: number,
   inState?: boolean,
   numItems?: number,
+  slideOffsetX?: number,
+  slideOffsetY?: number,
   transitionType?: 'in' | 'in-out',
 }
 export const CascadingSlideFade = (
@@ -29,11 +31,13 @@ export const CascadingSlideFade = (
     duration,
     index,
     itemDelay,
-    transitionType = 'in',
     enterDelay = 0,
     exitDelay = 0,
     inState = true,
-    numItems = 0
+    numItems = 0,
+    slideOffsetX = 0,
+    slideOffsetY = 8,   // chakra default
+    transitionType = 'in',
   } = props
 
   // create enter transition object
@@ -66,6 +70,8 @@ export const CascadingSlideFade = (
   return (
     <SlideFade
       in={inState}
+      offsetX={slideOffsetX}
+      offsetY={slideOffsetY}
       transition={transition}
     >
       {children}

@@ -1,5 +1,5 @@
 import { 
-  createRef, PropsWithChildren, ReactNode, useContext
+  createRef, PropsWithChildren, useContext
 } from 'react'
 import {  
   Box,  
@@ -14,15 +14,18 @@ import {
 } from '@chakra-ui/react'
 import { AddProductForm } from './AddProductForm'
 import { PortfolioPanelManager } from './PortfolioPanelManager'
+import { IconType } from 'react-icons'
 import { FaBox, FaFolderOpen, FaHouse, FaForward } from 'react-icons/fa6'
 import { CSSTransition } from 'react-transition-group'
 import { MobileModeContext } from '../state/MobileModeContext'
 import { SideBarNavContext } from '../state/SideBarNavContext'
 import { SideBarOverlayContext } from '../state/SideBarOverlayContext'
+import { CascadingSlideFade } from './Transitions'
 import { IMobileModeContext } from '../utils/mobile'
 import { 
   ISideBarNav, ISideBarNavContext, ISideBarOverlayContext, SideBarNav 
 } from '../utils/SideBar'
+
 
 import '../stylesheets/SideBar.css'
 
@@ -31,7 +34,8 @@ import '../stylesheets/SideBar.css'
 // constants
 // =========
 
-const TRANSITION_DURATION = 500   // duration in ms
+const EXIT_TRANSITION_DELAY = 300
+const TRANSITION_DURATION = 500
 
 
 // ==============
@@ -41,7 +45,7 @@ const TRANSITION_DURATION = 500   // duration in ms
 // -- Nav Button
 
 type TNavButtonProps = {
-  icon: ReactNode,
+  icon: IconType,
   isActive: boolean,
   sideBarNav: ISideBarNav,
 
@@ -63,7 +67,6 @@ const NavButton = (props: PropsWithChildren<TNavButtonProps>) => {
   // =====
 
   const { colorMode } = useColorMode()
-  const { mobileMode } = useContext(MobileModeContext) as IMobileModeContext
   const { setSideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
   const { sideBarOverlay } = 
     useContext(SideBarOverlayContext) as ISideBarOverlayContext
@@ -107,7 +110,7 @@ const NavButton = (props: PropsWithChildren<TNavButtonProps>) => {
         width={sideBarOverlay.isExpanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH}
         transition={`width ${TRANSITION_DURATION}ms`}
       > 
-        {props.icon}
+        <Icon as={props.icon} boxSize={6}/>
         {sideBarOverlay.isExpanded && (
           <>            
             <Text paddingLeft={2}>
@@ -171,7 +174,31 @@ const SideBarOverlay = () => {
       ? sideBarOverlay.isExpanded ? 'gray.100' : 'white'
       : sideBarOverlay.isExpanded ? 'gray.700' : 'gray.800'
 
-  
+  // -- NavButton Items
+  const navButtonItems: TNavButtonProps[] = [
+    {
+      sideBarNav: SideBarNav.HOME,
+      icon: FaHouse,
+      isActive: sideBarNav === SideBarNav.HOME
+    },
+    {
+      sideBarNav: SideBarNav.PORTFOLIO,
+      icon: FaFolderOpen,
+      isActive: sideBarNav === SideBarNav.PORTFOLIO
+    },
+    {
+      sideBarNav: SideBarNav.PRODUCT,
+      icon: FaBox,
+      isActive: sideBarNav === SideBarNav.PRODUCT
+    },
+    {
+      sideBarNav: SideBarNav.ADD_PRODUCT,
+      icon: FaForward,
+      isActive: sideBarNav === SideBarNav.ADD_PRODUCT
+    },
+  ]
+
+  // CSSTransition refs
   const nodeRef = createRef<any>()
 
 
@@ -186,7 +213,11 @@ const SideBarOverlay = () => {
       in={sideBarOverlay.isOpen}
       mountOnEnter={true}
       nodeRef={nodeRef}
-      timeout={TRANSITION_DURATION}
+      timeout={{
+        appear: TRANSITION_DURATION,
+        enter: TRANSITION_DURATION,
+        exit: TRANSITION_DURATION + EXIT_TRANSITION_DELAY
+      }}
       unmountOnExit={true}
     >
       <Box 
@@ -196,7 +227,10 @@ const SideBarOverlay = () => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         ref={nodeRef}
-        transition={`all ${TRANSITION_DURATION}ms`}
+        transition={!mobileMode.isActive
+          ? `background-color ${TRANSITION_DURATION}ms`
+          : undefined
+        }
         zIndex={1}
       >
         <Flex 
@@ -204,26 +238,28 @@ const SideBarOverlay = () => {
           direction='column' 
           justify='flex-start' 
         > 
-          <NavButton 
-            sideBarNav={SideBarNav.HOME}
-            icon={<Icon as={FaHouse} boxSize={6}/>}
-            isActive={sideBarNav === SideBarNav.HOME}
-          />
-          <NavButton 
-            sideBarNav={SideBarNav.PORTFOLIO} 
-            icon={<Icon as={FaFolderOpen} boxSize={6}/>} 
-            isActive={sideBarNav === SideBarNav.PORTFOLIO}
-          />
-          <NavButton 
-            sideBarNav={SideBarNav.PRODUCT} 
-            icon={<Icon as={FaBox} boxSize={6}/>} 
-            isActive={sideBarNav === SideBarNav.PRODUCT}
-          />
-          <NavButton 
-            sideBarNav={SideBarNav.ADD_PRODUCT} 
-            icon={<Icon as={FaForward} boxSize={6}/>} 
-            isActive={sideBarNav === SideBarNav.ADD_PRODUCT}
-          />
+          {navButtonItems.map((props: TNavButtonProps, ix: number) => {
+            return (
+              <CascadingSlideFade
+                key={props.sideBarNav.name}
+                index={ix}
+                duration={0.5}
+                enterDelay={0.1}
+                exitDelay={0}
+                inState={sideBarOverlay.isOpen}
+                itemDelay={0.075}
+                numItems={navButtonItems.length}
+                slideOffsetY={0}
+                transitionType='in-out'
+              >
+                <NavButton 
+                  sideBarNav={props.sideBarNav}
+                  icon={props.icon}
+                  isActive={props.isActive}
+                />
+              </CascadingSlideFade>
+            )
+          })}
         </Flex>
       </Box>
     </CSSTransition>

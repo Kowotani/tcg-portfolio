@@ -1,6 +1,7 @@
 :root {
+  --exitTransitionDelay: 300ms;
   --sideBarOverlayHeight: 224px;
-  --transitionDelay: 500ms;
+  --transitionDuration: 500ms;
 }
 
 /* SideBarOverlay */
@@ -10,15 +11,15 @@
 .sidebaroverlay-enter-active {
   --h: var(--sideBarOverlayHeight);
   
-  height: 224px;
-  transition: all var(--transitionDelay) ease-in-out;
+  height: var(--h);
+  transition: all var(--transitionDuration) ease-in-out;
 }
 .sidebaroverlay-exit {
   --h: var(--sideBarOverlayHeight);
   
-  height: 224px;
+  height: var(--h);
 }
 .sidebaroverlay-exit-active {
   height: 0px;
-  transition: all var(--transitionDelay) ease-in-out;
+  transition: all var(--transitionDuration) ease-in-out var(--exitTransitionDelay);
 }
