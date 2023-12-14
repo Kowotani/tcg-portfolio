@@ -9,9 +9,14 @@ import {
   InputGroup, 
   InputLeftElement,
   InputRightElement,   
-  Text
-} from '@chakra-ui/react';
+  Text,
+  useColorMode
+} from '@chakra-ui/react'
 import { FaRegTimesCircle, FaSearch } from 'react-icons/fa'
+import { 
+  getColorForBackground, getColorForBackgroundHover, getColorForText 
+} from '../utils/generic'
+
 
 // https://github.com/GastonKhouri/chakra-ui-search/blob/main/src/components/Search.tsx
 
@@ -31,6 +36,7 @@ type TSearchInput = BoxProps & {
 
 export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 
+  // destructure props
   const {
 		value,
 		onSearchChange,
@@ -45,33 +51,56 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 		searchResults = [],
 	} = props
 
+
+  // =====
+  // state
+  // =====
+
   const [ showResults, setShowResults ] = useState(false)
 
+
+  // =====
+  // hooks
+  // =====
+
+  const { colorMode } = useColorMode()
+
+
+  // ========
+  // function
+  // ========
+
+  // debounce input
 	const handleOnBlur = () => {
 		setTimeout(() => {
 			setShowResults(false)
 		}, 100)
-	};
+	}
+
+
+  // ==============
+  // main component
+  // ==============
 
   return (
 		<Box
 			position='relative'
-			w='100%'
+			width='100%'
 		>
 
       {/* Search input */}
-			<InputGroup mb='10px'>
+			<InputGroup marginBottom='10px'>
         <InputLeftElement
-          pointerEvents='none'
           children={<Icon as={FaSearch} color='gray.500' />}
+          pointerEvents='none'
         />
 
 				<Input
 					placeholder={placeholder}
 					value={value}
+          onBlur={handleOnBlur}
 					onChange={onSearchChange}
 					onFocus={() => setShowResults(true)}
-					onBlur={handleOnBlur}
 				/>
 
         {value.length > 0 
@@ -84,8 +113,8 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
                   fontSize='20px'
                   icon={<FaRegTimesCircle />}
                   isRound={true}
-                  onClick={() => (clearSearch ? clearSearch() : undefined)}
                   variant='ghost'
+                  onClick={() => (clearSearch ? clearSearch() : undefined)}
                 />
               }
             />
@@ -99,15 +128,15 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 			{
 				showResults && (
 					<Box
-						bgColor='white'
-						maxHeight={searchResultsMaxHeight ?? '100vh'}
-						overflowY='auto'
+						bgColor={getColorForBackground(colorMode)}
 						borderRadius='0.3em'
 						boxShadow='0 2px 4px 0 rgb(34 36 38 / 12%), 0 2px 10px 0 rgb(34 36 38 / 15%);'
-						sx={{'&::-webkit-scrollbar': {display: 'none'}}}
+						maxHeight={searchResultsMaxHeight ?? '100vh'}
+						overflowY='auto'
             position='absolute'
-            zIndex={1300}
+            sx={{'&::-webkit-scrollbar': {display: 'none'}}}
             width='100%'
+            zIndex={1300}
 					>
 						{value.length > 0 && searchResults.length > 0
               ? searchResults
@@ -118,11 +147,15 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
                       key={result[searchResultKey]}
                       borderBottom='1px solid rgba(34,36,38,.1)'
                       cursor='pointer'
-                      _hover={{bgColor: '#f9fafb'}}
+                      _hover={{bgColor: getColorForBackgroundHover(colorMode)}}
                       onClick={() => onSearchResultSelect(result)}
                     >
                       <Flex alignItems='center'>
-                        <Box p='0.8em' margin='0' color='black'>
+                        <Box 
+                          color={getColorForText(colorMode)}
+                          m={0}
+                          p='0.8em' 
+                        >
                           {searchResultRenderer(result)}
                         </Box>
                       </Flex>
@@ -132,11 +165,12 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 									<Box
 										borderBottom='1px solid rgba(34,36,38,.1)'
 									>
-									{noSearchResultsComponent ??
-                    (
-                      <Text>No Search Results</Text>
-                    )
-                  }
+                    {/* TODO: Update this */}
+                    {noSearchResultsComponent ??
+                      (
+                        <Text textAlign='center'>No Search Results</Text>
+                      )
+                    }
 									</Box>
 								)
 						}
