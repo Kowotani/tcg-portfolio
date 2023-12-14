@@ -111,13 +111,13 @@ const NavButton = (props: PropsWithChildren<TNavButtonProps>) => {
         transition={`width ${TRANSITION_DURATION}ms`}
       > 
         <Icon as={props.icon} boxSize={6}/>
-        {sideBarOverlay.isExpanded && (
-          <>            
-            <Text paddingLeft={2}>
-              {props.sideBarNav.name}
-            </Text>
-          </>
-        )}
+        <Text 
+          opacity={sideBarOverlay.isExpanded ? 1 : 0}
+          paddingLeft={2}
+          transition={`opacity ${TRANSITION_DURATION}ms`}
+        >
+          {props.sideBarNav.name}
+        </Text>
       </Flex>
     </Box>
   )
