@@ -34,6 +34,7 @@ import '../stylesheets/SideBar.css'
 // constants
 // =========
 
+const BACKGROUND_TRANSITION_DURATION = 200
 const EXIT_TRANSITION_DELAY = 300
 const TRANSITION_DURATION = 500
 
@@ -102,7 +103,7 @@ const NavButton = (props: PropsWithChildren<TNavButtonProps>) => {
       onClick={handleOnClick}
       overflow='hidden'
       p={2}
-      
+      transition={`background-color ${BACKGROUND_TRANSITION_DURATION}ms`}
     >
       <Flex 
         align='center' 
