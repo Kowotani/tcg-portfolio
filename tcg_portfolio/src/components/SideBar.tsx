@@ -26,7 +26,6 @@ import {
   ISideBarNav, ISideBarNavContext, ISideBarOverlayContext, SideBarNav 
 } from '../utils/SideBar'
 
-
 import '../stylesheets/SideBar.css'
 
 
@@ -35,8 +34,8 @@ import '../stylesheets/SideBar.css'
 // =========
 
 const BACKGROUND_TRANSITION_DURATION = 200
-const EXIT_TRANSITION_DELAY = 300
-const TRANSITION_DURATION = 500
+const EXIT_TRANSITION_DELAY = 100
+const TRANSITION_DURATION = 300
 
 
 // ==============
@@ -244,11 +243,11 @@ const SideBarOverlay = () => {
               <CascadingSlideFade
                 key={props.sideBarNav.name}
                 index={ix}
-                duration={0.5}
-                enterDelay={0.1}
+                duration={0.3}
+                enterDelay={0}
                 exitDelay={0}
                 inState={sideBarOverlay.isOpen}
-                itemDelay={0.075}
+                itemDelay={0.03}
                 numItems={navButtonItems.length}
                 slideOffsetY={0}
                 transitionType='in-out'

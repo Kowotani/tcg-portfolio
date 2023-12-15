@@ -1,7 +1,7 @@
 :root {
-  --exitTransitionDelay: 300ms;
+  --exitTransitionDelay: 100ms;
   --sideBarOverlayHeight: 224px;
-  --transitionDuration: 500ms;
+  --transitionDuration: 300ms;
 }
 
 /* SideBarOverlay */
