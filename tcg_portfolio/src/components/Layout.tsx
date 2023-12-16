@@ -1,7 +1,6 @@
 import { PropsWithChildren } from 'react'
 import { 
-  Box,
-  StackDivider
+  Box
 } from '@chakra-ui/react'
 
 
@@ -9,7 +8,6 @@ import {
 // components
 // ==========
 
-// -- section header
 type TSectionHeaderProps = {
   header: string
 }
@@ -29,9 +27,4 @@ export const SectionHeader = (
       {props.header}
     </Box>    
   )
-}
-
-// -- stack divider
-export const Divider = () => {
-  return <StackDivider borderColor='gray.200'/>
 }

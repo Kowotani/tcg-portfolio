@@ -4,6 +4,7 @@ import {
   Card,
   CardBody,
   HStack,
+  StackDivider,
   Text,
   VStack
 } from '@chakra-ui/react'
@@ -14,7 +15,6 @@ import {
   getPortfolioMarketValue, getPortfolioPercentPnl, getPortfolioTotalCost, 
   getPortfolioTotalPnl, 
 } from 'common'
-import { Divider } from './Layout'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { 
@@ -133,13 +133,13 @@ export const PortfolioPerfCard = (
       <Card>
         <CardBody>
           <HStack
-            divider={<Divider/>}
+            divider={<StackDivider color='gray.200'/>}
             spacing={4}
           >
             <VStack 
               display='flex' 
               alignItems='flex-start' 
-              divider={<Divider/>}
+              divider={<StackDivider color='gray.200'/>}
               spacing={2} 
               width='100%'
             >
@@ -163,7 +163,7 @@ export const PortfolioPerfCard = (
               {/* Descriptive Metrics */}
               <HStack
                 width='100%'
-                divider={<Divider/>}
+                divider={<StackDivider color='gray.200'/>}
                 spacing={4}
               >
 
@@ -188,7 +188,7 @@ export const PortfolioPerfCard = (
               {/* Performance Metrics */}
               <HStack
                 width='100%'
-                divider={<Divider/>}
+                divider={<StackDivider color='gray.200'/>}
                 spacing={4}
               >
 

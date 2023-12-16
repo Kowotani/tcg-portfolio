@@ -7,7 +7,8 @@ import {
   CardBody,
   HStack,
   Icon,
-  Progress
+  Progress,
+  StackDivider
 } from '@chakra-ui/react'
 import { 
   IPopulatedPortfolio, 
@@ -18,7 +19,7 @@ import {
 } from 'common'
 import { FiPlus } from 'react-icons/fi'
 import { PortfolioCard } from './PortfolioCard'
-import { Divider, SectionHeader } from './Layout'
+import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { LatestPricesContext } from '../state/LatestPricesContext'
@@ -181,7 +182,7 @@ export const AllPortfolios = (
       <Card>
         <CardBody>
           <HStack 
-            divider={<Divider/>}
+            divider={<StackDivider color='gray.200'/>}
             spacing={4}
           >
 
