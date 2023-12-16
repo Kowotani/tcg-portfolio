@@ -2,10 +2,10 @@ import { PropsWithChildren } from 'react'
 import { 
   Card,
   CardBody,
-  HStack,
-  StackDivider,
+  HStack
 } from '@chakra-ui/react'
 import { IProduct } from 'common'
+import { Divider } from './Layout'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
 
@@ -27,7 +27,7 @@ export const ProductCard = (props: PropsWithChildren<TProductCardProps>) => {
     >
       <CardBody>
         <HStack
-          divider={<StackDivider borderColor='gray.200'/>}
+          divider={<Divider/>}
           spacing={4}
         >
           <ProductImage 

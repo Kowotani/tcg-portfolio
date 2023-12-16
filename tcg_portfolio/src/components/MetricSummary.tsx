@@ -3,11 +3,11 @@ import {
   Box,
   HStack,
   Spacer,
-  StackDivider,
   Text,
   useColorMode,
   VStack
 } from '@chakra-ui/react'
+import { Divider } from './Layout'
 import * as _ from 'lodash'
 import { formatNumber, getColorForNumber } from '../utils/generic'
 
@@ -126,7 +126,7 @@ export const MetricSummary = (
 
         ? (
           <VStack
-            divider={<StackDivider color='gray.200'/>}
+            divider={<Divider/>}
             spacing={4}
           >
             {twoDimSummaryItems.map(
@@ -134,7 +134,7 @@ export const MetricSummary = (
 
                 return (
                   <HStack 
-                    divider={<StackDivider color='gray.200'/>}
+                    divider={<Divider/>}
                     spacing={4}
                     display='flex'
                     justifyContent='space-evenly'
@@ -184,7 +184,7 @@ export const MetricSummary = (
         ) : variant === 'hcard' ? (
 
           <HStack 
-            divider={<StackDivider color='gray.200'/>}
+            divider={<Divider/>}
             spacing={4}
             display='flex'
             justifyContent='space-evenly'
@@ -206,7 +206,7 @@ export const MetricSummary = (
         ) : variant === 'vcard' ? (
 
           <VStack 
-            divider={<StackDivider color='gray.200'/>}
+            divider={<Divider/>}
             spacing={4}
             display='flex'
             alignItems='center'

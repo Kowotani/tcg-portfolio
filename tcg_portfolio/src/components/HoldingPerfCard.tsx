@@ -11,11 +11,11 @@ import {
   CardBody,
   HStack,
   Spinner,
-  StackDivider,
   Text,
   VStack
 } from '@chakra-ui/react'
 import { PnlChart, PriceChart } from './Charts'
+import { Divider } from './Layout'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
@@ -95,7 +95,7 @@ export const HoldingPerfCard = (
     <Card>
       <CardBody>
         <HStack
-          divider={<StackDivider color='gray.200'/>}
+          divider={<Divider/>}
           spacing={4}
         >
           <VStack minWidth='100px'>
@@ -126,7 +126,7 @@ export const HoldingPerfCard = (
             {/* Content */}
             <HStack
               width='100%'
-              divider={<StackDivider color='gray.200'/>}
+              divider={<Divider/>}
               spacing={4}
             >
               {/* Product Desc */}

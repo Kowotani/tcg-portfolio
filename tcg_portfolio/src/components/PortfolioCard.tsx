@@ -12,7 +12,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  StackDivider,
   Text,
   useDisclosure,
   useToast,
@@ -29,6 +28,7 @@ import {
   getPortfolioMarketValue, getPortfolioPercentPnl, getPortfolioTotalCost, 
   getPortfolioTotalPnl
 } from 'common'
+import { Divider } from './Layout'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { 
@@ -209,7 +209,7 @@ export const PortfolioCard = (
       <Card>
         <CardBody>
           <HStack
-            divider={<StackDivider color='gray.200'/>}
+            divider={<Divider/>}
             spacing={4}
           >
             <VStack spacing={0} width='100%'>
@@ -224,7 +224,7 @@ export const PortfolioCard = (
 
               <HStack
                 width='100%'
-                divider={<StackDivider color='gray.200'/>}
+                divider={<Divider/>}
                 spacing={4}
               >
                 {/* Description */}

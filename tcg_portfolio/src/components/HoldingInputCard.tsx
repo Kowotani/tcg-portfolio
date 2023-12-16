@@ -7,7 +7,6 @@ import {
   CardBody,
   CloseButton,
   HStack,
-  StackDivider,
   Text,
   useDisclosure,
   VStack
@@ -19,6 +18,7 @@ import {
   getHoldingTotalCost, getHoldingTotalPnl
 } from 'common'
 import { EditTransactionsModal } from './EditTransactionsModal'
+import { Divider } from './Layout'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
@@ -122,7 +122,7 @@ export const HoldingInputCard = (
       <Card>
         <CardBody>
           <HStack
-            divider={<StackDivider color='gray.200'/>}
+            divider={<Divider/>}
             spacing={4}
           >
             <VStack minWidth='100px'>
@@ -187,7 +187,7 @@ export const HoldingInputCard = (
 
               <HStack
                 width='100%'
-                divider={<StackDivider color='gray.200'/>}
+                divider={<Divider/>}
                 spacing={4}
               >
                 {/* Product Desc */}
