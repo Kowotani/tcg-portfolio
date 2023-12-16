@@ -2,9 +2,9 @@ import * as _ from 'lodash'
 import numeral from 'numeral'
 
 
-// =========
-// functions
-// =========
+// ======
+// format
+// ======
 
 /*
 DESC
@@ -34,30 +34,6 @@ export function formatNumber(
   return value 
     ? numeral(value).format(format)
     : placeholder ?? ''
-}
-
-/*
-DESC
-  Returns the first locale detected from the browser (ie. navigator.languages). 
-  Defaults to 'en-US' if none are found
-RETURN
-  The first locale detected from the browser
-REF
-  https://phrase.com/blog/posts/detecting-a-users-locale/
-*/
-export function getBrowserLocale(): string {
-  
-  const DEFAULT_LOCALE = 'en-US'
-
-  const browserLocales = navigator.languages === undefined
-    ? [navigator.language]
-    : navigator.languages
-
-  if (!browserLocales || browserLocales.length === 0) {
-    return DEFAULT_LOCALE
-  }
-
-  return browserLocales[0].trim()
 }
 
 /*
@@ -136,6 +112,11 @@ export function getColorForText(
   return colorMode === 'light' ? 'black' : 'white'
 }
 
+
+// =====
+// other
+// =====
+
 /*
 DESC
   Check if the input is a valid HTTP URL
@@ -169,4 +150,28 @@ interface IFormattedNumber {
   suffix?: string,
   precision?: number,
   placeholder?: string
+}
+
+/*
+DESC
+  Returns the first locale detected from the browser (ie. navigator.languages). 
+  Defaults to 'en-US' if none are found
+RETURN
+  The first locale detected from the browser
+REF
+  https://phrase.com/blog/posts/detecting-a-users-locale/
+*/
+export function getBrowserLocale(): string {
+  
+  const DEFAULT_LOCALE = 'en-US'
+
+  const browserLocales = navigator.languages === undefined
+    ? [navigator.language]
+    : navigator.languages
+
+  if (!browserLocales || browserLocales.length === 0) {
+    return DEFAULT_LOCALE
+  }
+
+  return browserLocales[0].trim()
 }
