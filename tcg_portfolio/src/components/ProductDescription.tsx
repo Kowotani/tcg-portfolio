@@ -1,58 +1,155 @@
 import { PropsWithChildren } from 'react'
-import { Box, BoxProps, Text } from '@chakra-ui/react'
-import { IProduct } from 'common'
+import { 
+  As,
+  Box, 
+  BoxProps, 
+  Flex,
+  Spacer, 
+  Text 
+} from '@chakra-ui/react'
+import { IProduct, formatAsISO } from 'common'
 import { 
   getProductNameWithLanguage, NonVisibileProductSubtypes 
 } from '../utils/Product'
 
 
 // ==============
-// Main Component
+// main component
 // ==============
 
 type TProductDescriptionProps = BoxProps & {
   product: IProduct,
-  showHeader?: boolean
+  showHeader?: boolean,
+  showLabels?: boolean,
+  showReleaseDate?: boolean
 }
 export const ProductDescription = (
   props: PropsWithChildren<TProductDescriptionProps>
 ) => {
 
+  // desctructure props
+  const {
+    product,
+    fontSize = 'md',
+    showHeader = false,
+    showLabels = false,
+    showReleaseDate = false,
+    textAlign = 'left'
+  } = props
+
+
+  // =============
+  // sub component
+  // =============
+
+  // -- TextWrapper
+  type TTextWrapperProps = BoxProps & {
+    asType?: As
+  }
+  const TextWrapper = (
+    props: PropsWithChildren<TTextWrapperProps>
+  ) => {
+    return (
+      <Text
+        textAlign={textAlign}
+        fontSize={fontSize}
+        as={props.asType}
+      >
+        {props.children}
+      </Text>
+    )
+  }
+
+  type TLabelledTextProps = BoxProps & {
+    label: string
+  }
+  const LabelledTextWrapper = (
+    props: PropsWithChildren<TLabelledTextProps>
+  ) => {
+    return (
+      <Flex direction='row' justify='flex-start'>
+        <TextWrapper asType='b'>
+          {`${props.label}:`}
+        </TextWrapper>
+        <Box width={2}/>
+        <TextWrapper>
+          {props.children}
+        </TextWrapper>
+      </Flex>  
+    )
+  }
+
+
+  // ==============
+  // main component
+  // ==============
+
   return (
     <Box>
-      {props.showHeader
+
+      {/* Name */}
+      {showHeader && (
+        <TextWrapper fontWeight='bold'>
+          {getProductNameWithLanguage(product)}
+        </TextWrapper>
+      )}
+
+      {/* TCG */}
+      {showLabels 
         ? (
-          <Text 
-            textAlign={props.textAlign} 
-            fontWeight='bold'
-          >
-            {getProductNameWithLanguage(props.product)}
-          </Text>
+          <LabelledTextWrapper label='TCG'> 
+            {product.tcg}
+          </LabelledTextWrapper>
+        ) : (
+          <TextWrapper>
+            {product.tcg}
+          </TextWrapper>
         )
-        : undefined 
       }
-      <Text 
-        textAlign={props.textAlign} 
-        fontSize={props.fontSize}
-      >
-        {props.product.tcg}
-      </Text>
-      <Text 
-        textAlign={props.textAlign} 
-        fontSize={props.fontSize}
-      >
-        {props.product.type}
-      </Text>
-      {props.product.subtype 
-        && !NonVisibileProductSubtypes.includes(props.product.subtype)
+
+      {/* Type */}
+      {showLabels 
         ? (
-          <Text 
-            textAlign={props.textAlign} 
-            fontSize={props.fontSize}
-          >
-            {props.product.subtype}
-          </Text>   
-        ) : undefined
+          <LabelledTextWrapper label='Type'> 
+            {product.type}
+          </LabelledTextWrapper>
+        ) : (
+          <TextWrapper>
+            {product.type}
+          </TextWrapper>
+        )
+      }
+
+      {/* Subtype */}
+      {product.subtype 
+        && !NonVisibileProductSubtypes.includes(product.subtype)
+        && (
+          showLabels
+          ? (
+            <LabelledTextWrapper label='Subtype'> 
+              {product.subtype}
+            </LabelledTextWrapper>
+          ) : (
+            <TextWrapper> 
+              {product.subtype}
+            </TextWrapper>
+          )
+        )
+      }
+
+      {/* Release Date */}
+      {showReleaseDate && (
+        showLabels
+          ? (
+            <LabelledTextWrapper label='Release Date'> 
+              {formatAsISO(product.releaseDate)}
+            </LabelledTextWrapper>
+          ) : (
+            <TextWrapper> 
+              {formatAsISO(product.releaseDate)}
+            </TextWrapper>
+          )
+        )
       }
     </Box>
   )
