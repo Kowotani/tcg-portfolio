@@ -3,6 +3,7 @@ import {
   Box,
   Card,
   CardBody,
+  Flex,
   HStack,
   Text,
   useColorMode,
@@ -196,24 +197,34 @@ const CustomTooltip = (
     return (
       <Card>
         <CardBody p={2}>
-          <Text as='b' fontSize='medium'>{date}</Text>
+          <Flex justify='center'>
+            <Text as='b' fontSize='medium'>
+              {date}
+            </Text>
+          </Flex>
 
           {/* Primary */}
-          <Box display='flex' justifyContent='center'>
+          <Flex justify='center'>
             <Text fontSize='medium'>
               {props.primaryKeyAlt ?? props.primaryKey}: 
             </Text>
-            <Box width={1}/>
+            <Box width={2}/>
             <Text fontSize='medium' color={color}> 
               {primaryText} 
             </Text>
-          </Box>
+          </Flex>
 
           {/* Reference */}
           {referenceText &&
-            <Text fontSize='medium'>
-              {props.referenceKey}: {referenceText}
-            </Text>
+            <Flex justify='center'>
+              <Text fontSize='medium'>
+                {props.referenceKey}:
+              </Text>
+              <Box width={2}/>
+              <Text fontSize='medium'>
+                {referenceText}
+              </Text>
+            </Flex>
           }
         </CardBody>
       </Card>
