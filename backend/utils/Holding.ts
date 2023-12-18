@@ -1,9 +1,12 @@
 import { 
-  IHolding, IPopulatedHolding, ITransaction, TDatedValue,
+  // data models
+  IHolding, IPopulatedHolding, ITransaction, TDatedValue, TransactionType,
 
+  // getters
   getHoldingAggregatedPurchases, getHoldingAggregatedSales, getHoldingQuantity, 
   getHoldingPurchases, getHoldingSales, getHoldingTcgplayerId,
 
+  // others
   assert, dateSub, getDaysBetween, getHoldingFirstTransactionDate,
   isDateAfter, isDateBefore
 } from 'common'
@@ -15,7 +18,7 @@ import * as df from 'danfojs-node'
 import * as _ from 'lodash'
 import { IMHolding } from '../mongo/models/holdingSchema'
 import { IMProduct } from '../mongo/models/productSchema'
-import { getProductDocs } from '../mongo/dbi/Product'
+import { getProductDoc, getProductDocs } from '../mongo/dbi/Product'
 import { getPriceSeries } from '../mongo/dbi/Price'
 import { isProductDoc, genProductNotFoundError } from './Product'
 
@@ -57,6 +60,43 @@ export async function getIMHoldingsFromIHoldings(
   })
   
   return newHoldings
+}
+
+
+// ==========
+// generators
+// ==========
+
+/*
+DESC
+  Returns an IHolding corresponding to a purchase of 1 unit of of the input 
+  tcgplayerId on the Product's release date at MSRP
+INPUT
+  tcgplayerId: The tcgplayerId of the Product
+RETURN
+  An IHolding corresponding to the description
+*/
+export async function genReleaseDateProductHolding(
+  tcgplayerId: number
+): Promise<IHolding> {
+
+  // get Product doc
+  const product = await getProductDoc({tcgplayerId: tcgplayerId})
+  assert(isProductDoc(product), 'Product not found')
+
+  // create Transaction
+  const txn: ITransaction = {
+    date: product.releaseDate,
+    price: product.msrp,
+    type: TransactionType.Purchase,
+    quantity: 1
+  }
+
+  // return Holding
+  return {
+    tcgplayerId: tcgplayerId,
+    transactions: [txn]
+  } as IHolding
 }
 
 

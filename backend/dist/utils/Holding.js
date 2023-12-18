@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -28,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hasValidTransactions = exports.areValidHoldings = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTotalCostAsDatedValues = exports.getHoldingRevenueSeries = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingCumPnLSeries = exports.getHoldingCumPnLAsDatedValues = exports.getHoldingMarketValueSeries = exports.getHoldingMarketValueAsDatedValues = exports.getHoldingCostOfGoodsSoldSeries = exports.getIMHoldingsFromIHoldings = void 0;
+exports.hasValidTransactions = exports.areValidHoldings = exports.getHoldingTransactionQuantitySeries = exports.getHoldingTotalCostSeries = exports.getHoldingTotalCostAsDatedValues = exports.getHoldingRevenueSeries = exports.getHoldingTimeWeightedReturn = exports.getHoldingPurchaseCostSeries = exports.getHoldingCumPnLSeries = exports.getHoldingCumPnLAsDatedValues = exports.getHoldingMarketValueSeries = exports.getHoldingMarketValueAsDatedValues = exports.getHoldingCostOfGoodsSoldSeries = exports.genReleaseDateProductHolding = exports.getIMHoldingsFromIHoldings = void 0;
 const common_1 = require("common");
 const danfo_1 = require("./danfo");
 const _ = __importStar(require("lodash"));
@@ -63,6 +67,38 @@ function getIMHoldingsFromIHoldings(holdings) {
     });
 }
 exports.getIMHoldingsFromIHoldings = getIMHoldingsFromIHoldings;
+// ==========
+// generators
+// ==========
+/*
+DESC
+  Returns an IHolding corresponding to a purchase of 1 unit of of the input
+  tcgplayerId on the Product's release date at MSRP
+INPUT
+  tcgplayerId: The tcgplayerId of the Product
+RETURN
+  An IHolding corresponding to the description
+*/
+function genReleaseDateProductHolding(tcgplayerId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get Product doc
+        const product = yield (0, Product_1.getProductDoc)({ tcgplayerId: tcgplayerId });
+        (0, common_1.assert)((0, Product_2.isProductDoc)(product), 'Product not found');
+        // create Transaction
+        const txn = {
+            date: product.releaseDate,
+            price: product.msrp,
+            type: common_1.TransactionType.Purchase,
+            quantity: 1
+        };
+        // return Holding
+        return {
+            tcgplayerId: tcgplayerId,
+            transactions: [txn]
+        };
+    });
+}
+exports.genReleaseDateProductHolding = genReleaseDateProductHolding;
 // =======
 // getters
 // =======
