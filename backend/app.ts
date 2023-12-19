@@ -2,27 +2,28 @@ import { loadImageToS3 } from './aws/s3Manager'
 import {
   // data models 
   IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
-  IPrice, IPriceData, IProduct, TDatedValue, THoldingPerformanceData, 
-  TPerformanceData,
+  IPrice, IPriceData, IProduct, TDatedValue, 
+  THoldingPerformanceData, TPerformanceData,
   
   PerformanceMetric, TimeseriesGranularity,
 
   // api response status
   DeletePortfolioStatus, GetPortfolioHoldingsPerformanceStatus, 
   GetPortfolioPerformanceStatus, GetPortfoliosStatus, 
-  GetPricesStatus, GetProductsStatus, PostLatestPriceStatus, 
-  PostPortfolioStatus, PostPriceStatus, PostProductStatus, PutPortfolioStatus,
+  GetPricesStatus, GetProductPerformanceStatus, GetProductsStatus, 
+  PostLatestPriceStatus, PostPortfolioStatus, PostPriceStatus, 
+  PostProductStatus, PutPortfolioStatus,
   
   // request / response data models
   TDataResBody, TDeletePortfolioReqBody, TGetPortfolioHoldingsPerformanceResBody,
-  TGetPortfolioPerformanceResBody, TPostLatestPriceReqBody, 
-  TPostPortfolioReqBody, TPostPriceReqBody, TPutPortfolioReqBody, 
-  TPostProductReqBody, TProductPostResBody, TResBody, 
+  TGetPortfolioPerformanceResBody, TGetProductPerformanceResBody, 
+  TPostLatestPriceReqBody, TPostPortfolioReqBody, TPostPriceReqBody, 
+  TPutPortfolioReqBody, TPostProductReqBody, TProductPostResBody, TResBody, 
 
   // endpoint URLs
   LATEST_PRICES_URL, PORTFOLIO_URL, PORTFOLIO_HOLDINGS_PERFORMANCE_URL, 
   PORTFOLIO_PERFORMANCE_URL, PORTFOLIOS_URL, PRICE_URL, PRODUCT_URL, 
-  PRODUCTS_URL, 
+  PRODUCT_PERFORMANCE_URL, PRODUCTS_URL, 
 
   // model helpers
   getPortfolioHoldings, getHoldingTcgplayerId,
@@ -40,8 +41,8 @@ import { getLatestPrices, insertPrices } from './mongo/dbi/Price'
 import multer from 'multer'
 import { loadCurrentPrice } from './scraper/scrapeManager'
 import { 
-  getHoldingCumPnLAsDatedValues, getHoldingMarketValueAsDatedValues, 
-  getHoldingTotalCostAsDatedValues 
+  genReleaseDateProductHolding, getHoldingCumPnLAsDatedValues, 
+  getHoldingMarketValueAsDatedValues, getHoldingTotalCostAsDatedValues 
 } from './utils/Holding'
 import { 
   isPortfolioDoc, getPortfolioCumPnLAsDatedValues, 
@@ -694,6 +695,77 @@ app.post(PRODUCT_URL, upload.none(), async (req: any, res: any) => {
     }
   }
   
+})
+
+/*
+DESC
+  Handle GET request to retrieve performance data for the input Product and
+  date range. The performance will be calculated as having purchased 1 unit
+  at MSRP on the release date
+INPUT
+  Request query parameters:
+    tcgplayerId: The Product's tcgplayerId
+    metrics: An array of PerformanceMetrics
+RETURN
+  TGetProductPerformanceResBody response with status codes
+
+  Status Code
+    200: The Product performance data was retrieved successfully
+    500: An error occurred
+*/
+app.get(PRODUCT_PERFORMANCE_URL, async (req: any, res: any) => {
+
+  try {
+
+    // parse query params
+    const tcgplayerId = req.query.tcgplayerId
+    const productDoc = 
+      await getProductDoc({tcgplayerId: tcgplayerId}) as IProduct
+    const startDate = productDoc.releaseDate
+    const endDate = new Date()
+    const metrics = String(req.query.metrics).split(',') as PerformanceMetric[]
+
+    // create Holding for a purchase of 1 unit at MSRP on release date 
+    const holding = await genReleaseDateProductHolding(tcgplayerId)
+
+    // create performance data object
+    let performanceData: TPerformanceData = {}
+
+    for (const metric of metrics) {
+
+      let fn: (a1: IHolding, a2?: Date, a3?: Date) => Promise<TDatedValue[]>
+
+      switch(metric) {        
+        case PerformanceMetric.CumPnL:
+          fn = getHoldingCumPnLAsDatedValues
+          break
+        case PerformanceMetric.MarketValue:
+          fn = getHoldingMarketValueAsDatedValues
+          break
+        default:
+          const err = `Unknown metric: ${metric}`
+          throw new Error(err)
+      }
+      const values = await fn(holding, startDate, endDate)
+      performanceData[metric] = values
+    }    
+
+    // return performance data
+    res.status(200)
+    
+    const body: TGetProductPerformanceResBody = {
+      data: performanceData,
+      message: GetProductPerformanceStatus.Success
+    }
+    res.send(body)
+
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: `${GetProductPerformanceStatus.Error}: ${err}`
+    }
+    res.send(body)
+  }
 })
 
 /*

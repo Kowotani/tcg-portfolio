@@ -597,6 +597,66 @@ app.post(common_1.PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0, vo
 }));
 /*
 DESC
+  Handle GET request to retrieve performance data for the input Product and
+  date range. The performance will be calculated as having purchased 1 unit
+  at MSRP on the release date
+INPUT
+  Request query parameters:
+    tcgplayerId: The Product's tcgplayerId
+    metrics: An array of PerformanceMetrics
+RETURN
+  TGetProductPerformanceResBody response with status codes
+
+  Status Code
+    200: The Product performance data was retrieved successfully
+    500: An error occurred
+*/
+app.get(common_1.PRODUCT_PERFORMANCE_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // parse query params
+        const tcgplayerId = req.query.tcgplayerId;
+        const productDoc = yield (0, Product_1.getProductDoc)({ tcgplayerId: tcgplayerId });
+        const startDate = productDoc.releaseDate;
+        const endDate = new Date();
+        const metrics = String(req.query.metrics).split(',');
+        // create Holding for a purchase of 1 unit at MSRP on release date 
+        const holding = yield (0, Holding_1.genReleaseDateProductHolding)(tcgplayerId);
+        // create performance data object
+        let performanceData = {};
+        for (const metric of metrics) {
+            let fn;
+            switch (metric) {
+                case common_1.PerformanceMetric.CumPnL:
+                    fn = Holding_1.getHoldingCumPnLAsDatedValues;
+                    break;
+                case common_1.PerformanceMetric.MarketValue:
+                    fn = Holding_1.getHoldingMarketValueAsDatedValues;
+                    break;
+                default:
+                    const err = `Unknown metric: ${metric}`;
+                    throw new Error(err);
+            }
+            const values = yield fn(holding, startDate, endDate);
+            performanceData[metric] = values;
+        }
+        // return performance data
+        res.status(200);
+        const body = {
+            data: performanceData,
+            message: common_1.GetProductPerformanceStatus.Success
+        };
+        res.send(body);
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: `${common_1.GetProductPerformanceStatus.Error}: ${err}`
+        };
+        res.send(body);
+    }
+}));
+/*
+DESC
   Handle GET request for all Product documents
 RETURN
   Response body with status codes and messages

@@ -42,6 +42,10 @@ export declare enum PostProductStatus {
     AlreadyExists = "tcgplayerId already exists",
     Error = "Error creating the Product doc"
 }
+export declare enum GetProductPerformanceStatus {
+    Success = "Successfully retrieved Product performance",
+    Error = "Error retrieving Product performance"
+}
 export declare enum GetProductsStatus {
     Success = "Successfully retrieved Products",
     Error = "Error retrieving Products"
@@ -51,6 +55,7 @@ export declare const PORTFOLIO_PERFORMANCE_URL: string;
 export declare const PORTFOLIO_HOLDINGS_PERFORMANCE_URL: string;
 export declare const PORTFOLIOS_URL = "/portfolios";
 export declare const PRODUCT_URL = "/product";
+export declare const PRODUCT_PERFORMANCE_URL = "/product/performance";
 export declare const PRODUCTS_URL = "/products";
 export declare const LATEST_PRICE_URL = "/price/latest";
 export declare const LATEST_PRICES_URL = "/prices/latest";
@@ -66,6 +71,7 @@ export declare type TGetPortfolioHoldingsPerformanceResBody = TDataResBody<THold
 export declare type TProductPostResBody<Type> = TDataResBody<Type> & {
     tcgplayerId: number;
 };
+export declare type TGetProductPerformanceResBody = TDataResBody<TPerformanceData>;
 export declare type TDeletePortfolioReqBody = {
     userId: number;
     portfolioName: string;
@@ -90,4 +96,7 @@ export declare type TPostPriceReqBody = {
 export declare type TPostProductReqBody = {
     formData: IProduct;
     imageUrl?: string;
+};
+export declare type TGetProductPerformanceReqBody = {
+    tcgplayerId: number;
 };

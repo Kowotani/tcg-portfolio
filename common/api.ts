@@ -107,6 +107,15 @@ export enum PostProductStatus {
 }
 
 /*
+  Endpoint:   PRODUCT_PERFORMANCE_URL
+  Type:       GET
+*/
+export enum GetProductPerformanceStatus {
+  Success = 'Successfully retrieved Product performance',
+  Error = 'Error retrieving Product performance',
+}
+
+/*
   Endpoint:   PRODUCTS_URL
   Type:       GET
 */
@@ -129,6 +138,7 @@ export const PORTFOLIOS_URL = '/portfolios'
 
 // -- product
 export const PRODUCT_URL = '/product'
+export const PRODUCT_PERFORMANCE_URL = '/product/performance'
 export const PRODUCTS_URL = '/products'
 
 // -- prices
@@ -186,6 +196,14 @@ export type TGetPortfolioHoldingsPerformanceResBody
 export type TProductPostResBody<Type> = TDataResBody<Type> & {
   tcgplayerId: number
 }
+
+/*
+  Endpoint:   PRODUCT_PERFORMANCE_URL
+  Type:       GET
+  Req / Res:  Response
+*/
+export type TGetProductPerformanceResBody 
+  = TDataResBody<TPerformanceData>
 
 // --------
 // requests
@@ -256,4 +274,13 @@ export type TPostPriceReqBody = {
 export type TPostProductReqBody = {
   formData: IProduct,
   imageUrl?: string
+}
+
+/*
+  Endpoint:   PRODUCT_PERFORMANCE_URL
+  Type:       GET
+  Req / Res:  Request
+*/
+export type TGetProductPerformanceReqBody = {
+  tcgplayerId: number
 }

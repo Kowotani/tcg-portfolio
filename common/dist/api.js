@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.PRICE_URL = exports.LATEST_PRICES_URL = exports.LATEST_PRICE_URL = exports.PRODUCTS_URL = exports.PRODUCT_URL = exports.PORTFOLIOS_URL = exports.PORTFOLIO_HOLDINGS_PERFORMANCE_URL = exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL = exports.GetProductsStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PostLatestPriceStatus = exports.GetPortfoliosStatus = exports.GetPortfolioPerformanceStatus = exports.GetPortfolioHoldingsPerformanceStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
+exports.PRICE_URL = exports.LATEST_PRICES_URL = exports.LATEST_PRICE_URL = exports.PRODUCTS_URL = exports.PRODUCT_PERFORMANCE_URL = exports.PRODUCT_URL = exports.PORTFOLIOS_URL = exports.PORTFOLIO_HOLDINGS_PERFORMANCE_URL = exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL = exports.GetProductsStatus = exports.GetProductPerformanceStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PostLatestPriceStatus = exports.GetPortfoliosStatus = exports.GetPortfolioPerformanceStatus = exports.GetPortfolioHoldingsPerformanceStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
 // =====
 // enums
 // =====
@@ -101,6 +101,15 @@ var PostProductStatus;
     PostProductStatus["Error"] = "Error creating the Product doc";
 })(PostProductStatus = exports.PostProductStatus || (exports.PostProductStatus = {}));
 /*
+  Endpoint:   PRODUCT_PERFORMANCE_URL
+  Type:       GET
+*/
+var GetProductPerformanceStatus;
+(function (GetProductPerformanceStatus) {
+    GetProductPerformanceStatus["Success"] = "Successfully retrieved Product performance";
+    GetProductPerformanceStatus["Error"] = "Error retrieving Product performance";
+})(GetProductPerformanceStatus = exports.GetProductPerformanceStatus || (exports.GetProductPerformanceStatus = {}));
+/*
   Endpoint:   PRODUCTS_URL
   Type:       GET
 */
@@ -119,6 +128,7 @@ exports.PORTFOLIO_HOLDINGS_PERFORMANCE_URL = "".concat(exports.PORTFOLIO_URL, "/
 exports.PORTFOLIOS_URL = '/portfolios';
 // -- product
 exports.PRODUCT_URL = '/product';
+exports.PRODUCT_PERFORMANCE_URL = '/product/performance';
 exports.PRODUCTS_URL = '/products';
 // -- prices
 exports.LATEST_PRICE_URL = '/price/latest';
