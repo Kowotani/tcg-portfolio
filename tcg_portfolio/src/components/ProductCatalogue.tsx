@@ -1,12 +1,18 @@
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
+import axios from 'axios'
 import { 
-  Box, 
-  BoxProps, 
   Flex,
-  Text 
+  Spinner, 
 } from '@chakra-ui/react'
-import { IProduct } from 'common'
+import { 
+  // data models
+  IProduct,
+
+  // api
+  PRODUCTS_URL
+ } from 'common'
 import { SectionHeader } from './Layout'
+import * as _ from 'lodash'
 import { ProductDetailsCard } from './ProductDetailsCard'
 
 
@@ -15,27 +21,42 @@ export const ProductCatalogue = (
   props: PropsWithChildren<TProductCatalogueProps>
 ) => {
 
-  const fooProduct = {
-    tcgplayerId: 208279,
-    tcg: 'Magic: The Gathering',
-    releaseDate: new Date(Date.parse('2022-05-15T00:00:00.000Z')),
-    name: 'Ikoria: Lair of Behemoths',
-    type: 'Booster Box',
-    subtype: 'Collector',
-    language: 'ENG',
-    setCode: 'IKO',
-    msrp: 225
-
-  } as IProduct
-
   
   // =====
   // state
   // =====
 
-  const [ product, setProduct ] = useState(fooProduct)
+  const [ allProducts, setAllProducts ] = useState([] as IProduct[])
+  const [ product, setProduct ] = useState({} as IProduct)
 
 
+  // =====
+  // hooks
+  // =====
+
+  // initial load of all Products
+  useEffect(() => {
+
+    // call endpoint
+    axios({
+      method: 'get',
+      url: PRODUCTS_URL
+    })
+    .then(res => {
+      // set allProducts
+      const products = res.data.data
+      setAllProducts(products)
+
+      // set product randomly
+      const ix = Math.max(Math.floor(Math.random() * products.length - 1), 0)
+      setProduct(products[ix])
+    })
+    .catch(err => {
+      console.log('Error fetching all Products: ' + err)
+    })
+  }, [])
+
+  
   // ==============
   // main component
   // ==============
@@ -43,7 +64,22 @@ export const ProductCatalogue = (
   return (
     <>
       <SectionHeader header='Product Details'/>
-      <ProductDetailsCard product={product}/>
+      {_.isEmpty(product)
+        ? (
+          <Flex 
+            alignItems='center' 
+            justifyContent='center' 
+            width='100%'
+          >
+            <Spinner 
+              color='blue.500'
+              height={75}
+              width={75}
+              thickness='7px'
+            />
+          </Flex>
+        ) : <ProductDetailsCard product={product}/>
+      }
     </>
   )
 }
