@@ -8,7 +8,7 @@ import {
 
   // others
   assert, dateSub, getDaysBetween, getHoldingFirstTransactionDate,
-  isDateAfter, isDateBefore
+  isDateAfter, isDateBefore, isIHolding, isITransaction
 } from 'common'
 import { 
   accumulateAndDensifySeries, defaultTrimOrExtendSeries, 
@@ -94,7 +94,7 @@ export async function genReleaseDateProductHolding(
 
   // return Holding
   return {
-    tcgplayerId: tcgplayerId,
+    tcgplayerId: product.tcgplayerId,
     transactions: [txn]
   } as IHolding
 }

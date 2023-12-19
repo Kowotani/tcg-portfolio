@@ -92,10 +92,14 @@ function genReleaseDateProductHolding(tcgplayerId) {
             quantity: 1
         };
         // return Holding
-        return {
-            tcgplayerId: tcgplayerId,
+        const holding = {
+            tcgplayerId: product.tcgplayerId,
             transactions: [txn]
         };
+        console.log(typeof (holding.tcgplayerId));
+        (0, common_1.assert)(typeof (holding.tcgplayerId) === 'number', 'not a number');
+        (0, common_1.assert)((0, common_1.isIHolding)(holding), 'not a holding');
+        return holding;
     });
 }
 exports.genReleaseDateProductHolding = genReleaseDateProductHolding;
