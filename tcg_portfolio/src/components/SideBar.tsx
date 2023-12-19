@@ -1,7 +1,6 @@
 import { 
   createRef, PropsWithChildren, useContext
 } from 'react'
-import { IProduct } from 'common'
 import {  
   Box,  
   Flex,
@@ -15,7 +14,7 @@ import {
 } from '@chakra-ui/react'
 import { AddProductForm } from './AddProductForm'
 import { PortfolioPanelManager } from './PortfolioPanelManager'
-import { ProductDetailsCard } from './ProductDetailsCard'
+import { ProductCatalogue } from './ProductCatalogue'
 import { IconType } from 'react-icons'
 import { FaBox, FaFolderOpen, FaHouse, FaForward } from 'react-icons/fa6'
 import { CSSTransition } from 'react-transition-group'
@@ -289,18 +288,6 @@ const SideBarContent = (props: PropsWithChildren<TSideBarContentProps>) => {
   // =====
 
   const { mobileMode } = useContext(MobileModeContext) as IMobileModeContext
-  const fooProduct = {
-    tcgplayerId: 208279,
-    tcg: 'Magic: The Gathering',
-    releaseDate: new Date(Date.parse('2022-05-15T00:00:00.000Z')),
-    name: 'Ikoria: Lair of Behemoths',
-    type: 'Booster Box',
-    subtype: 'Collector',
-    language: 'ENG',
-    setCode: 'IKO',
-    msrp: 225
-
-  } as IProduct
 
 
   // ==============
@@ -324,7 +311,7 @@ const SideBarContent = (props: PropsWithChildren<TSideBarContentProps>) => {
             <PortfolioPanelManager />
           </TabPanel>          
           <TabPanel>
-            <ProductDetailsCard product={fooProduct}/>
+            <ProductCatalogue />
           </TabPanel>
           <TabPanel>
             <AddProductForm />

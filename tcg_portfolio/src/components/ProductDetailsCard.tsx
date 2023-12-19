@@ -2,7 +2,6 @@ import { PropsWithChildren, useContext } from 'react'
 import { 
   Card,
   CardBody,
-  Flex,
   HStack,
   StackDivider,
   Text,
@@ -27,6 +26,7 @@ type TProductCardProps = {
 export const ProductDetailsCard = (
   props: PropsWithChildren<TProductCardProps>
 ) => {
+
 
   // =====
   // state
