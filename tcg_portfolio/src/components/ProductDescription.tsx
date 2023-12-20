@@ -4,7 +4,6 @@ import {
   Box, 
   BoxProps, 
   Flex,
-  Spacer, 
   Text 
 } from '@chakra-ui/react'
 import { IProduct, formatAsISO } from 'common'
