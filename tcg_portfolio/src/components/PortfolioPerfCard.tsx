@@ -56,7 +56,6 @@ export const PortfolioPerfCard = (
     {
       title: 'Total Holdings:',
       value: getPortfolioHoldings(portfolio).length,
-      titleStyle: {}
     },
   ]
 
@@ -65,14 +64,12 @@ export const PortfolioPerfCard = (
     {
       title: 'First Purchase:',
       placeholder: formatAsISO(getPortfolioFirstTransactionDate(portfolio) as Date),
-      titleStyle: {}
     },
     {
       title: 'Portfolio Age:',
       placeholder: formatDateDiffAsYearsMonthsDays(
         getPortfolioFirstTransactionDate(portfolio) as Date, 
         new Date()),
-      titleStyle: {}
     },
   ]
 
@@ -84,7 +81,6 @@ export const PortfolioPerfCard = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: ' -',
-      titleStyle: {},
     },
     {
       title: 'Market Value:',
@@ -92,7 +88,6 @@ export const PortfolioPerfCard = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: ' -',
-      titleStyle: {},
     },
   ]
 
@@ -104,7 +99,6 @@ export const PortfolioPerfCard = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: ' -',
-      titleStyle: {},
     },
     {
       title: 'Return:',
@@ -114,7 +108,6 @@ export const PortfolioPerfCard = (
       formattedPrecision: 2,
       formattedSuffix: '%',
       placeholder: '- ',
-      titleStyle: {},
     },
   ]
 

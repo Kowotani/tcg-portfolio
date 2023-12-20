@@ -90,7 +90,6 @@ export const AllPortfolios = (
       formattedPrefix: '',
       formattedPrecision: 0,
       placeholder: '-',
-      titleStyle: {},
     }
   ]
 
@@ -101,7 +100,6 @@ export const AllPortfolios = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
-      titleStyle: {},
     },
     {
       title: 'Market Value:',
@@ -109,7 +107,6 @@ export const AllPortfolios = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
-      titleStyle: {},
     }
   ]
 
@@ -122,7 +119,6 @@ export const AllPortfolios = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: '$ -',
-      titleStyle: {},
     },
     {
       title: 'Return:',
@@ -132,7 +128,6 @@ export const AllPortfolios = (
       formattedPrecision: 2,
       formattedSuffix: '%',
       placeholder: '- %',
-      titleStyle: {},
     },
   ]
 

@@ -14,6 +14,7 @@ import {
 import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { ProductDetailsCard } from './ProductDetailsCard'
+import { parseProductsEndpointResponse } from '../utils/api'
 
 
 type TProductCatalogueProps = {}
@@ -44,7 +45,8 @@ export const ProductCatalogue = (
     })
     .then(res => {
       // set allProducts
-      const products = res.data.data
+      const data = res.data.data
+      const products = parseProductsEndpointResponse(data)
       setAllProducts(products)
 
       // set product randomly

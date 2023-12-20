@@ -70,7 +70,6 @@ export const HoldingInputCard = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: ' -',
-      titleStyle: {},
     },
     {
       title: isInactive ? 'Total Rev:' : 'Market Value:',
@@ -78,7 +77,6 @@ export const HoldingInputCard = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: ' -',
-      titleStyle: {},
     },
   ]
 
@@ -89,7 +87,6 @@ export const HoldingInputCard = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: ' -',
-      titleStyle: {},
     },
     {
       title: 'Return:',
@@ -99,7 +96,6 @@ export const HoldingInputCard = (
       formattedPrecision: 2,
       formattedSuffix: '%',
       placeholder: '- ',
-      titleStyle: {},
     },
   ]
 

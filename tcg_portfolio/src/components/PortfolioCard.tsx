@@ -158,7 +158,6 @@ export const PortfolioCard = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: ' -',
-      titleStyle: {},
     },
     {
       title: 'Market Value:',
@@ -166,7 +165,6 @@ export const PortfolioCard = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: ' -',
-      titleStyle: {},
     },
   ]
 
@@ -177,7 +175,6 @@ export const PortfolioCard = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: ' -',
-      titleStyle: {},
     },
     {
       title: 'Return:',
@@ -187,7 +184,6 @@ export const PortfolioCard = (
       formattedPrecision: 2,
       formattedSuffix: '%',
       placeholder: '- ',
-      titleStyle: {},
     },
   ]
 

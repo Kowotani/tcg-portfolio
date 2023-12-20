@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react'
 import { 
   Box,
+  Flex,
   HStack,
   Spacer,
   StackDivider,
@@ -8,13 +9,31 @@ import {
   useColorMode,
   VStack
 } from '@chakra-ui/react'
+import { formatAsISO } from 'common'
 import * as _ from 'lodash'
 import { formatNumber, getColorForNumber } from '../utils/generic'
 
 
-// --------------
-// Sub Components
-// --------------
+// =====
+// types
+// =====
+
+export type TMetricSummaryItem = {
+  title: string,
+  value?: number,
+  formatAsDate?: boolean,
+  formattedPrefix?: string,
+  formattedPrecision?: number,
+  formattedSuffix?: string,
+  isListSpacer?: boolean,
+  placeholder?: string,
+  titleStyle?: {[key: string]: string},
+}
+
+
+// ==============
+// sub components
+// ==============
 
 // -- MetricSummaryItem
 
@@ -25,9 +44,11 @@ const MetricSummaryItem = (
   props: PropsWithChildren<TMetricSummaryItemProps>
 ) => {
 
+  // desstructure props
   const {
     title,
     value,
+    formatAsDate,
     formattedPrefix,
     formattedPrecision,
     formattedSuffix,
@@ -40,47 +61,52 @@ const MetricSummaryItem = (
   const { colorMode } = useColorMode()
   const color = getColorForNumber(colorMode, value)
 
+  // formatted value
+  const formattedValue = formatAsDate
+    ? formatAsISO(new Date(value as number))
+    : formatNumber({
+        value: value,
+        prefix: formattedPrefix,
+        suffix: formattedSuffix,
+        precision: formattedPrecision,
+        placeholder: placeholder
+      })
+
+  // default title
+  const DefaultTitle = () => {
+    return (<Text style={titleStyle}>{title}</Text>)
+  }
+
+  // main component
+
   return (
     <>
       {variant === 'list' 
 
         ? (
-          <Box 
-            display='flex' 
+          <Flex 
             justifyContent='space-between' 
             width='100%'
           >
             {titleStyle
-              ? <Text style={titleStyle}>{title}</Text>
-              : <Text as='b'>{title}</Text>
+              ? <DefaultTitle />
+              : <Text>{title}</Text>
             }
             <Spacer minWidth={2}/>
             <Text color={color}>
-              {formatNumber({
-                value: value,
-                prefix: formattedPrefix,
-                suffix: formattedSuffix,
-                precision: formattedPrecision,
-                placeholder: placeholder
-              })}
+              {formattedValue}
             </Text>
-          </Box>
+          </Flex>
 
         ) : ['hcard', 'vcard'].includes(variant) ? (
 
           <Box>
             {titleStyle
-              ? <Text style={titleStyle}>{title}</Text>
+              ? <DefaultTitle />
               : <Text as='b' align='center'>{title}</Text>
             }
             <Text align='center' color={color}>
-              {formatNumber({
-                  value: value,
-                  prefix: formattedPrefix,
-                  suffix: formattedSuffix,
-                  precision: formattedPrecision,
-                  placeholder: placeholder
-                })}
+              {formattedValue}
             </Text>
           </Box>
 
@@ -92,19 +118,9 @@ const MetricSummaryItem = (
 
 
 // ==============
-// Main Component
+// main component
 // ==============
 
-export type TMetricSummaryItem = {
-  title: string,
-  value?: number,
-  formattedPrefix?: string,
-  formattedPrecision?: number,
-  formattedSuffix?: string,
-  isListSpacer?: boolean,
-  placeholder?: string,
-  titleStyle?: {[key: string]: string},
-}
 export type TMetricSummaryProps = {
   summaryItems?: TMetricSummaryItem[],
   twoDimSummaryItems?: TMetricSummaryItem[][],
@@ -122,43 +138,44 @@ export const MetricSummary = (
 
   return (
     <>
-      {!_.isEmpty(twoDimSummaryItems[0])
 
-        ? (
-          <VStack
-            divider={<StackDivider color='gray.200'/>}
-            spacing={4}
-          >
-            {twoDimSummaryItems.map(
-              (itemRow: TMetricSummaryItem[]) => {
+      {/* Two Dimensional */}
+      {!_.isEmpty(twoDimSummaryItems[0]) && (
+        <VStack
+          divider={<StackDivider color='gray.200'/>}
+          spacing={4}
+        >
+          {twoDimSummaryItems.map(
+            (itemRow: TMetricSummaryItem[]) => {
 
-                return (
-                  <HStack 
-                    divider={<StackDivider color='gray.200'/>}
-                    spacing={4}
-                    display='flex'
-                    justifyContent='space-evenly'
-                    width='100%'
-                  >
-                    {itemRow.map(
-                      (item: TMetricSummaryItem) => {
-                        return (
-                          <MetricSummaryItem
-                            {...item}
-                            key={item.title}
-                            variant={variant}
-                          />
-                        )
-                      }
-                    )}
-                  </HStack>
-                )
-              }
-            )}
-          </VStack>
+              return (
+                <HStack 
+                  divider={<StackDivider color='gray.200'/>}
+                  spacing={4}
+                  display='flex'
+                  justifyContent='space-evenly'
+                  width='100%'
+                >
+                  {itemRow.map(
+                    (item: TMetricSummaryItem) => {
+                      return (
+                        <MetricSummaryItem
+                          {...item}
+                          key={item.title}
+                          variant={variant}
+                        />
+                      )
+                    }
+                  )}
+                </HStack>
+              )
+            }
+          )}
+        </VStack>
+      )}
 
-      ) : variant === 'list' ? (
-
+      {/* List */}
+      {variant === 'list' && (
         <VStack           
           spacing={0}
           width='fit-content'      
@@ -180,53 +197,53 @@ export const MetricSummary = (
             }
           )}
         </VStack>
+      )}
 
-        ) : variant === 'hcard' ? (
+      {/* Horizontal Cards */}
+      {variant === 'hcard' && (
+        <HStack 
+          divider={<StackDivider color='gray.200'/>}
+          spacing={4}
+          display='flex'
+          justifyContent='space-evenly'
+          width='100%'              
+        >
+          {summaryItems.map(
+            (item: TMetricSummaryItem) => {
+              return (
+                <MetricSummaryItem
+                  {...item}
+                  key={item.title}
+                  variant={variant}
+                />
+              )
+            }
+          )}
+        </HStack>
+      )}
 
-          <HStack 
-            divider={<StackDivider color='gray.200'/>}
-            spacing={4}
-            display='flex'
-            justifyContent='space-evenly'
-            width='100%'              
-          >
-            {summaryItems.map(
-              (item: TMetricSummaryItem) => {
-                return (
-                  <MetricSummaryItem
-                    {...item}
-                    key={item.title}
-                    variant={variant}
-                  />
-                )
-              }
-            )}
-          </HStack>
-
-        ) : variant === 'vcard' ? (
-
-          <VStack 
-            divider={<StackDivider color='gray.200'/>}
-            spacing={4}
-            display='flex'
-            alignItems='center'
-            width='fit-content'
-          >
-            {summaryItems.map(
-              (item: TMetricSummaryItem) => {
-                return (
-                  <MetricSummaryItem
-                    {...item}
-                    key={item.title}
-                    variant={variant}
-                  />
-                )
-              }
-            )}
-          </VStack>
-
-        ) : undefined
-      }
+      {/* Vertical Cards */}
+      {variant === 'vcard' && (
+        <VStack 
+          divider={<StackDivider color='gray.200'/>}
+          spacing={4}
+          display='flex'
+          alignItems='center'
+          width='fit-content'
+        >
+          {summaryItems.map(
+            (item: TMetricSummaryItem) => {
+              return (
+                <MetricSummaryItem
+                  {...item}
+                  key={item.title}
+                  variant={variant}
+                />
+              )
+            }
+          )}
+        </VStack>
+      )} 
     </>
   )
 }
