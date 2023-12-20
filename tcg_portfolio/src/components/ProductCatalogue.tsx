@@ -6,10 +6,10 @@ import {
 } from '@chakra-ui/react'
 import { 
   // data models
-  IProduct,
+  IProduct, PerformanceMetric, TDatedValue,
 
   // api
-  PRODUCTS_URL
+  PRODUCT_PERFORMANCE_URL, PRODUCTS_URL, TGetProductPerformanceResBody
  } from 'common'
 import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
@@ -22,12 +22,19 @@ export const ProductCatalogue = (
   props: PropsWithChildren<TProductCatalogueProps>
 ) => {
 
+  // =========
+  // constants
+  // =========
+
+  const PRODUCT_PERFORMANCE_METRIC = PerformanceMetric.MarketValue
+
   
   // =====
   // state
   // =====
 
   const [ allProducts, setAllProducts ] = useState([] as IProduct[])
+  const [ marketValue, setMarketValue ] = useState([] as TDatedValue[])
   const [ product, setProduct ] = useState({} as IProduct)
 
 
@@ -58,6 +65,29 @@ export const ProductCatalogue = (
     })
   }, [])
 
+  // load Product market value data
+  useEffect(() => {
+
+    // call endpoint
+    axios({
+      method: 'get',
+      url: PRODUCT_PERFORMANCE_URL,
+      params: {
+        tcgplayerId: product.tcgplayerId,
+        metrics: [PRODUCT_PERFORMANCE_METRIC]
+      }      
+    })
+    .then(res => {
+      // set marketValue data
+      const resData = res.data as TGetProductPerformanceResBody
+      const values = resData.data[PRODUCT_PERFORMANCE_METRIC] as TDatedValue[]
+      setMarketValue(values)
+    })
+    .catch(err => {
+      console.log('Error fetching Product performance data: ' + err)
+    })
+  }, [product])
+
   
   // ==============
   // main component
@@ -65,7 +95,10 @@ export const ProductCatalogue = (
 
   return (
     <>
+      {/* Product Details */}
       <SectionHeader header='Product Details'/>
+
+      {/* Details */}
       {_.isEmpty(product)
         ? (
           <Flex 
@@ -82,6 +115,9 @@ export const ProductCatalogue = (
           </Flex>
         ) : <ProductDetailsCard product={product}/>
       }
+
+      {/* Product Search */}
+      <SectionHeader header='Product Search'/>
     </>
   )
 }
