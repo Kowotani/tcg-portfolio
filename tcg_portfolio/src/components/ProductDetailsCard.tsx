@@ -26,7 +26,7 @@ type TProductCardProps = {
 export const ProductDetailsCard = (
   props: PropsWithChildren<TProductCardProps>
 ) => {
-
+  
 
   // =====
   // state
@@ -42,14 +42,18 @@ export const ProductDetailsCard = (
 
   const price = latestPrices.get(props.product.tcgplayerId)?.prices.marketPrice
 
-  const perfSummary: TMetricSummaryItem[] = [
+  const releaseSummary: TMetricSummaryItem[] = [
+    {
+      title: 'Release Date:',
+      value: props.product.releaseDate.getTime(),
+      formatAsDate: true
+    },
     {
       title: 'MSRP:',
       value: props.product.msrp,
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: ' -',
-      titleStyle: {},
     },
     {
       title: 'Price:',
@@ -57,7 +61,6 @@ export const ProductDetailsCard = (
       formattedPrefix: '$',
       formattedPrecision: 2,
       placeholder: ' -',
-      titleStyle: {},
     },
   ]
 
@@ -96,12 +99,11 @@ export const ProductDetailsCard = (
             <ProductDescription 
               product={props.product}
               showLabels={true}
-              showReleaseDate={true}
             />
             
-            {/* Perf Metrics */}
+            {/* Release Metrics */}
             <MetricSummary 
-              summaryItems={perfSummary}
+              summaryItems={releaseSummary}
               variant='list'
             />
           
