@@ -20,13 +20,13 @@ import * as _ from 'lodash'
 // ========
 
 /*
-EDNPOINT
+ENDPOINT
   GET:LATEST_PRICES_URL
 DESC
   Parses the input response object from the endpoint and returns a 
   Map<number, IDatedPriceData>
 INPUT
-  responresponse: The response corresponding to the return value
+  response: The response corresponding to the return value
 RETURN
   A map of tcgplayerId => IDatedPriceData
 */
@@ -72,13 +72,35 @@ export function parsePortfoliosEndpointResponse(
 ): IPopulatedPortfolio[] {
 
   // parse populatedPortfolio
-  const portfolios = response.map((portfolio: any) => {
-    return parsePopulatedPortfolioJSON(portfolio)
+  const portfolios = response.map((json: any) => {
+    return parsePopulatedPortfolioJSON(json)
   }) 
   assert(isIPopulatedPortfolioArray(portfolios), 
     'Could not parse IPopulatedPortfolio[]')
 
   return portfolios
+}
+
+/*
+ENDPOINT
+  GET:PRODUCTS_URL
+DESC
+  Parses the input response object from the endpoint and returns an IProduct[]
+INPUT
+  response: The response corresponding to the return value
+RETURN
+  An IProduct
+*/
+export function parseProductsEndpointResponse(
+  response: any[]
+): IProduct[] {
+
+  // parse Product
+  const products = response.map((json: any) => {
+    return parseProductJSON(json)
+  })
+
+  return products
 }
 
 
