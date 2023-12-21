@@ -1,5 +1,9 @@
 import { 
-  IDatedPriceData, IPriceData
+  // data models
+  IDatedPriceData, IPriceData,
+
+  // others
+  getDaysBetween
 } from 'common'
 import { formatNumber } from './generic'
 
@@ -32,6 +36,29 @@ export function formatAsPrice(value: number): string {
     prefix: '$',
     precision: 2
   })
+}
+
+/*
+  DESC
+    Calculates the annualized return based on the input prices and dates
+  INPUT
+    startPrice: The starting price
+    endPrice: The ending price
+    startDate: The start date
+    endDate: The end date
+  RETURN
+    The annualized return
+*/
+export function getAnnualizedReturn(
+  startPrice: number,
+  endPrice: number,
+  startDate: Date,
+  endDate: Date,
+  precision?: number
+): number {
+  const simpleReturn = (endPrice / startPrice) - 1
+  const elapsedDays = getDaysBetween(startDate, endDate)
+  return Math.pow(1 + simpleReturn, 365 / elapsedDays) - 1
 }
 
 /*
