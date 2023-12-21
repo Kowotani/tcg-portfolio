@@ -1,12 +1,15 @@
 import { 
+  // data models
   TDatedValue, PerformanceMetric,
 
-  genFirstOfMonthDateRange, genFirstOfQuarterDateRange, genFirstOfYearDateRange,
-  genSundayOfWeekDateRange, getDaysBetween,
+  // date functions
+  formatInTimeZone, genDateRange, genFirstOfMonthDateRange, 
+  genFirstOfQuarterDateRange, genFirstOfYearDateRange,
+  genSundayOfWeekDateRange, getDateOneMonthAgo, getDateThreeMonthsAgo, 
+  getDateSixMonthsAgo, getDateOneYearAgo, getDaysBetween, isDateAfter, 
+  isDateBefore,
 
-  formatInTimeZone, genDateRange, getDateOneMonthAgo, getDateThreeMonthsAgo, 
-  getDateSixMonthsAgo, getDateOneYearAgo,
-
+  // other
   assert
 } from 'common'
 import * as _ from 'lodash'
@@ -30,6 +33,39 @@ export enum ChartDateRange {
 // =========
 // functions
 // =========
+
+/*
+DESC
+  Clamps the input datedValues to fall within the input dateRange
+INPUT
+  datedValues: A TDatedValue[]
+  dateRange: A ChartDateRange
+RETURN
+  The dated values that are within the date range
+*/
+export function clampDatedValues(
+  datedValues: TDatedValue[], 
+  dateRange: ChartDateRange
+): TDatedValue[] {
+
+  // return all if dateRange is all
+  if (dateRange === ChartDateRange.All) {
+    return datedValues
+  }
+
+  // get start and end dates
+  const startDate = getStartDateFromChartDateRange(dateRange)
+  const endDate = new Date()
+
+  // return filtered values
+  return datedValues.filter((dv: TDatedValue) => {
+    const date = _.isDate(dv.date)
+      ? dv.date
+      : new Date(Date.parse(dv.date))
+    return isDateAfter(date, startDate, true) 
+      && isDateBefore(date, endDate, true)
+  })
+}
 
 /*
 DESC

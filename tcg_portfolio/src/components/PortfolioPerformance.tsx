@@ -19,9 +19,6 @@ import {
   // endpoint URLs
   PORTFOLIO_HOLDINGS_PERFORMANCE_URL, PORTFOLIO_PERFORMANCE_URL,
 
-  // date helpers
-  isDateAfter, isDateBefore,
-
   // rest
   getHoldingTcgplayerId
 } from 'common'
@@ -33,7 +30,7 @@ import { PortfolioPerfCard } from './PortfolioPerfCard'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { UserContext } from '../state/UserContext'
 import { CascadingSlideFade } from './Transitions'
-import { ChartDateRange, getStartDateFromChartDateRange } from '../utils/Chart'
+import { clampDatedValues, ChartDateRange } from '../utils/Chart'
 import { 
   ILatestPricesContext, getIPriceDataMapFromIDatedPriceDataMap 
 } from '../utils/Price'
@@ -49,44 +46,6 @@ const DEFAULT_METRICS = [
   PerformanceMetric.TotalCost,
   PerformanceMetric.CumPnL
 ]
-
-
-// =========
-// functions
-// =========
-
-/*
-DESC
-  Clamps the input datedValues to fall within the input dateRange
-INPUT
-  datedValues: A TDatedValue[]
-  dateRange: A ChartDateRange
-RETURN
-  The dated values that are within the date range
-*/
-function clampDatedValues(
-  datedValues: TDatedValue[], 
-  dateRange: ChartDateRange
-): TDatedValue[] {
-
-  // return all if dateRange is all
-  if (dateRange === ChartDateRange.All) {
-    return datedValues
-  }
-
-  // get start and end dates
-  const startDate = getStartDateFromChartDateRange(dateRange)
-  const endDate = new Date()
-
-  // return filtered values
-  return datedValues.filter((dv: TDatedValue) => {
-    const date = _.isDate(dv.date)
-      ? dv.date
-      : new Date(Date.parse(dv.date))
-    return isDateAfter(date, startDate, true) 
-      && isDateBefore(date, endDate, true)
-  })
-}
 
 
 // ==============
