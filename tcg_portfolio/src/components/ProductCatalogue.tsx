@@ -28,7 +28,7 @@ export const ProductCatalogue = (
   props: PropsWithChildren<TProductCatalogueProps>
 ) => {
 
-  
+
   // =========
   // constants
   // =========
@@ -58,12 +58,12 @@ export const ProductCatalogue = (
     } as TDatedValue
   })
   const chartData = new Map<string, TDatedValue[]>([
-    [PerformanceMetric.MarketValue, productMarketValues],
+    ['Price', productMarketValues],
     ['MSRP', productMsrpValues]
   ])
 
   const dataKeys = {
-    primaryKey: PerformanceMetric.MarketValue,
+    primaryKey: 'Price',
     referenceKey: 'MSRP'
   }
 
