@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getLocalDateFromISOString = exports.getClientTimezone = exports.formatInTimeZone = exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getDaysBetween = exports.getClampedDate = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getLocalDateFromISOString = exports.getClientTimezone = exports.formatInTimeZone = exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getStartOfDate = exports.getDaysBetween = exports.getClampedDate = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 var date_fns_tz_1 = require("date-fns-tz");
 var _ = require("lodash");
@@ -199,6 +199,18 @@ function getDaysBetween(startDate, endDate) {
     return (0, date_fns_1.differenceInCalendarDays)(endDate, startDate);
 }
 exports.getDaysBetween = getDaysBetween;
+/*
+DESC
+  Returns the input Date starting at midnight
+INPUT
+  date: A Date
+RETURN
+  The date starting at midnight
+*/
+function getStartOfDate(date) {
+    return (0, date_fns_1.startOfDay)(date);
+}
+exports.getStartOfDate = getStartOfDate;
 /*
 DESC
   Returns whether the first date is after the second date, or equal to if

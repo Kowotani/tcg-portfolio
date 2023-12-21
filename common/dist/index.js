@@ -15,5 +15,6 @@ __exportStar(require("./dataModels"), exports);
 __exportStar(require("./dateUtils"), exports);
 __exportStar(require("./holdingUtils"), exports);
 __exportStar(require("./portfolioUtils"), exports);
+__exportStar(require("./productUtils"), exports);
 __exportStar(require("./typeguards"), exports);
 __exportStar(require("./utils"), exports);

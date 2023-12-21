@@ -2,6 +2,7 @@ import {
   add, clamp, differenceInCalendarDays, differenceInDays, differenceInMonths, 
   differenceInYears, eachMonthOfInterval, eachQuarterOfInterval, 
   eachWeekOfInterval, eachYearOfInterval, isAfter, isBefore, isEqual, 
+  startOfDay, 
   startOfToday, sub
 } from 'date-fns'
 import { format, utcToZonedTime } from 'date-fns-tz'
@@ -229,8 +230,6 @@ export function getClampedDate(
     })
 }
 
-
-
 /*
 DESC
   Returns the number of calendar days between two dates
@@ -245,6 +244,18 @@ export function getDaysBetween(
   endDate: Date
 ): number {
   return differenceInCalendarDays(endDate, startDate)
+}
+
+/*
+DESC
+  Returns the input Date starting at midnight
+INPUT
+  date: A Date
+RETURN
+  The date starting at midnight
+*/
+export function getStartOfDate(date: Date): Date {
+  return startOfDay(date)
 }
 
 /*
