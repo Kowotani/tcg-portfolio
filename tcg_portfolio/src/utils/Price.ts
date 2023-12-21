@@ -40,25 +40,34 @@ export function formatAsPrice(value: number): string {
 
 /*
   DESC
-    Calculates the annualized return based on the input prices and dates
+    Calculates the return based on the input prices, and annualizes if
+    startDate and endDate are input
   INPUT
     startPrice: The starting price
     endPrice: The ending price
-    startDate: The start date
-    endDate: The end date
+    startDate?: The start date
+    endDate?: The end date
   RETURN
-    The annualized return
+    The (annualized) return
 */
-export function getAnnualizedReturn(
+export function getReturn(
   startPrice: number,
   endPrice: number,
-  startDate: Date,
-  endDate: Date,
-  precision?: number
+  startDate?: Date,
+  endDate?: Date,
 ): number {
+
+  // simple
   const simpleReturn = (endPrice / startPrice) - 1
-  const elapsedDays = getDaysBetween(startDate, endDate)
-  return Math.pow(1 + simpleReturn, 365 / elapsedDays) - 1
+
+  // elapsedDays to annualize
+  const elapsedDays = startDate && endDate
+    ? getDaysBetween(startDate, endDate)
+    : undefined
+  
+  return elapsedDays
+    ? Math.pow(1 + simpleReturn, 365 / elapsedDays) - 1
+    : simpleReturn
 }
 
 /*
