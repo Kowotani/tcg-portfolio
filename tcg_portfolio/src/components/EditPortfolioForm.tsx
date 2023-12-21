@@ -12,16 +12,15 @@ import {
   VStack
 } from '@chakra-ui/react'
 import { 
+  // data models
   IPopulatedHolding, IPopulatedPortfolio, IProduct, 
 
-  getIPortfoliosFromIPopulatedPortfolios,
+  // api
+  PORTFOLIO_URL, PRODUCTS_URL, TPostPortfolioReqBody, TPutPortfolioReqBody,
 
-  PORTFOLIO_URL, PRODUCTS_URL,
-  
-  TPutPortfolioReqBody,
-
-  assert, isASCII, isIPopulatedHolding, isIPortfolio, isTResBody, 
-  TPostPortfolioReqBody
+  // others
+  assert, getIPortfoliosFromIPopulatedPortfolios, getReleasedProducts, isASCII, 
+  isIPopulatedHolding, isIPortfolio, isTResBody,
 } from 'common'
 import { FilterInput } from './FilterInput'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
@@ -33,6 +32,7 @@ import { ProductSearchResult } from './ProductSearchResult';
 import { SearchInput } from './SearchInput'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { CascadingSlideFade } from './Transitions'
+import { parseProductsEndpointResponse } from '../utils/api'
 import { filterFnHoldingCard, sortFnPopulatedHoldingAsc } from '../utils/Holding'
 import { PortfolioPanelNav } from '../utils/PortfolioPanel'
 import { 
@@ -471,7 +471,8 @@ export const EditPortfolioForm = (
       url: PRODUCTS_URL,
     })
     .then(res => {
-      const products: IProduct[] = res.data.data
+      const data = res.data.data
+      const products = getReleasedProducts(parseProductsEndpointResponse(data))
       const existingTCGPlayerIds = portfolio.populatedHoldings.map(
         (holding: IPopulatedHolding) => holding.product.tcgplayerId
       )
