@@ -1,20 +1,26 @@
 import { PropsWithChildren, useEffect, useState } from 'react'
 import axios from 'axios'
 import { 
+  Box,
   Flex,
   Spinner, 
 } from '@chakra-ui/react'
+import { PriceChart } from './Charts'
 import { 
   // data models
   IProduct, PerformanceMetric, TDatedValue,
 
   // api
-  PRODUCT_PERFORMANCE_URL, PRODUCTS_URL, TGetProductPerformanceResBody
+  PRODUCT_PERFORMANCE_URL, PRODUCTS_URL, TGetProductPerformanceResBody,
+
+  // others
+  getReleasedProducts
  } from 'common'
 import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { ProductDetailsCard } from './ProductDetailsCard'
 import { parseProductsEndpointResponse } from '../utils/api'
+import { ChartDateRange, clampDatedValues } from '../utils/Chart'
 
 
 type TProductCatalogueProps = {}
@@ -22,6 +28,7 @@ export const ProductCatalogue = (
   props: PropsWithChildren<TProductCatalogueProps>
 ) => {
 
+  
   // =========
   // constants
   // =========
@@ -34,8 +41,31 @@ export const ProductCatalogue = (
   // =====
 
   const [ allProducts, setAllProducts ] = useState([] as IProduct[])
+  const [ chartDateRange, setChartDateRange ] = useState(ChartDateRange.All)
   const [ marketValue, setMarketValue ] = useState([] as TDatedValue[])
   const [ product, setProduct ] = useState({} as IProduct)
+
+
+  // ===============
+  // chart variables
+  // ===============
+
+  const productMarketValues = clampDatedValues(marketValue, chartDateRange)
+  const productMsrpValues = productMarketValues.map((dv: TDatedValue) => {
+    return {
+      date: dv.date,
+      value: product.msrp ?? 0
+    } as TDatedValue
+  })
+  const chartData = new Map<string, TDatedValue[]>([
+    [PerformanceMetric.MarketValue, productMarketValues],
+    ['MSRP', productMsrpValues]
+  ])
+
+  const dataKeys = {
+    primaryKey: PerformanceMetric.MarketValue,
+    referenceKey: 'MSRP'
+  }
 
 
   // =====
@@ -53,7 +83,7 @@ export const ProductCatalogue = (
     .then(res => {
       // set allProducts
       const data = res.data.data
-      const products = parseProductsEndpointResponse(data)
+      const products = getReleasedProducts(parseProductsEndpointResponse(data))
       setAllProducts(products)
 
       // set product randomly
@@ -82,6 +112,7 @@ export const ProductCatalogue = (
       const resData = res.data as TGetProductPerformanceResBody
       const values = resData.data[PRODUCT_PERFORMANCE_METRIC] as TDatedValue[]
       setMarketValue(values)
+      console.log(values)
     })
     .catch(err => {
       console.log('Error fetching Product performance data: ' + err)
@@ -114,6 +145,36 @@ export const ProductCatalogue = (
             />
           </Flex>
         ) : <ProductDetailsCard product={product}/>
+      }
+
+      {/* Price Chart */}
+      {_.isEmpty(product)
+        ? (
+          <Flex
+            alignItems='center' 
+            justifyContent='center' 
+            width='100%'
+          >
+            <Spinner 
+              color='blue.500'
+              height={75}
+              width={75}
+              thickness='7px'
+            />
+          </Flex>
+        ) : (
+          <Box marginTop={4}>
+            <PriceChart 
+              data={chartData}
+              dataKeys={dataKeys}
+              dateRange={ChartDateRange.All}
+              isControlled={false}
+              height={200}
+              minWidth={300}
+              setParentDateRange={setChartDateRange}
+            />
+          </Box>
+        )
       }
 
       {/* Product Search */}
