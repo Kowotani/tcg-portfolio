@@ -39,28 +39,50 @@ type TProductImageProps = BoxProps & {
 }
 export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
 
+
+  // ===============
+  // image variables
+  // ===============
+  
   const tcgplayerId = props.product.tcgplayerId
   const imageUrl = 
     `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_200w.jpg`
+  const secretLairImageUrl = 
+  `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_1_200w.jpg`
+
+  // isSecretLair
+  const isSecretLair = props.product.type === 'Secret Lair'
+
+
+  // =============
+  // sub component
+  // =============
+  
+  const ProductImage = () => {
+    return (
+      <Image 
+        borderRadius={12} 
+        boxSize={props.boxSize}
+        fallbackSrc={isSecretLair ? imageUrl : undefined}
+        src={isSecretLair ? secretLairImageUrl : imageUrl}
+      />
+    )
+  }
+
+
+  // ==============
+  // main component
+  // ==============
 
   return (
     <>
       {props.externalUrl
         ? (
           <UrlWrapper tcgplayerId={tcgplayerId}>
-            <Image 
-              borderRadius={12}
-              boxSize={props.boxSize}
-              src={imageUrl}
-            />            
+            <ProductImage />  
           </UrlWrapper>
-        ) : (
-          <Image
-            borderRadius={12} 
-            boxSize={props.boxSize}
-            src={imageUrl}
-          />       
-      )}
+        ) : <ProductImage />
+      }
     </>
   )
 }
