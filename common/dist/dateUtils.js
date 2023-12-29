@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getLocalDateFromISOString = exports.getClientTimezone = exports.formatInTimeZone = exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getStartOfDate = exports.getDaysBetween = exports.getClampedDate = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getLocalDateFromISOString = exports.getClientTimezone = exports.formatInTimeZone = exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getStartOfDate = exports.getDaysBetween = exports.getClampedDate = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.areDatesEqual = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 var date_fns_tz_1 = require("date-fns-tz");
 var _ = require("lodash");
@@ -98,6 +98,19 @@ exports.genSundayOfWeekDateRange = genSundayOfWeekDateRange;
 // =======
 // generic
 // =======
+/*
+DESC
+  Returns whether the two input dates are equal
+INPUT
+  first: The first Date
+  second: The second Date
+RETURN
+  TRUE if the dates are equal, FALSE otherwise
+*/
+function areDatesEqual(first, second) {
+    return (0, date_fns_1.isEqual)(first, second);
+}
+exports.areDatesEqual = areDatesEqual;
 /*
 DESC
   Adds the input duration to the input Date

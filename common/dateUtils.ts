@@ -129,6 +129,19 @@ export function genSundayOfWeekDateRange(
 
 /*
 DESC
+  Returns whether the two input dates are equal
+INPUT
+  first: The first Date 
+  second: The second Date
+RETURN
+  TRUE if the dates are equal, FALSE otherwise
+*/
+export function areDatesEqual(first: Date, second: Date): boolean {
+  return isEqual(first, second)
+}
+
+/*
+DESC
   Adds the input duration to the input Date
 INPUT
   date: A Date 
