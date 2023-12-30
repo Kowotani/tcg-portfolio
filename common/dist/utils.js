@@ -107,7 +107,7 @@ function getValueAtDate(datedValues, date, closest, useEarlier) {
             var later = _.first(sortedValues.filter(function (dv) { return dv.date > date; }));
             var laterDiff = (0, dateUtils_1.dateDiff)(date, later.date, 'days');
             return earlierDiff < laterDiff
-                || (earlierDiff === laterDiff && useEarlier)
+                || (earlierDiff === laterDiff && (useEarlier !== null && useEarlier !== void 0 ? useEarlier : true))
                 ? earlier.value
                 : later.value;
         }

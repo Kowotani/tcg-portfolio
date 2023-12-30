@@ -133,7 +133,7 @@ export function getValueAtDate(
       const laterDiff = dateDiff(date, later.date, 'days')
 
       return earlierDiff < laterDiff 
-        || (earlierDiff === laterDiff && useEarlier)
+        || (earlierDiff === laterDiff && (useEarlier ?? true))
           ? earlier.value
           : later.value 
     }
