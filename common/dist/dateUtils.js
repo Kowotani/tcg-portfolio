@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getLocalDateFromISOString = exports.getClientTimezone = exports.formatInTimeZone = exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getStartOfDate = exports.getDaysBetween = exports.getClampedDate = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateAdd = exports.areDatesEqual = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getLocalDateFromISOString = exports.getClientTimezone = exports.formatInTimeZone = exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getStartOfDate = exports.getDaysBetween = exports.getClampedDate = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateDiff = exports.dateAdd = exports.areDatesEqual = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 var date_fns_tz_1 = require("date-fns-tz");
 var _ = require("lodash");
@@ -123,6 +123,29 @@ function dateAdd(date, duration) {
     return (0, date_fns_1.add)(date, duration);
 }
 exports.dateAdd = dateAdd;
+/*
+DESC
+  Returns the difference of endDate - startDate in the input calendar units
+INPUT
+  startDate: A Date
+  endDate: A Date
+  units: The supported units for the calculation
+RETURN
+  The number of calendar units in between startDate and endDate
+*/
+function dateDiff(startDate, endDate, units) {
+    switch (units) {
+        case 'days':
+            return (0, date_fns_1.differenceInCalendarDays)(endDate, startDate);
+        case 'weeks':
+            return (0, date_fns_1.differenceInCalendarWeeks)(endDate, startDate);
+        case 'months':
+            return (0, date_fns_1.differenceInCalendarMonths)(endDate, startDate);
+        case 'years':
+            return (0, date_fns_1.differenceInCalendarYears)(endDate, startDate);
+    }
+}
+exports.dateDiff = dateDiff;
 /*
 DESC
   Subtracts the input duration to the input Date

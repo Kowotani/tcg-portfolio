@@ -5,6 +5,7 @@ export declare function genFirstOfYearDateRange(startDate: Date, endDate: Date):
 export declare function genSundayOfWeekDateRange(startDate: Date, endDate: Date): Date[];
 export declare function areDatesEqual(first: Date, second: Date): boolean;
 export declare function dateAdd(date: Date, duration: TDateMathDuration): Date;
+export declare function dateDiff(startDate: Date, endDate: Date, units: 'days' | 'weeks' | 'months' | 'years'): number;
 export declare function dateSub(date: Date, duration: TDateMathDuration): Date;
 export declare function formatAsISO(date: Date): string;
 export declare function formatDateDiffAsYearsMonthsDays(startDate: Date, endDate: Date): string;

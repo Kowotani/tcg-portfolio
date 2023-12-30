@@ -1,9 +1,16 @@
 import { 
-  add, clamp, differenceInCalendarDays, differenceInDays, differenceInMonths, 
-  differenceInYears, eachMonthOfInterval, eachQuarterOfInterval, 
-  eachWeekOfInterval, eachYearOfInterval, isAfter, isBefore, isEqual, 
-  startOfDay, 
-  startOfToday, sub
+  add, clamp, sub,
+  
+  isAfter, isBefore, isEqual, 
+
+  differenceInCalendarDays, differenceInDays, differenceInCalendarWeeks, 
+  differenceInCalendarMonths, differenceInMonths, differenceInCalendarYears, 
+  differenceInYears, 
+  
+  eachMonthOfInterval, eachQuarterOfInterval,  eachWeekOfInterval, 
+  eachYearOfInterval, 
+
+  startOfDay, startOfToday, 
 } from 'date-fns'
 import { format, utcToZonedTime } from 'date-fns-tz'
 import * as _ from 'lodash'
@@ -150,6 +157,37 @@ RETURN
 */
 export function dateAdd(date: Date, duration: TDateMathDuration): Date {
   return add(date, duration)
+}
+
+/*
+DESC
+  Returns the difference of endDate - startDate in the input calendar units
+INPUT
+  startDate: A Date 
+  endDate: A Date
+  units: The supported units for the calculation
+RETURN
+  The number of calendar units in between startDate and endDate
+*/
+export function dateDiff(
+  startDate: Date,
+  endDate: Date, 
+  units: 'days' | 'weeks' | 'months' | 'years'
+): number {
+
+  switch (units) {
+    case 'days':
+      return differenceInCalendarDays(endDate, startDate)
+
+    case 'weeks':
+      return differenceInCalendarWeeks(endDate, startDate)
+
+    case 'months':
+      return differenceInCalendarMonths(endDate, startDate)
+
+      case 'years':
+        return differenceInCalendarYears(endDate, startDate)
+  }
 }
 
 /*
