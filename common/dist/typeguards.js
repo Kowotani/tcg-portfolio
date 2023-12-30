@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isITransactionArray = exports.isITransaction = exports.hasITransactionKeys = exports.hasIProductKeys = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIDatedPriceData = exports.hasIDatedPriceDataKeys = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.isIProduct = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = void 0;
+exports.isITransactionArray = exports.isITransaction = exports.hasITransactionKeys = exports.hasIProductKeys = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIDatedPriceData = exports.hasIDatedPriceDataKeys = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.isIProduct = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.isTDatedvalue = exports.hasTDatedValueKeys = exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 // ===
@@ -48,6 +48,38 @@ function isTProductPostResBody(arg) {
         && isTDataResBody(arg);
 }
 exports.isTProductPostResBody = isTProductPostResBody;
+// =======
+// generic
+// =======
+/*
+DESC
+  Returns whether or not the input has all TDatedValue keys
+INPUT
+  arg: An object that might be a TDatedValue
+RETURN
+  TRUE if the input has all TDatedValue keys, FALSE otherwise
+*/
+function hasTDatedValueKeys(arg) {
+    return arg
+        && arg.date
+        && arg.value;
+}
+exports.hasTDatedValueKeys = hasTDatedValueKeys;
+/*
+DESC
+  Returns whether or not the input is an IHolding[]
+INPUT
+  arg: An object that might be an IHolding[]
+RETURN
+  TRUE if the input is an IHolding[], FALSE otherwise
+*/
+function isTDatedvalue(arg) {
+    return arg
+        && hasTDatedValueKeys(arg)
+        && _.isDate(arg.date)
+        && typeof (arg.value) === 'number';
+}
+exports.isTDatedvalue = isTDatedvalue;
 // =======
 // holding
 // =======

@@ -2,11 +2,9 @@ import {
   TDataResBody, TProductPostResBody, TResBody,
 } from './api'
 import {
-  IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, IPrice, 
-  IPriceData, IProduct, ITransaction, ProductLanguage, ProductSubtype, 
-  ProductType, TCG, TransactionType,
-
-  IDatedPriceData, 
+  IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
+  IPrice, IPriceData, IProduct, ITransaction, ProductLanguage, ProductSubtype, 
+  ProductType, TCG, TDatedValue, TransactionType,
 } from './dataModels'
 import * as _ from 'lodash'
 
@@ -57,6 +55,40 @@ export function isTProductPostResBody<Type>(
   return arg
     && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
     && isTDataResBody<Type>(arg)
+}
+
+
+// =======
+// generic
+// =======
+
+/*
+DESC
+  Returns whether or not the input has all TDatedValue keys
+INPUT
+  arg: An object that might be a TDatedValue
+RETURN
+  TRUE if the input has all TDatedValue keys, FALSE otherwise
+*/
+export function hasTDatedValueKeys(arg: any): boolean {
+  return arg
+    && arg.date
+    && arg.value
+}
+
+/*
+DESC
+  Returns whether or not the input is an IHolding[]
+INPUT
+  arg: An object that might be an IHolding[] 
+RETURN
+  TRUE if the input is an IHolding[], FALSE otherwise
+*/
+export function isTDatedvalue(arg: any): arg is TDatedValue {
+  return arg
+    && hasTDatedValueKeys(arg)
+    && _.isDate(arg.date)
+    && typeof(arg.value) === 'number'
 }
 
 
