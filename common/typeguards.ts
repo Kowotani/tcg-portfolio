@@ -2,9 +2,13 @@ import {
   TDataResBody, TProductPostResBody, TResBody,
 } from './api'
 import {
+  // data models
   IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
-  IPrice, IPriceData, IProduct, ITransaction, ProductLanguage, ProductSubtype, 
-  ProductType, TCG, TDatedValue, TransactionType,
+  IPrice, IPriceData, IProduct, ITransaction,  TDatedValue, TPerformanceData,
+
+  // enums
+  PerformanceMetric, ProductLanguage, ProductSubtype, ProductType, TCG, 
+  TransactionType
 } from './dataModels'
 import * as _ from 'lodash'
 
@@ -55,40 +59,6 @@ export function isTProductPostResBody<Type>(
   return arg
     && arg.tcgplayerId && typeof(arg.tcgplayerId) === 'number'
     && isTDataResBody<Type>(arg)
-}
-
-
-// =======
-// generic
-// =======
-
-/*
-DESC
-  Returns whether or not the input has all TDatedValue keys
-INPUT
-  arg: An object that might be a TDatedValue
-RETURN
-  TRUE if the input has all TDatedValue keys, FALSE otherwise
-*/
-export function hasTDatedValueKeys(arg: any): boolean {
-  return arg
-    && arg.date
-    && arg.value
-}
-
-/*
-DESC
-  Returns whether or not the input is an IHolding[]
-INPUT
-  arg: An object that might be an IHolding[] 
-RETURN
-  TRUE if the input is an IHolding[], FALSE otherwise
-*/
-export function isTDatedvalue(arg: any): arg is TDatedValue {
-  return arg
-    && hasTDatedValueKeys(arg)
-    && _.isDate(arg.date)
-    && typeof(arg.value) === 'number'
 }
 
 
@@ -458,6 +428,92 @@ export function hasIProductKeys(arg: any): boolean {
     && arg.name
     && arg.type
     && arg.language
+}
+
+
+// ===========
+// TDatedValue
+// ===========
+
+/*
+DESC
+  Returns whether or not the input has all TDatedValue keys
+INPUT
+  arg: An object that might be a TDatedValue
+RETURN
+  TRUE if the input has all TDatedValue keys, FALSE otherwise
+*/
+export function hasTDatedValueKeys(arg: any): boolean {
+  return arg
+    && arg.date
+    && arg.value
+}
+
+/*
+DESC
+  Returns whether or not the input is an TDatedValue
+INPUT
+  arg: An object that might be an TDatedValue
+RETURN
+  TRUE if the input is an TDatedValue, FALSE otherwise
+*/
+export function isTDatedvalue(arg: any): arg is TDatedValue {
+  return arg
+    && hasTDatedValueKeys(arg)
+    && _.isDate(arg.date)
+    && typeof(arg.value) === 'number'
+}
+
+/*
+DESC
+  Returns whether or not the input is an TDatedValue[]
+INPUT
+  arg: An object that might be an TDatedValue[] 
+RETURN
+  TRUE if the input is an TDatedValue[], FALSE otherwise
+*/
+export function isTDatedvalueArray(arg: any): arg is TDatedValue[] {
+  return arg
+    && Array.isArray(arg)
+    && _.every(arg.map((el: any) => {
+      return isTDatedvalue(el)
+    }))
+}
+
+
+// ================
+// TPerformanceData
+// ================
+
+/*
+DESC
+  Returns whether or not the input has all TPerformanceData keys
+INPUT
+  arg: An object that might be a TPerformanceData
+RETURN
+  TRUE if the input has all TPerformanceData keys, FALSE otherwise
+*/
+export function hasTPerformanceDataKeys(arg: any): boolean {
+  return arg
+    && _.every(Object.keys(arg), (key: string) => {
+      return Object.values(PerformanceMetric).includes(key as PerformanceMetric)
+    })
+}
+
+/*
+DESC
+  Returns whether or not the input is an TPerformanceData
+INPUT
+  arg: An object that might be an TPerformanceData 
+RETURN
+  TRUE if the input is an TPerformanceData, FALSE otherwise
+*/
+export function isTPerformanceData(arg: any): arg is TPerformanceData {
+  return arg
+    && hasTPerformanceDataKeys(arg)
+    && _.every(Object.keys(arg), (key: string) => {
+      return isTDatedvalueArray(arg[key])
+    })
 }
 
 
