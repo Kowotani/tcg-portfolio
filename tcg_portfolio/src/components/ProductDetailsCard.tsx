@@ -7,12 +7,23 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react'
-import { IProduct } from 'common'
+import { 
+  // data models
+  IProduct, TDatedValue,
+
+  // date helpers
+  getDateOneMonthAgo, getDateOneYearAgo,
+
+  // others
+  getValueAtDate
+} from 'common'
+import * as _ from 'lodash'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
 import { LatestPricesContext } from '../state/LatestPricesContext'
-import { ILatestPricesContext } from '../utils/Price'
+import { ChartDateRange, getStartDateFromChartDateRange } from '../utils/Chart'
+import { getReturn, ILatestPricesContext } from '../utils/Price'
 import { getProductNameWithLanguage } from '../utils/Product'
 
 
@@ -21,7 +32,9 @@ import { getProductNameWithLanguage } from '../utils/Product'
 // ==============
 
 type TProductCardProps = {
-  product: IProduct
+  chartDateRange: ChartDateRange,
+  marketValue: TDatedValue[],
+  product: IProduct,
 }
 export const ProductDetailsCard = (
   props: PropsWithChildren<TProductCardProps>
@@ -63,6 +76,67 @@ export const ProductDetailsCard = (
       placeholder: ' -',
     },
   ]
+
+  // const sortedMarketValue = sortDatedValues(props.marketValue)
+
+  // 1-month return
+  const oneMonthAgoPrice = 
+    getValueAtDate(props.marketValue, getDateOneMonthAgo())
+  const oneMonthReturn = oneMonthAgoPrice && price 
+    ? getReturn(oneMonthAgoPrice, price)
+    : undefined
+
+  // 1-year return
+  const oneYearAgoPrice = 
+    getValueAtDate(props.marketValue, getDateOneYearAgo())
+  const oneYearReturn = oneYearAgoPrice && price 
+    ? getReturn(oneYearAgoPrice, price)
+    : undefined
+
+  // custom return
+  const customDate = props.chartDateRange === ChartDateRange.All
+    ? (_.head(props.marketValue) as TDatedValue).date
+    : getStartDateFromChartDateRange(props.chartDateRange)
+  const customPrice = getValueAtDate(props.marketValue, customDate)
+  const customReturn = customPrice && price 
+    ? getReturn(customPrice, price)
+    : undefined
+  const customTitle = 
+    props.chartDateRange === ChartDateRange.OneMonth ? '1-Month Return:'
+    : props.chartDateRange === ChartDateRange.ThreeMonths ? '3-Month Return:'
+    : props.chartDateRange === ChartDateRange.SixMonths ? '6-Month Return:'
+    : props.chartDateRange === ChartDateRange.OneYear ? '1-Year Return:'
+    : 'All-Time Return:'
+
+  const oneMonthItem: TMetricSummaryItem = {
+    title: '1-Month Return:',
+    value: oneMonthReturn,
+    formattedPrecision: 2,
+    formattedSuffix: '%',
+    placeholder: ' -',
+  }
+  const oneYearItem: TMetricSummaryItem = {
+    title: '1-Year Return:',
+    value: oneYearReturn,
+    formattedPrecision: 2,
+    formattedSuffix: '%',
+    placeholder: ' -',
+  }
+  const customItem: TMetricSummaryItem = {
+    title: customTitle,
+    value: customReturn,
+    formattedPrecision: 2,
+    formattedSuffix: '%',
+    placeholder: '- ',
+  }
+
+  const perfSummary = [
+    ChartDateRange.ThreeMonths, 
+    ChartDateRange.SixMonths,
+    ChartDateRange.All
+  ].includes(props.chartDateRange)
+    ? [oneMonthItem, oneYearItem, customItem]
+    : [oneMonthItem, oneYearItem]
 
 
   // ==============
@@ -106,6 +180,12 @@ export const ProductDetailsCard = (
               summaryItems={releaseSummary}
               variant='list'
             />
+
+            {/* Perf Metrics */}
+            <MetricSummary 
+              summaryItems={perfSummary}
+              variant='list'
+            />            
           
           </HStack>
 

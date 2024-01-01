@@ -19,7 +19,9 @@ import {
 import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { ProductDetailsCard } from './ProductDetailsCard'
-import { parseProductsEndpointResponse } from '../utils/api'
+import { 
+  parseProductsEndpointResponse, parseProductPerformanceEndpointResponse 
+} from '../utils/api'
 import { ChartDateRange, clampDatedValues } from '../utils/Chart'
 
 
@@ -98,25 +100,29 @@ export const ProductCatalogue = (
   // load Product market value data
   useEffect(() => {
 
-    // call endpoint
-    axios({
-      method: 'get',
-      url: PRODUCT_PERFORMANCE_URL,
-      params: {
-        tcgplayerId: product.tcgplayerId,
-        metrics: [PRODUCT_PERFORMANCE_METRIC]
-      }      
-    })
-    .then(res => {
-      // set marketValue data
-      const resData = res.data as TGetProductPerformanceResBody
-      const values = resData.data[PRODUCT_PERFORMANCE_METRIC] as TDatedValue[]
-      setMarketValue(values)
-      console.log(values)
-    })
-    .catch(err => {
-      console.log('Error fetching Product performance data: ' + err)
-    })
+    // only call endpoint if a Product is set
+    if (!_.isEmpty(product)) {
+
+      // call endpoint
+      axios({
+        method: 'get',
+        url: PRODUCT_PERFORMANCE_URL,
+        params: {
+          tcgplayerId: product.tcgplayerId,
+          metrics: [PRODUCT_PERFORMANCE_METRIC]
+        }      
+      })
+      .then(res => {
+        // set marketValue data
+        const resData = res.data as TGetProductPerformanceResBody
+        const perfData = parseProductPerformanceEndpointResponse(resData.data)
+        const values = perfData[PRODUCT_PERFORMANCE_METRIC] as TDatedValue[]
+        setMarketValue(values)
+      })
+      .catch(err => {
+        console.log('Error fetching Product performance data: ' + err)
+      })
+    }
   }, [product])
 
   
@@ -130,7 +136,7 @@ export const ProductCatalogue = (
       <SectionHeader header='Product Details'/>
 
       {/* Details */}
-      {_.isEmpty(product)
+      {_.isEmpty(product) || _.isEmpty(marketValue)
         ? (
           <Flex 
             alignItems='center' 
@@ -144,11 +150,17 @@ export const ProductCatalogue = (
               thickness='7px'
             />
           </Flex>
-        ) : <ProductDetailsCard product={product}/>
+        ) : (
+          <ProductDetailsCard 
+            chartDateRange={chartDateRange}
+            marketValue={marketValue} 
+            product={product}
+          />
+        )
       }
 
       {/* Price Chart */}
-      {_.isEmpty(product)
+      {_.isEmpty(product) || _.isEmpty(marketValue)
         ? (
           <Flex
             alignItems='center' 
@@ -167,7 +179,7 @@ export const ProductCatalogue = (
             <PriceChart 
               data={chartData}
               dataKeys={dataKeys}
-              dateRange={ChartDateRange.All}
+              dateRange={chartDateRange}
               isControlled={false}
               height={200}
               minWidth={300}
