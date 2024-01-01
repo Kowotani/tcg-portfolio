@@ -1,16 +1,19 @@
 import { 
   // data models
-  IPopulatedHolding, IPopulatedPortfolio, IProduct, ITransaction, 
+  IPopulatedHolding, IPopulatedPortfolio, IProduct, ITransaction, TDatedValue,
+  TPerformanceData,
 
   // type guards
   hasIDatedPriceDataKeys, hasIPopulatedHoldingKeys, hasIPopulatedPortfolioKeys, 
-  hasIProductKeys, hasITransactionKeys, 
+  hasIProductKeys, hasITransactionKeys, hasTDatedValueKeys, 
+  hasTPerformanceDataKeys,
   
   isIDatedPriceData, isIPopulatedHolding, isIPopulatedPortfolio, 
-  isIPopulatedPortfolioArray, isIProduct, isITransaction,
+  isIPopulatedPortfolioArray, isIProduct, isITransaction, isTDatedvalue,
+  isTDatedvalueArray, isTPerformanceData,
 
   // generic
-  assert, getLocalDateFromISOString, IDatedPriceData
+  assert, getLocalDateFromISOString, IDatedPriceData, PerformanceMetric
 } from 'common'
 import * as _ from 'lodash'
 
@@ -83,6 +86,25 @@ export function parsePortfoliosEndpointResponse(
 
 /*
 ENDPOINT
+  GET:PRODUCT_PERFORMANCE_URL
+DESC
+  Parses the input response object from the endpoint and returns 
+    a TPerformanceData
+INPUT
+  response: The response corresponding to the return value
+RETURN
+  A TPerformanceData
+*/
+export function parseProductPerformanceEndpointResponse(
+  response: any
+): TPerformanceData {
+
+  // parse TPerformanceData
+  return parseTPerformanceDataJSON(response)
+}
+
+/*
+ENDPOINT
   GET:PRODUCTS_URL
 DESC
   Parses the input response object from the endpoint and returns an IProduct[]
@@ -101,6 +123,76 @@ export function parseProductsEndpointResponse(
   })
 
   return products
+}
+
+
+// =======
+// generic
+// =======
+
+/*
+  DESC
+    Returns a TDatedValue after parsing the input json
+  INPUT
+    json: A JSON representation of a TDatedValue
+  RETURN
+    An TDatedValue
+*/
+function parseTDatedValueJSON(json: any): TDatedValue {
+
+  // verify keys exist
+  assert(hasTDatedValueKeys(json), 'JSON is not TDatedValue shaped')
+
+  // parse json
+  const obj = {
+    date: getLocalDateFromISOString(json.date),
+    value: json.value as number
+  }
+  assert(isTDatedvalue(obj), 'Object is not a TDatedValue')
+  return obj
+}
+
+/*
+  DESC
+    Returns a TDatedValue[] after parsing the input json
+  INPUT
+    json: A JSON representation of a TDatedValue[]
+  RETURN
+    An TDatedValue[]
+*/
+function parseTDatedValueArrayJSON(json: any): TDatedValue[] {
+
+  // verify JSON shape
+  assert(_.isArray(json), 'JSON is not array shaped')
+
+  // parse json
+  const obj = json.map((el: any) => {
+    return parseTDatedValueJSON(el)
+  })
+  assert(isTDatedvalueArray(obj), 'Object is not a TDatedValue[]')
+  return obj
+}
+
+/*
+  DESC
+    Returns a TPerformanceData after parsing the input json
+  INPUT
+    json: A JSON representation of a TPerformanceData
+  RETURN
+    An TPerformanceData
+*/
+function parseTPerformanceDataJSON(json: any): TPerformanceData {
+
+  // verify keys exist
+  assert(hasTPerformanceDataKeys(json), 'JSON is not TPerformanceData shaped')
+
+  // parse json
+  const obj = {} as TPerformanceData
+  Object.keys(json).forEach((key: string) => {
+    obj[key as PerformanceMetric] = parseTDatedValueArrayJSON(json[key])
+  })
+  assert(isTPerformanceData(obj), 'Object is not a TPerformanceData')
+  return obj
 }
 
 
