@@ -61,9 +61,11 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
   const ProductImage = () => {
     return (
       <Image 
+        backgroundColor='white'
         borderRadius={12} 
         boxSize={props.boxSize}
         fallbackSrc={isSecretLair ? imageUrl : undefined}
+        fit='contain'
         src={isSecretLair ? secretLairImageUrl : imageUrl}
       />
     )
