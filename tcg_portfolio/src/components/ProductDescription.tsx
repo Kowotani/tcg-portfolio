@@ -4,7 +4,8 @@ import {
   Box, 
   BoxProps, 
   Flex,
-  Text 
+  Text,
+  Tooltip 
 } from '@chakra-ui/react'
 import { IProduct, formatAsISO } from 'common'
 import { 
@@ -18,6 +19,8 @@ import {
 
 type TProductDescriptionProps = BoxProps & {
   product: IProduct,
+  noOfHeaderLines?: number,
+  noOfDescriptionLines?: number,
   showHeader?: boolean,
   showLabels?: boolean,
   showReleaseDate?: boolean
@@ -30,6 +33,8 @@ export const ProductDescription = (
   const {
     product,
     fontSize = 'md',
+    noOfHeaderLines = undefined,
+    noOfDescriptionLines = undefined,
     showHeader = false,
     showLabels = false,
     showReleaseDate = false,
@@ -43,16 +48,18 @@ export const ProductDescription = (
 
   // -- TextWrapper
   type TTextWrapperProps = BoxProps & {
-    asType?: As
+    asType?: As,
+    noOfLines?: number
   }
   const TextWrapper = (
     props: PropsWithChildren<TTextWrapperProps>
   ) => {
     return (
       <Text
-        textAlign={textAlign}
         fontSize={fontSize}
+        textAlign={textAlign}
         as={props.asType}
+        noOfLines={props.noOfLines}
       >
         {props.children}
       </Text>
@@ -60,18 +67,22 @@ export const ProductDescription = (
   }
 
   type TLabelledTextProps = BoxProps & {
-    label: string
+    label: string,
+    noOfLines?: number
   }
   const LabelledTextWrapper = (
     props: PropsWithChildren<TLabelledTextProps>
   ) => {
     return (
       <Flex direction='row' justify='flex-start'>
-        <TextWrapper asType='b'>
+        <TextWrapper 
+          asType='b'
+          noOfLines={props.noOfLines}
+        >
           {`${props.label}:`}
         </TextWrapper>
         <Box width={2}/>
-        <TextWrapper>
+        <TextWrapper noOfLines={props.noOfLines}>
           {props.children}
         </TextWrapper>
       </Flex>  
@@ -88,7 +99,10 @@ export const ProductDescription = (
 
       {/* Name */}
       {showHeader && (
-        <TextWrapper fontWeight='bold'>
+        <TextWrapper 
+          fontWeight='bold' 
+          noOfLines={noOfHeaderLines}
+        >
           {getProductNameWithLanguage(product)}
         </TextWrapper>
       )}
@@ -96,11 +110,14 @@ export const ProductDescription = (
       {/* TCG */}
       {showLabels 
         ? (
-          <LabelledTextWrapper label='TCG'> 
+          <LabelledTextWrapper 
+            label='TCG' 
+            noOfLines={noOfDescriptionLines}
+          > 
             {product.tcg}
           </LabelledTextWrapper>
         ) : (
-          <TextWrapper>
+          <TextWrapper noOfLines={noOfDescriptionLines}>
             {product.tcg}
           </TextWrapper>
         )
@@ -109,11 +126,14 @@ export const ProductDescription = (
       {/* Type */}
       {showLabels 
         ? (
-          <LabelledTextWrapper label='Type'> 
+          <LabelledTextWrapper 
+            label='Type' 
+            noOfLines={noOfDescriptionLines}
+          > 
             {product.type}
           </LabelledTextWrapper>
         ) : (
-          <TextWrapper>
+          <TextWrapper noOfLines={noOfDescriptionLines}>
             {product.type}
           </TextWrapper>
         )
@@ -125,11 +145,14 @@ export const ProductDescription = (
         && (
           showLabels
           ? (
-            <LabelledTextWrapper label='Subtype'> 
+            <LabelledTextWrapper 
+              label='Subtype'
+              noOfLines={noOfDescriptionLines}
+            > 
               {product.subtype}
             </LabelledTextWrapper>
           ) : (
-            <TextWrapper> 
+            <TextWrapper noOfLines={noOfDescriptionLines}> 
               {product.subtype}
             </TextWrapper>
           )
@@ -140,11 +163,14 @@ export const ProductDescription = (
       {showReleaseDate && (
         showLabels
           ? (
-            <LabelledTextWrapper label='Release Date'> 
+            <LabelledTextWrapper 
+              label='Release Date'
+              noOfLines={noOfDescriptionLines}
+            > 
               {formatAsISO(product.releaseDate)}
             </LabelledTextWrapper>
           ) : (
-            <TextWrapper> 
+            <TextWrapper noOfLines={noOfDescriptionLines}> 
               {formatAsISO(product.releaseDate)}
             </TextWrapper>
           )
