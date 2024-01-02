@@ -18,6 +18,7 @@ import {
  } from 'common'
 import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
+import { ProductCatalogueCard } from './ProductCatalogueCard'
 import { ProductDetailsCard } from './ProductDetailsCard'
 import { 
   parseProductsEndpointResponse, parseProductPerformanceEndpointResponse 
@@ -118,6 +119,7 @@ export const ProductCatalogue = (
         const perfData = parseProductPerformanceEndpointResponse(resData.data)
         const values = perfData[PRODUCT_PERFORMANCE_METRIC] as TDatedValue[]
         setMarketValue(values)
+        window.scrollTo({top: 0, behavior: 'smooth'}) // scroll to the top
       })
       .catch(err => {
         console.log('Error fetching Product performance data: ' + err)
@@ -181,7 +183,7 @@ export const ProductCatalogue = (
               dataKeys={dataKeys}
               dateRange={chartDateRange}
               isControlled={false}
-              height={200}
+              height={300}
               minWidth={300}
               setParentDateRange={setChartDateRange}
             />
@@ -191,6 +193,24 @@ export const ProductCatalogue = (
 
       {/* Product Search */}
       <SectionHeader header='Product Search'/>
+
+      {/* Search Results */}
+      <Flex
+        alignItems='flex-start'
+        flexWrap='wrap'
+        justifyContent='center'
+      >
+        {_.slice(allProducts, 0, 20).map((product: IProduct) => {
+          return (
+            <Box m={2}>
+              <ProductCatalogueCard 
+                product={product}
+                setCatalogueProduct={setProduct}
+              />
+            </Box>
+          )
+        })}
+      </Flex>
     </>
   )
 }
