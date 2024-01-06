@@ -20,6 +20,7 @@ import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { ProductCatalogueCard } from './ProductCatalogueCard'
 import { ProductDetailsCard } from './ProductDetailsCard'
+import ReactPaginate from 'react-paginate'
 import { 
   parseProductsEndpointResponse, parseProductPerformanceEndpointResponse 
 } from '../utils/api'
@@ -37,14 +38,17 @@ export const ProductCatalogue = (
   // =========
 
   const PRODUCT_PERFORMANCE_METRIC = PerformanceMetric.MarketValue
+  const NUM_PAGINATED_RESULTS = 10
+   
 
-  
   // =====
   // state
   // =====
 
   const [ allProducts, setAllProducts ] = useState([] as IProduct[])
   const [ chartDateRange, setChartDateRange ] = useState(ChartDateRange.All)
+  const [ filteredProducts, setFilteredProducts ] = useState([] as IProduct[])
+  const [ paginatedProducts, setPaginatedProducts ] = useState([] as IProduct[])
   const [ marketValue, setMarketValue ] = useState([] as TDatedValue[])
   const [ product, setProduct ] = useState({} as IProduct)
 
@@ -71,6 +75,26 @@ export const ProductCatalogue = (
   }
 
 
+  // =========
+  // functions
+  // =========
+
+  /*
+    DESC
+      Handles the click event from the ReactPaginate page component and
+      updates paginatedProducts
+    INPUT
+      event: The current page object
+  */
+  function handlePageChange(event: any): void {
+    const startIx = event.selected * NUM_PAGINATED_RESULTS
+    const endIx = Math.min(
+      (event.selected + 1) * NUM_PAGINATED_RESULTS, 
+      filteredProducts.length)
+    setPaginatedProducts(_.slice(filteredProducts, startIx, endIx))
+  }
+
+
   // =====
   // hooks
   // =====
@@ -88,6 +112,9 @@ export const ProductCatalogue = (
       const data = res.data.data
       const products = getReleasedProducts(parseProductsEndpointResponse(data))
       setAllProducts(products)
+      // TODO: fix this
+      setFilteredProducts(products)
+      setPaginatedProducts(_.slice(products, 0, NUM_PAGINATED_RESULTS))
 
       // set product randomly
       const ix = Math.max(Math.floor(Math.random() * products.length - 1), 0)
@@ -127,7 +154,7 @@ export const ProductCatalogue = (
     }
   }, [product])
 
-  
+
   // ==============
   // main component
   // ==============
@@ -194,15 +221,15 @@ export const ProductCatalogue = (
       {/* Product Search */}
       <SectionHeader header='Product Search'/>
 
-      {/* Search Results */}
+      {/* Paginated Products */}
       <Flex
         alignItems='flex-start'
         flexWrap='wrap'
         justifyContent='center'
       >
-        {_.slice(allProducts, 0, 20).map((product: IProduct) => {
+        {_.slice(paginatedProducts).map((product: IProduct) => {
           return (
-            <Box m={2}>
+            <Box key={product.tcgplayerId} m={2}>
               <ProductCatalogueCard 
                 product={product}
                 setCatalogueProduct={setProduct}
@@ -211,6 +238,18 @@ export const ProductCatalogue = (
           )
         })}
       </Flex>
+
+      {/* Pagination UI */}
+      <ReactPaginate 
+        breakLabel='...'
+        marginPagesDisplayed={1}
+        nextLabel='>'
+        onPageChange={handlePageChange}
+        pageCount={Math.ceil(allProducts.length / NUM_PAGINATED_RESULTS)}
+        pageRangeDisplayed={3}
+        previousLabel='<'
+        renderOnZeroPageCount={null}
+      />
     </>
   )
 }
