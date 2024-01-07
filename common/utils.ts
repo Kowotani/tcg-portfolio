@@ -40,6 +40,22 @@ export function assert(condition: any, msg?: string): asserts condition {
 
 /*
 DESC
+  Returns an array of sequential numbers between the input start and end
+INPUT
+  start: The starting number
+  end: The ending number
+RETURN
+  An array of sequential numbers [start, ..., end]
+*/
+export function genSequentialArray(start: number, end: number): number[] {
+  assert(end >= start, 'end is not >= start')
+  return Array(end - start + 1).fill(0).map((num: number, ix: number) => {
+    return num + ix + start
+  })
+}
+
+/*
+DESC
   Converts a price string (determined by isPriceString()) to a number
 INPUT
   A string to convert

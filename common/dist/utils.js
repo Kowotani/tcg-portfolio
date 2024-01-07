@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.sortFnDatedValueDesc = exports.sortFnDatedValueAsc = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sortDatedValues = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isASCII = exports.getValueAtDate = exports.getProductSubtypes = exports.getPriceFromString = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
+exports.sortFnDatedValueDesc = exports.sortFnDatedValueAsc = exports.sortFnDateDesc = exports.sortFnDateAsc = exports.sortDatedValues = exports.sleep = exports.logObject = exports.isTCGPriceTypeValue = exports.isPriceString = exports.isASCII = exports.getValueAtDate = exports.getProductSubtypes = exports.getPriceFromString = exports.genSequentialArray = exports.assert = exports.SECONDS_PER_DAY = exports.MILLISECONDS_PER_SECOND = exports.DAYS_PER_YEAR = void 0;
 var dataModels_1 = require("./dataModels");
 var dateUtils_1 = require("./dateUtils");
 var _ = require("lodash");
@@ -30,6 +30,22 @@ function assert(condition, msg) {
     }
 }
 exports.assert = assert;
+/*
+DESC
+  Returns an array of sequential numbers between the input start and end
+INPUT
+  start: The starting number
+  end: The ending number
+RETURN
+  An array of sequential numbers [start, ..., end]
+*/
+function genSequentialArray(start, end) {
+    assert(end >= start, 'end is not >= start');
+    return Array(end - start + 1).fill(0).map(function (num, ix) {
+        return num + ix + start;
+    });
+}
+exports.genSequentialArray = genSequentialArray;
 /*
 DESC
   Converts a price string (determined by isPriceString()) to a number
