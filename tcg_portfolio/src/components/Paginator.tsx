@@ -179,7 +179,8 @@ export const Paginator = (props: PropsWithChildren<PaginatorProps>) => {
       {props.pages.map((num: number, ix: number) => {
 
         return (
-          <Button 
+          <Button
+            key={num} 
             colorScheme='blue'
             isActive={props.isCenter 
               ? ix === (props.pages.length - 1) / 2
