@@ -2,6 +2,7 @@ import { PropsWithChildren, useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { 
   Box,
+  Icon,
   Flex,
   Spinner, 
 } from '@chakra-ui/react'
@@ -16,6 +17,7 @@ import {
   // others
   getReleasedProducts
  } from 'common'
+import { FilterInput } from './FilterInput'
 import { useWindowDimensions } from '../hooks/WindowDimensions'
 import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
@@ -23,11 +25,15 @@ import { MobileModeContext } from '../state/MobileModeContext'
 import { Paginator } from './Paginator'
 import { ProductCatalogueCard } from './ProductCatalogueCard'
 import { ProductDetailsCard } from './ProductDetailsCard'
+import { FaSearch } from 'react-icons/fa'
 import { 
   parseProductsEndpointResponse, parseProductPerformanceEndpointResponse 
 } from '../utils/api'
 import { ChartDateRange, clampDatedValues } from '../utils/Chart'
 import { IMobileModeContext } from '../utils/mobile'
+import { 
+  filterFnProductSearchResult, sortFnProductSearchResults 
+} from '../utils/Product'
 
 
 type TProductCatalogueProps = {}
@@ -54,11 +60,12 @@ export const ProductCatalogue = (
   const [ cardWidth, setCardWidth ] = useState(DEFAULT_CARD_WIDTH)
   const [ chartDateRange, setChartDateRange ] = useState(ChartDateRange.All)
   const [ filteredProducts, setFilteredProducts ] = useState([] as IProduct[])
+  const [ marketValue, setMarketValue ] = useState([] as TDatedValue[])
   const [ numItemsPerPage, setNumItemsPerPage ] = 
     useState(DEFAULT_NUM_ITEMS_PER_PAGE)
   const [ paginatedProducts, setPaginatedProducts ] = useState([] as IProduct[])
-  const [ marketValue, setMarketValue ] = useState([] as TDatedValue[])
   const [ product, setProduct ] = useState({} as IProduct)
+  const [ productFilter, setProductFilter ] = useState('')
 
   const { mobileMode } = useContext(MobileModeContext) as IMobileModeContext
   const { width } = useWindowDimensions()
@@ -94,12 +101,12 @@ export const ProductCatalogue = (
     DESC
       Updates paginatedProducts based on the active page number
     INPUT
-      page: The active page number
+      page: The active page number (the first page is 1)
   */
   function updatePaginatedProducts(page: number): void {
-    const startIx = page * numItemsPerPage
+    const startIx = (page - 1) * numItemsPerPage
     const endIx = Math.min(
-      (page + 1) * numItemsPerPage, 
+      page * numItemsPerPage, 
       filteredProducts.length)
     setPaginatedProducts(_.slice(filteredProducts, startIx, endIx))
   }
@@ -120,11 +127,11 @@ export const ProductCatalogue = (
     .then(res => {
       // set allProducts
       const data = res.data.data
-      const products = getReleasedProducts(parseProductsEndpointResponse(data))
+      const products = getReleasedProducts(
+        parseProductsEndpointResponse(data))
+        .sort(sortFnProductSearchResults)
       setAllProducts(products)
-      // TODO: fix this
       setFilteredProducts(products)
-      setPaginatedProducts(_.slice(products, 0, numItemsPerPage))
 
       // set product randomly
       const ix = Math.max(Math.floor(Math.random() * products.length - 1), 0)
@@ -179,6 +186,19 @@ export const ProductCatalogue = (
       : DEFAULT_CARD_WIDTH
     setCardWidth(newCardWidth)
   }, [mobileMode.isActive])
+
+  // update filteredProducts
+  useEffect(() => {
+    const newFilteredProducts = allProducts
+      .filter(filterFnProductSearchResult(productFilter))
+      .sort(sortFnProductSearchResults)
+      setFilteredProducts(newFilteredProducts)
+  }, [productFilter, allProducts])
+
+  // update paginatedProducts
+  useEffect(() => {
+    updatePaginatedProducts(1)
+  }, [filteredProducts])
 
 
   // ==============
@@ -246,6 +266,14 @@ export const ProductCatalogue = (
 
       {/* Product Search */}
       <SectionHeader header='Product Search'/>
+
+      <FilterInput 
+        icon={<Icon as={FaSearch} color='gray.500'/>}
+        placeholder='Search for a Product'
+        onFilterChange={e => setProductFilter(e.target.value)}
+        value={productFilter}
+        clearFilter={() => setProductFilter('')}
+      />
 
       {/* Paginated Products */}
       <Flex
