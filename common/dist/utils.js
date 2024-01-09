@@ -40,7 +40,7 @@ RETURN
   An array of sequential numbers [start, ..., end]
 */
 function genSequentialArray(start, end) {
-    assert(end >= start, 'end is not >= start');
+    assert(end >= start, "end (".concat(end, ") is not >= start (").concat(start, ")"));
     return Array(end - start + 1).fill(0).map(function (num, ix) {
         return num + ix + start;
     });

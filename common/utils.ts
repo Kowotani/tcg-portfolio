@@ -48,7 +48,7 @@ RETURN
   An array of sequential numbers [start, ..., end]
 */
 export function genSequentialArray(start: number, end: number): number[] {
-  assert(end >= start, 'end is not >= start')
+  assert(end >= start, `end (${end}) is not >= start (${start})`)
   return Array(end - start + 1).fill(0).map((num: number, ix: number) => {
     return num + ix + start
   })
