@@ -9,16 +9,17 @@ import {
   InputLeftElement,
   InputRightElement,   
 } from '@chakra-ui/react'
-import { FaFilter, FaRegTimesCircle } from 'react-icons/fa'
+import { FaFilter, FaRegTimesCircle, FaSearch } from 'react-icons/fa'
 
 // https://github.com/GastonKhouri/chakra-ui-search/blob/main/src/components/Search.tsx
 
 
 type TFilterInput = BoxProps & {
-  value: string;
-	onFilterChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  clearFilter?: () => void;
-  placeholder?: string;
+  value: string,
+	onFilterChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
+  icon?: React.ReactNode,
+  placeholder?: string,
+  clearFilter?: () => void
 }
 
 export const FilterInput = (props: PropsWithChildren<TFilterInput>) => {
@@ -26,8 +27,9 @@ export const FilterInput = (props: PropsWithChildren<TFilterInput>) => {
   const {
 		value,
 		onFilterChange,
-    clearFilter,
+    icon = <Icon as={FaFilter} color='gray.500' />,
 		placeholder = '',
+    clearFilter
 	} = props
 
   return (
@@ -39,7 +41,7 @@ export const FilterInput = (props: PropsWithChildren<TFilterInput>) => {
 			<InputGroup mb='10px'>
         <InputLeftElement
           pointerEvents='none'
-          children={<Icon as={FaFilter} color='gray.500' />}
+          children={icon}
         />
 
 				<Input

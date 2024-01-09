@@ -21,34 +21,45 @@ import {
 // https://github.com/GastonKhouri/chakra-ui-search/blob/main/src/components/Search.tsx
 
 type TSearchInput = BoxProps & {
-  value: string;
-	onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-	searchResultRenderer: (result: any) => JSX.Element;
-  searchResultKey: string;
-	onSearchResultSelect: (result: any) => void;
-  clearSearch?: () => void;
-  maxSearchResults?: number;
-	noSearchResultsComponent?: JSX.Element;
-  placeholder?: string;
-  searchResultsMaxHeight?: string;
-  searchResults?: any[];
+  searchResultKey: string,
+  value: string,
+	onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
+  onSearchResultSelect: (result: any) => void,
+	searchResultRenderer: (result: any) => JSX.Element,
+  icon?: React.ReactNode,
+  maxSearchResults?: number,
+	noSearchResultsComponent?: JSX.Element,
+  placeholder?: string,
+  searchResults?: any[],
+  searchResultsMaxHeight?: string,
+  clearSearch?: () => void
 }
 
 export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 
+
+  // =========
+  // constants
+  // =========
+
+  const DEBOUNCE_DELAY = 100
+  const DEFAULT_SEARCH_RESULTS_MAX_HEIGHT = '100vh'
+  const SEARCH_RESULT_ZINDEX = 1300   // equal to chakra overlay z-index
+
   // destructure props
   const {
+    searchResultKey,
 		value,
 		onSearchChange,
+    onSearchResultSelect,
 		searchResultRenderer,
-		onSearchResultSelect,
-    clearSearch,
-    maxSearchResults,
-    noSearchResultsComponent,
+    icon = <Icon as={FaSearch} color='gray.500' />,
+    maxSearchResults = undefined,   // to be set later
+    noSearchResultsComponent = undefined,   // to be set later
 		placeholder = '',
-    searchResultKey,
-    searchResultsMaxHeight,
 		searchResults = [],
+    searchResultsMaxHeight = DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+    clearSearch = undefined,
 	} = props
 
 
@@ -74,7 +85,7 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 	const handleOnBlur = () => {
 		setTimeout(() => {
 			setShowResults(false)
-		}, 100)
+		}, DEBOUNCE_DELAY)
 	}
 
 
@@ -89,9 +100,9 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 		>
 
       {/* Search input */}
-			<InputGroup marginBottom='10px'>
+			<InputGroup marginBottom={2}>
         <InputLeftElement
-          children={<Icon as={FaSearch} color='gray.500' />}
+          children={icon}
           pointerEvents='none'
         />
 
@@ -131,12 +142,12 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 						bgColor={getColorForBackground(colorMode)}
 						borderRadius='0.3em'
 						boxShadow='0 2px 4px 0 rgb(34 36 38 / 12%), 0 2px 10px 0 rgb(34 36 38 / 15%);'
-						maxHeight={searchResultsMaxHeight ?? '100vh'}
+						maxHeight={searchResultsMaxHeight}
 						overflowY='auto'
             position='absolute'
             sx={{'&::-webkit-scrollbar': {display: 'none'}}}
             width='100%'
-            zIndex={1300}
+            zIndex={SEARCH_RESULT_ZINDEX}
 					>
 						{value.length > 0 && searchResults.length > 0
               ? searchResults
