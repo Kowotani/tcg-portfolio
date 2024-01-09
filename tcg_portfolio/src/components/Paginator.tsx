@@ -55,7 +55,7 @@ export const Paginator = (props: PropsWithChildren<PaginatorProps>) => {
     right: []
   } as PagesLayout
 
-  const numPages = Math.floor(numItems / numItemsPerPage)
+  const numPages = Math.max(Math.floor(numItems / numItemsPerPage), 1)
 
 
   // =====
