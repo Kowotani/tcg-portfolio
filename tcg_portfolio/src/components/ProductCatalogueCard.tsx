@@ -19,11 +19,30 @@ import { getProductNameWithLanguage } from '../utils/Product'
 
 type TProductCatalogueCardProps = {
   product: IProduct,
+  height?: string | number,
+  width?: string | number,
   setCatalogueProduct: (product: IProduct) => void
 }
 export const ProductCatalogueCard = (
   props: PropsWithChildren<TProductCatalogueCardProps>
 ) => {
+
+
+  // =========
+  // constants
+  // =========
+
+  const DEFAULT_CARD_HEIGHT = '220px'
+  const DEFAULT_CARD_WIDTH = '350px'
+  const DEFAULT_IMAGE_SIZE = '150px'
+
+  const {
+    product,
+    height = DEFAULT_CARD_HEIGHT,
+    width = DEFAULT_CARD_WIDTH,
+    setCatalogueProduct
+  } = props
+
 
   // =====
   // state
@@ -32,7 +51,8 @@ export const ProductCatalogueCard = (
   const { latestPrices } 
     = useContext(LatestPricesContext) as ILatestPricesContext
 
-  const price = latestPrices.get(props.product.tcgplayerId)?.prices.marketPrice
+  const price = latestPrices.get(product.tcgplayerId)?.prices.marketPrice
+
 
   // ==============
   // main component
@@ -41,9 +61,9 @@ export const ProductCatalogueCard = (
   return (
     <Card
       cursor='pointer'
-      height='220px'
-      width='350px'
-      onClick={() => props.setCatalogueProduct(props.product)}
+      height={height}
+      width={width}
+      onClick={() => setCatalogueProduct(product)}
     >
       <CardBody>
         <HStack 
@@ -55,7 +75,10 @@ export const ProductCatalogueCard = (
           <VStack spacing={4}>
 
             {/* Product Image */}
-            <ProductImage boxSize='150px' product={props.product}/>
+            <ProductImage 
+              boxSize={DEFAULT_IMAGE_SIZE} 
+              product={product}
+            />
 
             {/* Price */}
             <Text>
@@ -70,12 +93,12 @@ export const ProductCatalogueCard = (
 
             {/* Product Name */}
             <Text align='left' fontWeight='bold'>
-              {getProductNameWithLanguage(props.product)}
+              {getProductNameWithLanguage(product)}
             </Text>
 
             {/* Product Description */}
             <ProductDescription 
-              product={props.product} 
+              product={product} 
             />
 
           </VStack>
