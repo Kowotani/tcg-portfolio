@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { PropsWithChildren, useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { 
   Box,
@@ -16,15 +16,18 @@ import {
   // others
   getReleasedProducts
  } from 'common'
+import { useWindowDimensions } from '../hooks/WindowDimensions'
 import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
+import { MobileModeContext } from '../state/MobileModeContext'
+import { Paginator } from './Paginator'
 import { ProductCatalogueCard } from './ProductCatalogueCard'
 import { ProductDetailsCard } from './ProductDetailsCard'
-import ReactPaginate from 'react-paginate'
 import { 
   parseProductsEndpointResponse, parseProductPerformanceEndpointResponse 
 } from '../utils/api'
 import { ChartDateRange, clampDatedValues } from '../utils/Chart'
+import { IMobileModeContext } from '../utils/mobile'
 
 
 type TProductCatalogueProps = {}
@@ -37,20 +40,28 @@ export const ProductCatalogue = (
   // constants
   // =========
 
+  const DEFAULT_CARD_HEIGHT = '220px'
+  const DEFAULT_CARD_WIDTH = '350px'
+  const DEFAULT_NUM_ITEMS_PER_PAGE = 12
   const PRODUCT_PERFORMANCE_METRIC = PerformanceMetric.MarketValue
-  const NUM_PAGINATED_RESULTS = 10
-   
+  
 
   // =====
   // state
   // =====
 
   const [ allProducts, setAllProducts ] = useState([] as IProduct[])
+  const [ cardWidth, setCardWidth ] = useState(DEFAULT_CARD_WIDTH)
   const [ chartDateRange, setChartDateRange ] = useState(ChartDateRange.All)
   const [ filteredProducts, setFilteredProducts ] = useState([] as IProduct[])
+  const [ numItemsPerPage, setNumItemsPerPage ] = 
+    useState(DEFAULT_NUM_ITEMS_PER_PAGE)
   const [ paginatedProducts, setPaginatedProducts ] = useState([] as IProduct[])
   const [ marketValue, setMarketValue ] = useState([] as TDatedValue[])
   const [ product, setProduct ] = useState({} as IProduct)
+
+  const { mobileMode } = useContext(MobileModeContext) as IMobileModeContext
+  const { width } = useWindowDimensions()
 
 
   // ===============
@@ -81,15 +92,14 @@ export const ProductCatalogue = (
 
   /*
     DESC
-      Handles the click event from the ReactPaginate page component and
-      updates paginatedProducts
+      Updates paginatedProducts based on the active page number
     INPUT
-      event: The current page object
+      page: The active page number
   */
-  function handlePageChange(event: any): void {
-    const startIx = event.selected * NUM_PAGINATED_RESULTS
+  function updatePaginatedProducts(page: number): void {
+    const startIx = page * numItemsPerPage
     const endIx = Math.min(
-      (event.selected + 1) * NUM_PAGINATED_RESULTS, 
+      (page + 1) * numItemsPerPage, 
       filteredProducts.length)
     setPaginatedProducts(_.slice(filteredProducts, startIx, endIx))
   }
@@ -114,7 +124,7 @@ export const ProductCatalogue = (
       setAllProducts(products)
       // TODO: fix this
       setFilteredProducts(products)
-      setPaginatedProducts(_.slice(products, 0, NUM_PAGINATED_RESULTS))
+      setPaginatedProducts(_.slice(products, 0, numItemsPerPage))
 
       // set product randomly
       const ix = Math.max(Math.floor(Math.random() * products.length - 1), 0)
@@ -153,6 +163,22 @@ export const ProductCatalogue = (
       })
     }
   }, [product])
+
+  // update numItemsPerPage
+  useEffect(() => {
+    const newNumItemsPerPage = width > 1850 
+      ? 30   // 5 or 6 columns
+      : DEFAULT_NUM_ITEMS_PER_PAGE
+    setNumItemsPerPage(newNumItemsPerPage)
+  }, [width])
+
+  // update cardWidth
+  useEffect(() => {
+    const newCardWidth = mobileMode.isActive 
+      ? '100%' 
+      : DEFAULT_CARD_WIDTH
+    setCardWidth(newCardWidth)
+  }, [mobileMode.isActive])
 
 
   // ==============
@@ -229,10 +255,16 @@ export const ProductCatalogue = (
       >
         {_.slice(paginatedProducts).map((product: IProduct) => {
           return (
-            <Box key={product.tcgplayerId} m={2}>
+            <Box 
+              key={product.tcgplayerId} 
+              m={2} 
+              width={cardWidth}
+            >
               <ProductCatalogueCard 
+                height={DEFAULT_CARD_HEIGHT}
                 product={product}
                 setCatalogueProduct={setProduct}
+                width={cardWidth}
               />
             </Box>
           )
@@ -240,16 +272,16 @@ export const ProductCatalogue = (
       </Flex>
 
       {/* Pagination UI */}
-      <ReactPaginate 
-        breakLabel='...'
-        marginPagesDisplayed={1}
-        nextLabel='>'
-        onPageChange={handlePageChange}
-        pageCount={Math.ceil(allProducts.length / NUM_PAGINATED_RESULTS)}
-        pageRangeDisplayed={3}
-        previousLabel='<'
-        renderOnZeroPageCount={null}
-      />
+      <Flex
+        justifyContent='center'
+        m={4}
+      >
+        <Paginator 
+          numItems={filteredProducts.length}
+          numItemsPerPage={numItemsPerPage}
+          onPageClick={updatePaginatedProducts}
+        />
+      </Flex>
     </>
   )
 }
