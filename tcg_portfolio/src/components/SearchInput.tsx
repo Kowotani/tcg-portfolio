@@ -42,7 +42,6 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
   // constants
   // =========
 
-  const DEBOUNCE_DELAY = 100
   const DEFAULT_SEARCH_RESULTS_MAX_HEIGHT = '100vh'
   const SEARCH_RESULT_ZINDEX = 1300   // equal to chakra overlay z-index
 
@@ -77,18 +76,6 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
   const { colorMode } = useColorMode()
 
 
-  // ========
-  // function
-  // ========
-
-  // debounce input
-	const handleOnBlur = () => {
-		setTimeout(() => {
-			setShowResults(false)
-		}, DEBOUNCE_DELAY)
-	}
-
-
   // ==============
   // main component
   // ==============
@@ -109,7 +96,6 @@ export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
 				<Input
 					placeholder={placeholder}
 					value={value}
-          onBlur={handleOnBlur}
 					onChange={onSearchChange}
 					onFocus={() => setShowResults(true)}
 				/>
