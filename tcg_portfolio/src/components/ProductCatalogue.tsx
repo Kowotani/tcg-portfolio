@@ -5,6 +5,7 @@ import {
   Icon,
   Flex,
   Spinner, 
+  Text
 } from '@chakra-ui/react'
 import { PriceChart } from './Charts'
 import { 
@@ -274,6 +275,19 @@ export const ProductCatalogue = (
         value={productFilter}
         clearFilter={() => setProductFilter('')}
       />
+
+      {productFilter.length > 0 &&
+        <Flex justifyContent='center' width='100%'>
+          <Text as='em' fontSize='lg'>
+            {filteredProducts.length}
+            &nbsp;of&nbsp;
+            {allProducts.length} 
+            &nbsp;product
+            {allProducts.length > 1 ? 's': ''}
+            &nbsp;displayed
+          </Text>
+        </Flex>
+      }
 
       {/* Paginated Products */}
       <Flex
