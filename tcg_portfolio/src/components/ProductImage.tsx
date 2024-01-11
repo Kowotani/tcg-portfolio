@@ -5,7 +5,7 @@ import {
   LinkBox,
   LinkOverlay,
 } from '@chakra-ui/react'
-import { IProduct } from 'common'
+import { IProduct, ProductSubtype, ProductType } from 'common'
 
 
 // =============
@@ -51,7 +51,9 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
     `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_1_200w.jpg`
 
   // isSecretLair
-  const isSecretLair = props.product.type === 'Secret Lair'
+  const isSecretLairNonCommanderDeck = 
+    props.product.type === ProductType.SecretLair
+    && !(props.product.subtype === ProductSubtype.CommanderDeck)
 
 
   // =============
@@ -65,9 +67,8 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
         borderRadius={12} 
         boxSize={props.boxSize}
         fallbackStrategy='onError'
-        fallbackSrc={isSecretLair ? imageUrl : undefined}
         fit='contain'
-        src={isSecretLair ? secretLairImageUrl : imageUrl}
+        src={isSecretLairNonCommanderDeck ? secretLairImageUrl : imageUrl}
       />
     )
   }
