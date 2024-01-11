@@ -11,7 +11,7 @@ import {
   useRadioGroup
 } from '@chakra-ui/react'
 import { 
-  TDatedValue, formatInTimeZone
+  TDatedValue, dateDiff, formatInTimeZone
 } from 'common'
 import * as _ from 'lodash'
 import { 
@@ -24,9 +24,10 @@ import {
 import { 
   ChartDateRange, TChartDataPoint, 
 
-  dateAxisTickFormatter, getChartDataFromDatedValues, getChartDataKeys, 
-  getDateAxisTicks, getPnlChartDataFromDatedValues, 
-  getStartDateFromChartDateRange, priceAxisTickFormatter
+  dateAxisTickFormatter, dateAxisTickWithYearFormatter, 
+  getChartDataFromDatedValues, getChartDataKeys, getDateAxisTicks, 
+  getPnlChartDataFromDatedValues, getStartDateFromChartDateRange, 
+  priceAxisTickFormatter
 } from '../utils/Chart'
 import { getColorForNumber } from '../utils/generic'
 import { formatAsPrice } from '../utils/Price'
@@ -315,6 +316,7 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
     : getStartDateFromChartDateRange(dateRange)
 
   const ticks = getDateAxisTicks(startDate, endDate, dateRange)
+  const showYear = dateDiff(startDate, endDate, 'days') >= 365
 
 
   // ================
@@ -339,98 +341,99 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
 
   return (
     <>
-        <ResponsiveContainer 
-          minHeight={props.minHeight}
-          minWidth={props.minWidth}
-          height={props.height}
-          width={props.width ?? '100%'}
-        >
-          <ComposedChart data={chartData}>
+      <ResponsiveContainer 
+        minHeight={props.minHeight}
+        minWidth={props.minWidth}
+        height={props.height}
+        width={props.width ?? '100%'}
+      >
+        <ComposedChart data={chartData}>
 
-            {/* X-Axis */}
-            <XAxis 
-              dataKey='date' 
-              domain={[startDate.getTime(), endDate.getTime()]}
-              scale='time'
-              tickFormatter={dateAxisTickFormatter}
-              tick={{fontSize: 18}}
-              ticks={ticks}
-              type='number'
-            />
+          {/* X-Axis */}
+          <XAxis 
+            dataKey='date' 
+            domain={[startDate.getTime(), endDate.getTime()]}
+            scale='time'
+            tickFormatter={showYear 
+              ? dateAxisTickWithYearFormatter
+              : dateAxisTickFormatter}
+            tick={{fontSize: 18}}
+            ticks={ticks}
+            type='number'
+          />
 
-            {/* Y-Axis */}
-            <YAxis 
-              tick={{fontSize: 18}}
-              tickFormatter={priceAxisTickFormatter}
-              width={getPriceAxisWidth(chartData, primaryKey)}
-            />
+          {/* Y-Axis */}
+          <YAxis 
+            tick={{fontSize: 18}}
+            tickFormatter={priceAxisTickFormatter}
+            width={getPriceAxisWidth(chartData, primaryKey)}
+          />
 
-            {/* Grid */}
-            <CartesianGrid opacity={0.5} vertical={false}/>
+          {/* Grid */}
+          <CartesianGrid opacity={0.5} vertical={false}/>
 
-            {/* Tooltip */}
-            <Tooltip 
-              content={
-                <CustomTooltip 
-                  primaryKey={primaryKey}
-                  referenceKey={referenceKey}
-                  primaryKeyAlt={primaryKeyAlt}
-                />
-              }
-            />
-
-            {/* Profit Area */}
-            <Area 
-              type='monotone' 
-              dataKey={profitAreaDataKey}
-              stroke={GREEN}
-              strokeWidth={0}
-              fill={GREEN}
-              fillOpacity={0.4}
-            />
-
-            {/* Profit Line */}
-            <Line
-              type='monotone' 
-              dataKey={profitLineDataKey}
-              dot={false}
-              stroke={GREEN}
-              strokeWidth={3}
-            />
-
-            {/* Loss Area */}
-            <Area 
-              type='monotone' 
-              dataKey={lossAreaDataKey}
-              stroke={RED}
-              strokeWidth={0}
-              fill={RED}
-              fillOpacity={0.4}
-            />
-
-            {/* Loss Line */}
-            <Line
-              type='monotone' 
-              dataKey={lossLineDataKey}
-              dot={false}
-              stroke={RED}
-              strokeWidth={3}
-            />
-
-            {/* Reference Value */}
-            {referenceDataKey &&
-              <Area 
-                type='monotone'
-                dataKey={referenceDataKey}
-                stroke={GRAY}
-                strokeWidth={2}
-                strokeDasharray='5 5'
-                fillOpacity={0.2}
+          {/* Tooltip */}
+          <Tooltip 
+            content={
+              <CustomTooltip 
+                primaryKey={primaryKey}
+                referenceKey={referenceKey}
+                primaryKeyAlt={primaryKeyAlt}
               />
             }
-          </ComposedChart>
-        </ResponsiveContainer>
-      
+          />
+
+          {/* Profit Area */}
+          <Area 
+            type='monotone' 
+            dataKey={profitAreaDataKey}
+            stroke={GREEN}
+            strokeWidth={0}
+            fill={GREEN}
+            fillOpacity={0.4}
+          />
+
+          {/* Profit Line */}
+          <Line
+            type='monotone' 
+            dataKey={profitLineDataKey}
+            dot={false}
+            stroke={GREEN}
+            strokeWidth={3}
+          />
+
+          {/* Loss Area */}
+          <Area 
+            type='monotone' 
+            dataKey={lossAreaDataKey}
+            stroke={RED}
+            strokeWidth={0}
+            fill={RED}
+            fillOpacity={0.4}
+          />
+
+          {/* Loss Line */}
+          <Line
+            type='monotone' 
+            dataKey={lossLineDataKey}
+            dot={false}
+            stroke={RED}
+            strokeWidth={3}
+          />
+
+          {/* Reference Value */}
+          {referenceDataKey &&
+            <Area 
+              type='monotone'
+              dataKey={referenceDataKey}
+              stroke={GRAY}
+              strokeWidth={2}
+              strokeDasharray='5 5'
+              fillOpacity={0.2}
+            />
+          }
+        </ComposedChart>
+      </ResponsiveContainer>
 
       {/* Radio Buttons */}
       {!props.isControlled && (
@@ -490,6 +493,7 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
     : getStartDateFromChartDateRange(dateRange)
 
   const ticks = getDateAxisTicks(startDate, endDate, dateRange)
+  const showYear = dateDiff(startDate, endDate, 'days') >= 365
 
 
   // ================
@@ -514,77 +518,77 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
   return (
     <>
-      
-        <ResponsiveContainer 
-          minHeight={props.minHeight}
-          minWidth={props.minWidth}
-          height={props.height}
-          width={props.width ?? '100%'}
-        >
-          <AreaChart data={chartData}>
+      <ResponsiveContainer 
+        minHeight={props.minHeight}
+        minWidth={props.minWidth}
+        height={props.height}
+        width={props.width ?? '100%'}
+      >
+        <AreaChart data={chartData}>
 
-            {/* X-Axis */}
-            <XAxis 
-              dataKey='date' 
-              domain={[startDate.getTime(), endDate.getTime()]}
-              scale='time'
-              tickFormatter={dateAxisTickFormatter}
-              tick={{fontSize: 18}}
-              ticks={ticks}
-              type='number'
-            />
+          {/* X-Axis */}
+          <XAxis 
+            dataKey='date' 
+            domain={[startDate.getTime(), endDate.getTime()]}
+            scale='time'
+            tickFormatter={showYear 
+              ? dateAxisTickWithYearFormatter
+              : dateAxisTickFormatter}
+            tick={{fontSize: 18}}
+            ticks={ticks}
+            type='number'
+          />
 
-            {/* Y-Axis */}
-            <YAxis 
-              tick={{fontSize: 18}}
-              tickFormatter={priceAxisTickFormatter}
-              width={getPriceAxisWidth(chartData, primaryKey)}
-            />
+          {/* Y-Axis */}
+          <YAxis 
+            tick={{fontSize: 18}}
+            tickFormatter={priceAxisTickFormatter}
+            width={getPriceAxisWidth(chartData, primaryKey)}
+          />
 
-            {/* Grid */}
-            <CartesianGrid opacity={0.5} vertical={false}/>
+          {/* Grid */}
+          <CartesianGrid opacity={0.5} vertical={false}/>
 
-            {/* Tooltip */}
-            <Tooltip 
-              content={
-                <CustomTooltip 
-                  primaryKey={primaryKey}
-                  referenceKey={referenceKey}
-                />
-              }
-            />
-
-            {/* Primary Value */}
-            <Area 
-              type='monotone' 
-              dataKey={primaryDataKey}
-              stroke={BLUE}
-              strokeWidth={3}
-              fill='url(#colorPrice)'
-              fillOpacity={1}
-            />
-            <defs>
-              <linearGradient id='colorPrice' x1={0} y1={0} x2={0} y2={1}>
-                <stop offset='0%' stopColor={BLUE} stopOpacity={0.8}/>
-                <stop offset='95%' stopColor={BLUE} stopOpacity={0}/>
-              </linearGradient>
-            </defs>            
-
-            {/* Reference Value */}
-            {referenceDataKey &&
-              <Area 
-                type='monotone'
-                dataKey={referenceDataKey}
-                stroke={GRAY}
-                strokeWidth={2}
-                strokeDasharray='5 5'
-                fillOpacity={0}
+          {/* Tooltip */}
+          <Tooltip 
+            content={
+              <CustomTooltip 
+                primaryKey={primaryKey}
+                referenceKey={referenceKey}
               />
             }
-          </AreaChart>
-        </ResponsiveContainer>
-      
+          />
 
+          {/* Primary Value */}
+          <Area 
+            type='monotone' 
+            dataKey={primaryDataKey}
+            stroke={BLUE}
+            strokeWidth={3}
+            fill='url(#colorPrice)'
+            fillOpacity={1}
+          />
+          <defs>
+            <linearGradient id='colorPrice' x1={0} y1={0} x2={0} y2={1}>
+              <stop offset='0%' stopColor={BLUE} stopOpacity={0.8}/>
+              <stop offset='95%' stopColor={BLUE} stopOpacity={0}/>
+            </linearGradient>
+          </defs>            
+
+          {/* Reference Value */}
+          {referenceDataKey &&
+            <Area 
+              type='monotone'
+              dataKey={referenceDataKey}
+              stroke={GRAY}
+              strokeWidth={2}
+              strokeDasharray='5 5'
+              fillOpacity={0}
+            />
+          }
+        </AreaChart>
+      </ResponsiveContainer>
+      
       {/* Radio Buttons */}
       {!props.isControlled && (
         <Box minWidth={props.minWidth} marginTop={2}>

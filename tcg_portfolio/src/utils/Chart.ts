@@ -72,11 +72,24 @@ DESC
   Converts the input array of number ticks into readable date ticks
 INPUT
   ticks: A number[] representing dates
+  showYear?: Whether to show the year (default: FALSE)
 RETURN
   A string[] with readable dates
 */
 export function dateAxisTickFormatter(tick: number): string {
   return formatInTimeZone(new Date(tick), 'MMM d', 'UTC')
+}
+
+/*
+DESC
+  Converts the input array of number ticks into readable date ticks
+INPUT
+  ticks: A number[] representing dates
+RETURN
+  A string[] with readable dates
+*/
+export function dateAxisTickWithYearFormatter(tick: number): string {
+  return formatInTimeZone(new Date(tick), "MMM ''yy", 'UTC')
 }
 
 /*
@@ -264,10 +277,6 @@ export function getDateAxisTicks(
 
       // monthly
       } else if (daysBetween <= 360) {
-        dates = genFirstOfMonthDateRange(startDate, endDate)
-
-      // quarterly
-      } else if (daysBetween <= 720) {
         dates = genFirstOfQuarterDateRange(startDate, endDate)
 
       // yearly
