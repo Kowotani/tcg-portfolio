@@ -281,7 +281,7 @@ export const PortfolioPerformance = (
               dataKeys={marketValueDataKeys}
               dateRange={chartDateRange}
               isControlled={false}
-              height={300}
+              minHeight={300}
               minWidth={400}
               setParentDateRange={setChartDateRange}
             />
@@ -292,7 +292,7 @@ export const PortfolioPerformance = (
               dataKeys={cumPnlDataKeys}
               dateRange={chartDateRange}
               isControlled={false}
-              height={300}
+              minHeight={300}
               minWidth={400}
               setParentDateRange={setChartDateRange}
             />

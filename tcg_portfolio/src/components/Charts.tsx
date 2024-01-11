@@ -141,8 +141,10 @@ type TChartProps = {
   dataKeys: {[key: string]: string},
   dateRange: ChartDateRange,
   isControlled: boolean,
-  height: number,
+  minHeight: number,
   minWidth: number,
+  height?: number,
+  width?: number
   setParentDateRange?: (dateRange: ChartDateRange) => void,
 }
 
@@ -337,8 +339,12 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
 
   return (
     <>
-      <Box height={props.height} minWidth={props.minWidth} width='100%'>
-        <ResponsiveContainer height='100%' width='100%'>
+        <ResponsiveContainer 
+          minHeight={props.minHeight}
+          minWidth={props.minWidth}
+          height={props.height}
+          width={props.width ?? '100%'}
+        >
           <ComposedChart data={chartData}>
 
             {/* X-Axis */}
@@ -424,7 +430,7 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
             }
           </ComposedChart>
         </ResponsiveContainer>
-      </Box>
+      
 
       {/* Radio Buttons */}
       {!props.isControlled && (
@@ -508,8 +514,13 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
 
   return (
     <>
-      <Box height={props.height} minWidth={props.minWidth} width='100%'>
-        <ResponsiveContainer height='100%' width='100%'>
+      
+        <ResponsiveContainer 
+          minHeight={props.minHeight}
+          minWidth={props.minWidth}
+          height={props.height}
+          width={props.width ?? '100%'}
+        >
           <AreaChart data={chartData}>
 
             {/* X-Axis */}
@@ -572,7 +583,7 @@ export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
             }
           </AreaChart>
         </ResponsiveContainer>
-      </Box>
+      
 
       {/* Radio Buttons */}
       {!props.isControlled && (

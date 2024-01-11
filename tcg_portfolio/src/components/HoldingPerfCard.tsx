@@ -155,7 +155,7 @@ export const HoldingPerfCard = (
                         dataKeys={props.chartDataKeys}
                         dateRange={props.chartDateRange}
                         isControlled={true}
-                        height={200}
+                        minHeight={200}
                         minWidth={200}
                       />
                     ) : (
@@ -166,7 +166,7 @@ export const HoldingPerfCard = (
                             dataKeys={props.chartDataKeys}
                             dateRange={props.chartDateRange}
                             isControlled={true}
-                            height={200}
+                            minHeight={200}
                             minWidth={200}
                           />
                         ) 

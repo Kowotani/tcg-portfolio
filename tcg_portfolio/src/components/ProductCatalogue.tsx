@@ -257,7 +257,7 @@ export const ProductCatalogue = (
               dataKeys={dataKeys}
               dateRange={chartDateRange}
               isControlled={false}
-              height={300}
+              minHeight={300}
               minWidth={300}
               setParentDateRange={setChartDateRange}
             />
