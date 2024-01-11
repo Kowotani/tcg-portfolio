@@ -3,6 +3,7 @@ import axios from 'axios'
 import { 
   Box,
   Button,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -663,16 +664,17 @@ export const EditPortfolioForm = (
       />
 
       {holdingFilter.length > 0 &&
-        <Box width='100%'>
-          <Text fontSize='lg' as='em'>
-          {portfolio.populatedHoldings.filter(filterFnHoldingCard(holdingFilter)).length}
-          &nbsp;of&nbsp;
-          {portfolio.populatedHoldings.length} 
-          &nbsp;holding
-          {portfolio.populatedHoldings.length > 1 ? 's': ''}
-          &nbsp;displayed
+        <Flex justifyContent='center' width='100%'>
+          <Text as='em' fontSize='lg'>
+            {portfolio.populatedHoldings
+              .filter(filterFnHoldingCard(holdingFilter)).length}
+            &nbsp;of&nbsp;
+            {portfolio.populatedHoldings.length} 
+            &nbsp;holding
+            {portfolio.populatedHoldings.length > 1 ? 's': ''}
+            &nbsp;displayed
           </Text>
-        </Box>
+        </Flex>
       }
 
       {/* Holding Cards */}
