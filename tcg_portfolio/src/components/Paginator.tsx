@@ -215,62 +215,64 @@ export const Paginator = (props: PropsWithChildren<PaginatorProps>) => {
 
   return (
     <>
-      <HStack spacing={1}>
+      {numItems > 0 && 
+        <HStack spacing={1}>
 
-        {/* Prev */}
-        <IconButton 
-          aria-label='Previous'
-          colorScheme='blue'
-          icon={<Icon as={FaCaretLeft}/>}
-          isDisabled={activePage === 1}
-          p={4}
-          size='lg'
-          variant='ghost'
-          onClick={handleOnPreviousClick}
-        />
+          {/* Prev */}
+          <IconButton 
+            aria-label='Previous'
+            colorScheme='blue'
+            icon={<Icon as={FaCaretLeft}/>}
+            isDisabled={activePage === 1}
+            p={4}
+            size='lg'
+            variant='ghost'
+            onClick={handleOnPreviousClick}
+          />
 
-        {/* Left Pages */}
-        {pagesLayout.left.length &&
-          <PaginatorButtons pages={pagesLayout.left}/>
-        }
+          {/* Left Pages */}
+          {pagesLayout.left.length &&
+            <PaginatorButtons pages={pagesLayout.left}/>
+          }
 
-        {/* Left Break */}
-        {hasLeftBreak && 
-          <Box paddingX={2}>
-            <Icon as={FaEllipsis}/>
-          </Box>
-        }
+          {/* Left Break */}
+          {hasLeftBreak && 
+            <Box paddingX={2}>
+              <Icon as={FaEllipsis}/>
+            </Box>
+          }
 
-        {/* Center Pages */}
-        {pagesLayout.center.length &&
-          <PaginatorButtons isCenter={true} pages={pagesLayout.center}/>
-        }
+          {/* Center Pages */}
+          {pagesLayout.center.length &&
+            <PaginatorButtons isCenter={true} pages={pagesLayout.center}/>
+          }
 
-        {/* Right Break */}
-        {hasRightBreak && 
-          <Box paddingX={2}>
-            <Icon as={FaEllipsis}/>
-          </Box>
-        }
+          {/* Right Break */}
+          {hasRightBreak && 
+            <Box paddingX={2}>
+              <Icon as={FaEllipsis}/>
+            </Box>
+          }
 
-        {/* Right Pages */}
-        {pagesLayout.right.length &&
-          <PaginatorButtons pages={pagesLayout.right}/>
-        }
+          {/* Right Pages */}
+          {pagesLayout.right.length &&
+            <PaginatorButtons pages={pagesLayout.right}/>
+          }
 
-        {/* Next */}
-        <IconButton 
-          aria-label='Next'
-          colorScheme='blue'
-          icon={<Icon as={FaCaretRight}/>}
-          isDisabled={activePage === numPages}
-          p={4}
-          size='lg'
-          variant='ghost'
-          onClick={handleOnNextClick}
-        />
+          {/* Next */}
+          <IconButton 
+            aria-label='Next'
+            colorScheme='blue'
+            icon={<Icon as={FaCaretRight}/>}
+            isDisabled={activePage === numPages}
+            p={4}
+            size='lg'
+            variant='ghost'
+            onClick={handleOnNextClick}
+          />
 
-      </HStack>
+        </HStack>
+      }
     </>
   )
 }
