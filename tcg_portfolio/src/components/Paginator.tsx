@@ -183,6 +183,8 @@ export const Paginator = (props: PropsWithChildren<PaginatorProps>) => {
             key={num} 
             colorScheme='blue'
             isActive={props.isCenter 
+              && pagesLayout.left.length
+              && pagesLayout.right.length
               ? ix === (props.pages.length - 1) / 2
               : num === activePage}
             p={4}
