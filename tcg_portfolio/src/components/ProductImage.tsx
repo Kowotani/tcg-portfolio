@@ -48,7 +48,7 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
   const imageUrl = 
     `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_200w.jpg`
   const secretLairImageUrl = 
-  `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_1_200w.jpg`
+    `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_1_200w.jpg`
 
   // isSecretLair
   const isSecretLair = props.product.type === 'Secret Lair'
@@ -64,6 +64,7 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
         backgroundColor='white'
         borderRadius={12} 
         boxSize={props.boxSize}
+        fallbackStrategy='onError'
         fallbackSrc={isSecretLair ? imageUrl : undefined}
         fit='contain'
         src={isSecretLair ? secretLairImageUrl : imageUrl}
