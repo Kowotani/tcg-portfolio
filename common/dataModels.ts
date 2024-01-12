@@ -64,6 +64,11 @@ export enum TCG {
   Sorcery = 'Sorcery',
 }
 
+// TCGCSV parsing status
+export enum ParsingStatus {
+  ToBeValidated = 'To be Validated',
+  Validated = 'Validated'
+}
 
 // -- scraper 
 
@@ -87,16 +92,6 @@ export enum TransactionType {
 // interfaces
 // ==========
 
-// -- User
-
-export interface IUser {
-  userId: number,
-  userName: string,
-  passwordHash: string,
-  passwordSalt: string,
-  email: string,
-}
-
 // -- Historical Price
 
 export interface IHistoricalPrice {
@@ -109,36 +104,36 @@ export interface IHistoricalPrice {
 // -- Price
 
 export interface IDatedPriceData {
-  priceDate: Date;
-  prices: IPriceData;
+  priceDate: Date,
+  prices: IPriceData
 }
 
 // stores the price snapshot data
 export interface IPrice extends IDatedPriceData {
-  tcgplayerId: number;
-  granularity: string;
+  tcgplayerId: number,
+  granularity: string
 }
 
 // stores the scraped price data
 export interface IPriceData {
-  marketPrice: number;
-  buylistMarketPrice?: number;
-  listedMedianPrice?: number;
+  marketPrice: number,
+  buylistMarketPrice?: number,
+  listedMedianPrice?: number
 }
 
 // -- Product
 
 // defines the required data for a Product
 export interface IProduct {
-  tcgplayerId: number;
-  tcg: TCG;
-  releaseDate: Date;
-  name: string;
-  type: ProductType;
-  language: ProductLanguage;
-  msrp: number;
-  subtype?: ProductSubtype;
-  setCode?: string;
+  tcgplayerId: number,
+  tcg: TCG,
+  releaseDate: Date,
+  name: string,
+  type: ProductType,
+  language: ProductLanguage,
+  msrp: number,
+  subtype?: ProductSubtype,
+  setCode?: string
 }
 
 // -- Portfolio, Holding, and Transaction schemas
@@ -249,6 +244,54 @@ export interface IPortfolioMethods {
 
 export interface IPopulatedPortfolio extends IPortfolioBase {
   populatedHoldings: IPopulatedHolding[],
+}
+
+// -- TCGCSV (Category, Group, ParsedProduct)
+
+// Category
+
+export interface ITCCategory {
+  categoryId: number,
+  name: string,
+  displayName: string,
+  tcg: TCG
+}
+
+// Group
+
+export interface ITCGroup {
+  groupId: number,
+  categoryId: number,
+  name: string,
+  abbreviation: string,
+  publishedOn: Date
+}
+
+// Product (to be validated)
+
+export interface ITCProduct {
+  tcgplayerId: number,
+  groupId: number,
+  categoryId: number,
+  tcg: TCG,
+  releaseDate: Date,
+  name: string,
+  type: ProductType,
+  language: ProductLanguage,
+  status: ParsingStatus,
+  msrp?: number,
+  subtype?: ProductSubtype,
+  setCode?: string
+}
+
+// -- User
+
+export interface IUser {
+  userId: number,
+  userName: string,
+  passwordHash: string,
+  passwordSalt: string,
+  email: string,
 }
 
 

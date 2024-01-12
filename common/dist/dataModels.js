@@ -4,7 +4,7 @@
 // =====
 var _a, _b, _c;
 exports.__esModule = true;
-exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.PerformanceMetric = exports.TimeseriesGranularity = void 0;
+exports.TCGToProductSubtype = exports.ProductTypeToProductSubtype = exports.TCGToProductType = exports.TransactionType = exports.TCGPriceType = exports.ParsingStatus = exports.TCG = exports.ProductType = exports.ProductSubtype = exports.ProductLanguage = exports.PerformanceMetric = exports.TimeseriesGranularity = void 0;
 // -- mongodb
 // timeseries granularity
 var TimeseriesGranularity;
@@ -65,6 +65,12 @@ var TCG;
     TCG["Pokemon"] = "Pokemon";
     TCG["Sorcery"] = "Sorcery";
 })(TCG = exports.TCG || (exports.TCG = {}));
+// TCGCSV parsing status
+var ParsingStatus;
+(function (ParsingStatus) {
+    ParsingStatus["ToBeValidated"] = "To be Validated";
+    ParsingStatus["Validated"] = "Validated";
+})(ParsingStatus = exports.ParsingStatus || (exports.ParsingStatus = {}));
 // -- scraper 
 // TCG price types
 var TCGPriceType;

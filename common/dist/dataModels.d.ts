@@ -44,6 +44,10 @@ export declare enum TCG {
     Pokemon = "Pokemon",
     Sorcery = "Sorcery"
 }
+export declare enum ParsingStatus {
+    ToBeValidated = "To be Validated",
+    Validated = "Validated"
+}
 export declare enum TCGPriceType {
     MarketPrice = "Market Price",
     BuylistMarketPrice = "Buylist Market Price",
@@ -52,13 +56,6 @@ export declare enum TCGPriceType {
 export declare enum TransactionType {
     Purchase = "Purchase",
     Sale = "Sale"
-}
-export interface IUser {
-    userId: number;
-    userName: string;
-    passwordHash: string;
-    passwordSalt: string;
-    email: string;
 }
 export interface IHistoricalPrice {
     tcgplayerId: number;
@@ -162,6 +159,40 @@ export interface IPortfolioMethods {
 }
 export interface IPopulatedPortfolio extends IPortfolioBase {
     populatedHoldings: IPopulatedHolding[];
+}
+export interface ITCCategory {
+    categoryId: number;
+    name: string;
+    displayName: string;
+    tcg: TCG;
+}
+export interface ITCGroup {
+    groupId: number;
+    categoryId: number;
+    name: string;
+    abbreviation: string;
+    publishedOn: Date;
+}
+export interface ITCProduct {
+    tcgplayerId: number;
+    groupId: number;
+    categoryId: number;
+    tcg: TCG;
+    releaseDate: Date;
+    name: string;
+    type: ProductType;
+    language: ProductLanguage;
+    status: ParsingStatus;
+    msrp?: number;
+    subtype?: ProductSubtype;
+    setCode?: string;
+}
+export interface IUser {
+    userId: number;
+    userName: string;
+    passwordHash: string;
+    passwordSalt: string;
+    email: string;
 }
 export declare const TCGToProductType: {
     [key in TCG]: ProductType[];
