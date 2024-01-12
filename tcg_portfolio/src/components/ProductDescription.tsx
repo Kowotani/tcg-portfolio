@@ -4,8 +4,7 @@ import {
   Box, 
   BoxProps, 
   Flex,
-  Text,
-  Tooltip 
+  Text
 } from '@chakra-ui/react'
 import { IProduct, formatAsISO } from 'common'
 import { 
