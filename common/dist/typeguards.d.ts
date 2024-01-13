@@ -1,5 +1,5 @@
 import { TDataResBody, TProductPostResBody, TResBody } from './api';
-import { IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, IPrice, IPriceData, IProduct, ITransaction, TDatedValue, TPerformanceData } from './dataModels';
+import { IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, IPrice, IPriceData, IProduct, ITCCategory, ITCGroup, ITCProduct, ITransaction, TDatedValue, TPerformanceData } from './dataModels';
 export declare function isTResBody(arg: any): arg is TResBody;
 export declare function isTDataResBody<Type>(arg: any): arg is TDataResBody<Type>;
 export declare function isTProductPostResBody<Type>(arg: any): arg is TProductPostResBody<Type>;
@@ -24,6 +24,9 @@ export declare function isIPriceArray(arg: any): arg is IPrice;
 export declare function isIPriceData(arg: any): arg is IPriceData;
 export declare function isIPriceDataArray(arg: any): arg is IPriceData[];
 export declare function hasIProductKeys(arg: any): boolean;
+export declare function isITCCategory(arg: any): arg is ITCCategory;
+export declare function isITCGroup(arg: any): arg is ITCGroup;
+export declare function isITCProduct(arg: any): arg is ITCProduct;
 export declare function hasTDatedValueKeys(arg: any): boolean;
 export declare function isTDatedvalue(arg: any): arg is TDatedValue;
 export declare function isTDatedvalueArray(arg: any): arg is TDatedValue[];

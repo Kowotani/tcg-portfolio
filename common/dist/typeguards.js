@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isITransactionArray = exports.isITransaction = exports.hasITransactionKeys = exports.isTPerformanceData = exports.hasTPerformanceDataKeys = exports.isTDatedvalueArray = exports.isTDatedvalue = exports.hasTDatedValueKeys = exports.hasIProductKeys = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIDatedPriceData = exports.hasIDatedPriceDataKeys = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.isIProduct = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = void 0;
+exports.isITransactionArray = exports.isITransaction = exports.hasITransactionKeys = exports.isTPerformanceData = exports.hasTPerformanceDataKeys = exports.isTDatedvalueArray = exports.isTDatedvalue = exports.hasTDatedValueKeys = exports.isITCProduct = exports.isITCGroup = exports.isITCCategory = exports.hasIProductKeys = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIDatedPriceData = exports.hasIDatedPriceDataKeys = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.isIProduct = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 // ===
@@ -405,6 +405,92 @@ function hasIProductKeys(arg) {
         && arg.language;
 }
 exports.hasIProductKeys = hasIProductKeys;
+// ==========
+// TCCategory
+// ==========
+/*
+DESC
+  Returns whether or not the input is an ITCCategory
+INPUT
+  arg: An object that might be an ITCCategory
+RETURN
+  TRUE if the input is an ITCCategory, FALSE otherwise
+*/
+function isITCCategory(arg) {
+    return arg
+        && arg.categoryId
+        && arg.name
+        && arg.displayName
+        && arg.tcg
+        && typeof (arg.categoryId) === 'number'
+        && typeof (arg.name) === 'string'
+        && typeof (arg.displayName) === 'string'
+        && _.values(dataModels_1.TCG).includes(arg.tcg);
+}
+exports.isITCCategory = isITCCategory;
+// ========
+// ITCGroup
+// ========
+/*
+DESC
+  Returns whether or not the input is an isITCGroup
+INPUT
+  arg: An object that might be an isITCGroup
+RETURN
+  TRUE if the input is an isITCGroup, FALSE otherwise
+*/
+function isITCGroup(arg) {
+    return arg
+        && arg.groupId
+        && arg.categoryId
+        && arg.name
+        && arg.abbreviation
+        && arg.publishedOn
+        && typeof (arg.groupId) === 'number'
+        && typeof (arg.categoryId) === 'number'
+        && typeof (arg.name) === 'string'
+        && typeof (arg.abbreviation) === 'string'
+        && _.isDate(arg.publishedOn);
+}
+exports.isITCGroup = isITCGroup;
+// ==========
+// ITCProduct
+// ==========
+/*
+DESC
+  Returns whether or not the input is an ITCProduct
+INPUT
+  arg: An object that might be an ITCProduct
+RETURN
+  TRUE if the input is an ITCProduct, FALSE otherwise
+*/
+function isITCProduct(arg) {
+    return arg
+        // required
+        && arg.tcgplayerId
+        && arg.groupId
+        && arg.categoryId
+        && arg.tcg
+        && arg.releaseDate
+        && arg.name
+        && arg.type
+        && arg.language
+        && arg.status
+        && typeof (arg.tcgplayerId) === 'number'
+        && typeof (arg.groupId) === 'number'
+        && typeof (arg.categoryId) === 'number'
+        && _.values(dataModels_1.TCG).includes(arg.tcg)
+        && _.isDate(arg.releaseDate)
+        && typeof (arg.name) === 'string'
+        && _.values(dataModels_1.ProductType).includes(arg.type)
+        && _.values(dataModels_1.ProductLanguage).includes(arg.language)
+        && _.values(dataModels_1.ParsingStatus).includes(arg.status)
+        // optional
+        && arg.msrp ? typeof (arg.msrp) === 'number' : true
+        && arg.subtype ? _.values(dataModels_1.ProductSubtype).includes(arg.subtype) : true
+        && arg.setCode ? typeof (arg.setCode) === 'string' : true;
+}
+exports.isITCProduct = isITCProduct;
 // ===========
 // TDatedValue
 // ===========

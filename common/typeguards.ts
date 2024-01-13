@@ -4,11 +4,12 @@ import {
 import {
   // data models
   IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
-  IPrice, IPriceData, IProduct, ITransaction,  TDatedValue, TPerformanceData,
+  IPrice, IPriceData, IProduct, ITCCategory, ITCGroup, ITCProduct, ITransaction,
+  TDatedValue, TPerformanceData,
 
   // enums
-  PerformanceMetric, ProductLanguage, ProductSubtype, ProductType, TCG, 
-  TransactionType
+  ParsingStatus, PerformanceMetric, ProductLanguage, ProductSubtype, 
+  ProductType, TCG, TransactionType
 } from './dataModels'
 import * as _ from 'lodash'
 
@@ -428,6 +429,99 @@ export function hasIProductKeys(arg: any): boolean {
     && arg.name
     && arg.type
     && arg.language
+}
+
+
+// ==========
+// TCCategory
+// ==========
+
+/*
+DESC
+  Returns whether or not the input is an ITCCategory
+INPUT
+  arg: An object that might be an ITCCategory
+RETURN
+  TRUE if the input is an ITCCategory, FALSE otherwise
+*/
+export function isITCCategory(arg: any): arg is ITCCategory {
+  return arg
+    && arg.categoryId
+    && arg.name
+    && arg.displayName
+    && arg.tcg
+    && typeof(arg.categoryId) === 'number'
+    && typeof(arg.name) === 'string'
+    && typeof(arg.displayName) === 'string'
+    && _.values(TCG).includes(arg.tcg)
+}
+
+
+// ========
+// ITCGroup
+// ========
+
+/*
+DESC
+  Returns whether or not the input is an isITCGroup
+INPUT
+  arg: An object that might be an isITCGroup
+RETURN
+  TRUE if the input is an isITCGroup, FALSE otherwise
+*/
+export function isITCGroup(arg: any): arg is ITCGroup {
+  return arg
+    && arg.groupId
+    && arg.categoryId
+    && arg.name
+    && arg.abbreviation
+    && arg.publishedOn
+    && typeof(arg.groupId) === 'number'
+    && typeof(arg.categoryId) === 'number'
+    && typeof(arg.name) === 'string'
+    && typeof(arg.abbreviation) === 'string'
+    && _.isDate(arg.publishedOn)
+}
+
+
+// ==========
+// ITCProduct
+// ==========
+
+/*
+DESC
+  Returns whether or not the input is an ITCProduct
+INPUT
+  arg: An object that might be an ITCProduct 
+RETURN
+  TRUE if the input is an ITCProduct, FALSE otherwise
+*/
+export function isITCProduct(arg: any): arg is ITCProduct {
+  return arg
+    // required
+    && arg.tcgplayerId
+    && arg.groupId
+    && arg.categoryId
+    && arg.tcg 
+    && arg.releaseDate
+    && arg.name
+    && arg.type
+    && arg.language
+    && arg.status
+    && typeof(arg.tcgplayerId) === 'number'
+    && typeof(arg.groupId) === 'number'
+    && typeof(arg.categoryId) === 'number'
+    && _.values(TCG).includes(arg.tcg)
+    && _.isDate(arg.releaseDate)
+    && typeof(arg.name) === 'string'
+    && _.values(ProductType).includes(arg.type)
+    && _.values(ProductLanguage).includes(arg.language)
+    && _.values(ParsingStatus).includes(arg.status)
+
+    // optional
+    && arg.msrp ? typeof(arg.msrp) === 'number' : true
+    && arg.subtype ? _.values(ProductSubtype).includes(arg.subtype) : true
+    && arg.setCode ? typeof(arg.setCode) === 'string' : true
 }
 
 
