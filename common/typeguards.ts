@@ -438,6 +438,22 @@ export function hasIProductKeys(arg: any): boolean {
 
 /*
 DESC
+  Returns whether or not the input has all ITCCategory keys
+INPUT
+  arg: An object that might be an ITCCategory
+RETURN
+  TRUE if the input has all ITCCategory keys, FALSE otherwise
+*/
+export function hasITCCategoryKeys(arg: any): boolean {
+  return arg
+    && arg.categoryId
+    && arg.name
+    && arg.displayName
+    && arg.tcg
+}
+
+/*
+DESC
   Returns whether or not the input is an ITCCategory
 INPUT
   arg: An object that might be an ITCCategory
@@ -446,10 +462,7 @@ RETURN
 */
 export function isITCCategory(arg: any): arg is ITCCategory {
   return arg
-    && arg.categoryId
-    && arg.name
-    && arg.displayName
-    && arg.tcg
+    && hasITCCategoryKeys(arg)
     && typeof(arg.categoryId) === 'number'
     && typeof(arg.name) === 'string'
     && typeof(arg.displayName) === 'string'
@@ -463,6 +476,23 @@ export function isITCCategory(arg: any): arg is ITCCategory {
 
 /*
 DESC
+  Returns whether or not the input has all ITCGroup keys
+INPUT
+  arg: An object that might be an ITCGroup
+RETURN
+  TRUE if the input has all ITCGroup keys, FALSE otherwise
+*/
+export function hasITCGroupKeys(arg: any): boolean {
+  return arg
+    && arg.groupId
+    && arg.categoryId
+    && arg.name
+    && arg.abbreviation
+    && arg.publishedOn
+}
+
+/*
+DESC
   Returns whether or not the input is an isITCGroup
 INPUT
   arg: An object that might be an isITCGroup
@@ -471,11 +501,7 @@ RETURN
 */
 export function isITCGroup(arg: any): arg is ITCGroup {
   return arg
-    && arg.groupId
-    && arg.categoryId
-    && arg.name
-    && arg.abbreviation
-    && arg.publishedOn
+    && hasITCGroupKeys(arg)
     && typeof(arg.groupId) === 'number'
     && typeof(arg.categoryId) === 'number'
     && typeof(arg.name) === 'string'
@@ -490,13 +516,13 @@ export function isITCGroup(arg: any): arg is ITCGroup {
 
 /*
 DESC
-  Returns whether or not the input is an ITCProduct
+  Returns whether or not the input has all ITCProduct keys
 INPUT
-  arg: An object that might be an ITCProduct 
+  arg: An object that might be an ITCProduct
 RETURN
-  TRUE if the input is an ITCProduct, FALSE otherwise
+  TRUE if the input has all ITCProduct keys, FALSE otherwise
 */
-export function isITCProduct(arg: any): arg is ITCProduct {
+export function hasITCProductKeys(arg: any): boolean {
   return arg
     // required
     && arg.tcgplayerId
@@ -508,6 +534,25 @@ export function isITCProduct(arg: any): arg is ITCProduct {
     && arg.type
     && arg.language
     && arg.status
+
+    // optional
+    && (arg.msrp ?? true)
+    && (arg.subtype ?? true)
+    && (arg.setCode ?? true)
+}
+
+/*
+DESC
+  Returns whether or not the input is an ITCProduct
+INPUT
+  arg: An object that might be an ITCProduct 
+RETURN
+  TRUE if the input is an ITCProduct, FALSE otherwise
+*/
+export function isITCProduct(arg: any): arg is ITCProduct {
+  return arg
+    // required
+    && hasITCProductKeys(arg)
     && typeof(arg.tcgplayerId) === 'number'
     && typeof(arg.groupId) === 'number'
     && typeof(arg.categoryId) === 'number'

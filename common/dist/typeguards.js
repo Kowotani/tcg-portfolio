@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isITransactionArray = exports.isITransaction = exports.hasITransactionKeys = exports.isTPerformanceData = exports.hasTPerformanceDataKeys = exports.isTDatedvalueArray = exports.isTDatedvalue = exports.hasTDatedValueKeys = exports.isITCProduct = exports.isITCGroup = exports.isITCCategory = exports.hasIProductKeys = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIDatedPriceData = exports.hasIDatedPriceDataKeys = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.isIProduct = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = void 0;
+exports.isITransactionArray = exports.isITransaction = exports.hasITransactionKeys = exports.isTPerformanceData = exports.hasTPerformanceDataKeys = exports.isTDatedvalueArray = exports.isTDatedvalue = exports.hasTDatedValueKeys = exports.isITCProduct = exports.hasITCProductKeys = exports.isITCGroup = exports.hasITCGroupKeys = exports.isITCCategory = exports.hasITCCategoryKeys = exports.hasIProductKeys = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIDatedPriceData = exports.hasIDatedPriceDataKeys = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.isIProduct = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 // ===
@@ -410,6 +410,22 @@ exports.hasIProductKeys = hasIProductKeys;
 // ==========
 /*
 DESC
+  Returns whether or not the input has all ITCCategory keys
+INPUT
+  arg: An object that might be an ITCCategory
+RETURN
+  TRUE if the input has all ITCCategory keys, FALSE otherwise
+*/
+function hasITCCategoryKeys(arg) {
+    return arg
+        && arg.categoryId
+        && arg.name
+        && arg.displayName
+        && arg.tcg;
+}
+exports.hasITCCategoryKeys = hasITCCategoryKeys;
+/*
+DESC
   Returns whether or not the input is an ITCCategory
 INPUT
   arg: An object that might be an ITCCategory
@@ -418,10 +434,7 @@ RETURN
 */
 function isITCCategory(arg) {
     return arg
-        && arg.categoryId
-        && arg.name
-        && arg.displayName
-        && arg.tcg
+        && hasITCCategoryKeys(arg)
         && typeof (arg.categoryId) === 'number'
         && typeof (arg.name) === 'string'
         && typeof (arg.displayName) === 'string'
@@ -433,6 +446,23 @@ exports.isITCCategory = isITCCategory;
 // ========
 /*
 DESC
+  Returns whether or not the input has all ITCGroup keys
+INPUT
+  arg: An object that might be an ITCGroup
+RETURN
+  TRUE if the input has all ITCGroup keys, FALSE otherwise
+*/
+function hasITCGroupKeys(arg) {
+    return arg
+        && arg.groupId
+        && arg.categoryId
+        && arg.name
+        && arg.abbreviation
+        && arg.publishedOn;
+}
+exports.hasITCGroupKeys = hasITCGroupKeys;
+/*
+DESC
   Returns whether or not the input is an isITCGroup
 INPUT
   arg: An object that might be an isITCGroup
@@ -441,11 +471,7 @@ RETURN
 */
 function isITCGroup(arg) {
     return arg
-        && arg.groupId
-        && arg.categoryId
-        && arg.name
-        && arg.abbreviation
-        && arg.publishedOn
+        && hasITCGroupKeys(arg)
         && typeof (arg.groupId) === 'number'
         && typeof (arg.categoryId) === 'number'
         && typeof (arg.name) === 'string'
@@ -458,13 +484,14 @@ exports.isITCGroup = isITCGroup;
 // ==========
 /*
 DESC
-  Returns whether or not the input is an ITCProduct
+  Returns whether or not the input has all ITCProduct keys
 INPUT
   arg: An object that might be an ITCProduct
 RETURN
-  TRUE if the input is an ITCProduct, FALSE otherwise
+  TRUE if the input has all ITCProduct keys, FALSE otherwise
 */
-function isITCProduct(arg) {
+function hasITCProductKeys(arg) {
+    var _a, _b, _c;
     return arg
         // required
         && arg.tcgplayerId
@@ -476,6 +503,24 @@ function isITCProduct(arg) {
         && arg.type
         && arg.language
         && arg.status
+        // optional
+        && ((_a = arg.msrp) !== null && _a !== void 0 ? _a : true)
+        && ((_b = arg.subtype) !== null && _b !== void 0 ? _b : true)
+        && ((_c = arg.setCode) !== null && _c !== void 0 ? _c : true);
+}
+exports.hasITCProductKeys = hasITCProductKeys;
+/*
+DESC
+  Returns whether or not the input is an ITCProduct
+INPUT
+  arg: An object that might be an ITCProduct
+RETURN
+  TRUE if the input is an ITCProduct, FALSE otherwise
+*/
+function isITCProduct(arg) {
+    return arg
+        // required
+        && hasITCProductKeys(arg)
         && typeof (arg.tcgplayerId) === 'number'
         && typeof (arg.groupId) === 'number'
         && typeof (arg.categoryId) === 'number'
