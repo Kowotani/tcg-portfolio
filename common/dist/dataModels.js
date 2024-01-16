@@ -31,6 +31,7 @@ var ProductLanguage;
 // product subtype
 var ProductSubtype;
 (function (ProductSubtype) {
+    ProductSubtype["BoosterBundle"] = "Booster Bundle";
     ProductSubtype["Collector"] = "Collector";
     ProductSubtype["CommanderDeck"] = "Commander Deck";
     ProductSubtype["Draft"] = "Draft";
@@ -40,6 +41,7 @@ var ProductSubtype;
     ProductSubtype["Foil"] = "Foil";
     ProductSubtype["FoilEteched"] = "Foil Etched";
     ProductSubtype["NonFoil"] = "Non-Foil";
+    ProductSubtype["Play"] = "Play";
     ProductSubtype["SecondEdition"] = "2nd Edition";
     ProductSubtype["Set"] = "Set";
     ProductSubtype["TexturedFoil"] = "Textured Foil";

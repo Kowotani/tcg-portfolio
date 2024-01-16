@@ -14,6 +14,7 @@ export declare enum ProductLanguage {
     Japanese = "JPN"
 }
 export declare enum ProductSubtype {
+    BoosterBundle = "Booster Bundle",
     Collector = "Collector",
     CommanderDeck = "Commander Deck",
     Draft = "Draft",
@@ -23,6 +24,7 @@ export declare enum ProductSubtype {
     Foil = "Foil",
     FoilEteched = "Foil Etched",
     NonFoil = "Non-Foil",
+    Play = "Play",
     SecondEdition = "2nd Edition",
     Set = "Set",
     TexturedFoil = "Textured Foil",

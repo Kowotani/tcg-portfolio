@@ -29,6 +29,7 @@ export enum ProductLanguage {
 
 // product subtype
 export enum ProductSubtype {
+  BoosterBundle = 'Booster Bundle',
   Collector = 'Collector',
   CommanderDeck = 'Commander Deck',
   Draft = 'Draft',
@@ -38,6 +39,7 @@ export enum ProductSubtype {
   Foil = 'Foil',
   FoilEteched = 'Foil Etched',
   NonFoil = 'Non-Foil',
+  Play = 'Play',
   SecondEdition = '2nd Edition',
   Set = 'Set',
   TexturedFoil = 'Textured Foil',
