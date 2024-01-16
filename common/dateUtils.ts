@@ -10,7 +10,7 @@ import {
   eachMonthOfInterval, eachQuarterOfInterval,  eachWeekOfInterval, 
   eachYearOfInterval, 
 
-  startOfDay, startOfToday, 
+  startOfDay, startOfToday, parseJSON
 } from 'date-fns'
 import { format, utcToZonedTime } from 'date-fns-tz'
 import * as _ from 'lodash'
@@ -467,6 +467,18 @@ export function getLocalDateFromISOString(ISOString: string): Date {
   const day = Number(ISOString.substring(8,10))
 
   return new Date(year, month, day)
+}
+
+/*
+DESC
+  Wrapper for date-fns parseJSON (https://date-fns.org/v3.2.0/docs/parseJSON)
+INPUT
+  json: A JSON formatted date
+RETURN
+  A Date
+*/
+export function getDateFromJSON(json: string): Date {
+  return parseJSON(json)
 }
 
 
