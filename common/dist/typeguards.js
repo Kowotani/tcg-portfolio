@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isITransactionArray = exports.isITransaction = exports.hasITransactionKeys = exports.isTPerformanceData = exports.hasTPerformanceDataKeys = exports.isTDatedvalueArray = exports.isTDatedvalue = exports.hasTDatedValueKeys = exports.isITCProduct = exports.hasITCProductKeys = exports.isITCGroup = exports.hasITCGroupKeys = exports.isITCCategory = exports.hasITCCategoryKeys = exports.hasTCCategoryKeys = exports.hasIProductKeys = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIDatedPriceData = exports.hasIDatedPriceDataKeys = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.isIProduct = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = void 0;
+exports.isITransactionArray = exports.isITransaction = exports.hasITransactionKeys = exports.isTPerformanceData = exports.hasTPerformanceDataKeys = exports.isTDatedvalueArray = exports.isTDatedvalue = exports.hasTDatedValueKeys = exports.isITCProduct = exports.hasITCProductKeys = exports.isITCGroup = exports.hasITCGroupKeys = exports.isITCCategory = exports.hasITCCategoryKeys = exports.hasTCCategoryKeys = exports.isIProduct = exports.hasIProductKeys = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIDatedPriceData = exports.hasIDatedPriceDataKeys = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 // ===
@@ -16,7 +16,8 @@ RETURN
 */
 function isTResBody(arg) {
     return arg
-        && arg.message && typeof (arg.message) === 'string';
+        && arg.hasOwnProperty('message ')
+        && typeof (arg.message) === 'string';
 }
 exports.isTResBody = isTResBody;
 /*
@@ -30,7 +31,7 @@ RETURN
 function isTDataResBody(arg) {
     return arg
         // TODO: implement the type check
-        && arg.data
+        && arg.hasOwnProperty('data')
         && isTResBody(arg);
 }
 exports.isTDataResBody = isTDataResBody;
@@ -44,7 +45,8 @@ RETURN
 */
 function isTProductPostResBody(arg) {
     return arg
-        && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
+        && arg.hasOwnProperty('tcgplayerId')
+        && typeof (arg.tcgplayerId) === 'number'
         && isTDataResBody(arg);
 }
 exports.isTProductPostResBody = isTProductPostResBody;
@@ -61,7 +63,7 @@ RETURN
 */
 function hasIHoldingBaseKeys(arg) {
     return arg
-        && arg.transactions;
+        && arg.hasOwnProperty('transactions');
 }
 exports.hasIHoldingBaseKeys = hasIHoldingBaseKeys;
 /*
@@ -75,7 +77,7 @@ RETURN
 function hasIHoldingKeys(arg) {
     return arg
         && hasIHoldingBaseKeys(arg)
-        && arg.tcgplayerId;
+        && arg.hasOwnProperty('tcgplayerId');
 }
 exports.hasIHoldingKeys = hasIHoldingKeys;
 /*
@@ -89,7 +91,7 @@ RETURN
 function hasIPopulatedHoldingKeys(arg) {
     return arg
         && hasIHoldingBaseKeys(arg)
-        && arg.product;
+        && arg.hasOwnProperty('product');
 }
 exports.hasIPopulatedHoldingKeys = hasIPopulatedHoldingKeys;
 /*
@@ -144,30 +146,6 @@ function isIPopulatedHolding(arg) {
         }));
 }
 exports.isIPopulatedHolding = isIPopulatedHolding;
-/*
-DESC
-  Returns whether or not the input is an IProduct
-INPUT
-  arg: An object that might be an IProduct
-RETURN
-  TRUE if the input is an IProduct, FALSE otherwise
-*/
-function isIProduct(arg) {
-    return arg
-        // required
-        && hasIProductKeys(arg)
-        && typeof (arg.tcgplayerId) === 'number'
-        && _.values(dataModels_1.TCG).includes(arg.tcg)
-        && _.isDate(arg.releaseDate)
-        && typeof (arg.name) === 'string'
-        && _.values(dataModels_1.ProductType).includes(arg.type)
-        && _.values(dataModels_1.ProductLanguage).includes(arg.language)
-        // optional
-        && arg.msrp ? typeof (arg.msrp) === 'number' : true
-        && arg.subtype ? _.values(dataModels_1.ProductSubtype).includes(arg.subtype) : true
-        && arg.setCode ? typeof (arg.setCode) === 'string' : true;
-}
-exports.isIProduct = isIProduct;
 // =========
 // portfolio
 // =========
@@ -296,8 +274,8 @@ RETURN
 */
 function hasIDatedPriceDataKeys(arg) {
     return arg
-        && arg.priceDate
-        && arg.prices;
+        && arg.hasOwnProperty('priceDate')
+        && arg.hasOwnProperty('prices');
 }
 exports.hasIDatedPriceDataKeys = hasIDatedPriceDataKeys;
 /*
@@ -325,10 +303,14 @@ RETURN
 */
 function isIPrice(arg) {
     return arg
-        && arg.priceDate && _.isDate(arg.priceData)
-        && arg.tcgplayerId && typeof (arg.tcgplayerId) === 'number'
-        && arg.granularity && typeof (arg.granularity) === 'string'
-        && arg.prices && isIPriceData(arg.prices);
+        && arg.hasOwnProperty('priceDate')
+        && arg.hasOwnProperty('tcgplayerId')
+        && arg.hasOwnProperty('granularity')
+        && arg.hasOwnProperty('prices')
+        && typeof (arg.tcgplayerId) === 'number'
+        && typeof (arg.granularity) === 'string'
+        && _.isDate(arg.priceData)
+        && isIPriceData(arg.prices);
 }
 exports.isIPrice = isIPrice;
 /*
@@ -358,12 +340,13 @@ RETURN
 function isIPriceData(arg) {
     return arg
         // required
-        && arg.marketPrice && typeof (arg.marketPrice) === 'number'
+        && arg.hasOwnProperty('marketPrice')
+        && typeof (arg.marketPrice) === 'number'
         // optional
-        && arg.buylistMarketPrice
+        && arg.hasOwnProperty('buylistMarketPrice')
         ? typeof (arg.buylistMarketPrice) === 'number'
         : true
-            && arg.listedMedianPrice
+            && arg.hasOwnProperty('listedMedianPrice')
             ? typeof (arg.listedMedianPrice) === 'number'
             : true;
 }
@@ -397,14 +380,44 @@ RETURN
 */
 function hasIProductKeys(arg) {
     return arg
-        && arg.tcgplayerId
-        && arg.tcg
-        && arg.releaseDate
-        && arg.name
-        && arg.type
-        && arg.language;
+        && arg.hasOwnProperty('tcgplayerId')
+        && arg.hasOwnProperty('tcg')
+        && arg.hasOwnProperty('releaseDate')
+        && arg.hasOwnProperty('name')
+        && arg.hasOwnProperty('type')
+        && arg.hasOwnProperty('language');
 }
 exports.hasIProductKeys = hasIProductKeys;
+/*
+DESC
+  Returns whether or not the input is an IProduct
+INPUT
+  arg: An object that might be an IProduct
+RETURN
+  TRUE if the input is an IProduct, FALSE otherwise
+*/
+function isIProduct(arg) {
+    return arg
+        // required
+        && hasIProductKeys(arg)
+        && typeof (arg.tcgplayerId) === 'number'
+        && _.values(dataModels_1.TCG).includes(arg.tcg)
+        && _.isDate(arg.releaseDate)
+        && typeof (arg.name) === 'string'
+        && _.values(dataModels_1.ProductType).includes(arg.type)
+        && _.values(dataModels_1.ProductLanguage).includes(arg.language)
+        // optional
+        && arg.hasOwnProperty('msrp')
+        ? typeof (arg.msrp) === 'number'
+        : true
+            && arg.hasOwnProperty('subtype')
+            ? _.values(dataModels_1.ProductSubtype).includes(arg.subtype)
+            : true
+                && arg.hasOwnProperty('setCode')
+                ? typeof (arg.setCode) === 'string'
+                : true;
+}
+exports.isIProduct = isIProduct;
 // ==========
 // TCCategory
 // ==========
@@ -418,9 +431,9 @@ RETURN
 */
 function hasTCCategoryKeys(arg) {
     return arg
-        && arg.categoryId
-        && arg.name
-        && arg.displayName;
+        && arg.hasOwnProperty('categoryId')
+        && arg.hasOwnProperty('name')
+        && arg.hasOwnProperty('displayName');
 }
 exports.hasTCCategoryKeys = hasTCCategoryKeys;
 /*
@@ -434,7 +447,7 @@ RETURN
 function hasITCCategoryKeys(arg) {
     return arg
         && hasTCCategoryKeys(arg)
-        && arg.tcg;
+        && arg.hasOwnProperty('tcg');
 }
 exports.hasITCCategoryKeys = hasITCCategoryKeys;
 /*
@@ -467,11 +480,9 @@ RETURN
 */
 function hasITCGroupKeys(arg) {
     return arg
-        && arg.groupId
-        && arg.categoryId
-        && arg.name
-        && arg.abbreviation
-        && arg.publishedOn;
+        && arg.hasOwnProperty('groupId')
+        && arg.hasOwnProperty('categoryId')
+        && arg.hasOwnProperty('name');
 }
 exports.hasITCGroupKeys = hasITCGroupKeys;
 /*
@@ -484,12 +495,18 @@ RETURN
 */
 function isITCGroup(arg) {
     return arg
+        //required
         && hasITCGroupKeys(arg)
         && typeof (arg.groupId) === 'number'
         && typeof (arg.categoryId) === 'number'
         && typeof (arg.name) === 'string'
-        && typeof (arg.abbreviation) === 'string'
-        && _.isDate(arg.publishedOn);
+        // optional
+        && arg.hasOwnProperty('abbrevation')
+        ? typeof (arg.abbreviation) === 'string'
+        : true
+            && arg.hasOwnProperty('publishedOn')
+            ? _.isDate(arg.publishedOn)
+            : true;
 }
 exports.isITCGroup = isITCGroup;
 // ==========
@@ -504,22 +521,16 @@ RETURN
   TRUE if the input has all ITCProduct keys, FALSE otherwise
 */
 function hasITCProductKeys(arg) {
-    var _a, _b, _c;
     return arg
-        // required
-        && arg.tcgplayerId
-        && arg.groupId
-        && arg.categoryId
-        && arg.tcg
-        && arg.releaseDate
-        && arg.name
-        && arg.type
-        && arg.language
-        && arg.status
-        // optional
-        && ((_a = arg.msrp) !== null && _a !== void 0 ? _a : true)
-        && ((_b = arg.subtype) !== null && _b !== void 0 ? _b : true)
-        && ((_c = arg.setCode) !== null && _c !== void 0 ? _c : true);
+        && arg.hasOwnProperty('tcgplayerId')
+        && arg.hasOwnProperty('groupId')
+        && arg.hasOwnProperty('categoryId')
+        && arg.hasOwnProperty('tcg')
+        && arg.hasOwnProperty('releaseDate')
+        && arg.hasOwnProperty('name')
+        && arg.hasOwnProperty('type')
+        && arg.hasOwnProperty('language')
+        && arg.hasOwnProperty('status');
 }
 exports.hasITCProductKeys = hasITCProductKeys;
 /*
@@ -544,9 +555,15 @@ function isITCProduct(arg) {
         && _.values(dataModels_1.ProductLanguage).includes(arg.language)
         && _.values(dataModels_1.ParsingStatus).includes(arg.status)
         // optional
-        && arg.msrp ? typeof (arg.msrp) === 'number' : true
-        && arg.subtype ? _.values(dataModels_1.ProductSubtype).includes(arg.subtype) : true
-        && arg.setCode ? typeof (arg.setCode) === 'string' : true;
+        && arg.hasOwnProperty('msrp')
+        ? typeof (arg.msrp) === 'number'
+        : true
+            && arg.hasOwnProperty('subtype')
+            ? _.values(dataModels_1.ProductSubtype).includes(arg.subtype)
+            : true
+                && arg.hasOwnProperty('setCode')
+                ? typeof (arg.setCode) === 'string'
+                : true;
 }
 exports.isITCProduct = isITCProduct;
 // ===========
@@ -562,8 +579,8 @@ RETURN
 */
 function hasTDatedValueKeys(arg) {
     return arg
-        && arg.date
-        && arg.value;
+        && arg.hasOwnProperty('date')
+        && arg.hasOwnProperty('value');
 }
 exports.hasTDatedValueKeys = hasTDatedValueKeys;
 /*
@@ -644,10 +661,10 @@ RETURN
 */
 function hasITransactionKeys(arg) {
     return arg
-        && arg.type
-        && arg.date
-        && arg.price
-        && arg.quantity;
+        && arg.hasOwnProperty('type')
+        && arg.hasOwnProperty('date')
+        && arg.hasOwnProperty('price')
+        && arg.hasOwnProperty('quantity');
 }
 exports.hasITransactionKeys = hasITransactionKeys;
 /*
