@@ -170,8 +170,8 @@ export interface ITCGroup {
     groupId: number;
     categoryId: number;
     name: string;
-    abbreviation: string;
-    publishedOn: Date;
+    abbreviation?: string;
+    publishedOn?: Date;
 }
 export interface ITCProduct {
     tcgplayerId: number;
