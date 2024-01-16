@@ -24,6 +24,7 @@ export declare function isIPriceArray(arg: any): arg is IPrice;
 export declare function isIPriceData(arg: any): arg is IPriceData;
 export declare function isIPriceDataArray(arg: any): arg is IPriceData[];
 export declare function hasIProductKeys(arg: any): boolean;
+export declare function hasTCCategoryKeys(arg: any): boolean;
 export declare function hasITCCategoryKeys(arg: any): boolean;
 export declare function isITCCategory(arg: any): arg is ITCCategory;
 export declare function hasITCGroupKeys(arg: any): boolean;

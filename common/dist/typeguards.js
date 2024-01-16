@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isITransactionArray = exports.isITransaction = exports.hasITransactionKeys = exports.isTPerformanceData = exports.hasTPerformanceDataKeys = exports.isTDatedvalueArray = exports.isTDatedvalue = exports.hasTDatedValueKeys = exports.isITCProduct = exports.hasITCProductKeys = exports.isITCGroup = exports.hasITCGroupKeys = exports.isITCCategory = exports.hasITCCategoryKeys = exports.hasIProductKeys = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIDatedPriceData = exports.hasIDatedPriceDataKeys = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.isIProduct = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = void 0;
+exports.isITransactionArray = exports.isITransaction = exports.hasITransactionKeys = exports.isTPerformanceData = exports.hasTPerformanceDataKeys = exports.isTDatedvalueArray = exports.isTDatedvalue = exports.hasTDatedValueKeys = exports.isITCProduct = exports.hasITCProductKeys = exports.isITCGroup = exports.hasITCGroupKeys = exports.isITCCategory = exports.hasITCCategoryKeys = exports.hasTCCategoryKeys = exports.hasIProductKeys = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIDatedPriceData = exports.hasIDatedPriceDataKeys = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.isIProduct = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 // ===
@@ -410,6 +410,21 @@ exports.hasIProductKeys = hasIProductKeys;
 // ==========
 /*
 DESC
+  Returns whether or not the input has all Category keys expected from TCGCSV
+INPUT
+  arg: An object that might have all Category keys expected from TCGCSV
+RETURN
+  TRUE if the input has all Category keys exepcted from TCGCSV, FALSE otherwise
+*/
+function hasTCCategoryKeys(arg) {
+    return arg
+        && arg.categoryId
+        && arg.name
+        && arg.displayName;
+}
+exports.hasTCCategoryKeys = hasTCCategoryKeys;
+/*
+DESC
   Returns whether or not the input has all ITCCategory keys
 INPUT
   arg: An object that might be an ITCCategory
@@ -418,9 +433,7 @@ RETURN
 */
 function hasITCCategoryKeys(arg) {
     return arg
-        && arg.categoryId
-        && arg.name
-        && arg.displayName
+        && hasTCCategoryKeys(arg)
         && arg.tcg;
 }
 exports.hasITCCategoryKeys = hasITCCategoryKeys;

@@ -438,6 +438,21 @@ export function hasIProductKeys(arg: any): boolean {
 
 /*
 DESC
+  Returns whether or not the input has all Category keys expected from TCGCSV
+INPUT
+  arg: An object that might have all Category keys expected from TCGCSV
+RETURN
+  TRUE if the input has all Category keys exepcted from TCGCSV, FALSE otherwise
+*/
+export function hasTCCategoryKeys(arg: any): boolean {
+  return arg
+    && arg.categoryId
+    && arg.name
+    && arg.displayName
+}
+
+/*
+DESC
   Returns whether or not the input has all ITCCategory keys
 INPUT
   arg: An object that might be an ITCCategory
@@ -446,9 +461,7 @@ RETURN
 */
 export function hasITCCategoryKeys(arg: any): boolean {
   return arg
-    && arg.categoryId
-    && arg.name
-    && arg.displayName
+    && hasTCCategoryKeys(arg)
     && arg.tcg
 }
 
