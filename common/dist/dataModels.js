@@ -132,14 +132,16 @@ exports.ProductTypeToProductSubtype = (_b = {},
         ProductSubtype.Draft,
         ProductSubtype.FABVersionTwo,
         ProductSubtype.FirstEdition,
+        ProductSubtype.Play,
         ProductSubtype.SecondEdition,
         ProductSubtype.Set,
         ProductSubtype.Unlimited,
     ],
     // Bundle 
     _b[ProductType.Bundle] = [
+        ProductSubtype.BoosterBundle,
         ProductSubtype.EliteTrainerBox,
-        ProductSubtype.UltraPremiumCollection
+        ProductSubtype.UltraPremiumCollection,
     ],
     // Secret Lair
     _b[ProductType.SecretLair] = [
@@ -167,6 +169,7 @@ exports.TCGToProductSubtype = (_c = {},
         ProductSubtype.Foil,
         ProductSubtype.FoilEteched,
         ProductSubtype.NonFoil,
+        ProductSubtype.Play,
         ProductSubtype.Set,
         ProductSubtype.TexturedFoil,
     ],
@@ -177,6 +180,7 @@ exports.TCGToProductSubtype = (_c = {},
     ],
     // Pokemon
     _c[TCG.Pokemon] = [
+        ProductSubtype.BoosterBundle,
         ProductSubtype.EliteTrainerBox,
         ProductSubtype.UltraPremiumCollection,
     ],

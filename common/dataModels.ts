@@ -350,6 +350,7 @@ export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubtyp
     ProductSubtype.Draft,
     ProductSubtype.FABVersionTwo,
     ProductSubtype.FirstEdition,
+    ProductSubtype.Play,
     ProductSubtype.SecondEdition,
     ProductSubtype.Set,
     ProductSubtype.Unlimited,
@@ -357,8 +358,9 @@ export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubtyp
 
   // Bundle 
   [ProductType.Bundle]: [
+    ProductSubtype.BoosterBundle,
     ProductSubtype.EliteTrainerBox,
-    ProductSubtype.UltraPremiumCollection
+    ProductSubtype.UltraPremiumCollection,
   ],
 
   // Secret Lair
@@ -391,6 +393,7 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
     ProductSubtype.Foil,
     ProductSubtype.FoilEteched,
     ProductSubtype.NonFoil,
+    ProductSubtype.Play,
     ProductSubtype.Set,
     ProductSubtype.TexturedFoil,
   ],
@@ -403,6 +406,7 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
 
   // Pokemon
   [TCG.Pokemon]: [
+    ProductSubtype.BoosterBundle,
     ProductSubtype.EliteTrainerBox,
     ProductSubtype.UltraPremiumCollection,
   ],  
