@@ -39,6 +39,7 @@ var ProductSubtype;
     ProductSubtype["FABVersionTwo"] = "2.0";
     ProductSubtype["FirstEdition"] = "1st Edition";
     ProductSubtype["Foil"] = "Foil";
+    ProductSubtype["GalaxyFoil"] = "Galaxy Foil";
     ProductSubtype["FoilEteched"] = "Foil Etched";
     ProductSubtype["NonFoil"] = "Non-Foil";
     ProductSubtype["Play"] = "Play";
@@ -148,6 +149,7 @@ exports.ProductTypeToProductSubtype = (_b = {},
         ProductSubtype.CommanderDeck,
         ProductSubtype.Foil,
         ProductSubtype.FoilEteched,
+        ProductSubtype.GalaxyFoil,
         ProductSubtype.NonFoil,
         ProductSubtype.TexturedFoil,
     ],
