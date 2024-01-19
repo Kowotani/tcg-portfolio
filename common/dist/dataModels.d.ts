@@ -23,6 +23,7 @@ export declare enum ProductSubtype {
     FirstEdition = "1st Edition",
     Foil = "Foil",
     GalaxyFoil = "Galaxy Foil",
+    GildedFoil = "Gilded Foil",
     FoilEteched = "Foil Etched",
     NonFoil = "Non-Foil",
     Play = "Play",

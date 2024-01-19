@@ -40,6 +40,7 @@ var ProductSubtype;
     ProductSubtype["FirstEdition"] = "1st Edition";
     ProductSubtype["Foil"] = "Foil";
     ProductSubtype["GalaxyFoil"] = "Galaxy Foil";
+    ProductSubtype["GildedFoil"] = "Gilded Foil";
     ProductSubtype["FoilEteched"] = "Foil Etched";
     ProductSubtype["NonFoil"] = "Non-Foil";
     ProductSubtype["Play"] = "Play";
@@ -150,6 +151,7 @@ exports.ProductTypeToProductSubtype = (_b = {},
         ProductSubtype.Foil,
         ProductSubtype.FoilEteched,
         ProductSubtype.GalaxyFoil,
+        ProductSubtype.GildedFoil,
         ProductSubtype.NonFoil,
         ProductSubtype.TexturedFoil,
     ],
@@ -170,6 +172,8 @@ exports.TCGToProductSubtype = (_c = {},
         ProductSubtype.Draft,
         ProductSubtype.Foil,
         ProductSubtype.FoilEteched,
+        ProductSubtype.GalaxyFoil,
+        ProductSubtype.GildedFoil,
         ProductSubtype.NonFoil,
         ProductSubtype.Play,
         ProductSubtype.Set,
