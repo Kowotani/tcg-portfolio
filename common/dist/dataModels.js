@@ -39,9 +39,10 @@ var ProductSubtype;
     ProductSubtype["FABVersionTwo"] = "2.0";
     ProductSubtype["FirstEdition"] = "1st Edition";
     ProductSubtype["Foil"] = "Foil";
+    ProductSubtype["FoilEteched"] = "Foil Etched";
     ProductSubtype["GalaxyFoil"] = "Galaxy Foil";
     ProductSubtype["GildedFoil"] = "Gilded Foil";
-    ProductSubtype["FoilEteched"] = "Foil Etched";
+    ProductSubtype["IllumineersTrove"] = "Illumineer's Trove";
     ProductSubtype["NonFoil"] = "Non-Foil";
     ProductSubtype["Play"] = "Play";
     ProductSubtype["SecondEdition"] = "2nd Edition";
@@ -102,7 +103,8 @@ exports.TCGToProductType = (_a = {},
     ],
     // Lorcana
     _a[TCG.Lorcana] = [
-        ProductType.BoosterBox
+        ProductType.BoosterBox,
+        ProductType.Bundle,
     ],
     // MTG
     _a[TCG.MagicTheGathering] = [
@@ -123,7 +125,7 @@ exports.TCGToProductType = (_a = {},
     ],
     // Sorcery
     _a[TCG.Sorcery] = [
-        ProductType.BoosterBox
+        ProductType.BoosterBox,
     ],
     _a);
 // product type -> product subtype
@@ -143,6 +145,7 @@ exports.ProductTypeToProductSubtype = (_b = {},
     _b[ProductType.Bundle] = [
         ProductSubtype.BoosterBundle,
         ProductSubtype.EliteTrainerBox,
+        ProductSubtype.IllumineersTrove,
         ProductSubtype.UltraPremiumCollection,
     ],
     // Secret Lair
@@ -165,6 +168,9 @@ exports.TCGToProductSubtype = (_c = {},
         ProductSubtype.Unlimited,
     ],
     // Lorcana
+    _c[TCG.Lorcana] = [
+        ProductSubtype.IllumineersTrove,
+    ],
     // MTG
     _c[TCG.MagicTheGathering] = [
         ProductSubtype.Collector,

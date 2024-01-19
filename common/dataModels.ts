@@ -37,9 +37,10 @@ export enum ProductSubtype {
   FABVersionTwo = '2.0',
   FirstEdition = '1st Edition',
   Foil = 'Foil',
+  FoilEteched = 'Foil Etched',
   GalaxyFoil = 'Galaxy Foil',
   GildedFoil = 'Gilded Foil',
-  FoilEteched = 'Foil Etched',
+  IllumineersTrove = `Illumineer's Trove`,
   NonFoil = 'Non-Foil',
   Play = 'Play',
   SecondEdition = '2nd Edition',
@@ -314,7 +315,8 @@ export const TCGToProductType: { [key in TCG]: ProductType[] } = {
 
   // Lorcana
   [TCG.Lorcana]: [
-    ProductType.BoosterBox
+    ProductType.BoosterBox,
+    ProductType.Bundle,
   ],
 
   // MTG
@@ -339,7 +341,7 @@ export const TCGToProductType: { [key in TCG]: ProductType[] } = {
 
   // Sorcery
   [TCG.Sorcery]: [
-    ProductType.BoosterBox
+    ProductType.BoosterBox,
   ]
 }
 
@@ -362,6 +364,7 @@ export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubtyp
   [ProductType.Bundle]: [
     ProductSubtype.BoosterBundle,
     ProductSubtype.EliteTrainerBox,
+    ProductSubtype.IllumineersTrove,
     ProductSubtype.UltraPremiumCollection,
   ],
 
@@ -388,6 +391,9 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
   ],
 
   // Lorcana
+  [TCG.Lorcana]: [
+    ProductSubtype.IllumineersTrove,
+  ],
 
   // MTG
   [TCG.MagicTheGathering]: [
