@@ -34,6 +34,34 @@ const TCCATEGORY_TO_TCG_MAP = new Map([
     ['Sorcery Contested Realm', common_1.TCG.Sorcery]
 ]);
 // --------------
+// estimated MSRP
+// --------------
+// -- Flesh and Blood
+const FAB_BOOSTER_BOX_MSRP = 110;
+const FAB_FIRST_EDITION_BOOSTER_BOX_MSRP = 100;
+const FAB_UNLIMITED_EDITION_BOOSTER_BOX_MSRP = 100;
+// -- Lorcana
+const LORCANA_BOOSTER_BOX_MSRP = 145;
+const LORCANA_ILLUMINEERS_TROVE_MSRP = 50;
+// -- Magic the Gathering
+const MTG_BUNDLE_MSRP = 40;
+const MTG_COLLECTOR_BOOSTER_BOX_MSRP = 250;
+const MTG_DRAFT_BOOSTER_BOX_MSRP = 100;
+const MTG_PLAY_BOOSTER_BOX_MSRP = 140;
+const MTG_SET_BOOSTER_BOX_MSRP = 120;
+const MTG_SL_EDH_DECK_MSRP = 150;
+const MTG_SL_FOIL_MSRP = 40;
+const MTG_SL_NON_FOIL_MSRP = 30;
+// -- MetaZoo
+const METAZOO_BOOSTER_BOX_MSRP = 190;
+// -- Pokemon
+const PKM_BOOSTER_BOX_MSRP = 160;
+const PKM_BOOSTER_BUNDLE_MSRP = 25;
+const PKM_ETB_MSRP = 50;
+const PKM_UPC_MSRP = 120;
+// -- Sorcery
+const SORCERY_BOOSTER_BOX_MSRP = 150;
+// --------------
 // regex patterns
 // --------------
 // -- Flesh and Blood
@@ -46,6 +74,8 @@ const FAB_UNLIMITED_EDITION_BOOSTER_BOX_NAME = /.*(?= Booster Box \[Unlimited Ed
 // -- Lorcana
 const LORCANA_BOOSTER_BOX_FORMAT = /Booster Box$/;
 const LORCANA_BOOSTER_BOX_NAME = /(?<=^Disney Lorcana: ).*(?= Booster Box$)/g;
+const LORCANA_ILLUMINEERS_TROVE_FORMAT = /Illumineer's Trove$/g;
+const LORCANA_ILLUMINEERS_TROVE_NAME = /(?<=^Disney Lorcana: ).*(?= Illumineer's Trove$)/g;
 // -- Magic the Gathering
 const MTG_BUNDLE_FORMAT = /Bundle$/g;
 const MTG_BUNDLE_NAME = /^.*?(?=( - )+.*Bundle$)/g;
@@ -171,6 +201,150 @@ exports.parseTCProducts = parseTCProducts;
 // =======
 /*
 DESC
+  Returns the estimated MSRP of a Product based on the input TCG, ProductType,
+  and ProductSubtype
+INPUT
+  tcg: A TCG enum
+  type: A ProductType enum
+  subtype?: A Subtype enum, if exists
+RETURN
+  The estimated MSRP, or null if it doesn't exist
+*/
+function getProductEstimatedMSRP(tcg, type, subtype) {
+    switch (tcg) {
+        // ===============
+        // Flesh and Blood
+        // ===============
+        case common_1.TCG.FleshAndBlood:
+            // first edition booster box
+            if (type === common_1.ProductType.BoosterBox &&
+                subtype === common_1.ProductSubtype.FirstEdition) {
+                return FAB_FIRST_EDITION_BOOSTER_BOX_MSRP;
+                // unlimited edition booster box
+            }
+            else if (type === common_1.ProductType.BoosterBox &&
+                subtype === common_1.ProductSubtype.Unlimited) {
+                return FAB_UNLIMITED_EDITION_BOOSTER_BOX_MSRP;
+                // 2.0 booster box
+            }
+            else if (type === common_1.ProductType.BoosterBox &&
+                subtype === common_1.ProductSubtype.FABVersionTwo) {
+                return FAB_BOOSTER_BOX_MSRP;
+            }
+            return null;
+        // =======
+        // Lorcana
+        // =======
+        case common_1.TCG.Lorcana:
+            // booster box
+            if (type === common_1.ProductType.BoosterBox) {
+                return LORCANA_BOOSTER_BOX_MSRP;
+                // illumineer's trove
+            }
+            else if (type === common_1.ProductType.Bundle &&
+                subtype === common_1.ProductSubtype.IllumineersTrove) {
+                return LORCANA_ILLUMINEERS_TROVE_MSRP;
+            }
+            return null;
+        // ===================
+        // Magic the Gathering
+        // ===================
+        case common_1.TCG.MagicTheGathering:
+            // -- non secret lair
+            // collector booster box
+            if (type === common_1.ProductType.BoosterBox &&
+                subtype === common_1.ProductSubtype.Collector) {
+                return MTG_COLLECTOR_BOOSTER_BOX_MSRP;
+                // set booster box
+            }
+            else if (type === common_1.ProductType.BoosterBox &&
+                subtype === common_1.ProductSubtype.Set) {
+                return MTG_SET_BOOSTER_BOX_MSRP;
+                // play booster box
+            }
+            else if (type === common_1.ProductType.BoosterBox &&
+                subtype === common_1.ProductSubtype.Play) {
+                return MTG_PLAY_BOOSTER_BOX_MSRP;
+                // draft booster box
+            }
+            else if (type === common_1.ProductType.BoosterBox &&
+                subtype === common_1.ProductSubtype.Draft) {
+                return MTG_DRAFT_BOOSTER_BOX_MSRP;
+                // bundle
+            }
+            else if (type === common_1.ProductType.Bundle) {
+                return MTG_BUNDLE_MSRP;
+                // -- secret lair
+                // SL commander deck
+            }
+            else if (type === common_1.ProductType.SecretLair &&
+                subtype === common_1.ProductSubtype.CommanderDeck) {
+                return MTG_SL_EDH_DECK_MSRP;
+                // SL foil (any type)
+            }
+            else if (type === common_1.ProductType.SecretLair &&
+                [
+                    common_1.ProductSubtype.Foil,
+                    common_1.ProductSubtype.FoilEteched,
+                    common_1.ProductSubtype.GalaxyFoil,
+                    common_1.ProductSubtype.GildedFoil,
+                    common_1.ProductSubtype.TexturedFoil
+                ].includes(subtype)) {
+                return MTG_SL_FOIL_MSRP;
+                // SL non foil
+            }
+            else if (type === common_1.ProductType.SecretLair &&
+                subtype === common_1.ProductSubtype.NonFoil) {
+                return MTG_SL_NON_FOIL_MSRP;
+            }
+            return null;
+        // =======
+        // MetaZoo
+        // =======
+        case common_1.TCG.MetaZoo:
+            // booster box
+            if (type === common_1.ProductType.BoosterBox &&
+                subtype === common_1.ProductSubtype.FirstEdition)
+                return METAZOO_BOOSTER_BOX_MSRP;
+            return null;
+        // =======
+        // Pokemon
+        // =======
+        case common_1.TCG.Pokemon:
+            // booster box
+            if (type === common_1.ProductType.BoosterBox) {
+                return PKM_BOOSTER_BOX_MSRP;
+                // booster bundle
+            }
+            else if (type === common_1.ProductType.Bundle &&
+                subtype === common_1.ProductSubtype.BoosterBundle) {
+                return PKM_BOOSTER_BUNDLE_MSRP;
+                // elite trainer box
+            }
+            else if (type === common_1.ProductType.Bundle &&
+                subtype === common_1.ProductSubtype.EliteTrainerBox) {
+                return PKM_ETB_MSRP;
+                // ultra premium collection
+            }
+            else if (type === common_1.ProductType.Bundle &&
+                subtype === common_1.ProductSubtype.UltraPremiumCollection) {
+                return PKM_UPC_MSRP;
+            }
+            return null;
+        // =======
+        // Sorcery
+        // =======
+        case common_1.TCG.Sorcery:
+            // booster box
+            if (type === common_1.ProductType.BoosterBox)
+                return SORCERY_BOOSTER_BOX_MSRP;
+            return null;
+        default:
+            return null;
+    }
+}
+/*
+DESC
   Returns an IProductMetadata if the input JSON corresponds to a scrapable
   product for the input TCG
 INPUT
@@ -185,16 +359,8 @@ function getProductMetadata(tcg, json) {
         // Flesh and Blood
         // ===============
         case common_1.TCG.FleshAndBlood:
-            // 2.0 booster box
-            if (FAB_BOOSTER_BOX_FORMAT.test(json.name)) {
-                return {
-                    name: _.head(json.name.match(FAB_BOOSTER_BOX_NAME)),
-                    type: common_1.ProductType.BoosterBox,
-                    subtype: common_1.ProductSubtype.FABVersionTwo
-                };
-                // 1st edition booster box
-            }
-            else if (FAB_FIRST_EDITION_BOOSTER_BOX_FORMAT.test(json.name)) {
+            // 1st edition booster box
+            if (FAB_FIRST_EDITION_BOOSTER_BOX_FORMAT.test(json.name)) {
                 return {
                     name: _.head(json.name.match(FAB_FIRST_EDITION_BOOSTER_BOX_NAME)),
                     type: common_1.ProductType.BoosterBox,
@@ -208,6 +374,14 @@ function getProductMetadata(tcg, json) {
                     type: common_1.ProductType.BoosterBox,
                     subtype: common_1.ProductSubtype.Unlimited
                 };
+                // 2.0 booster box
+            }
+            else if (FAB_BOOSTER_BOX_FORMAT.test(json.name)) {
+                return {
+                    name: _.head(json.name.match(FAB_BOOSTER_BOX_NAME)),
+                    type: common_1.ProductType.BoosterBox,
+                    subtype: common_1.ProductSubtype.FABVersionTwo
+                };
             }
             return null;
         // =======
@@ -219,6 +393,14 @@ function getProductMetadata(tcg, json) {
                 return {
                     name: _.head(json.name.match(LORCANA_BOOSTER_BOX_NAME)),
                     type: common_1.ProductType.BoosterBox
+                };
+                // illumineer's trove
+            }
+            else if (LORCANA_ILLUMINEERS_TROVE_FORMAT.test(json.name)) {
+                return {
+                    name: _.head(json.name.match(LORCANA_ILLUMINEERS_TROVE_NAME)),
+                    type: common_1.ProductType.Bundle,
+                    subtype: common_1.ProductSubtype.IllumineersTrove
                 };
             }
             return null;
@@ -479,6 +661,7 @@ RETURN
   An ITCProduct, or null if the product should not be parsed
 */
 function parseITCProductJSON(tcg, json) {
+    var _a;
     // verify keys exist
     (0, common_1.assert)((0, common_1.hasITCProductKeys)(json), 'JSON is not ITCProduct shaped');
     // get product metadata
@@ -494,17 +677,13 @@ function parseITCProductJSON(tcg, json) {
             name: metadata.name,
             type: metadata.type,
             language: common_1.ProductLanguage.English,
+            msrp: (_a = getProductEstimatedMSRP(tcg, metadata.type, metadata.subtype)) !== null && _a !== void 0 ? _a : 0,
             status: common_1.ParsingStatus.ToBeValidated
         };
-        if (metadata.msrp)
-            obj['msrp'] = metadata.msrp;
         if (metadata.subtype)
             obj['subtype'] = metadata.subtype;
         (0, common_1.assert)((0, common_1.isITCProduct)(obj), 'Object is not an ITCProduct');
         return obj;
-        // product should be ignored
     }
-    else {
-        return null;
-    }
+    return null;
 }
