@@ -10,126 +10,74 @@ import {
   // generic
   assert, getDateFromJSON
 } from 'common'
+import { 
+  // relationship objects
+  TCCATEGORYNAME_TO_TCG_MAP, 
+
+  // regex + msrp
+  FAB_BOOSTER_BOX_FORMAT, FAB_BOOSTER_BOX_MSRP, FAB_BOOSTER_BOX_NAME,
+
+  FAB_FIRST_EDITION_BOOSTER_BOX_FORMAT, FAB_FIRST_EDITION_BOOSTER_BOX_MSRP,
+  FAB_FIRST_EDITION_BOOSTER_BOX_NAME, 
+
+  FAB_UNLIMITED_EDITION_BOOSTER_BOX_FORMAT, 
+  FAB_UNLIMITED_EDITION_BOOSTER_BOX_MSRP, 
+  FAB_UNLIMITED_EDITION_BOOSTER_BOX_NAME,
+
+  LORCANA_BOOSTER_BOX_FORMAT, LORCANA_BOOSTER_BOX_MSRP, LORCANA_BOOSTER_BOX_NAME,
+
+  LORCANA_ILLUMINEERS_TROVE_FORMAT, LORCANA_ILLUMINEERS_TROVE_MSRP, 
+  LORCANA_ILLUMINEERS_TROVE_NAME,
+
+  MTG_BUNDLE_FORMAT, MTG_BUNDLE_MSRP, MTG_BUNDLE_NAME,
+
+  MTG_COLLECTOR_BOOSTER_BOX_FORMAT, MTG_COLLECTOR_BOOSTER_BOX_MSRP, 
+  MTG_COLLECTOR_BOOSTER_BOX_NAME,
+
+  MTG_DRAFT_BOOSTER_BOX_FORMAT, MTG_DRAFT_BOOSTER_BOX_MSRP, 
+  MTG_DRAFT_BOOSTER_BOX_NAME,
+
+  MTG_EDH_DECK_SET_FORMAT, MTG_EDH_DECK_SET_NAME,
+
+  MTG_PLAY_BOOSTER_BOX_FORMAT, MTG_PLAY_BOOSTER_BOX_MSRP, 
+  MTG_PLAY_BOOSTER_BOX_NAME,
+
+  MTG_SET_BOOSTER_BOX_FORMAT, MTG_SET_BOOSTER_BOX_MSRP, MTG_SET_BOOSTER_BOX_NAME,
+
+  MTG_SL_FORMAT, MTG_SL_BUNDLE_FORMAT, 
+  
+  MTG_SL_EDH_DECK_FORMAT, MTG_SL_EDH_DECK_MSRP, MTG_SL_EDH_DECK_NAME,
+
+  MTG_SL_FOIL_ETCHED_FORMAT, MTG_SL_FOIL_ETCHED_NAME, 
+
+  MTG_SL_FOIL_FORMAT, MTG_SL_FOIL_MSRP, MTG_SL_FOIL_NAME,
+
+  MTG_SL_GALAXY_FOIL_FORMAT, MTG_SL_GALAXY_FOIL_NAME, 
+
+  MTG_SL_GILDED_FOIL_FORMAT, MTG_SL_GILDED_FOIL_NAME,
+
+  MTG_SL_NON_FOIL_FORMAT, MTG_SL_NON_FOIL_MSRP, MTG_SL_NON_FOIL_NAME,
+
+  MTG_SL_TEXTURED_FOIL_FORMAT, MTG_SL_TEXTURED_FOIL_NAME,
+
+  METAZOO_FIRST_EDITION_BOOSTER_BOX_FORMAT, 
+  METAZOO_FIRST_EDITION_BOOSTER_BOX_MSRP, 
+  METAZOO_FIRST_EDITION_BOOSTER_BOX_NAME,
+
+  PKM_BOOSTER_BOX_FORMAT, PKM_BOOSTER_BOX_MSRP, PKM_BOOSTER_BOX_NAME,
+
+  PKM_BOOSTER_BUNDLE_FORMAT, PKM_BOOSTER_BUNDLE_MSRP, PKM_BOOSTER_BUNDLE_NAME,
+
+  PKM_CODE_CARD_FORMAT,
+
+  PKM_ETB_FORMAT, PKM_ETB_MSRP, PKM_ETB_SET_NAME, PKM_ETB_TYPE_NAME,
+
+  PKM_UPC_FORMAT, PKM_UPC_MSRP, PKM_UPC_NAME,
+
+  SORCERY_BOOSTER_BOX_FORMAT, SORCERY_BOOSTER_BOX_MSRP, SORCERY_BOOSTER_BOX_NAME
+
+} from './tcgcsv'
 import * as _ from 'lodash'
-
-
-// =========
-// constants
-// =========
-
-const TCCATEGORY_TO_TCG_MAP = new Map<string, TCG>([
-  ['Flesh & Blood TCG', TCG.FleshAndBlood],
-  ['Lorcana TCG', TCG.Lorcana],
-  ['Magic', TCG.MagicTheGathering],
-  ['MetaZoo', TCG.MetaZoo],
-  ['Pokemon', TCG.Pokemon],
-  ['Sorcery Contested Realm', TCG.Sorcery]
-])
-
-
-// --------------
-// estimated MSRP
-// --------------
-
-// -- Flesh and Blood
-const FAB_BOOSTER_BOX_MSRP = 110
-const FAB_FIRST_EDITION_BOOSTER_BOX_MSRP = 100
-const FAB_UNLIMITED_EDITION_BOOSTER_BOX_MSRP = 100
-
-
-// -- Lorcana
-const LORCANA_BOOSTER_BOX_MSRP = 145
-const LORCANA_ILLUMINEERS_TROVE_MSRP = 50
-
-// -- Magic the Gathering
-const MTG_BUNDLE_MSRP = 40
-const MTG_COLLECTOR_BOOSTER_BOX_MSRP = 250
-const MTG_DRAFT_BOOSTER_BOX_MSRP = 100
-const MTG_PLAY_BOOSTER_BOX_MSRP = 140
-const MTG_SET_BOOSTER_BOX_MSRP = 120
-const MTG_SL_EDH_DECK_MSRP = 150
-const MTG_SL_FOIL_MSRP = 40
-const MTG_SL_NON_FOIL_MSRP = 30
-
-// -- MetaZoo
-const METAZOO_BOOSTER_BOX_MSRP = 190
-
-// -- Pokemon
-const PKM_BOOSTER_BOX_MSRP = 160
-const PKM_BOOSTER_BUNDLE_MSRP = 25
-const PKM_ETB_MSRP = 50
-const PKM_UPC_MSRP = 120
-
-// -- Sorcery
-const SORCERY_BOOSTER_BOX_MSRP = 150
-
-// --------------
-// regex patterns
-// --------------
-
-// -- Flesh and Blood
-const FAB_BOOSTER_BOX_FORMAT = /Booster Box$/
-const FAB_BOOSTER_BOX_NAME = /.*(?= Booster Box$)/g
-const FAB_FIRST_EDITION_BOOSTER_BOX_FORMAT = /Booster Box \[1st Edition\]$/
-const FAB_FIRST_EDITION_BOOSTER_BOX_NAME = /.*(?= Booster Box \[1st Edition\])$/g
-const FAB_UNLIMITED_EDITION_BOOSTER_BOX_FORMAT = /Booster Box \[Unlimited Edition\]$/
-const FAB_UNLIMITED_EDITION_BOOSTER_BOX_NAME = /.*(?= Booster Box \[Unlimited Edition\]$)/g
-
-// -- Lorcana
-const LORCANA_BOOSTER_BOX_FORMAT = /Booster Box$/
-const LORCANA_BOOSTER_BOX_NAME = /(?<=^Disney Lorcana: ).*(?= Booster Box$)/g
-const LORCANA_ILLUMINEERS_TROVE_FORMAT = /Illumineer's Trove$/g
-const LORCANA_ILLUMINEERS_TROVE_NAME = /(?<=^Disney Lorcana: ).*(?= Illumineer's Trove$)/g
-
-// -- Magic the Gathering
-const MTG_BUNDLE_FORMAT = /Bundle$/g
-const MTG_BUNDLE_NAME = /^.*?(?=( - )+.*Bundle$)/g
-const MTG_COLLECTOR_BOOSTER_BOX_FORMAT = /Collector Booster Display$/g
-const MTG_COLLECTOR_BOOSTER_BOX_NAME = /^.*(?= - Collector Booster Display$)/g
-const MTG_DRAFT_BOOSTER_BOX_FORMAT = /(Draft Booster (Box|Display)$|Booster Box$)/g
-const MTG_DRAFT_BOOSTER_BOX_NAME = /^.*(?= - Draft Booster (Box|Display)$| - Booster Box$)/g
-const MTG_PLAY_BOOSTER_BOX_FORMAT = /Play Booster Display$/g
-const MTG_PLAY_BOOSTER_BOX_NAME = /^.*(?= - Play Booster Display$)/g
-const MTG_SET_BOOSTER_BOX_FORMAT = /^.*(?= - Set Booster Display$)/g
-const MTG_SET_BOOSTER_BOX_NAME = /Set Booster Display$/g
-const MTG_EDH_DECK_SET_FORMAT = /^.*?(?=[ -]* Commander Deck(s? \[Set of \d\]| Case| Display))/
-const MTG_EDH_DECK_SET_NAME = /Commander Deck(s? \[Set of \d\]| Case| Display)/g
-const MTG_SL_FORMAT = /^Secret Lair/g
-const MTG_SL_BUNDLE_FORMAT = /^Secret Lair.*Bundle/g
-const MTG_SL_EDH_DECK_FORMAT = /^Secret Lair Commander Deck:/g
-const MTG_SL_EDH_DECK_NAME = /(?<=^Secret Lair Commander Deck: ).*/g
-const MTG_SL_FOIL_ETCHED_FORMAT = /^Secret Lair Drop:.*(?=Foil Etched)/g
-const MTG_SL_FOIL_ETCHED_NAME = /(?<=^Secret Lair Drop: ).*(?= Foil Etched)/g
-const MTG_SL_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Foil)/g
-const MTG_SL_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= Foil)/g
-const MTG_SL_GALAXY_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Galaxy Foil)/g
-const MTG_SL_GALAXY_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= Galaxy Foil)/g
-const MTG_SL_GILDED_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Gilded Foil)/g
-const MTG_SL_GILDED_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= Gilded Foil)/g
-const MTG_SL_NON_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Non-Foil)/g
-const MTG_SL_NON_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= Non-Foil)/g
-const MTG_SL_TEXTURED_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Textured Foil)/g
-const MTG_SL_TEXTURED_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= Textured Foil)/g
-
-// -- MetaZoo
-const METAZOO_FIRST_EDITION_BOOSTER_BOX_FORMAT = /First Edition Booster Box$/
-const METAZOO_FIRST_EDITION_BOOSTER_BOX_NAME = /^.*(?=: First Edition Booster Box$)/
-
-// -- Pokemom
-const PKM_CODE_CARD_FORMAT = /^Code Card/
-const PKM_BOOSTER_BOX_FORMAT = /Booster Box$/
-const PKM_BOOSTER_BOX_NAME = /.*(?= Booster Box$)/g
-const PKM_BOOSTER_BUNDLE_FORMAT = /Booster Bundle$/
-const PKM_BOOSTER_BUNDLE_NAME = /.*(?= Booster Bundle$)/g
-const PKM_ETB_FORMAT = /Elite Trainer Box($| \[(?!Set of).*\])/
-const PKM_ETB_SET_NAME = /.*(?= Elite Trainer Box($| \[(?!Set of).*\]))/g
-const PKM_ETB_TYPE_NAME = /(?<=\[).*(?=\]$)/g
-const PKM_UPC_FORMAT = /Ultra-Premium Collection$/
-const PKM_UPC_NAME = /.*(?= Ultra-Premium Collection$)/g
-
-// -- Sorcery
-const SORCERY_BOOSTER_BOX_FORMAT = /Booster Box$/
-const SORCERY_BOOSTER_BOX_NAME = /.*(?= Booster Box$)/g
 
 
 // ==========
@@ -170,9 +118,8 @@ export function parseTCCategories(
   // parse each element for a supported TCG
   response.forEach((el: any) => {
     assert(hasTCCategoryKeys(el), 'Element is not ITCCategory shaped')
-    if (TCCATEGORY_TO_TCG_MAP.get(el.name)) {
+    if (TCCATEGORYNAME_TO_TCG_MAP.get(el.name))
       categories.push(parseITCCategoryJSON(el))
-    }
   })
   
   return categories
@@ -371,7 +318,7 @@ function getProductEstimatedMSRP(
       // booster box
       if (type === ProductType.BoosterBox && 
           subtype === ProductSubtype.FirstEdition)
-        return METAZOO_BOOSTER_BOX_MSRP
+        return METAZOO_FIRST_EDITION_BOOSTER_BOX_MSRP
 
       return null
 
@@ -744,7 +691,7 @@ function parseITCCategoryJSON(json: any): ITCCategory {
     categoryId: json.categoryId,
     name: json.name,
     displayName: json.displayName,
-    tcg: TCCATEGORY_TO_TCG_MAP.get(json.name)
+    tcg: TCCATEGORYNAME_TO_TCG_MAP.get(json.name)
   }
   assert(isITCCategory(obj), 'Object is not an ITCCategory')
   return obj
@@ -786,6 +733,7 @@ DESC
   Returns an ITCProduct after parsing the input json, or null if the product
   should not be parsed
 INPUT
+  tcg: The TCG of the products
   json: A JSON representation of an ITCProduct
 RETURN
   An ITCProduct, or null if the product should not be parsed
