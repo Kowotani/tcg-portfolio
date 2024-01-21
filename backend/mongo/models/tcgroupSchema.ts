@@ -17,13 +17,11 @@ export const tcgroupSchema = new Schema<IMTCGroup>({
   groupId: {
     type: Number,
     min: 1,
-    unique: true,
     required: true
   },
   categoryId: {
     type: Number,
     min: 1,
-    unique: true,
     required: true
   },
   name: {
@@ -33,6 +31,11 @@ export const tcgroupSchema = new Schema<IMTCGroup>({
   abbreviation: String,
   publishedOn: Date
 })
+
+tcgroupSchema.index(
+  { groupId: 1, categoryId: 1 },
+  { unique: true }
+)
 
 
 // ==============
