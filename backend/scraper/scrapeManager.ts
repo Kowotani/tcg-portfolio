@@ -1,16 +1,20 @@
 import { 
-  IDatedPriceData, IPrice, IPriceData, TimeseriesGranularity, 
+  // data models
+  IDatedPriceData, IPrice, IPriceData, ITCGroup, TimeseriesGranularity, 
 
-  formatAsISO
+  // generic
+  assert, formatAsISO
 } from 'common'
-import * as _ from 'lodash'
 import { IMProduct } from '../mongo/models/productSchema'
 import { insertPrices } from '../mongo/dbi/Price'
 import { 
   getProductDocs, getTcgplayerIdsForHistoricalScrape 
 } from '../mongo/dbi/Product'
+import { getTCGroupDocs, insertTCGroups } from '../mongo/dbi/TCGroup'
 import { scrapeCurrent, scrapeHistorical } from './scraper'
+import { getParsedTCGroups } from './tcgcsv'
 import { TcgPlayerChartDateRange } from '../utils/Chart'
+import { TCCATEGORYID_TO_TCG_MAP } from '../utils/tcgcsv'
 
 
 // =========
@@ -186,6 +190,44 @@ export async function loadHistoricalPrices(
   return numInserted
 }
 
+/*
+DESC
+  Loads TCGCSV Groups for the input TCGCSV categoryId
+INPUT
+  categoryId: The TCGCSV categoryId
+RETURN
+  The number of documents loaded for the input Category
+*/
+export async function loadTCGroups(
+  categoryId: number
+): Promise<number> {
+
+  // verify categoryId is recognized
+  assert(TCCATEGORYID_TO_TCG_MAP.get(categoryId), 
+    `CategoryId not found in TCCATEGORYID_TO_TCG: ${categoryId}`)
+
+  // get TCGroup data
+  const groups = await getParsedTCGroups(categoryId)
+
+  // remove existing groups
+  const existingGroups = await getTCGroupDocs(categoryId)
+  const existingGroupIds = existingGroups.map((group: ITCGroup) => {
+    return group.groupId
+  })
+  const newGroups = groups.filter((group: ITCGroup) => {
+    return !existingGroupIds.includes(group.groupId)
+  })
+
+  // insert new groups
+  if (newGroups) {
+    const res = await insertTCGroups(newGroups)
+    return res
+  }
+    
+  return 0
+}
+
+
 async function main() {
 
   // const tcgplayerId = 224721
@@ -200,6 +242,9 @@ async function main() {
 
   // const numInserted = await loadHistoricalPrices(TcgPlayerChartDateRange.OneYear)
   // console.log(`Inserted ${numInserted} docs`)
+  // const categoryId = 77
+  // const res = await loadTCGroups(categoryId)
+  // console.log(`Inserted ${res} docs for categoryId: ${categoryId}`)
 }
 
 main()

@@ -9,11 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadHistoricalPrices = exports.loadCurrentPrices = exports.loadCurrentPrice = void 0;
+exports.loadTCGroups = exports.loadHistoricalPrices = exports.loadCurrentPrices = exports.loadCurrentPrice = void 0;
 const common_1 = require("common");
 const Price_1 = require("../mongo/dbi/Price");
 const Product_1 = require("../mongo/dbi/Product");
+const TCGroup_1 = require("../mongo/dbi/TCGroup");
 const scraper_1 = require("./scraper");
+const tcgcsv_1 = require("./tcgcsv");
+const tcgcsv_2 = require("../utils/tcgcsv");
 // =========
 // functions
 // =========
@@ -155,6 +158,37 @@ function loadHistoricalPrices(dateRange) {
     });
 }
 exports.loadHistoricalPrices = loadHistoricalPrices;
+/*
+DESC
+  Loads TCGCSV Groups for the input TCGCSV categoryId
+INPUT
+  categoryId: The TCGCSV categoryId
+RETURN
+  The number of documents loaded for the input Category
+*/
+function loadTCGroups(categoryId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // verify categoryId is recognized
+        (0, common_1.assert)(tcgcsv_2.TCCATEGORYID_TO_TCG_MAP.get(categoryId), `CategoryId not found in TCCATEGORYID_TO_TCG: ${categoryId}`);
+        // get TCGroup data
+        const groups = yield (0, tcgcsv_1.getParsedTCGroups)(categoryId);
+        // remove existing groups
+        const existingGroups = yield (0, TCGroup_1.getTCGroupDocs)(categoryId);
+        const existingGroupIds = existingGroups.map((group) => {
+            return group.groupId;
+        });
+        const newGroups = groups.filter((group) => {
+            return !existingGroupIds.includes(group.groupId);
+        });
+        // insert new groups
+        if (newGroups) {
+            const res = yield (0, TCGroup_1.insertTCGroups)(newGroups);
+            return res;
+        }
+        return 0;
+    });
+}
+exports.loadTCGroups = loadTCGroups;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         // const tcgplayerId = 224721
@@ -167,6 +201,9 @@ function main() {
         // console.log(`Inserted ${numInserted} docs`)
         // const numInserted = await loadHistoricalPrices(TcgPlayerChartDateRange.OneYear)
         // console.log(`Inserted ${numInserted} docs`)
+        // const categoryId = 77
+        // const res = await loadTCGroups(categoryId)
+        // console.log(`Inserted ${res} docs for categoryId: ${categoryId}`)
     });
 }
 main()
