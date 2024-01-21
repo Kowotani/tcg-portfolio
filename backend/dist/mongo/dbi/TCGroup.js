@@ -24,18 +24,21 @@ const url = 'mongodb://localhost:27017/tcgPortfolio';
 // =======
 /*
 DESC
-  Retrieves a TCGroup document by TCGCSV groupId
+  Retrieves a TCGroup document by TCGCSV groupId (and optionally categoryId)
 INPUT
   groupId: The TCGCSV groupId
+  categoryId?: The TCGCSV categoryId
 RETURN
   The document if found, else null
 */
-function getTCGroupDoc(groupId) {
+function getTCGroupDoc(groupId, categoryId) {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const tcgroupDoc = yield tcgroupSchema_1.TCGroup.findOne({ 'groupId': groupId });
+            const tcgroupDoc = categoryId
+                ? yield tcgroupSchema_1.TCGroup.findOne({ 'categoryId': categoryId, 'groupId': groupId })
+                : yield tcgroupSchema_1.TCGroup.findOne({ 'groupId': groupId });
             return tcgroupDoc;
         }
         catch (err) {
@@ -47,16 +50,20 @@ function getTCGroupDoc(groupId) {
 exports.getTCGroupDoc = getTCGroupDoc;
 /*
 DESC
-  Returns all TCGroups
+  Returns all TCGroups (optionally for an input categoryId)
+INPUT
+  categoryId?: The TCGCSV categoryId
 RETURN
   An ITCGroup[]
 */
-function getTCGroupDocs() {
+function getTCGroupDocs(categoryId) {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const docs = yield tcgroupSchema_1.TCGroup.find({});
+            const docs = categoryId
+                ? yield tcgroupSchema_1.TCGroup.find({ 'categoryId': categoryId })
+                : yield tcgroupSchema_1.TCGroup.find({});
             return docs;
         }
         catch (err) {

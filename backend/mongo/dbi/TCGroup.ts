@@ -17,21 +17,25 @@ const url = 'mongodb://localhost:27017/tcgPortfolio'
 
 /*
 DESC
-  Retrieves a TCGroup document by TCGCSV groupId
+  Retrieves a TCGroup document by TCGCSV groupId (and optionally categoryId)
 INPUT
   groupId: The TCGCSV groupId
+  categoryId?: The TCGCSV categoryId
 RETURN
   The document if found, else null
 */
 export async function getTCGroupDoc(
-  groupId: number
+  groupId: number,
+  categoryId?: number
 ): Promise<HydratedDocument<IMTCGroup> | null> {
 
   // connect to db
   await mongoose.connect(url)
 
   try {
-    const tcgroupDoc = await TCGroup.findOne({ 'groupId': groupId })
+    const tcgroupDoc = categoryId 
+      ? await TCGroup.findOne({ 'categoryId': categoryId, 'groupId': groupId })
+      : await TCGroup.findOne({ 'groupId': groupId })
     return tcgroupDoc
 
   } catch(err) {
@@ -43,18 +47,24 @@ export async function getTCGroupDoc(
 
 /*
 DESC
-  Returns all TCGroups
+  Returns all TCGroups (optionally for an input categoryId)
+INPUT
+  categoryId?: The TCGCSV categoryId
 RETURN
   An ITCGroup[]
 */
-export async function getTCGroupDocs(): Promise<HydratedDocument<IMTCGroup>[]> {
+export async function getTCGroupDocs(
+  categoryId?: number
+): Promise<HydratedDocument<IMTCGroup>[]> {
 
   // connect to db
   await mongoose.connect(url);
 
   try {
 
-    const docs = await TCGroup.find({})
+    const docs = categoryId
+      ? await TCGroup.find({ 'categoryId': categoryId })
+      : await TCGroup.find({})
     return docs
 
   } catch(err) {
