@@ -80,16 +80,17 @@ DESC
 INPUT
   tcg: A TCG enum
   response: The response corresponding to the return value
+  setCode?: The set code for the products
 RETURN
   An ITCProduct[]
 */
-function parseTCProducts(tcg, response) {
+function parseTCProducts(tcg, response, setCode) {
     // check if response is Array-shaped
     (0, common_1.assert)(Array.isArray(response), 'Input is not an Array');
     let products = [];
     // parse each element
     response.forEach((el) => {
-        const product = parseITCProductJSON(tcg, el);
+        const product = parseITCProductJSON(tcg, el, setCode);
         if (product)
             products.push(product);
     });
@@ -558,10 +559,11 @@ DESC
 INPUT
   tcg: The TCG of the products
   json: A JSON representation of an ITCProduct
+  setCode?: The set code of the product
 RETURN
   An ITCProduct, or null if the product should not be parsed
 */
-function parseITCProductJSON(tcg, json) {
+function parseITCProductJSON(tcg, json, setCode) {
     var _a;
     // verify keys exist
     (0, common_1.assert)((0, common_1.hasITCProductKeys)(json), 'JSON is not ITCProduct shaped');
@@ -583,6 +585,8 @@ function parseITCProductJSON(tcg, json) {
         };
         if (metadata.subtype)
             obj['subtype'] = metadata.subtype;
+        if (setCode)
+            obj['setCode'] = setCode;
         (0, common_1.assert)((0, common_1.isITCProduct)(obj), 'Object is not an ITCProduct');
         return obj;
     }
