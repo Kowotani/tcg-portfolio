@@ -1,9 +1,7 @@
 import axios from 'axios'
-import {
-  // data models
-  ITCGroup
-} from 'common'
-import { parseTCGroups } from '../utils/api'
+import { ITCCategory, ITCGroup } from 'common'
+import * as _ from 'lodash' 
+import { parseTCCategories, parseTCGroups } from '../utils/api'
 
 
 // =========
@@ -16,6 +14,25 @@ const URL_BASE = 'https://tcgcsv.com'
 // =========
 // functions
 // =========
+
+// -- ITCCategory
+
+/*
+DESC
+  Returns an ITCCategory[] of all scraped Categories
+RETURN
+  An ITCCategory[]
+*/
+export async function getParsedTCCategories(): Promise<ITCCategory[]> {
+
+  const url = `${URL_BASE}/categories`
+  const res = await axios({
+    method: 'get',
+    url: url,
+  })
+
+  return parseTCCategories(res.data.results)
+}
 
 // -- ITCGroup
 

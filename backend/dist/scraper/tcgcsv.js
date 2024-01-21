@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getParsedTCGroups = void 0;
+exports.getParsedTCGroups = exports.getParsedTCCategories = void 0;
 const axios_1 = __importDefault(require("axios"));
 const api_1 = require("../utils/api");
 // =========
@@ -22,6 +22,24 @@ const URL_BASE = 'https://tcgcsv.com';
 // =========
 // functions
 // =========
+// -- ITCCategory
+/*
+DESC
+  Returns an ITCCategory[] of all scraped Categories
+RETURN
+  An ITCCategory[]
+*/
+function getParsedTCCategories() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const url = `${URL_BASE}/categories`;
+        const res = yield (0, axios_1.default)({
+            method: 'get',
+            url: url,
+        });
+        return (0, api_1.parseTCCategories)(res.data.results);
+    });
+}
+exports.getParsedTCCategories = getParsedTCCategories;
 // -- ITCGroup
 /*
 DESC
