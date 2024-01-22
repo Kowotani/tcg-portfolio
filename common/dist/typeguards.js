@@ -482,7 +482,8 @@ function hasITCGroupKeys(arg) {
     return arg
         && arg.hasOwnProperty('groupId')
         && arg.hasOwnProperty('categoryId')
-        && arg.hasOwnProperty('name');
+        && arg.hasOwnProperty('name')
+        && arg.hasOwnProperty('publishedOn');
 }
 exports.hasITCGroupKeys = hasITCGroupKeys;
 /*
@@ -500,13 +501,11 @@ function isITCGroup(arg) {
         && typeof (arg.groupId) === 'number'
         && typeof (arg.categoryId) === 'number'
         && typeof (arg.name) === 'string'
+        && _.isDate(arg.publishedOn)
         // optional
         && arg.hasOwnProperty('abbrevation')
         ? typeof (arg.abbreviation) === 'string'
-        : true
-            && arg.hasOwnProperty('publishedOn')
-            ? _.isDate(arg.publishedOn)
-            : true;
+        : true;
 }
 exports.isITCGroup = isITCGroup;
 // ==========

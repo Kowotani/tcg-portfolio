@@ -268,8 +268,8 @@ export interface ITCGroup {
   groupId: number,
   categoryId: number,
   name: string,
-  abbreviation?: string,
-  publishedOn?: Date
+  publishedOn: Date,
+  abbreviation?: string
 }
 
 // Product (to be validated)

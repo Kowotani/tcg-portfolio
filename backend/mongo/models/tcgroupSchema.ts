@@ -28,8 +28,11 @@ export const tcgroupSchema = new Schema<IMTCGroup>({
     type: String,
     required: true
   },
-  abbreviation: String,
-  publishedOn: Date
+  publishedOn: {
+    type: Date,
+    required: true 
+  },
+  abbreviation: String
 })
 
 tcgroupSchema.index(

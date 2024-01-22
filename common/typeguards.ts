@@ -514,6 +514,7 @@ export function hasITCGroupKeys(arg: any): boolean {
     && arg.hasOwnProperty('groupId')
     && arg.hasOwnProperty('categoryId')
     && arg.hasOwnProperty('name')
+    && arg.hasOwnProperty('publishedOn')
 }
 
 /*
@@ -531,13 +532,11 @@ export function isITCGroup(arg: any): arg is ITCGroup {
     && typeof(arg.groupId) === 'number'
     && typeof(arg.categoryId) === 'number'
     && typeof(arg.name) === 'string'
+    && _.isDate(arg.publishedOn) 
 
     // optional
     && arg.hasOwnProperty('abbrevation') 
       ? typeof(arg.abbreviation) === 'string' 
-      : true
-    && arg.hasOwnProperty('publishedOn')
-      ? _.isDate(arg.publishedOn) 
       : true
 }
 
