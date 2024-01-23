@@ -73,33 +73,33 @@ export const MTG_DRAFT_BOOSTER_BOX_NAME =
   /^.*(?= - Draft Booster (Box|Display)$| - Booster Box$)/g
 export const MTG_PLAY_BOOSTER_BOX_FORMAT = /Play Booster Display$/g
 export const MTG_PLAY_BOOSTER_BOX_NAME = /^.*(?= - Play Booster Display$)/g
-export const MTG_SET_BOOSTER_BOX_FORMAT = /^.*(?= - Set Booster Display$)/g
-export const MTG_SET_BOOSTER_BOX_NAME = /Set Booster Display$/g
+export const MTG_SET_BOOSTER_BOX_FORMAT = /Set Booster Display$/g
+export const MTG_SET_BOOSTER_BOX_NAME = /^.*(?= - Set Booster Display$)/g
 export const MTG_EDH_DECK_SET_FORMAT = 
-  /^.*?(?=[ -]* Commander Deck(s? \[Set of \d\]| Case| Display))/g
-export const MTG_EDH_DECK_SET_NAME = 
   /Commander Deck(s? \[Set of \d\]| Case| Display)/g
+export const MTG_EDH_DECK_SET_NAME = 
+  /^.*?(?=[ -]* Commander Deck(s? \[Set of \d\]| Case| Display))/g
 export const MTG_SL_FORMAT = /^Secret Lair/g
 export const MTG_SL_BUNDLE_FORMAT = /^Secret Lair.*Bundle/g
 export const MTG_SL_EDH_DECK_FORMAT = /^Secret Lair Commander Deck:/g
 export const MTG_SL_EDH_DECK_NAME = /(?<=^Secret Lair Commander Deck: ).*/g
-export const MTG_SL_FOIL_ETCHED_FORMAT = /^Secret Lair Drop:.*(?=Foil Etched)/g
+export const MTG_SL_FOIL_ETCHED_FORMAT = /^Secret Lair Drop:.*(?= - Foil Etched)/g
 export const MTG_SL_FOIL_ETCHED_NAME = 
   /(?<=^Secret Lair Drop: ).*(?= Foil Etched)/g
-export const MTG_SL_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Foil)/g
-export const MTG_SL_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= Foil)/g
+export const MTG_SL_FOIL_FORMAT = /^Secret Lair Drop:.*(?=(Traditional )?Foil)/g
+export const MTG_SL_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= - (Traditional )?Foil)/g
 export const MTG_SL_GALAXY_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Galaxy Foil)/g
 export const MTG_SL_GALAXY_FOIL_NAME = 
-  /(?<=^Secret Lair Drop: ).*(?= Galaxy Foil)/g
+  /(?<=^Secret Lair Drop: ).*(?= - Galaxy Foil)/g
 export const MTG_SL_GILDED_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Gilded Foil)/g
 export const MTG_SL_GILDED_FOIL_NAME = 
-  /(?<=^Secret Lair Drop: ).*(?= Gilded Foil)/g
+  /(?<=^Secret Lair Drop: ).*(?= - Gilded Foil)/g
 export const MTG_SL_NON_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Non-Foil)/g
-export const MTG_SL_NON_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= Non-Foil)/g
+export const MTG_SL_NON_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= - Non-Foil)/g
 export const MTG_SL_TEXTURED_FOIL_FORMAT = 
   /^Secret Lair Drop:.*(?=Textured Foil)/g
 export const MTG_SL_TEXTURED_FOIL_NAME = 
-  /(?<=^Secret Lair Drop: ).*(?= Textured Foil)/g
+  /(?<=^Secret Lair Drop: ).*(?= - Textured Foil)/g
 
 // -- msrp
 
@@ -161,7 +161,7 @@ export const PKM_UPC_MSRP = 120
 // -- regex
 
 export const SORCERY_BOOSTER_BOX_FORMAT = /Booster Box$/g
-export const SORCERY_BOOSTER_BOX_NAME = /.*(?= Booster Box$)/g
+export const SORCERY_BOOSTER_BOX_NAME = /.*(?= - Booster Box$)/g
 
 // -- msrp
 

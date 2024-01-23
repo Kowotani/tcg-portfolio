@@ -43,26 +43,26 @@ exports.MTG_DRAFT_BOOSTER_BOX_FORMAT = /(Draft Booster (Box|Display)$|Booster Bo
 exports.MTG_DRAFT_BOOSTER_BOX_NAME = /^.*(?= - Draft Booster (Box|Display)$| - Booster Box$)/g;
 exports.MTG_PLAY_BOOSTER_BOX_FORMAT = /Play Booster Display$/g;
 exports.MTG_PLAY_BOOSTER_BOX_NAME = /^.*(?= - Play Booster Display$)/g;
-exports.MTG_SET_BOOSTER_BOX_FORMAT = /^.*(?= - Set Booster Display$)/g;
-exports.MTG_SET_BOOSTER_BOX_NAME = /Set Booster Display$/g;
-exports.MTG_EDH_DECK_SET_FORMAT = /^.*?(?=[ -]* Commander Deck(s? \[Set of \d\]| Case| Display))/g;
-exports.MTG_EDH_DECK_SET_NAME = /Commander Deck(s? \[Set of \d\]| Case| Display)/g;
+exports.MTG_SET_BOOSTER_BOX_FORMAT = /Set Booster Display$/g;
+exports.MTG_SET_BOOSTER_BOX_NAME = /^.*(?= - Set Booster Display$)/g;
+exports.MTG_EDH_DECK_SET_FORMAT = /Commander Deck(s? \[Set of \d\]| Case| Display)/g;
+exports.MTG_EDH_DECK_SET_NAME = /^.*?(?=[ -]* Commander Deck(s? \[Set of \d\]| Case| Display))/g;
 exports.MTG_SL_FORMAT = /^Secret Lair/g;
 exports.MTG_SL_BUNDLE_FORMAT = /^Secret Lair.*Bundle/g;
 exports.MTG_SL_EDH_DECK_FORMAT = /^Secret Lair Commander Deck:/g;
 exports.MTG_SL_EDH_DECK_NAME = /(?<=^Secret Lair Commander Deck: ).*/g;
-exports.MTG_SL_FOIL_ETCHED_FORMAT = /^Secret Lair Drop:.*(?=Foil Etched)/g;
+exports.MTG_SL_FOIL_ETCHED_FORMAT = /^Secret Lair Drop:.*(?= - Foil Etched)/g;
 exports.MTG_SL_FOIL_ETCHED_NAME = /(?<=^Secret Lair Drop: ).*(?= Foil Etched)/g;
-exports.MTG_SL_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Foil)/g;
-exports.MTG_SL_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= Foil)/g;
+exports.MTG_SL_FOIL_FORMAT = /^Secret Lair Drop:.*(?=(Traditional )?Foil)/g;
+exports.MTG_SL_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= - (Traditional )?Foil)/g;
 exports.MTG_SL_GALAXY_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Galaxy Foil)/g;
-exports.MTG_SL_GALAXY_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= Galaxy Foil)/g;
+exports.MTG_SL_GALAXY_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= - Galaxy Foil)/g;
 exports.MTG_SL_GILDED_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Gilded Foil)/g;
-exports.MTG_SL_GILDED_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= Gilded Foil)/g;
+exports.MTG_SL_GILDED_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= - Gilded Foil)/g;
 exports.MTG_SL_NON_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Non-Foil)/g;
-exports.MTG_SL_NON_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= Non-Foil)/g;
+exports.MTG_SL_NON_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= - Non-Foil)/g;
 exports.MTG_SL_TEXTURED_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Textured Foil)/g;
-exports.MTG_SL_TEXTURED_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= Textured Foil)/g;
+exports.MTG_SL_TEXTURED_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= - Textured Foil)/g;
 // -- msrp
 exports.MTG_BUNDLE_MSRP = 40;
 exports.MTG_COLLECTOR_BOOSTER_BOX_MSRP = 250;
@@ -104,7 +104,7 @@ exports.PKM_UPC_MSRP = 120;
 // -------
 // -- regex
 exports.SORCERY_BOOSTER_BOX_FORMAT = /Booster Box$/g;
-exports.SORCERY_BOOSTER_BOX_NAME = /.*(?= Booster Box$)/g;
+exports.SORCERY_BOOSTER_BOX_NAME = /.*(?= - Booster Box$)/g;
 // -- msrp
 exports.SORCERY_BOOSTER_BOX_MSRP = 150;
 // ====================
