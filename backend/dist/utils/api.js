@@ -76,21 +76,21 @@ ENDPOINT
   GET:tcgcsvm.com/{categoryId}/{groupId}/products
 DESC
   Parses the input response object from the endpoint and returns an
-  ITCProduct[]
+  ITCProduct[], using the input tcg and group for supplemental data
 INPUT
   tcg: A TCG enum
+  group: An ITCGroup
   response: The response corresponding to the return value
-  setCode?: The set code for the products
 RETURN
   An ITCProduct[]
 */
-function parseTCProducts(tcg, response, setCode) {
+function parseTCProducts(tcg, group, response) {
     // check if response is Array-shaped
     (0, common_1.assert)(Array.isArray(response), 'Input is not an Array');
     let products = [];
     // parse each element
     response.forEach((el) => {
-        const product = parseITCProductJSON(tcg, el, setCode);
+        const product = parseITCProductJSON(tcg, group, el);
         if (product)
             products.push(product);
     });
@@ -558,15 +558,14 @@ DESC
   should not be parsed
 INPUT
   tcg: The TCG of the products
+  group: An ITCGroup for the products
   json: A JSON representation of an ITCProduct
   setCode?: The set code of the product
 RETURN
   An ITCProduct, or null if the product should not be parsed
 */
-function parseITCProductJSON(tcg, json, setCode) {
+function parseITCProductJSON(tcg, group, json) {
     var _a;
-    // verify keys exist
-    (0, common_1.assert)((0, common_1.hasITCProductKeys)(json), 'JSON is not ITCProduct shaped');
     // get product metadata
     const metadata = getProductMetadata(tcg, json);
     // product should be parsed
@@ -576,7 +575,7 @@ function parseITCProductJSON(tcg, json, setCode) {
             groupId: json.groupId,
             categoryId: json.categoryId,
             tcg: tcg,
-            releaseDate: (0, common_1.getDateFromJSON)(json.publishedOn),
+            releaseDate: group.publishedOn,
             name: metadata.name,
             type: metadata.type,
             language: common_1.ProductLanguage.English,
@@ -585,8 +584,8 @@ function parseITCProductJSON(tcg, json, setCode) {
         };
         if (metadata.subtype)
             obj['subtype'] = metadata.subtype;
-        if (setCode)
-            obj['setCode'] = setCode;
+        if (group.abbreviation)
+            obj['setCode'] = group.abbreviation;
         (0, common_1.assert)((0, common_1.isITCProduct)(obj), 'Object is not an ITCProduct');
         return obj;
     }
