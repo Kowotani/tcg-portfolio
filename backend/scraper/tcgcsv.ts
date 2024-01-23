@@ -1,7 +1,15 @@
 import axios from 'axios'
-import { ITCCategory, ITCGroup } from 'common'
+import {
+  // data models
+  ITCCategory, ITCGroup, ITCProduct,
+
+  // generic
+  assert
+} from 'common'
 import * as _ from 'lodash' 
-import { parseTCCategories, parseTCGroups } from '../utils/api'
+import { getTCGroupDoc } from '../mongo/dbi/TCGroup'
+import { TCCATEGORYID_TO_TCG_MAP } from '../utils/tcgcsv'
+import { parseTCCategories, parseTCGroups, parseTCProducts } from '../utils/api'
 
 
 // =========
@@ -15,7 +23,9 @@ const URL_BASE = 'https://tcgcsv.com'
 // functions
 // =========
 
-// -- ITCCategory
+// -----------
+// ITCCategory
+// -----------
 
 /*
 DESC
@@ -34,7 +44,9 @@ export async function getParsedTCCategories(): Promise<ITCCategory[]> {
   return parseTCCategories(res.data.results)
 }
 
-// -- ITCGroup
+// --------
+// ITCGroup
+// --------
 
 /*
 DESC
@@ -55,4 +67,39 @@ export async function getParsedTCGroups(
   })
 
   return parseTCGroups(res.data.results)
+}
+
+// ----------
+// ITCProduct
+// ----------
+
+/*
+DESC
+  Returns an ITCProduct[] of scraped Products for the input categoryId and 
+  groupId
+INPUT
+  categoryId: The categoryId to scrape
+  groupId: The groupId to scrape
+RETURN
+  An ITCProduct[]
+*/
+export async function getParsedTCProducts(
+  categoryId: number,
+  groupId: number
+): Promise<ITCProduct[]> {
+
+  // get TCG
+  const tcg = TCCATEGORYID_TO_TCG_MAP.get(categoryId)
+  assert(tcg, `CategoryId not found in TCCATEGORYID_TO_TCG: ${categoryId}`)
+
+  // get TCGroup
+  const group = await getTCGroupDoc(groupId, categoryId) as ITCGroup
+
+  const url = `${URL_BASE}/${categoryId}/${groupId}/products`
+  const res = await axios({
+    method: 'get',
+    url: url,
+  })
+
+  return parseTCProducts(tcg, group, res.data.results)
 }

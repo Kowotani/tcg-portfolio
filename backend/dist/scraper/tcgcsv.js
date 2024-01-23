@@ -12,8 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getParsedTCGroups = exports.getParsedTCCategories = void 0;
+exports.getParsedTCProducts = exports.getParsedTCGroups = exports.getParsedTCCategories = void 0;
 const axios_1 = __importDefault(require("axios"));
+const common_1 = require("common");
+const TCGroup_1 = require("../mongo/dbi/TCGroup");
+const tcgcsv_1 = require("../utils/tcgcsv");
 const api_1 = require("../utils/api");
 // =========
 // constants
@@ -22,7 +25,9 @@ const URL_BASE = 'https://tcgcsv.com';
 // =========
 // functions
 // =========
-// -- ITCCategory
+// -----------
+// ITCCategory
+// -----------
 /*
 DESC
   Returns an ITCCategory[] of all scraped Categories
@@ -40,7 +45,9 @@ function getParsedTCCategories() {
     });
 }
 exports.getParsedTCCategories = getParsedTCCategories;
-// -- ITCGroup
+// --------
+// ITCGroup
+// --------
 /*
 DESC
   Returns an ITCGroup[] of scraped Groups for the input categoryId
@@ -60,3 +67,32 @@ function getParsedTCGroups(categoryId) {
     });
 }
 exports.getParsedTCGroups = getParsedTCGroups;
+// ----------
+// ITCProduct
+// ----------
+/*
+DESC
+  Returns an ITCProduct[] of scraped Products for the input categoryId and
+  groupId
+INPUT
+  categoryId: The categoryId to scrape
+  groupId: The groupId to scrape
+RETURN
+  An ITCProduct[]
+*/
+function getParsedTCProducts(categoryId, groupId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get TCG
+        const tcg = tcgcsv_1.TCCATEGORYID_TO_TCG_MAP.get(categoryId);
+        (0, common_1.assert)(tcg, `CategoryId not found in TCCATEGORYID_TO_TCG: ${categoryId}`);
+        // get TCGroup
+        const group = yield (0, TCGroup_1.getTCGroupDoc)(groupId, categoryId);
+        const url = `${URL_BASE}/${categoryId}/${groupId}/products`;
+        const res = yield (0, axios_1.default)({
+            method: 'get',
+            url: url,
+        });
+        return (0, api_1.parseTCProducts)(tcg, group, res.data.results);
+    });
+}
+exports.getParsedTCProducts = getParsedTCProducts;
