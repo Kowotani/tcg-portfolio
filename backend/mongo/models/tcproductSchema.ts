@@ -25,13 +25,11 @@ export const tcproductSchema = new Schema<IMTCProduct>({
   groupId: {
     type: Number,
     min: 1,
-    unique: true,
     required: true
   },
   categoryId: {
     type: Number,
     min: 1,
-    unique: true,
     required: true
   },  
   tcg: {
