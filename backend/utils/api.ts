@@ -4,8 +4,7 @@ import {
   ProductType, ProductSubtype, TCG,
 
   // typeguards
-  hasTCCategoryKeys, hasITCGroupKeys, hasITCProductKeys, 
-  isITCCategory, isITCGroup, isITCProduct,
+  hasTCCategoryKeys, hasITCGroupKeys, isITCCategory, isITCGroup, isITCProduct,
 
   // generic
   assert, getDateFromJSON
