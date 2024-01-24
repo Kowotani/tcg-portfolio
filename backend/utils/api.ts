@@ -38,6 +38,8 @@ import {
 
   MTG_EDH_DECK_SET_FORMAT, MTG_EDH_DECK_SET_NAME,
 
+  MTG_JUMPSTART_BOOSTER_BOX_FORMAT,
+
   MTG_PLAY_BOOSTER_BOX_FORMAT, MTG_PLAY_BOOSTER_BOX_MSRP, 
   MTG_PLAY_BOOSTER_BOX_NAME,
 
@@ -457,7 +459,8 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
         // exclude
         // -------
 
-        if (MTG_SL_BUNDLE_FORMAT.test(json.name)) return null
+        if (MTG_SL_BUNDLE_FORMAT.test(json.name))
+          return null
 
         // -------
         // include
@@ -522,6 +525,17 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
 
       // -- non secret lairs
       } else {
+
+        // -------
+        // exclude
+        // -------
+
+        if (MTG_JUMPSTART_BOOSTER_BOX_FORMAT.test(json.name))
+          return null
+
+        // -------
+        // include
+        // -------
 
         // collector booster box
         if (MTG_COLLECTOR_BOOSTER_BOX_FORMAT.test(json.name)) {
@@ -761,7 +775,7 @@ function parseITCProductJSON(
       name: metadata.name,
       type: metadata.type,
       language: ProductLanguage.English,
-      msrp: getProductEstimatedMSRP(tcg, metadata.type, metadata.subtype) ?? 0,
+      msrp: getProductEstimatedMSRP(tcg, metadata.type, metadata.subtype) ?? 1,
       status: ParsingStatus.ToBeValidated
     } as ITCProduct
     if (metadata.subtype) obj['subtype'] = metadata.subtype

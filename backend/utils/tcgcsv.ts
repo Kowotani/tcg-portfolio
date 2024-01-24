@@ -64,21 +64,23 @@ export const LORCANA_ILLUMINEERS_TROVE_MSRP = 50
 
 export const MTG_BUNDLE_FORMAT = /Bundle$/g
 export const MTG_BUNDLE_NAME = /^.*?(?=( - )+.*Bundle$)/g
-export const MTG_COLLECTOR_BOOSTER_BOX_FORMAT = /Collector Booster Display$/g
+export const MTG_COLLECTOR_BOOSTER_BOX_FORMAT = /Collector Booster (Box|Display)$/g
 export const MTG_COLLECTOR_BOOSTER_BOX_NAME = 
-  /^.*(?= - Collector Booster Display$)/g
+  /^.*(?= - Collector Booster (Box|Display)$)/g
 export const MTG_DRAFT_BOOSTER_BOX_FORMAT = 
   /(Draft Booster (Box|Display)$|Booster Box$)/g
 export const MTG_DRAFT_BOOSTER_BOX_NAME = 
   /^.*(?= - Draft Booster (Box|Display)$| - Booster Box$)/g
 export const MTG_PLAY_BOOSTER_BOX_FORMAT = /Play Booster Display$/g
 export const MTG_PLAY_BOOSTER_BOX_NAME = /^.*(?= - Play Booster Display$)/g
-export const MTG_SET_BOOSTER_BOX_FORMAT = /Set Booster Display$/g
-export const MTG_SET_BOOSTER_BOX_NAME = /^.*(?= - Set Booster Display$)/g
+export const MTG_SET_BOOSTER_BOX_FORMAT = /Set Booster (Box|Display)$/g
+export const MTG_SET_BOOSTER_BOX_NAME = /^.*(?= - Set Booster (Box|Display)$)/g
 export const MTG_EDH_DECK_SET_FORMAT = 
   /Commander Deck(s? \[Set of \d\]| Case| Display)/g
 export const MTG_EDH_DECK_SET_NAME = 
   /^.*?(?=[ -]* Commander Deck(s? \[Set of \d\]| Case| Display))/g
+export const MTG_JUMPSTART_BOOSTER_BOX_FORMAT =
+  /Jumpstart Booster (Box|Display)$/g
 export const MTG_SL_FORMAT = /^Secret Lair/g
 export const MTG_SL_BUNDLE_FORMAT = /^Secret Lair.*Bundle/g
 export const MTG_SL_EDH_DECK_FORMAT = /^Secret Lair Commander Deck:/g

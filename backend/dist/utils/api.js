@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -378,6 +382,14 @@ function getProductMetadata(tcg, json) {
                 // -- non secret lairs
             }
             else {
+                // -------
+                // exclude
+                // -------
+                if (tcgcsv_1.MTG_JUMPSTART_BOOSTER_BOX_FORMAT.test(json.name))
+                    return null;
+                // -------
+                // include
+                // -------
                 // collector booster box
                 if (tcgcsv_1.MTG_COLLECTOR_BOOSTER_BOX_FORMAT.test(json.name)) {
                     return {
@@ -579,7 +591,7 @@ function parseITCProductJSON(tcg, group, json) {
             name: metadata.name,
             type: metadata.type,
             language: common_1.ProductLanguage.English,
-            msrp: (_a = getProductEstimatedMSRP(tcg, metadata.type, metadata.subtype)) !== null && _a !== void 0 ? _a : 0,
+            msrp: (_a = getProductEstimatedMSRP(tcg, metadata.type, metadata.subtype)) !== null && _a !== void 0 ? _a : 1,
             status: common_1.ParsingStatus.ToBeValidated
         };
         if (metadata.subtype)
