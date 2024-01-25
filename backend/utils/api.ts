@@ -179,7 +179,18 @@ export function parseTCProducts(
   // parse each element
   response.forEach((el: any) => {
     const product = parseITCProductJSON(tcg, group, el)
-    if (product) products.push(product)
+    if (product) {
+
+      // append if name was properly parsed
+      if (product.name && product.name.length) {
+        products.push(product)
+
+      // log error message
+      } else { 
+        const msg = `Error parsing name for tcgplayerId: ${product.tcgplayerId}`
+        console.log(msg)
+      }
+    }
   })
   
   return products
