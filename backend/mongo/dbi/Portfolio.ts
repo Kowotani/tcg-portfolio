@@ -5,7 +5,9 @@ import {
 
   assert, getHoldingTcgplayerId, getPortfolioHoldings, isIPopulatedHolding
 } from 'common'
-import { areValidHoldings, getIMHoldingsFromIHoldings } from '../../utils/Holding'
+import { 
+  areValidHoldings, getIMHoldingsFromIHoldings 
+} from '../../utils/Holding'
 import * as _ from 'lodash'
 import mongoose, { HydratedDocument} from 'mongoose'
 import { IMPortfolio, Portfolio } from '../models/portfolioSchema'
@@ -207,7 +209,8 @@ export async function getPortfolios(
         // create populatedHoldings
         const populatedHoldings: IPopulatedHolding[] = portfolio.holdings.map(
           (el: any) => {
-            assert(isIPopulatedHolding(el))
+            assert(isIPopulatedHolding(el), 
+              'Element is not an IPopulatedHolding')
             return el
         })
 
@@ -279,8 +282,7 @@ export async function setPortfolio(
   try {
 
     // check that userIds match
-    assert(
-      existingPortfolio.userId === newPortfolio.userId,
+    assert(existingPortfolio.userId === newPortfolio.userId,
       `Mismatched userIds provided to setPortfolio(${existingPortfolio.userId}, ${newPortfolio.userId})`
     )
 
@@ -297,8 +299,7 @@ export async function setPortfolio(
       const errMsg = `Portfolio not found (${existingPortfolio.userId}, ${existingPortfolio.portfolioName})`
       throw new Error(errMsg)
     }
-    assert(
-      isPortfolioDoc(portfolioDoc),
+    assert(isPortfolioDoc(portfolioDoc),
       genPortfolioNotFoundError(existingPortfolio.userId, 
         existingPortfolio.portfolioName, 'setPortfolio()').toString()
     )
@@ -322,244 +323,6 @@ export async function setPortfolio(
 }
 
 async function main(): Promise<number> {  
-
-  let res
-
-  // const userId = 1234
-  // const portfolioName = 'Delta'
-  // const tcgplayerId = 493975
-  // const description = 'Washer dryer mechanic'
-  // let holdings: IHolding[] = [
-  //   {
-  //     tcgplayerId: 233232,
-  //     transactions: [
-  //       {
-  //         type: TransactionType.Purchase,
-  //         date: new Date(),
-  //         price: 99,
-  //         quantity: 1,
-  //       },
-  //       {
-  //         type: TransactionType.Sale,
-  //         date: new Date(),
-  //         price: 99,
-  //         quantity: 2,
-  //       },        
-  //     ],
-  //   },
-  // ]
-
-
-
-  // -- Set Portfolio
-  // const portfolio: IPortfolio = {
-  //   userId: userId, 
-  //   portfolioName: portfolioName,
-  //   holdings: [],
-  // }
-  // const portfolioDoc = await getPortfolioDoc(portfolio) as IPortfolio
-  // const holding = getPortfolioHolding(portfolioDoc, tcgplayerId) as IHolding
-  // const startDate = new Date(Date.parse('2023-06-09'))
-  // const endDate = new Date(Date.parse('2023-07-31'))
-  // const series = await getHoldingPnLAsDatedValues(holding, startDate, endDate)
-  // const priceMap = await getPriceMapOfSeries([tcgplayerId])
-  // const priceSeries = priceMap.get(tcgplayerId) as df.Series
-  // const pnl = getHoldingPnLSeries(holding, priceSeries, startDate, endDate)
-  // const mv = getHoldingMarketValueSeries(holding, priceSeries, startDate, endDate)
-  // const tc = getHoldingTotalCostSeries(holding, startDate, endDate)
-  // console.log('pnl: ', pnl)
-  // console.log('mv: ', mv)
-  // console.log('tc: ', tc)
-  // const tcgplayerIds = await getPortfolioTcgplayerIds(portfolio)
-  // console.log(tcgplayerIds)
-  // const twr = dfu.getHoldingTimeWeightedReturn(holding, priceSeries, startDate, endDate)
-  // console.log(twr)
-
-  // const newPortfolio: IPortfolio = {
-  //   userId: userId, 
-  //   portfolioName: portfolioName,
-  //   holdings: holdings,
-  // }
-  // res = await setPortfolio(portfolio, newPortfolio)
-  // if (res) {
-  //   console.log('Portfolio successfully set')
-  // } else {
-  //   console.log('Portfolio not set')
-  // }
-
-  // // -- Add portfolio holdings
-
-  // res = await addPortfolioHoldings(portfolio, holdings)
-  // if (res) {
-  //   console.log('Portfolio holdings successfully added')
-  // } else {
-  //   console.log('Portfolio holdings not added')
-  // }
-
-  // -- Set portfolio holdings
-
-  // res = await setPortfolioProperty(portfolio, 'description', 'Taco Bell')
-  // if (res) {
-  //   console.log('Portfolio holdings successfully set')
-  // } else {
-  //   console.log('Portfolio holdings not set')
-  // }
-
-  // // -- Get portfolios
-  
-  // res = await getPortfolioDocs(userId)
-  // if (res) {
-  //   console.log(res)
-  // } else {
-  //   console.log('Portfolios not retrieved')
-  // }
-
-  // res = await getPortfolios(userId)
-  // if (res) {
-  //   logObject(res)
-  // } else {
-  //   console.log('Portfolios not retrieved')
-  // }
-
-  // -- Add portfolio
-
-  // res = await addPortfolio(portfolio)
-  // if (res) {
-  //   console.log('Portfolio successfully created')
-  // } else {
-  //   console.log('Portfolio not created')
-  // }
-
-  // // -- Delete portfolio
-
-  // res = await deletePortfolio(userId, portfolioName)
-  // if (res) {
-  //   console.log('Portfolio successfully deleted')
-  // } else {
-  //   console.log('Portfolio not deleted')
-  // }
-
-  // // -- Add portfolio holding
-  // const holdingA: IHolding = {
-  //   tcgplayerId: 233232,
-  //   transactions: [
-  //     {
-  //       type: TransactionType.Purchase,
-  //       date: new Date('2023-09-01'),
-  //       price: 240,
-  //       quantity: 2
-  //     },
-  //     {
-  //       type: TransactionType.Sale,
-  //       date: new Date('2023-09-02'),
-  //       price: 245,
-  //       quantity: 1
-  //     },
-  //     {
-  //       type: TransactionType.Purchase,
-  //       date: new Date('2023-09-04'),
-  //       price: 250,
-  //       quantity: 1
-  //     },
-  //     {
-  //       type: TransactionType.Purchase,
-  //       date: new Date('2023-09-05'),
-  //       price: 250,
-  //       quantity: 1
-  //     },
-  //     {
-  //       type: TransactionType.Sale,
-  //       date: new Date('2023-09-06'),
-  //       price: 255,
-  //       quantity: 3
-  //     }
-  //   ]
-  // } 
-
-  // const holdingB: IHolding = {
-  //   tcgplayerId: 121527,
-  //   transactions: [
-  //     {
-  //       type: TransactionType.Purchase,
-  //       date: new Date('2023-09-07'),
-  //       price: 330,
-  //       quantity: 5
-  //     },
-  //     {
-  //       type: TransactionType.Sale,
-  //       date: new Date('2023-09-08'),
-  //       price: 325,
-  //       quantity: 1
-  //     },
-  //     {
-  //       type: TransactionType.Sale,
-  //       date: new Date('2023-09-10'),
-  //       price: 320,
-  //       quantity: 4
-  //     },
-  //   ]
-  // } 
-
-  // const portfolio = {
-  //   userId: 123,
-  //   portfolioName: 'foo',
-  //   holdings: [holdingA, holdingB]
-  // }
-
-  // const startDate = new Date('2023-09-01')
-  // const endDate = new Date('2023-09-12')
-
-  // const series = await getPortfolioMarketValueAsDatedValues(
-  //   portfolio, 
-  //   startDate,
-  //   endDate
-  // )
-
-  // console.log(dfu.getSeriesFromDatedValues(series))
-
-  // holdings = [
-  //   holding,
-  //   {
-  //     tcgplayerId: 233232,
-  //     transactions: [{
-  //       type: TransactionType.Purchase,
-  //       date: new Date(),
-  //       price: 4.99,
-  //       quantity: 100
-  //     }]ma
-  //   }    
-  // ]
-
-  // res = await addPortfolioHoldings(
-  //   {
-  //     userId: userId,
-  //     portfolioName: portfolioName,
-  //     holdings: holdings,
-  //   },
-  //   holdings
-  // )
-  // if (res) {
-  //   console.log('Holding successfully added')
-  // } else {
-  //   console.log('Holding not added')
-  // }
-
-  // // -- Delete portfolio holding
-
-  // res = await deletePortfolioHolding(
-  //   {
-  //     userId: userId,
-  //     portfolioName: portfolioName,
-  //     holdings: []
-  //   },
-  //   233232
-  // )
-  // if (res) {
-  //   console.log('Holding successfully deleted')
-  // } else {
-  //   console.log('Holding not deleted')
-  // }
-
   return 0
 }
 
