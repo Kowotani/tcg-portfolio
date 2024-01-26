@@ -17,14 +17,14 @@ import { formatAsPrice, ILatestPricesContext } from '../utils/Price'
 import { getProductNameWithLanguage } from '../utils/Product'
 
 
-type TProductCatalogueCardProps = {
+type TProductCardProps = {
   product: IProduct,
   height?: string | number,
   width?: string | number,
-  setCatalogueProduct: (product: IProduct) => void
+  onClick: (product: IProduct) => void
 }
-export const ProductCatalogueCard = (
-  props: PropsWithChildren<TProductCatalogueCardProps>
+export const ProductCard = (
+  props: PropsWithChildren<TProductCardProps>
 ) => {
 
 
@@ -40,7 +40,7 @@ export const ProductCatalogueCard = (
     product,
     height = DEFAULT_CARD_HEIGHT,
     width = DEFAULT_CARD_WIDTH,
-    setCatalogueProduct
+    onClick
   } = props
 
 
@@ -63,7 +63,7 @@ export const ProductCatalogueCard = (
       cursor='pointer'
       height={height}
       width={width}
-      onClick={() => setCatalogueProduct(product)}
+      onClick={() => onClick(product)}
     >
       <CardBody>
         <HStack 

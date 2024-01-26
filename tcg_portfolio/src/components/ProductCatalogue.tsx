@@ -24,7 +24,7 @@ import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { MobileModeContext } from '../state/MobileModeContext'
 import { Paginator } from './Paginator'
-import { ProductCatalogueCard } from './ProductCatalogueCard'
+import { ProductCard } from './ProductCard'
 import { ProductDetailsCard } from './ProductDetailsCard'
 import { FaSearch } from 'react-icons/fa'
 import { 
@@ -302,11 +302,11 @@ export const ProductCatalogue = (
               m={2} 
               width={cardWidth}
             >
-              <ProductCatalogueCard 
+              <ProductCard 
                 height={DEFAULT_CARD_HEIGHT}
                 product={product}
-                setCatalogueProduct={setProduct}
                 width={cardWidth}
+                onClick={setProduct}
               />
             </Box>
           )
