@@ -122,10 +122,7 @@ export function isIHolding(arg: any): arg is IHolding {
   return arg
     && hasIHoldingKeys(arg)
     && typeof(arg.tcgplayerId) === 'number'
-    && Array.isArray(arg.transactions)
-      && _.every(arg.transactions.map((el: any) => {
-        return isITransaction(el)
-      }))
+    && isITransactionArray(arg.transactions)
 }
 
 /*
@@ -156,10 +153,7 @@ export function isIPopulatedHolding(arg: any): arg is IPopulatedHolding {
   return arg
     && hasIPopulatedHoldingKeys(arg)
     && isIProduct(arg.product)
-    && Array.isArray(arg.transactions)
-      && _.every(arg.transactions.map((el: any) => {
-        return isITransaction(el)
-      }))
+    && isITransactionArray(arg.transactions)
 }
 
 
@@ -259,10 +253,7 @@ export function isIPortfolio(arg: any): arg is IPortfolio {
     && hasIPortfolioKeys(arg)
     && typeof(arg.userId) === 'number'
     && typeof(arg.portfolioName) === 'string'
-    && Array.isArray(arg.holdings)
-      && _.every(arg.holdings.map((el: any) => {
-        return isIHolding(el)
-      }))
+    && isIHoldingArray(arg.holdings)
 }
 
 /*

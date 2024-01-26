@@ -106,10 +106,7 @@ function isIHolding(arg) {
     return arg
         && hasIHoldingKeys(arg)
         && typeof (arg.tcgplayerId) === 'number'
-        && Array.isArray(arg.transactions)
-        && _.every(arg.transactions.map(function (el) {
-            return isITransaction(el);
-        }));
+        && isITransactionArray(arg.transactions);
 }
 exports.isIHolding = isIHolding;
 /*
@@ -140,10 +137,7 @@ function isIPopulatedHolding(arg) {
     return arg
         && hasIPopulatedHoldingKeys(arg)
         && isIProduct(arg.product)
-        && Array.isArray(arg.transactions)
-        && _.every(arg.transactions.map(function (el) {
-            return isITransaction(el);
-        }));
+        && isITransactionArray(arg.transactions);
 }
 exports.isIPopulatedHolding = isIPopulatedHolding;
 // =========
@@ -239,10 +233,7 @@ function isIPortfolio(arg) {
         && hasIPortfolioKeys(arg)
         && typeof (arg.userId) === 'number'
         && typeof (arg.portfolioName) === 'string'
-        && Array.isArray(arg.holdings)
-        && _.every(arg.holdings.map(function (el) {
-            return isIHolding(el);
-        }));
+        && isIHoldingArray(arg.holdings);
 }
 exports.isIPortfolio = isIPortfolio;
 /*
