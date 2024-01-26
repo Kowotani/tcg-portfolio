@@ -1,5 +1,6 @@
 import { TDataResBody, TProductPostResBody, TResBody } from './api';
 import { IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, IPrice, IPriceData, IProduct, ITCCategory, ITCGroup, ITCProduct, ITransaction, TDatedValue, TPerformanceData } from './dataModels';
+export declare function hasKeys(arg: any, keys: string[]): boolean;
 export declare function isTResBody(arg: any): arg is TResBody;
 export declare function isTDataResBody<Type>(arg: any): arg is TDataResBody<Type>;
 export declare function isTProductPostResBody<Type>(arg: any): arg is TProductPostResBody<Type>;

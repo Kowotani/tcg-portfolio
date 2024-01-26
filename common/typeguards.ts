@@ -14,6 +14,26 @@ import {
 import * as _ from 'lodash'
 
 
+// =======
+// helpers
+// =======
+
+/*
+DESC
+  Returns whether the input object has all of the input keys
+INPUT
+  arg: An object
+  keys: A string[] of keys
+RETURN
+  TRUE if the object has all of the keys, FALSE otherwise
+*/
+export function hasKeys(arg: any, keys: string[]): boolean {
+  return _.every(keys.map((key: string) => {
+    return _.hasIn(arg, key)
+  }))
+}
+
+
 // ===
 // api
 // ===
@@ -28,7 +48,7 @@ RETURN
 */
 export function isTResBody(arg: any): arg is TResBody {
   return arg
-    && arg.hasOwnProperty('message ')
+    && hasKeys(arg, ['message'])
     && typeof(arg.message) === 'string'
 }
 
@@ -43,7 +63,7 @@ RETURN
 export function isTDataResBody<Type>(arg: any): arg is TDataResBody<Type> {
   return arg
     // TODO: implement the type check
-    && arg.hasOwnProperty('data')
+    && hasKeys(arg, ['data'])
     && isTResBody(arg)
 }
 
@@ -59,7 +79,7 @@ export function isTProductPostResBody<Type>(
   arg: any
 ): arg is TProductPostResBody<Type> {
   return arg
-    && arg.hasOwnProperty('tcgplayerId') 
+    && hasKeys(arg, ['tcgplayerId'])
     && typeof(arg.tcgplayerId) === 'number'
     && isTDataResBody<Type>(arg)
 }
@@ -79,7 +99,7 @@ RETURN
 */
 export function hasIHoldingBaseKeys(arg: any): boolean {
   return arg 
-    && arg.hasOwnProperty('transactions')
+    && hasKeys(arg, ['transactions'])
 }
 
 /*
@@ -93,7 +113,7 @@ RETURN
 export function hasIHoldingKeys(arg: any): boolean {
   return arg 
     && hasIHoldingBaseKeys(arg)
-    && arg.hasOwnProperty('tcgplayerId')
+    && hasKeys(arg, ['tcgplayerId'])
 }
 
 /*
@@ -107,7 +127,7 @@ RETURN
 export function hasIPopulatedHoldingKeys(arg: any): boolean {
   return arg 
     && hasIHoldingBaseKeys(arg)
-    && arg.hasOwnProperty('product')
+    && hasKeys(arg, ['product'])
 }
 
 /*
@@ -188,7 +208,7 @@ RETURN
 export function hasIPopulatedPortfolioKeys(arg: any): boolean {
   return arg 
     && hasIPortfolioBaseKeys(arg)
-    && arg.populatedHoldings
+    && hasKeys(arg, ['populatedHoldings'])
 }
 
 /*
@@ -201,8 +221,7 @@ RETURN
 */
 export function hasIPortfolioBaseKeys(arg: any): boolean {
   return arg 
-    && arg.userId
-    && arg.portfolioName
+    && hasKeys(arg, ['portfolioName', 'userId'])
 }
 
 /*
@@ -216,7 +235,7 @@ RETURN
 export function hasIPortfolioKeys(arg: any): boolean {
   return arg 
     && hasIPortfolioBaseKeys(arg)
-    && arg.holdings
+    && hasKeys(arg, ['holdings'])
 }
 
 /*
@@ -300,8 +319,7 @@ RETURN
 */
 export function hasIDatedPriceDataKeys(arg: any): boolean {
   return arg 
-    && arg.hasOwnProperty('priceDate')
-    && arg.hasOwnProperty('prices')
+    && hasKeys(arg, ['priceDate', 'prices'])
 }
 
 /*
@@ -329,10 +347,7 @@ RETURN
 */
 export function isIPrice(arg: any): arg is IPrice {
   return arg
-    && arg.hasOwnProperty('priceDate') 
-    && arg.hasOwnProperty('tcgplayerId') 
-    && arg.hasOwnProperty('granularity') 
-    && arg.hasOwnProperty('prices') 
+    && hasKeys(arg, ['granularity', 'priceDate', 'prices', 'tcgplayerId'])
     && typeof(arg.tcgplayerId) === 'number'
     && typeof(arg.granularity) === 'string'
     && _.isDate(arg.priceData)
@@ -366,14 +381,14 @@ RETURN
 export function isIPriceData(arg: any): arg is IPriceData {
   return arg
     // required
-    && arg.hasOwnProperty('marketPrice') 
+    && hasKeys(arg, ['marketPrice'])
     && typeof(arg.marketPrice) === 'number'
 
     // optional
-    && arg.hasOwnProperty('buylistMarketPrice')
+    && hasKeys(arg, ['buylistMarketPrice'])
       ? typeof(arg.buylistMarketPrice) === 'number' 
       : true
-    && arg.hasOwnProperty('listedMedianPrice')
+    && hasKeys(arg, ['listedMedianPrice'])
       ? typeof(arg.listedMedianPrice) === 'number' 
       : true
 }
@@ -409,12 +424,14 @@ RETURN
 */
 export function hasIProductKeys(arg: any): boolean {
   return arg 
-    && arg.hasOwnProperty('tcgplayerId')
-    && arg.hasOwnProperty('tcg') 
-    && arg.hasOwnProperty('releaseDate')
-    && arg.hasOwnProperty('name')
-    && arg.hasOwnProperty('type')
-    && arg.hasOwnProperty('language')
+    && hasKeys(arg, [
+      'language', 
+      'name', 
+      'releaseDate', 
+      'tcg', 
+      'tcgplayerId', 
+      'type'
+    ])
 }
 
 /*
@@ -437,13 +454,13 @@ export function isIProduct(arg: any): arg is IProduct {
     && _.values(ProductLanguage).includes(arg.language)
 
     // optional
-    && arg.hasOwnProperty('msrp') 
+    && hasKeys(arg, ['msrp']) 
       ? typeof(arg.msrp) === 'number' 
       : true
-    && arg.hasOwnProperty('subtype') 
+    && hasKeys(arg, ['subtype'])
       ? _.values(ProductSubtype).includes(arg.subtype) 
       : true
-    && arg.hasOwnProperty('setCode') 
+    && hasKeys(arg, ['setCode'])
       ? typeof(arg.setCode) === 'string' 
       : true
 }
@@ -464,9 +481,7 @@ RETURN
 */
 export function hasTCCategoryKeys(arg: any): boolean {
   return arg
-    && arg.hasOwnProperty('categoryId')
-    && arg.hasOwnProperty('name')
-    && arg.hasOwnProperty('displayName')
+    && hasKeys(arg, ['categoryId', 'displayName', 'name'])
 }
 
 /*
@@ -480,7 +495,7 @@ RETURN
 export function hasITCCategoryKeys(arg: any): boolean {
   return arg
     && hasTCCategoryKeys(arg)
-    && arg.hasOwnProperty('tcg')
+    && hasKeys(arg, ['tcg'])
 }
 
 /*
@@ -515,10 +530,7 @@ RETURN
 */
 export function hasITCGroupKeys(arg: any): boolean {
   return arg
-    && arg.hasOwnProperty('groupId')
-    && arg.hasOwnProperty('categoryId')
-    && arg.hasOwnProperty('name')
-    && arg.hasOwnProperty('publishedOn')
+    && hasKeys(arg, ['categoryId', 'groupId', 'name', 'publishedOn'])
 }
 
 /*
@@ -539,7 +551,7 @@ export function isITCGroup(arg: any): arg is ITCGroup {
     && _.isDate(arg.publishedOn) 
 
     // optional
-    && arg.hasOwnProperty('abbrevation') 
+    && hasKeys(arg, ['abbrevation']) 
       ? typeof(arg.abbreviation) === 'string' 
       : true
 }
@@ -559,15 +571,16 @@ RETURN
 */
 export function hasITCProductKeys(arg: any): boolean {
   return arg
-    && arg.hasOwnProperty('tcgplayerId')
-    && arg.hasOwnProperty('groupId')
-    && arg.hasOwnProperty('categoryId')
-    && arg.hasOwnProperty('tcg')
-    && arg.hasOwnProperty('releaseDate')
-    && arg.hasOwnProperty('name')
-    && arg.hasOwnProperty('type')
-    && arg.hasOwnProperty('language')
-    && arg.hasOwnProperty('status')
+    && hasKeys(arg, [
+      'categoryId', 
+      'groupId', 
+      'language', 
+      'name', 
+      'releaseDate', 
+      'status',
+      'tcg', 
+      'tcgplayerId'
+    ])
 }
 
 /*
@@ -593,13 +606,13 @@ export function isITCProduct(arg: any): arg is ITCProduct {
     && _.values(ParsingStatus).includes(arg.status)
 
     // optional
-    && arg.hasOwnProperty('msrp') 
+    && hasKeys(arg, ['msrp']) 
       ? typeof(arg.msrp) === 'number' 
       : true
-    && arg.hasOwnProperty('subtype') 
+    && hasKeys(arg, ['subtype']) 
       ? _.values(ProductSubtype).includes(arg.subtype) 
       : true
-    && arg.hasOwnProperty('setCode') 
+    && hasKeys(arg, ['setCode']) 
       ? typeof(arg.setCode) === 'string' 
       : true
 }
@@ -619,8 +632,7 @@ RETURN
 */
 export function hasTDatedValueKeys(arg: any): boolean {
   return arg
-    && arg.hasOwnProperty('date')
-    && arg.hasOwnProperty('value')
+    && hasKeys(arg, ['date', 'value'])
 }
 
 /*
@@ -705,10 +717,7 @@ RETURN
 */
 export function hasITransactionKeys(arg: any): boolean {
   return arg 
-  && arg.hasOwnProperty('type')
-  && arg.hasOwnProperty('date')
-  && arg.hasOwnProperty('price')
-  && arg.hasOwnProperty('quantity')
+    && hasKeys(arg, ['date', 'quantity', 'price', 'type'])
 }
 
 /*
