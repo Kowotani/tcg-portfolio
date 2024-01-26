@@ -19,14 +19,9 @@ import * as _ from 'lodash'
 
 // -- regex
 
-export const FAB_BOOSTER_BOX_FORMAT = /Booster Box$/g
 export const FAB_BOOSTER_BOX_NAME = /.*(?= Booster Box$)/g
-export const FAB_FIRST_EDITION_BOOSTER_BOX_FORMAT = 
-  /Booster Box \[1st Edition\]$/g
 export const FAB_FIRST_EDITION_BOOSTER_BOX_NAME = 
   /.*(?= Booster Box \[1st Edition\])$/g
-export const FAB_UNLIMITED_EDITION_BOOSTER_BOX_FORMAT = 
-  /Booster Box \[Unlimited Edition\]$/g
 export const FAB_UNLIMITED_EDITION_BOOSTER_BOX_NAME = 
   /.*(?= Booster Box \[Unlimited Edition\]$)/g
 
@@ -43,10 +38,8 @@ export const FAB_UNLIMITED_EDITION_BOOSTER_BOX_MSRP = 100
 
 // -- regex
 
-export const LORCANA_BOOSTER_BOX_FORMAT = /Booster Box$/g
 export const LORCANA_BOOSTER_BOX_NAME = 
   /(?<=^Disney Lorcana: ).*(?= Booster Box$)/g
-export const LORCANA_ILLUMINEERS_TROVE_FORMAT = /Illumineer's Trove$/g
 export const LORCANA_ILLUMINEERS_TROVE_NAME = 
   /(?<=^Disney Lorcana: ).*(?= Illumineer's Trove$)/g
 
@@ -62,44 +55,26 @@ export const LORCANA_ILLUMINEERS_TROVE_MSRP = 50
 
 // -- regex
 
-export const MTG_BUNDLE_FORMAT = /Bundle$/g
 export const MTG_BUNDLE_NAME = /^.*?(?=( - )+.*Bundle$)/g
-export const MTG_COLLECTOR_BOOSTER_BOX_FORMAT = /Collector Booster (Box|Display)$/g
-export const MTG_COLLECTOR_BOOSTER_BOX_NAME = 
-  /^.*(?= - Collector Booster (Box|Display)$)/g
-export const MTG_DRAFT_BOOSTER_BOX_FORMAT = 
-  /(Draft Booster (Box|Display)$|Booster Box$)/g
+export const MTG_COLLECTOR_BOOSTER_BOX_NAME = /^.*(?= - Collector Booster (Box|Display)$)/g
 export const MTG_DRAFT_BOOSTER_BOX_NAME = 
   /^.*(?= - Draft Booster (Box|Display)$| - Booster Box$)/g
-export const MTG_PLAY_BOOSTER_BOX_FORMAT = /Play Booster Display$/g
 export const MTG_PLAY_BOOSTER_BOX_NAME = /^.*(?= - Play Booster Display$)/g
-export const MTG_SET_BOOSTER_BOX_FORMAT = /Set Booster (Box|Display)$/g
 export const MTG_SET_BOOSTER_BOX_NAME = /^.*(?= - Set Booster (Box|Display)$)/g
-export const MTG_EDH_DECK_SET_FORMAT = 
-  /Commander Deck(s? \[Set of \d\]| Case| Display)/g
 export const MTG_EDH_DECK_SET_NAME = 
   /^.*?(?=[ -]* Commander Deck(s? \[Set of \d\]| Case| Display))/g
-export const MTG_JUMPSTART_BOOSTER_BOX_FORMAT =
-  /Jumpstart Booster (Box|Display)$/g
-export const MTG_SL_FORMAT = /^Secret Lair/g
-export const MTG_SL_BUNDLE_FORMAT = /^Secret Lair.*Bundle/g
-export const MTG_SL_EDH_DECK_FORMAT = /^Secret Lair Commander Deck:/g
+export const MTG_JUMPSTART_BOOSTER_BOX_FORMAT = /Jumpstart Booster (Box|Display)$/
+export const MTG_SL_FORMAT = /^Secret Lair/
+export const MTG_SL_BUNDLE_FORMAT = /^Secret Lair.*Bundle$/
 export const MTG_SL_EDH_DECK_NAME = /(?<=^Secret Lair Commander Deck: ).*/g
-export const MTG_SL_FOIL_ETCHED_FORMAT = /^Secret Lair Drop:.*(?= - Foil Etched)/g
 export const MTG_SL_FOIL_ETCHED_NAME = 
   /(?<=^Secret Lair Drop: ).*(?= Foil Etched)/g
-export const MTG_SL_FOIL_FORMAT = /^Secret Lair Drop:.*(?=(Traditional )?Foil)/g
 export const MTG_SL_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= - (Traditional )?Foil)/g
-export const MTG_SL_GALAXY_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Galaxy Foil)/g
 export const MTG_SL_GALAXY_FOIL_NAME = 
   /(?<=^Secret Lair Drop: ).*(?= - Galaxy Foil)/g
-export const MTG_SL_GILDED_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Gilded Foil)/g
 export const MTG_SL_GILDED_FOIL_NAME = 
   /(?<=^Secret Lair Drop: ).*(?= - Gilded Foil)/g
-export const MTG_SL_NON_FOIL_FORMAT = /^Secret Lair Drop:.*(?=Non-Foil)/g
 export const MTG_SL_NON_FOIL_NAME = /(?<=^Secret Lair Drop: ).*(?= - Non-Foil)/g
-export const MTG_SL_TEXTURED_FOIL_FORMAT = 
-  /^Secret Lair Drop:.*(?=Textured Foil)/g
 export const MTG_SL_TEXTURED_FOIL_NAME = 
   /(?<=^Secret Lair Drop: ).*(?= - Textured Foil)/g
 
@@ -121,8 +96,6 @@ export const MTG_SL_NON_FOIL_MSRP = 30
 
 // -- regex
 
-export const METAZOO_FIRST_EDITION_BOOSTER_BOX_FORMAT = 
-  /First Edition Booster Box$/g
 export const METAZOO_FIRST_EDITION_BOOSTER_BOX_NAME = 
   /^.*(?=: First Edition Booster Box$)/g
 
@@ -137,15 +110,12 @@ export const METAZOO_FIRST_EDITION_BOOSTER_BOX_MSRP = 190
 
 // -- regex
 
-export const PKM_CODE_CARD_FORMAT = /^Code Card/g
-export const PKM_BOOSTER_BOX_FORMAT = /Booster Box$/g
+export const PKM_CODE_CARD_FORMAT = /^Code Card/
 export const PKM_BOOSTER_BOX_NAME = /.*(?= Booster Box$)/g
-export const PKM_BOOSTER_BUNDLE_FORMAT = /Booster Bundle$/g
 export const PKM_BOOSTER_BUNDLE_NAME = /.*(?= Booster Bundle$)/g
-export const PKM_ETB_FORMAT = /Elite Trainer Box($| \[(?!Set of).*\])/g
+export const PKM_ETB_FORMAT = /Elite Trainer Box($| \[(?!Set of).*\])/
 export const PKM_ETB_SET_NAME = /.*(?= Elite Trainer Box($| \[(?!Set of).*\]))/g
 export const PKM_ETB_TYPE_NAME = /(?<=\[).*(?=\]$)/g
-export const PKM_UPC_FORMAT = /Ultra-Premium Collection$/g
 export const PKM_UPC_NAME = /.*(?= Ultra-Premium Collection$)/g
 
 // -- msrp
@@ -162,7 +132,6 @@ export const PKM_UPC_MSRP = 120
 
 // -- regex
 
-export const SORCERY_BOOSTER_BOX_FORMAT = /Booster Box$/g
 export const SORCERY_BOOSTER_BOX_NAME = /.*(?= - Booster Box$)/g
 
 // -- msrp

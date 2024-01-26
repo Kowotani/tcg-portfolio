@@ -91,17 +91,8 @@ function parseTCProducts(tcg, group, response) {
     // parse each element
     response.forEach((el) => {
         const product = parseITCProductJSON(tcg, group, el);
-        if (product) {
-            // append if name was properly parsed
-            if (product.name && product.name.length) {
-                products.push(product);
-                // log error message
-            }
-            else {
-                const msg = `Error parsing name for tcgplayerId: ${product.tcgplayerId}`;
-                console.log(msg);
-            }
-        }
+        if (product)
+            products.push(product);
     });
     return products;
 }
@@ -270,7 +261,7 @@ function getProductMetadata(tcg, json) {
         // ===============
         case common_1.TCG.FleshAndBlood:
             // 1st edition booster box
-            if (tcgcsv_1.FAB_FIRST_EDITION_BOOSTER_BOX_FORMAT.test(json.name)) {
+            if (json.name.match(tcgcsv_1.FAB_FIRST_EDITION_BOOSTER_BOX_NAME)) {
                 return {
                     name: _.head(json.name.match(tcgcsv_1.FAB_FIRST_EDITION_BOOSTER_BOX_NAME)),
                     type: common_1.ProductType.BoosterBox,
@@ -278,7 +269,7 @@ function getProductMetadata(tcg, json) {
                 };
                 // unlimited booster box
             }
-            else if (tcgcsv_1.FAB_UNLIMITED_EDITION_BOOSTER_BOX_FORMAT.test(json.name)) {
+            else if (json.name.match(tcgcsv_1.FAB_UNLIMITED_EDITION_BOOSTER_BOX_NAME)) {
                 return {
                     name: _.head(json.name.match(tcgcsv_1.FAB_UNLIMITED_EDITION_BOOSTER_BOX_NAME)),
                     type: common_1.ProductType.BoosterBox,
@@ -286,7 +277,7 @@ function getProductMetadata(tcg, json) {
                 };
                 // 2.0 booster box
             }
-            else if (tcgcsv_1.FAB_BOOSTER_BOX_FORMAT.test(json.name)) {
+            else if (json.name.match(tcgcsv_1.FAB_BOOSTER_BOX_NAME)) {
                 return {
                     name: _.head(json.name.match(tcgcsv_1.FAB_BOOSTER_BOX_NAME)),
                     type: common_1.ProductType.BoosterBox,
@@ -299,14 +290,14 @@ function getProductMetadata(tcg, json) {
         // =======
         case common_1.TCG.Lorcana:
             // booster box
-            if (tcgcsv_1.LORCANA_BOOSTER_BOX_FORMAT.test(json.name)) {
+            if (json.name.match(tcgcsv_1.LORCANA_BOOSTER_BOX_NAME)) {
                 return {
                     name: _.head(json.name.match(tcgcsv_1.LORCANA_BOOSTER_BOX_NAME)),
                     type: common_1.ProductType.BoosterBox
                 };
                 // illumineer's trove
             }
-            else if (tcgcsv_1.LORCANA_ILLUMINEERS_TROVE_FORMAT.test(json.name)) {
+            else if (json.name.match(tcgcsv_1.LORCANA_ILLUMINEERS_TROVE_NAME)) {
                 return {
                     name: _.head(json.name.match(tcgcsv_1.LORCANA_ILLUMINEERS_TROVE_NAME)),
                     type: common_1.ProductType.Bundle,
@@ -329,7 +320,7 @@ function getProductMetadata(tcg, json) {
                 // include
                 // -------
                 // SL commander deck
-                if (tcgcsv_1.MTG_SL_EDH_DECK_FORMAT.test(json.name)) {
+                if (json.name.match(tcgcsv_1.MTG_SL_EDH_DECK_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_SL_EDH_DECK_NAME)),
                         type: common_1.ProductType.SecretLair,
@@ -337,7 +328,7 @@ function getProductMetadata(tcg, json) {
                     };
                     // SL non foil
                 }
-                else if (tcgcsv_1.MTG_SL_NON_FOIL_FORMAT.test(json.name)) {
+                else if (json.name.match(tcgcsv_1.MTG_SL_NON_FOIL_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_SL_NON_FOIL_NAME)),
                         type: common_1.ProductType.SecretLair,
@@ -345,7 +336,7 @@ function getProductMetadata(tcg, json) {
                     };
                     // SL textured foil
                 }
-                else if (tcgcsv_1.MTG_SL_TEXTURED_FOIL_FORMAT.test(json.name)) {
+                else if (json.name.match(tcgcsv_1.MTG_SL_TEXTURED_FOIL_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_SL_TEXTURED_FOIL_NAME)),
                         type: common_1.ProductType.SecretLair,
@@ -353,7 +344,7 @@ function getProductMetadata(tcg, json) {
                     };
                     // SL galaxy foil
                 }
-                else if (tcgcsv_1.MTG_SL_GALAXY_FOIL_FORMAT.test(json.name)) {
+                else if (json.name.match(tcgcsv_1.MTG_SL_GALAXY_FOIL_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_SL_GALAXY_FOIL_NAME)),
                         type: common_1.ProductType.SecretLair,
@@ -361,7 +352,7 @@ function getProductMetadata(tcg, json) {
                     };
                     // SL gilded foil
                 }
-                else if (tcgcsv_1.MTG_SL_GILDED_FOIL_FORMAT.test(json.name)) {
+                else if (json.name.match(tcgcsv_1.MTG_SL_GILDED_FOIL_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_SL_GILDED_FOIL_NAME)),
                         type: common_1.ProductType.SecretLair,
@@ -369,7 +360,7 @@ function getProductMetadata(tcg, json) {
                     };
                     // SL foil etched
                 }
-                else if (tcgcsv_1.MTG_SL_FOIL_ETCHED_FORMAT.test(json.name)) {
+                else if (json.name.match(tcgcsv_1.MTG_SL_FOIL_ETCHED_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_SL_FOIL_ETCHED_NAME)),
                         type: common_1.ProductType.SecretLair,
@@ -377,7 +368,7 @@ function getProductMetadata(tcg, json) {
                     };
                     // SL foil
                 }
-                else if (tcgcsv_1.MTG_SL_FOIL_FORMAT.test(json.name)) {
+                else if (json.name.match(tcgcsv_1.MTG_SL_FOIL_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_SL_FOIL_NAME)),
                         type: common_1.ProductType.SecretLair,
@@ -396,7 +387,7 @@ function getProductMetadata(tcg, json) {
                 // include
                 // -------
                 // collector booster box
-                if (tcgcsv_1.MTG_COLLECTOR_BOOSTER_BOX_FORMAT.test(json.name)) {
+                if (json.name.match(tcgcsv_1.MTG_COLLECTOR_BOOSTER_BOX_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_COLLECTOR_BOOSTER_BOX_NAME)),
                         type: common_1.ProductType.BoosterBox,
@@ -404,7 +395,7 @@ function getProductMetadata(tcg, json) {
                     };
                     // play booster box
                 }
-                else if (tcgcsv_1.MTG_PLAY_BOOSTER_BOX_FORMAT.test(json.name)) {
+                else if (json.name.match(tcgcsv_1.MTG_PLAY_BOOSTER_BOX_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_PLAY_BOOSTER_BOX_NAME)),
                         type: common_1.ProductType.BoosterBox,
@@ -412,7 +403,7 @@ function getProductMetadata(tcg, json) {
                     };
                     // set booster box
                 }
-                else if (tcgcsv_1.MTG_SET_BOOSTER_BOX_FORMAT.test(json.name)) {
+                else if (json.name.match(tcgcsv_1.MTG_SET_BOOSTER_BOX_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_SET_BOOSTER_BOX_NAME)),
                         type: common_1.ProductType.BoosterBox,
@@ -420,7 +411,7 @@ function getProductMetadata(tcg, json) {
                     };
                     // draft booster box
                 }
-                else if (tcgcsv_1.MTG_DRAFT_BOOSTER_BOX_FORMAT.test(json.name)) {
+                else if (json.name.match(tcgcsv_1.MTG_DRAFT_BOOSTER_BOX_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_DRAFT_BOOSTER_BOX_NAME)),
                         type: common_1.ProductType.BoosterBox,
@@ -428,14 +419,14 @@ function getProductMetadata(tcg, json) {
                     };
                     // commander deck set
                 }
-                else if (tcgcsv_1.MTG_EDH_DECK_SET_FORMAT.test(json.name)) {
+                else if (json.name.match(tcgcsv_1.MTG_EDH_DECK_SET_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_EDH_DECK_SET_NAME)),
                         type: common_1.ProductType.CommanderDeckSet,
                     };
                     // bundle
                 }
-                else if (tcgcsv_1.MTG_BUNDLE_FORMAT.test(json.name)) {
+                else if (json.name.match(tcgcsv_1.MTG_BUNDLE_NAME)) {
                     return {
                         name: _.head(json.name.match(tcgcsv_1.MTG_BUNDLE_NAME)),
                         type: common_1.ProductType.Bundle,
@@ -448,7 +439,7 @@ function getProductMetadata(tcg, json) {
         // =======
         case common_1.TCG.MetaZoo:
             // first edition booster box
-            if (tcgcsv_1.METAZOO_FIRST_EDITION_BOOSTER_BOX_FORMAT.test(json.name)) {
+            if (json.name.match(tcgcsv_1.METAZOO_FIRST_EDITION_BOOSTER_BOX_NAME)) {
                 return {
                     name: _.head(json.name.match(tcgcsv_1.METAZOO_FIRST_EDITION_BOOSTER_BOX_NAME)),
                     type: common_1.ProductType.BoosterBox,
@@ -469,14 +460,14 @@ function getProductMetadata(tcg, json) {
             // include
             // -------
             // booster box
-            if (tcgcsv_1.PKM_BOOSTER_BOX_FORMAT.test(json.name)) {
+            if (json.name.match(tcgcsv_1.PKM_BOOSTER_BOX_NAME)) {
                 return {
                     name: _.head(json.name.match(tcgcsv_1.PKM_BOOSTER_BOX_NAME)),
                     type: common_1.ProductType.BoosterBox
                 };
                 // booster bundle
             }
-            else if (tcgcsv_1.PKM_BOOSTER_BUNDLE_FORMAT.test(json)) {
+            else if (json.name.match(tcgcsv_1.PKM_BOOSTER_BUNDLE_NAME)) {
                 return {
                     name: _.head(json.name.match(tcgcsv_1.PKM_BOOSTER_BUNDLE_NAME)),
                     type: common_1.ProductType.Bundle,
@@ -494,7 +485,7 @@ function getProductMetadata(tcg, json) {
                 };
                 // ultra premium collection
             }
-            else if (tcgcsv_1.PKM_UPC_FORMAT.test(json.name)) {
+            else if (json.name.match(tcgcsv_1.PKM_UPC_NAME)) {
                 return {
                     name: _.head(json.name.match(tcgcsv_1.PKM_UPC_NAME)),
                     type: common_1.ProductType.Bundle,
@@ -507,7 +498,7 @@ function getProductMetadata(tcg, json) {
         // =======
         case common_1.TCG.Sorcery:
             // booster box
-            if (tcgcsv_1.SORCERY_BOOSTER_BOX_FORMAT.test(json.name)) {
+            if (json.name.match(tcgcsv_1.SORCERY_BOOSTER_BOX_NAME)) {
                 return {
                     name: _.head(json.name.match(tcgcsv_1.SORCERY_BOOSTER_BOX_NAME)),
                     type: common_1.ProductType.BoosterBox

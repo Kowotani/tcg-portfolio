@@ -1,7 +1,7 @@
 import { 
   // data models
   IDatedPriceData, IPrice, IPriceData, IProduct, ITCGroup, ITCProduct, 
-  TimeseriesGranularity, 
+  TimeseriesGranularity,
 
   // generic
   assert, formatAsISO, isDateAfter
@@ -302,8 +302,7 @@ export async function loadTCProducts({
   })
 
   // insert new Products
-  if (newProducts)
-    return await insertTCProducts(newProducts)
+  if (newProducts) return await insertTCProducts(newProducts)
 
   return 0
 }
@@ -323,15 +322,17 @@ async function main() {
 
   // const numInserted = await loadHistoricalPrices(TcgPlayerChartDateRange.OneYear)
   // console.log(`Inserted ${numInserted} docs`)
-  // const categoryId = 77
+  // const categoryId = 1
   // const groupId = 2576
   // const releaseDate = new Date(Date.parse('2023-01-01'))
   // const params = {
   //   categoryId: categoryId,
   //   releaseDate: releaseDate
   // }
+  // const tcgplayerId = 521581
+  // const res = await setTCProductProperty(tcgplayerId, 'status', ParsingStatus.ToBeValidated)
   // const res = await loadTCProducts(params)
-  // console.log(`Inserted ${res} docs for categoryId: ${categoryId}`)
+  // console.log(`Inserted ${res} docs for: ${TCCATEGORYID_TO_TCG_MAP.get(categoryId)}`)
 }
 
 main()

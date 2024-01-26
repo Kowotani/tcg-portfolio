@@ -14,69 +14,61 @@ import {
   TCCATEGORYNAME_TO_TCG_MAP, 
 
   // regex + msrp
-  FAB_BOOSTER_BOX_FORMAT, FAB_BOOSTER_BOX_MSRP, FAB_BOOSTER_BOX_NAME,
+  FAB_BOOSTER_BOX_MSRP, FAB_BOOSTER_BOX_NAME,
 
-  FAB_FIRST_EDITION_BOOSTER_BOX_FORMAT, FAB_FIRST_EDITION_BOOSTER_BOX_MSRP,
-  FAB_FIRST_EDITION_BOOSTER_BOX_NAME, 
-
-  FAB_UNLIMITED_EDITION_BOOSTER_BOX_FORMAT, 
+  FAB_FIRST_EDITION_BOOSTER_BOX_MSRP, FAB_FIRST_EDITION_BOOSTER_BOX_NAME, 
+ 
   FAB_UNLIMITED_EDITION_BOOSTER_BOX_MSRP, 
   FAB_UNLIMITED_EDITION_BOOSTER_BOX_NAME,
 
-  LORCANA_BOOSTER_BOX_FORMAT, LORCANA_BOOSTER_BOX_MSRP, LORCANA_BOOSTER_BOX_NAME,
+  LORCANA_BOOSTER_BOX_MSRP, LORCANA_BOOSTER_BOX_NAME,
 
-  LORCANA_ILLUMINEERS_TROVE_FORMAT, LORCANA_ILLUMINEERS_TROVE_MSRP, 
-  LORCANA_ILLUMINEERS_TROVE_NAME,
+  LORCANA_ILLUMINEERS_TROVE_MSRP, LORCANA_ILLUMINEERS_TROVE_NAME,
 
-  MTG_BUNDLE_FORMAT, MTG_BUNDLE_MSRP, MTG_BUNDLE_NAME,
+  MTG_BUNDLE_MSRP, MTG_BUNDLE_NAME,
 
-  MTG_COLLECTOR_BOOSTER_BOX_FORMAT, MTG_COLLECTOR_BOOSTER_BOX_MSRP, 
-  MTG_COLLECTOR_BOOSTER_BOX_NAME,
+  MTG_COLLECTOR_BOOSTER_BOX_MSRP, MTG_COLLECTOR_BOOSTER_BOX_NAME,
 
-  MTG_DRAFT_BOOSTER_BOX_FORMAT, MTG_DRAFT_BOOSTER_BOX_MSRP, 
-  MTG_DRAFT_BOOSTER_BOX_NAME,
+  MTG_DRAFT_BOOSTER_BOX_MSRP, MTG_DRAFT_BOOSTER_BOX_NAME,
 
-  MTG_EDH_DECK_SET_FORMAT, MTG_EDH_DECK_SET_NAME,
+  MTG_EDH_DECK_SET_NAME,
 
   MTG_JUMPSTART_BOOSTER_BOX_FORMAT,
 
-  MTG_PLAY_BOOSTER_BOX_FORMAT, MTG_PLAY_BOOSTER_BOX_MSRP, 
-  MTG_PLAY_BOOSTER_BOX_NAME,
+  MTG_PLAY_BOOSTER_BOX_MSRP, MTG_PLAY_BOOSTER_BOX_NAME,
 
-  MTG_SET_BOOSTER_BOX_FORMAT, MTG_SET_BOOSTER_BOX_MSRP, MTG_SET_BOOSTER_BOX_NAME,
+  MTG_SET_BOOSTER_BOX_MSRP, MTG_SET_BOOSTER_BOX_NAME,
 
   MTG_SL_FORMAT, MTG_SL_BUNDLE_FORMAT, 
   
-  MTG_SL_EDH_DECK_FORMAT, MTG_SL_EDH_DECK_MSRP, MTG_SL_EDH_DECK_NAME,
+  MTG_SL_EDH_DECK_MSRP, MTG_SL_EDH_DECK_NAME,
 
-  MTG_SL_FOIL_ETCHED_FORMAT, MTG_SL_FOIL_ETCHED_NAME, 
+  MTG_SL_FOIL_ETCHED_NAME, 
 
-  MTG_SL_FOIL_FORMAT, MTG_SL_FOIL_MSRP, MTG_SL_FOIL_NAME,
+  MTG_SL_FOIL_MSRP, MTG_SL_FOIL_NAME,
 
-  MTG_SL_GALAXY_FOIL_FORMAT, MTG_SL_GALAXY_FOIL_NAME, 
+  MTG_SL_GALAXY_FOIL_NAME, 
 
-  MTG_SL_GILDED_FOIL_FORMAT, MTG_SL_GILDED_FOIL_NAME,
+  MTG_SL_GILDED_FOIL_NAME,
 
-  MTG_SL_NON_FOIL_FORMAT, MTG_SL_NON_FOIL_MSRP, MTG_SL_NON_FOIL_NAME,
+  MTG_SL_NON_FOIL_MSRP, MTG_SL_NON_FOIL_NAME,
 
-  MTG_SL_TEXTURED_FOIL_FORMAT, MTG_SL_TEXTURED_FOIL_NAME,
-
-  METAZOO_FIRST_EDITION_BOOSTER_BOX_FORMAT, 
+  MTG_SL_TEXTURED_FOIL_NAME,
+ 
   METAZOO_FIRST_EDITION_BOOSTER_BOX_MSRP, 
   METAZOO_FIRST_EDITION_BOOSTER_BOX_NAME,
 
-  PKM_BOOSTER_BOX_FORMAT, PKM_BOOSTER_BOX_MSRP, PKM_BOOSTER_BOX_NAME,
+  PKM_BOOSTER_BOX_MSRP, PKM_BOOSTER_BOX_NAME,
 
-  PKM_BOOSTER_BUNDLE_FORMAT, PKM_BOOSTER_BUNDLE_MSRP, PKM_BOOSTER_BUNDLE_NAME,
+  PKM_BOOSTER_BUNDLE_MSRP, PKM_BOOSTER_BUNDLE_NAME,
 
   PKM_CODE_CARD_FORMAT,
 
   PKM_ETB_FORMAT, PKM_ETB_MSRP, PKM_ETB_SET_NAME, PKM_ETB_TYPE_NAME,
 
-  PKM_UPC_FORMAT, PKM_UPC_MSRP, PKM_UPC_NAME,
+  PKM_UPC_MSRP, PKM_UPC_NAME,
 
-  SORCERY_BOOSTER_BOX_FORMAT, SORCERY_BOOSTER_BOX_MSRP, SORCERY_BOOSTER_BOX_NAME
-
+  SORCERY_BOOSTER_BOX_MSRP, SORCERY_BOOSTER_BOX_NAME
 } from './tcgcsv'
 import * as _ from 'lodash'
 
@@ -179,18 +171,7 @@ export function parseTCProducts(
   // parse each element
   response.forEach((el: any) => {
     const product = parseITCProductJSON(tcg, group, el)
-    if (product) {
-
-      // append if name was properly parsed
-      if (product.name && product.name.length) {
-        products.push(product)
-
-      // log error message
-      } else { 
-        const msg = `Error parsing name for tcgplayerId: ${product.tcgplayerId}`
-        console.log(msg)
-      }
-    }
+    if (product) products.push(product)
   })
   
   return products
@@ -405,7 +386,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
     case TCG.FleshAndBlood:
 
       // 1st edition booster box
-      if (FAB_FIRST_EDITION_BOOSTER_BOX_FORMAT.test(json.name)) {
+      if (json.name.match(FAB_FIRST_EDITION_BOOSTER_BOX_NAME)) {
         return {
           name: _.head(json.name.match(FAB_FIRST_EDITION_BOOSTER_BOX_NAME)),
           type: ProductType.BoosterBox,
@@ -413,7 +394,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
         } as IProductMetadata 
 
       // unlimited booster box
-      } else if (FAB_UNLIMITED_EDITION_BOOSTER_BOX_FORMAT.test(json.name)) {
+      } else if (json.name.match(FAB_UNLIMITED_EDITION_BOOSTER_BOX_NAME)) {
         return {
           name: _.head(json.name.match(FAB_UNLIMITED_EDITION_BOOSTER_BOX_NAME)),
           type: ProductType.BoosterBox,
@@ -421,7 +402,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
         } as IProductMetadata 
 
       // 2.0 booster box
-      } else if (FAB_BOOSTER_BOX_FORMAT.test(json.name)) {
+      } else if (json.name.match(FAB_BOOSTER_BOX_NAME)) {
         return {
           name: _.head(json.name.match(FAB_BOOSTER_BOX_NAME)),
           type: ProductType.BoosterBox,
@@ -439,14 +420,14 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
     case TCG.Lorcana:
 
       // booster box
-      if (LORCANA_BOOSTER_BOX_FORMAT.test(json.name)) {
+      if (json.name.match(LORCANA_BOOSTER_BOX_NAME)) {
         return {
           name: _.head(json.name.match(LORCANA_BOOSTER_BOX_NAME)),
           type: ProductType.BoosterBox
         } as IProductMetadata 
         
       // illumineer's trove
-      } else if (LORCANA_ILLUMINEERS_TROVE_FORMAT.test(json.name)) {
+      } else if (json.name.match(LORCANA_ILLUMINEERS_TROVE_NAME)) {
         return {
           name: _.head(json.name.match(LORCANA_ILLUMINEERS_TROVE_NAME)),
           type: ProductType.Bundle,
@@ -478,7 +459,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
         // -------
 
         // SL commander deck
-        if (MTG_SL_EDH_DECK_FORMAT.test(json.name)) {
+        if (json.name.match(MTG_SL_EDH_DECK_NAME)) {
           return {
             name: _.head(json.name.match(MTG_SL_EDH_DECK_NAME)),
             type: ProductType.SecretLair,
@@ -486,7 +467,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
           } as IProductMetadata 
 
         // SL non foil
-        } else if (MTG_SL_NON_FOIL_FORMAT.test(json.name)) {
+        } else if (json.name.match(MTG_SL_NON_FOIL_NAME)) {
           return {
             name: _.head(json.name.match(MTG_SL_NON_FOIL_NAME)),
             type: ProductType.SecretLair,
@@ -494,7 +475,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
           } as IProductMetadata 
 
         // SL textured foil
-        } else if (MTG_SL_TEXTURED_FOIL_FORMAT.test(json.name)) {
+        } else if (json.name.match(MTG_SL_TEXTURED_FOIL_NAME)) {
           return {
             name: _.head(json.name.match(MTG_SL_TEXTURED_FOIL_NAME)),
             type: ProductType.SecretLair,
@@ -502,7 +483,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
           } as IProductMetadata   
 
         // SL galaxy foil
-        } else if (MTG_SL_GALAXY_FOIL_FORMAT.test(json.name)) {
+        } else if (json.name.match(MTG_SL_GALAXY_FOIL_NAME)) {
           return {
             name: _.head(json.name.match(MTG_SL_GALAXY_FOIL_NAME)),
             type: ProductType.SecretLair,
@@ -510,7 +491,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
           } as IProductMetadata         
 
         // SL gilded foil
-        } else if (MTG_SL_GILDED_FOIL_FORMAT.test(json.name)) {
+        } else if (json.name.match(MTG_SL_GILDED_FOIL_NAME)) {
           return {
             name: _.head(json.name.match(MTG_SL_GILDED_FOIL_NAME)),
             type: ProductType.SecretLair,
@@ -518,7 +499,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
           } as IProductMetadata   
 
         // SL foil etched
-        } else if (MTG_SL_FOIL_ETCHED_FORMAT.test(json.name)) {
+        } else if (json.name.match(MTG_SL_FOIL_ETCHED_NAME)) {
           return {
             name: _.head(json.name.match(MTG_SL_FOIL_ETCHED_NAME)),
             type: ProductType.SecretLair,
@@ -526,7 +507,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
           } as IProductMetadata   
 
         // SL foil
-        } else if (MTG_SL_FOIL_FORMAT.test(json.name)) {
+        } else if (json.name.match(MTG_SL_FOIL_NAME)) {
           return {
             name: _.head(json.name.match(MTG_SL_FOIL_NAME)),
             type: ProductType.SecretLair,
@@ -549,7 +530,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
         // -------
 
         // collector booster box
-        if (MTG_COLLECTOR_BOOSTER_BOX_FORMAT.test(json.name)) {
+        if (json.name.match(MTG_COLLECTOR_BOOSTER_BOX_NAME)) {
           return {
             name: _.head(json.name.match(MTG_COLLECTOR_BOOSTER_BOX_NAME)),
             type: ProductType.BoosterBox,
@@ -557,7 +538,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
           } as IProductMetadata 
 
         // play booster box
-        } else if (MTG_PLAY_BOOSTER_BOX_FORMAT.test(json.name)) {
+        } else if (json.name.match(MTG_PLAY_BOOSTER_BOX_NAME)) {
           return {
             name: _.head(json.name.match(MTG_PLAY_BOOSTER_BOX_NAME)),
             type: ProductType.BoosterBox,
@@ -565,7 +546,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
           } as IProductMetadata 
 
         // set booster box
-        } else if (MTG_SET_BOOSTER_BOX_FORMAT.test(json.name)) {
+        } else if (json.name.match(MTG_SET_BOOSTER_BOX_NAME)) {
           return {
             name: _.head(json.name.match(MTG_SET_BOOSTER_BOX_NAME)),
             type: ProductType.BoosterBox,
@@ -573,7 +554,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
           } as IProductMetadata 
 
         // draft booster box
-        } else if (MTG_DRAFT_BOOSTER_BOX_FORMAT.test(json.name)) {
+        } else if (json.name.match(MTG_DRAFT_BOOSTER_BOX_NAME)) {
           return {
             name: _.head(json.name.match(MTG_DRAFT_BOOSTER_BOX_NAME)),
             type: ProductType.BoosterBox,
@@ -581,14 +562,14 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
           } as IProductMetadata 
 
         // commander deck set
-        } else if (MTG_EDH_DECK_SET_FORMAT.test(json.name)) {
+        } else if (json.name.match(MTG_EDH_DECK_SET_NAME)) {
           return {
             name: _.head(json.name.match(MTG_EDH_DECK_SET_NAME)),
             type: ProductType.CommanderDeckSet,
           } as IProductMetadata 
 
         // bundle
-        } else if (MTG_BUNDLE_FORMAT.test(json.name)) {
+        } else if (json.name.match(MTG_BUNDLE_NAME)) {
           return {
             name: _.head(json.name.match(MTG_BUNDLE_NAME)),
             type: ProductType.Bundle,
@@ -606,7 +587,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
     case TCG.MetaZoo:
 
       // first edition booster box
-      if (METAZOO_FIRST_EDITION_BOOSTER_BOX_FORMAT.test(json.name)) {
+      if (json.name.match(METAZOO_FIRST_EDITION_BOOSTER_BOX_NAME)) {
         return {
           name: _.head(json.name.match(METAZOO_FIRST_EDITION_BOOSTER_BOX_NAME)),
           type: ProductType.BoosterBox,
@@ -634,14 +615,14 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
       // -------
 
       // booster box
-      if (PKM_BOOSTER_BOX_FORMAT.test(json.name)) {
+      if (json.name.match(PKM_BOOSTER_BOX_NAME)) {
         return {
           name: _.head(json.name.match(PKM_BOOSTER_BOX_NAME)),
           type: ProductType.BoosterBox
         } as IProductMetadata 
       
       // booster bundle
-      } else if (PKM_BOOSTER_BUNDLE_FORMAT.test(json)) {
+      } else if (json.name.match(PKM_BOOSTER_BUNDLE_NAME)) {
         return {
           name: _.head(json.name.match(PKM_BOOSTER_BUNDLE_NAME)),
           type: ProductType.Bundle,
@@ -661,7 +642,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
         } as IProductMetadata 
 
       // ultra premium collection
-      } else if (PKM_UPC_FORMAT.test(json.name)) {
+      } else if (json.name.match(PKM_UPC_NAME)) {
         return {
           name: _.head(json.name.match(PKM_UPC_NAME)),
           type: ProductType.Bundle,
@@ -679,7 +660,7 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
     case TCG.Sorcery:
 
       // booster box
-      if (SORCERY_BOOSTER_BOX_FORMAT.test(json.name)) {
+      if (json.name.match(SORCERY_BOOSTER_BOX_NAME)) {
         return {
           name: _.head(json.name.match(SORCERY_BOOSTER_BOX_NAME)),
           type: ProductType.BoosterBox
