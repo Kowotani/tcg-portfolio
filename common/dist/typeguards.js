@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.isITransactionArray = exports.isITransaction = exports.hasITransactionKeys = exports.isTPerformanceData = exports.hasTPerformanceDataKeys = exports.isTDatedvalueArray = exports.isTDatedvalue = exports.hasTDatedValueKeys = exports.isITCProduct = exports.hasITCProductKeys = exports.isITCGroup = exports.hasITCGroupKeys = exports.isITCCategory = exports.hasITCCategoryKeys = exports.hasTCCategoryKeys = exports.isIProduct = exports.hasIProductKeys = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIDatedPriceData = exports.hasIDatedPriceDataKeys = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = void 0;
+exports.isITransactionArray = exports.isITransaction = exports.hasITransactionKeys = exports.isTPerformanceData = exports.hasTPerformanceDataKeys = exports.isTDatedvalueArray = exports.isTDatedvalue = exports.hasTDatedValueKeys = exports.isITCProduct = exports.hasITCProductKeys = exports.isITCGroup = exports.hasITCGroupKeys = exports.isITCCategory = exports.hasITCCategoryKeys = exports.hasTCCategoryKeys = exports.isIProduct = exports.hasIProductKeys = exports.isIPriceDataArray = exports.isIPriceData = exports.isIPriceArray = exports.isIPrice = exports.isIDatedPriceData = exports.hasIDatedPriceDataKeys = exports.isIPortfolioArray = exports.isIPortfolio = exports.isIPopulatedPortfolioArray = exports.isIPopulatedPortfolio = exports.hasIPortfolioKeys = exports.hasIPortfolioBaseKeys = exports.hasIPopulatedPortfolioKeys = exports.isIPopulatedHoldingArray = exports.isIPopulatedHolding = exports.isIHoldingArray = exports.isIHolding = exports.hasIPopulatedHoldingKeys = exports.hasIHoldingKeys = exports.hasIHoldingBaseKeys = exports.isTProductPostResBody = exports.isTDataResBody = exports.isTResBody = void 0;
 var dataModels_1 = require("./dataModels");
 var _ = require("lodash");
 // ===
@@ -140,6 +140,22 @@ function isIPopulatedHolding(arg) {
         && isITransactionArray(arg.transactions);
 }
 exports.isIPopulatedHolding = isIPopulatedHolding;
+/*
+DESC
+  Returns whether or not the input is an IPopulatedHolding[]
+INPUT
+  arg: An object that might be an IPopulatedHolding[]
+RETURN
+  TRUE if the input is an IPopulatedHolding[], FALSE otherwise
+*/
+function isIPopulatedHoldingArray(arg) {
+    return arg
+        && Array.isArray(arg)
+        && _.every(arg.map(function (el) {
+            return isIPopulatedHolding(el);
+        }));
+}
+exports.isIPopulatedHoldingArray = isIPopulatedHoldingArray;
 // =========
 // portfolio
 // =========
@@ -198,10 +214,7 @@ function isIPopulatedPortfolio(arg) {
         && hasIPopulatedPortfolioKeys(arg)
         && typeof (arg.userId) === 'number'
         && typeof (arg.portfolioName) === 'string'
-        && Array.isArray(arg.populatedHoldings)
-        && _.every(arg.populatedHoldings.map(function (el) {
-            return isIPopulatedHolding(el);
-        }));
+        && isIPopulatedHoldingArray(arg.populatedHoldings);
 }
 exports.isIPopulatedPortfolio = isIPopulatedPortfolio;
 /*

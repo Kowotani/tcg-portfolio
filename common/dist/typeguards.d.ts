@@ -9,6 +9,7 @@ export declare function hasIPopulatedHoldingKeys(arg: any): boolean;
 export declare function isIHolding(arg: any): arg is IHolding;
 export declare function isIHoldingArray(arg: any): arg is IHolding[];
 export declare function isIPopulatedHolding(arg: any): arg is IPopulatedHolding;
+export declare function isIPopulatedHoldingArray(arg: any): arg is IPopulatedHolding[];
 export declare function hasIPopulatedPortfolioKeys(arg: any): boolean;
 export declare function hasIPortfolioBaseKeys(arg: any): boolean;
 export declare function hasIPortfolioKeys(arg: any): boolean;

@@ -156,6 +156,22 @@ export function isIPopulatedHolding(arg: any): arg is IPopulatedHolding {
     && isITransactionArray(arg.transactions)
 }
 
+/*
+DESC
+  Returns whether or not the input is an IPopulatedHolding[]
+INPUT
+  arg: An object that might be an IPopulatedHolding[] 
+RETURN
+  TRUE if the input is an IPopulatedHolding[], FALSE otherwise
+*/
+export function isIPopulatedHoldingArray(arg: any): arg is IPopulatedHolding[] {
+  return arg
+    && Array.isArray(arg)
+    && _.every(arg.map((el: any) => {
+      return isIPopulatedHolding(el)
+    }))
+}
+
 
 // =========
 // portfolio
@@ -216,10 +232,7 @@ export function isIPopulatedPortfolio(arg: any): arg is IPopulatedPortfolio {
     && hasIPopulatedPortfolioKeys(arg)
     && typeof(arg.userId) === 'number'
     && typeof(arg.portfolioName) === 'string'
-    && Array.isArray(arg.populatedHoldings)
-      && _.every(arg.populatedHoldings.map((el: any) => {
-        return isIPopulatedHolding(el)
-      }))
+    && isIPopulatedHoldingArray(arg.populatedHoldings)
 }
 
 /*
