@@ -245,11 +245,6 @@ export const AddProductForm = () => {
       formData: getPostFormData(),
     }
 
-    // add imageUrl, if exists
-    if (!imageUrlState.isInvalid) {
-      body.imageUrl = imageUrlState.imageUrl
-    }
-
     // submit
     axios({
       method: 'post',
@@ -269,21 +264,12 @@ export const AddProductForm = () => {
       // product was added
       if (res.status === 201) {
 
-        // added with image
+        // added (without image, as intended)
         if (resData.message === PostProductStatus.Added) {
           toast({
-            title: 'Product Added with Image',
+            title: 'Product Added',
             description: `${PostProductStatus.Added}: ${resData.tcgplayerId}`,
             status: 'success',
-            isClosable: true,
-          })        
-
-        // added without image
-        } else if (resData.message === PostProductStatus.AddedWithoutImage) {
-          toast({
-            title: 'Product Added without Image',
-            description: `${PostProductStatus.AddedWithoutImage}: ${resData.tcgplayerId}`,
-            status: 'info',
             isClosable: true,
           })        
         }

@@ -1,4 +1,3 @@
-import { loadImageToS3 } from './aws/s3Manager'
 import {
   // data models 
   IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
@@ -655,19 +654,12 @@ app.post(PRODUCT_URL, upload.none(), async (req: any, res: any) => {
       // add product
       const numInserted = await insertProducts([data])
 
-      // load image to S3
-      const isImageLoaded = body.imageUrl
-        ? await loadImageToS3(tcgplayerId, body.imageUrl)
-        : false
-
       // success
       if (numInserted > 0) {
         res.status(201)
         const body: TProductPostResBody<IProduct> = {
           tcgplayerId: data.tcgplayerId,
-          message: isImageLoaded
-            ? PostProductStatus.Added
-            : PostProductStatus.AddedWithoutImage,
+          message: PostProductStatus.Added,
           data: data,
         }
         res.send(body)

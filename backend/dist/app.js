@@ -12,7 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const s3Manager_1 = require("./aws/s3Manager");
 const common_1 = require("common");
 const express_1 = __importDefault(require("express"));
 const Portfolio_1 = require("./mongo/dbi/Portfolio");
@@ -556,18 +555,12 @@ app.post(common_1.PRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0, vo
         try {
             // add product
             const numInserted = yield (0, Product_1.insertProducts)([data]);
-            // load image to S3
-            const isImageLoaded = body.imageUrl
-                ? yield (0, s3Manager_1.loadImageToS3)(tcgplayerId, body.imageUrl)
-                : false;
             // success
             if (numInserted > 0) {
                 res.status(201);
                 const body = {
                     tcgplayerId: data.tcgplayerId,
-                    message: isImageLoaded
-                        ? common_1.PostProductStatus.Added
-                        : common_1.PostProductStatus.AddedWithoutImage,
+                    message: common_1.PostProductStatus.Added,
                     data: data,
                 };
                 res.send(body);
