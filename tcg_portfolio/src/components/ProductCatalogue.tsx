@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { 
   Box,
@@ -37,11 +37,7 @@ import {
 } from '../utils/Product'
 
 
-type TProductCatalogueProps = {}
-export const ProductCatalogue = (
-  props: PropsWithChildren<TProductCatalogueProps>
-) => {
-
+export const ProductCatalogue = () => {
 
   // =========
   // constants
