@@ -287,7 +287,8 @@ export async function loadTCProducts({
   const products = _.flattenDeep(resolvedPromises)
   
   // remove existing Products
-  const existingTCProducts = await getTCProductDocs(categoryId, groupId)
+  const existingTCProducts = await getTCProductDocs({
+    categoryId: categoryId, groupId: groupId})
   const existingProducts = await getProductDocs()
   const existingTcgplayerIds = _.union(
     existingTCProducts.map((product: ITCProduct) => {

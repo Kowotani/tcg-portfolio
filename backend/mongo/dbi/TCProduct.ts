@@ -1,6 +1,6 @@
 import { 
   // data models
-  ITCProduct, 
+  ITCProduct, ParsingStatus,
   
   // generic
   assert, isITCProduct 
@@ -49,16 +49,23 @@ export async function getTCProductDoc(
 
 /*
 DESC
-  Returns all TCProducts, optionally for an input categoryId or groupId 
+  Returns all TCProducts, optionally for an input categoryId or groupId or by
+  parsing status
 INPUT
   categoryId?: The TCGCSV categoryId
   groupId?: The TCGCSV groupId
+  status?: The ParsingStatus enum
 RETURN
   An ITCProduct[]
 */
-export async function getTCProductDocs(
+type IGetTCProductDocsProps = {
   categoryId?: number,
-  groupId?: number
+  groupId?: number,
+  status?: ParsingStatus  
+}
+export async function getTCProductDocs({
+  categoryId, groupId, status
+}: IGetTCProductDocsProps = {}
 ): Promise<HydratedDocument<IMTCProduct>[]> {
 
   // connect to db
@@ -66,11 +73,13 @@ export async function getTCProductDocs(
 
   try {
 
-    const filter = 
-      categoryId && groupId ? { 'categoryId': categoryId, 'groupId': groupId }
-      : categoryId ? { 'categoryId': categoryId }
-      : groupId ? { 'groupId': groupId }
-      : {}
+    let filter = {} as any
+    if (categoryId)
+      filter['categoryId'] = categoryId
+    if (groupId)
+      filter['groupId'] = groupId
+    if (status)
+      filter['status'] = status
     const docs = await TCProduct.find(filter)
     return docs
 

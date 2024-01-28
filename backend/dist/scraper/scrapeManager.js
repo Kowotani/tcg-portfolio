@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -238,7 +242,9 @@ function loadTCProducts({ categoryId, groupId, releaseDate } = {
         const resolvedPromises = yield Promise.all(promises);
         const products = _.flattenDeep(resolvedPromises);
         // remove existing Products
-        const existingTCProducts = yield (0, TCProduct_1.getTCProductDocs)(categoryId, groupId);
+        const existingTCProducts = yield (0, TCProduct_1.getTCProductDocs)({
+            categoryId: categoryId, groupId: groupId
+        });
         const existingProducts = yield (0, Product_1.getProductDocs)();
         const existingTcgplayerIds = _.union(existingTCProducts.map((product) => {
             return product.tcgplayerId;

@@ -47,24 +47,18 @@ function getTCProductDoc(tcgplayerId) {
     });
 }
 exports.getTCProductDoc = getTCProductDoc;
-/*
-DESC
-  Returns all TCProducts, optionally for an input categoryId or groupId
-INPUT
-  categoryId?: The TCGCSV categoryId
-  groupId?: The TCGCSV groupId
-RETURN
-  An ITCProduct[]
-*/
-function getTCProductDocs(categoryId, groupId) {
+function getTCProductDocs({ categoryId, groupId, status } = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
         try {
-            const filter = categoryId && groupId ? { 'categoryId': categoryId, 'groupId': groupId }
-                : categoryId ? { 'categoryId': categoryId }
-                    : groupId ? { 'groupId': groupId }
-                        : {};
+            let filter = {};
+            if (categoryId)
+                filter['categoryId'] = categoryId;
+            if (groupId)
+                filter['groupId'] = groupId;
+            if (status)
+                filter['status'] = status;
             const docs = yield tcproductSchema_1.TCProduct.find(filter);
             return docs;
         }
