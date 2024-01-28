@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, } from 'react'
+import { useContext, useState } from 'react'
 import axios from 'axios'
 import { 
   Button,
@@ -10,16 +10,19 @@ import {
   useToast,
   VStack, 
 } from '@chakra-ui/react'
-import { 
+import {
+  // data models 
   IProduct, ProductLanguage, ProductType, ProductSubtype, TCG, 
   TCGToProductType, 
   
-  getProductSubtypes, isASCII,
-
+  // api
   PostLatestPriceStatus, PostPriceStatus, PostProductStatus, 
   TPostLatestPriceReqBody, TPostPriceReqBody, TPostProductReqBody, 
 
-  LATEST_PRICE_URL, PRICE_URL, PRODUCT_URL
+  LATEST_PRICE_URL, PRICE_URL, PRODUCT_URL,
+
+  // generic
+  assert, getProductSubtypes, isASCII
 } from 'common'
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField'
@@ -27,6 +30,37 @@ import * as _ from 'lodash'
 import { SideBarNavContext } from '../state/SideBarNavContext'
 import { isHttpUrl } from '../utils/generic'
 import { ISideBarNavContext, SideBarNav } from '../utils/SideBar'
+
+
+// ==========
+// interfaces
+// ==========
+
+interface IBaseState {
+  errorMessage?: string
+  isInvalid?: boolean, 
+}
+
+interface IFormValueState<Type> extends IBaseState {
+  value?: Type
+}
+
+interface IFormValueWithStringValuesState<Type> extends IFormValueState<Type> {
+  stringValues: string[]
+}
+
+interface IFormDataState {
+  imageUrl: IFormValueState<string>,
+  language: IFormValueState<ProductLanguage>,
+  msrp: IFormValueState<number>,
+  name: IFormValueState<string>,
+  releaseDate: IFormValueState<Date>,
+  setCode: IFormValueState<string>,
+  subtype: IFormValueWithStringValuesState<ProductSubtype>,
+  tcg: IFormValueState<TCG>,
+  tcgplayerId: IFormValueState<number>,
+  type: IFormValueWithStringValuesState<ProductType>,
+}
 
 
 // ==============
@@ -41,109 +75,27 @@ export const AddProductForm = () => {
   // =========
 
   const IMAGE_URL_PLACEHOLDER = 'https://picsum.photos/'
-  const LANGUAGE_SELECT_DEFAULT = ProductLanguage.English
   const PRODUCT_SUBTYPE_DEFAULT_PLACEHOLDER = 'Select Type first'
   const PRODUCT_SUBTYPE_EMPTY_PLACEHOLDER = 'No Subtypes'
   const PRODUCT_TYPE_PLACEHOLDER = 'Select TCG first'
   const TCG_SELECT_DEFAULT = 'Select TCG'
 
 
-  // ======
-  // states
-  // ======
+  // =====
+  // state
+  // =====
 
-  // TCGPlayerID state
-  const [ TCGPlayerIdState, setTCGPlayerIdState ] = useState<{
-    tcgPlayerId: number | undefined,
-    isInvalid?: boolean, 
-    errorMessage?: string,
-  }>({
-    tcgPlayerId: undefined,
-  })
-
-  // Name state
-  const [ nameState, setNameState ] = useState<{
-    name: string,
-    isInvalid?: boolean, 
-    errorMessage?: string,
-  }>({
-    name: '',
-  })
-
-  // TCG state
-  const [ TCGState, setTCGState ] = useState<{
-    tcg: TCG | '',
-    isInvalid?: boolean, 
-    errorMessage?: string,
-  }>({
-    tcg: '',
-  })
-
-  // ProductType state
-  const [ productTypeState, setProductTypeState ] = useState<{
-    productType: ProductType | ''
-    isDisabled: boolean,
-    values: string[],
-  }>({
-    productType: '',
-    isDisabled: true,
-    values: [],
-  })
-
-  // ProductSubtype state
-  const [ productSubtypeState, setProductSubtypeState ] = useState<{
-    productSubtype: ProductSubtype | '',
-    isDisabled: boolean,
-    values: string[],
-  }>({
-    productSubtype: '',
-    isDisabled: true,
-    values: [],
-  })
-
-  // Release Date state
-  const [ releaseDateState, setReleaseDateState ] = useState<{
-    releaseDate: Date | undefined,
-    isInvalid?: boolean, 
-    errorMessage?: string,
-  }>({
-    releaseDate: undefined,
-  })
-
-  // Set Code state
-  const [ setCodeState, setSetCodeState ] = useState<{
-    setCode: string,
-    isInvalid: boolean, 
-    errorMessage?: string,
-  }>({
-    setCode: '',
-    isInvalid: false,
-  })
-
-  // Language state
-  const [ languageState, setLanguageState ] = useState<{
-    language: ProductLanguage,
-  }>({
-    language: LANGUAGE_SELECT_DEFAULT,
-  })
-
-  // MSRP state
-  const [ msrpState, setMsrpState ] = useState<{
-    msrp: number | undefined,
-    isInvalid?: boolean, 
-    errorMessage?: string,
-  }>({
-    msrp: undefined
-  })
-
-  // Image URL state
-  const [ imageUrlState, setImageURLState ] = useState<{
-    imageUrl: string,
-    isInvalid: boolean,
-    errorMessage?: string,
-  }>({
-    imageUrl: '',
-    isInvalid: false,
+  const [ formData, setFormData ] = useState<IFormDataState>({
+    imageUrl: { value: undefined },
+    language: { value: ProductLanguage.English},
+    msrp: { value: undefined },
+    name: { value: undefined },
+    releaseDate: { value: undefined },
+    setCode: { value: undefined },
+    subtype: { stringValues: [], value: undefined },
+    tcg: { value: undefined },
+    tcgplayerId: { value: undefined },
+    type: { stringValues: [], value: undefined }
   })
 
   // load latest price loading state
@@ -153,9 +105,111 @@ export const AddProductForm = () => {
   const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
   const isAddProductForm = sideBarNav === SideBarNav.ADD_PRODUCT
 
+
   // =========
   // functions
   // =========
+
+  // -------
+  // helpers
+  // -------
+
+  /*
+  DESC
+    Helper to generate an IFormValueState for various empty states during
+    form validation
+  */
+  function genEmptyState<Type>(): IFormValueState<Type> {
+    return {
+      isInvalid: undefined,
+      value: undefined
+    } as IFormValueState<Type>
+  }
+
+  /*
+  DESC
+    Helper to generate an IFormValueWithStringValuesState for various 
+    empty states during form validation
+  */
+  function genEmptyStringValuesState<Type>(
+  ): IFormValueWithStringValuesState<Type> {
+    return {
+      isInvalid: undefined,
+      stringValues: [],
+      value: undefined
+    } as IFormValueWithStringValuesState<Type>
+  }
+
+  /*
+  DESC
+    Helper to generate an IFormValueState for various error states during
+    form validation
+  INPUT
+    error: The error message for the error state
+  */
+  function genErrorState<Type>(errorMessage: string): IFormValueState<Type> {
+    return {
+      errorMessage: errorMessage,
+      isInvalid: true,
+      value: undefined
+    } as IFormValueState<Type>
+  }
+
+  /*
+  DESC
+    Helper to generate an IFormValueState for various valid states during
+    form validation
+  INPUT
+    value: The valid value to set
+  */
+  function genValidState<Type>(value: Type): IFormValueState<Type> {
+    return {
+      isInvalid: false,
+      value: value
+    } as IFormValueState<Type>
+  }
+
+  /*
+  DESC
+    Helper to generate an IFormValueWithStringValuesState for various 
+    valid states during form validation
+  INPUT
+    value: The valid value to set
+    stringValues: The valid string values to set
+  */
+  function genValidStringValuesState<Type>(
+    value: Type,
+    stringValues: string[]
+  ): IFormValueWithStringValuesState<Type> {
+    return {
+      isInvalid: false,
+      stringValues: stringValues,
+      value: value
+    } as IFormValueWithStringValuesState<Type>
+  }
+
+  /*
+  DESC
+    Returns whether or not the form submit button should be enabled
+  RETURN
+    TRUE if the form submit button should be enabled, FALSE otherwise
+  */
+  function isFormSubmitEnabled(): boolean {
+    return _.every([
+
+      // required
+      !(formData.msrp.isInvalid ?? true),
+      !(formData.name.isInvalid ?? true),
+      !(formData.releaseDate.isInvalid ?? true),
+      !(formData.tcg.isInvalid ?? true),
+      !(formData.tcgplayerId.isInvalid ?? true),
+      !(formData.type.isInvalid ?? true),
+
+      //optional
+      !(formData.setCode.isInvalid ?? false),
+      !(formData.subtype.isInvalid ?? false)
+    ], Boolean)
+  }
 
   // ------------
   // form control
@@ -163,74 +217,105 @@ export const AddProductForm = () => {
 
   /*
   DESC
-    Update Product Type state based on the input, which is a TCG enum 
-    or empty string
+    Handles onChange event for the ProductSubtype form input
   INPUT
-    input: TCG enum or empty string
+    value: The input value from the form 
   */
-  
-  function updateProductTypeInput(input: string): void {
-    
-    // default
-    if (input.length === 0) {
-      setProductTypeState({
-        productType: '',
-        isDisabled: true,
-        values: []
-      })
+  function handleProductSubtypeOnChange(value: string): void {
 
-    // tcg
-    } else {
-      setProductTypeState({
-        productType: TCGToProductType[input as TCG][0],
-        isDisabled: false,
-        values: TCGToProductType[input as TCG]
-      })
-    }
+    // validate input value
+    assert(Object.values(ProductSubtype).includes(value as ProductSubtype),
+      'Input value is not a ProductSubtype')
+    const subtype = value as ProductSubtype
+    const subtypes = formData.subtype.stringValues
+
+    setFormData({
+      ...formData,
+      subtype: genValidStringValuesState<ProductSubtype>(subtype, subtypes)
+    })
   }
 
   /*
   DESC
-    Update Product Subtype state based on the input, which is a TCG enum 
-    or empty string and a ProductType or empty string
+    Handles onChange event for the ProductType form input
   INPUT
-    tcg_input: TCG enum or empty string
-    product_input: ProductType enum or empty string
+    value: The input value from the form 
   */
+  function handleProductTypeOnChange(value: string): void {
+  
+    // validate input value
+    assert(Object.values(ProductType).includes(value as ProductType),
+      'Input value is not a ProductType')
+    const type = value as ProductType
+    
+    // get types
+    const tcg = formData.tcg.value
+    assert(tcg, 'TCG is undefined')
+    const types = TCGToProductType[tcg]
 
-  // update Product Subtype after Product Type is selected
-  function updateProductSubypeInput(tcg_input: string, product_input: string): void {
+    // get subtypes
+    const subtypes = getProductSubtypes(tcg, type)
+    const defaultSubtype = _.head(subtypes)
 
-    // empty tcg or product
-    if (tcg_input.length === 0 || product_input.length === 0) {
-      setProductSubtypeState({
-        productSubtype: '',
-        isDisabled: true,
-        values: []
+    setFormData({
+      ...formData,
+      type: genValidStringValuesState<ProductType>(type, types),
+      subtype: defaultSubtype
+        ? genValidStringValuesState<ProductSubtype>(defaultSubtype, subtypes)
+        : genEmptyStringValuesState<ProductSubtype>()
+    })
+  }
+
+  /*
+  DESC
+    Handles onChange event for the TCG form input
+  INPUT
+    value: The input value from the form 
+  */
+  function handleTCGOnChange(value: string): void {
+
+    // validate input value
+    const tcgState = getValidatedTCGState(value)
+
+    // invalid TCG
+    if (tcgState.isInvalid) {
+
+      setFormData({
+        ...formData,
+        tcg: genEmptyState<TCG>(),
+        type: genEmptyStringValuesState<ProductType>(),
+        subtype: genEmptyStringValuesState<ProductSubtype>()
       })
 
-    // tcg and product 
+    // valid TCG
     } else {
-      const productSubtypes = getProductSubtypes(
-        tcg_input as TCG, 
-        product_input as ProductType)
-      
-      // no product subtypes
-      if (productSubtypes.length === 0) {
-        setProductSubtypeState({
-          productSubtype: '',
-          isDisabled: true,
-          values: []
-        })
 
-      // has product subtypes
-      } else {
-        setProductSubtypeState({
-          productSubtype: productSubtypes[0],
-          isDisabled: false,
-          values: productSubtypes
-        })
-      }
+      const tcg = tcgState.value
+
+      assert(tcg, 'TCG is undefined in valid TCG state')
+
+      // get ProductTypes
+      const types = TCGToProductType[tcg]
+      const defaultType = _.head(types)
+
+      assert(defaultType, 'defaultType is undefined in valid TCG state')
+      const typeState = genValidStringValuesState<ProductType>(
+        defaultType, types)
+
+      // get Subtypes
+      const subtypes = getProductSubtypes(tcg, defaultType)
+      const defaultSubtype = _.head(subtypes)
+      const subtypeState = defaultSubtype
+        ? genValidStringValuesState<ProductSubtype>(
+            defaultSubtype, subtypes as ProductSubtype[])
+        : genEmptyStringValuesState<ProductSubtype>()
+
+      setFormData({
+        ...formData,
+        tcg: tcgState,
+        type: typeState,
+        subtype: subtypeState
+      })
     }
   }
 
@@ -351,178 +436,145 @@ export const AddProductForm = () => {
   // form validation
   // ---------------
 
-  // validate TCGplayerID
-  function validateTCGPlayerID(input: string): void {
+  // validate Image URL
+  function validateImageURL(input: string): void {
 
-    // empty state
-    if (input.length === 0) {
-      setTCGPlayerIdState({
-        tcgPlayerId: undefined,
-        isInvalid: true, 
-        errorMessage: 'TCGPlayerID is required',
-      })
+    const state: IFormValueState<string> = 
 
-    // TODO: check if TCGPlayer ID already exists
+      // non-ASCII
+      input.length && !isASCII(input) 
+        ? genErrorState<string>('Image URL must only contain ASCII characters')
 
-    // valid
-    } else {
-      setTCGPlayerIdState({ 
-        tcgPlayerId: parseInt(input),
-        isInvalid: false 
-      })
-    }
-  }
+      // non-URL format
+      : !isHttpUrl(input)
+        ? genErrorState<string>('Image URL is not a valid URL format')
+      
+      // valid
+      : genValidState<string>(input)
 
-  // validate Name
-  function validateName(input: string): void {
-
-    // empty state
-    if (input.length === 0) {
-      setNameState({
-        name: '',
-        isInvalid: true, 
-        errorMessage: 'Name is required',
-      })
-
-    // non-ASCII characters
-    } else if (!isASCII(input)) {
-      setNameState({
-        name: '',
-        isInvalid: true, 
-        errorMessage: 'Name must only contain ASCII characters',
-      })
-
-    // valid
-    } else {
-      setNameState({ 
-        name: input,
-        isInvalid: false 
-      })
-    }
-  }
-
-  // validate TCG
-  function validateTCG(input: string): void {
-
-    // default
-    if (input.length === 0) {
-      setTCGState({
-        tcg: '',
-        isInvalid: true, 
-        errorMessage: 'TCG is required',
-      })
-
-    // unrecognized TCG
-    } else if (!Object.values(TCG).includes(input as TCG)) {
-      setTCGState({
-        tcg: '',
-        isInvalid: true, 
-        errorMessage: 'Invalid TCG',
-      })
-
-    // valid
-    } else {
-      setTCGState({ 
-        tcg: input as TCG,
-        isInvalid: false 
-      })
-    }
-  }
-
-  // validate Release Date
-  function validateReleaseDate(input: string): void {
-
-    // default
-    if (input.length === 0) {
-      setReleaseDateState({
-        releaseDate: undefined, 
-        isInvalid: true, 
-        errorMessage: 'Release Date is required',
-      })
-
-    // valid
-    } else {
-      setReleaseDateState({ 
-        releaseDate: new Date(Date.parse(input)), 
-        isInvalid: false 
-      })
-    }
-  }  
-
-  // validate Set Code
-  function validateSetCode(input: string): void {
-
-    // ASCII only
-    if (input.length > 0 && !isASCII(input)) {
-      setSetCodeState({
-        setCode: '',
-        isInvalid: true, 
-        errorMessage: 'Set Code must only contain ASCII characters',
-      })
-
-    // valid
-    } else {
-      setSetCodeState({ 
-        setCode: input,
-        isInvalid: false 
-      })
-    }
+    setFormData({
+      ...formData,
+      imageUrl: state
+    })
   }
 
   // validate MSRP
   function validateMSRP(input: string): void {
 
-    // default
-    if (input.length === 0) {
-      setMsrpState({
-        msrp: undefined, 
-        isInvalid: true, 
-        errorMessage: 'MSRP is required',
-      })
+    const state: IFormValueState<number> = 
 
-    // numeric format
-    } else if (!_.isNumber(Number(input))) {
-      setMsrpState({
-        msrp: undefined, 
-        isInvalid: true, 
-        errorMessage: 'Input is not numeric',
-      })
-    
-    // valid
-    } else {
-      setMsrpState({ 
-        msrp: Number(input), 
-        isInvalid: false 
-      })
-    }
+      // empty
+      input.length === 0 
+        ? genErrorState<number>('MSRP is required')
+
+      // numeric format
+      : !_.isNumber(Number(input))
+        ? genErrorState<number>('MSRP is not numeric')
+
+      // valid
+      : genValidState<number>(Number(input))
+
+    setFormData({
+      ...formData,
+      msrp: state
+    })
   }  
 
-  // validate Image URL
-  function validateImageURL(input: string): void {
+  // validate Name
+  function validateName(input: string): void {
 
-    // ASCII only
-    if (input.length > 0 && !isASCII(input)) {
-      setImageURLState({
-        imageUrl: '',
-        isInvalid: true, 
-        errorMessage: 'Image URL must only contain ASCII characters',
-      })
+    const state: IFormValueState<string> = 
 
-    // URL format
-    } else if (input.length > 0 && !isHttpUrl(input)) {
-      setImageURLState({
-        imageUrl: '',
-        isInvalid: true, 
-        errorMessage: 'URL incorrectly formatted',
-      })
+      // empty
+      input.length === 0 
+        ? genErrorState<string>('Name is required')
 
-    // valid
-    } else {
-      setImageURLState({ 
-        imageUrl: input,
-        isInvalid: false 
-      })
-    }
+      // non-ASCII
+      : !isASCII(input) 
+        ? genErrorState<string>('Name must only contain ASCII characters')
+
+      // valid
+      : genValidState<string>(input)
+
+    setFormData({
+      ...formData,
+      name: state
+    })
+  }
+
+  // validate Release Date
+  function validateReleaseDate(input: string): void {
+
+    const state: IFormValueState<Date> = 
+
+      // empty
+      input.length === 0
+        ? genErrorState<Date>('Release Date is required')
+
+      // valid
+      : genValidState<Date>(new Date(Date.parse(input)))
+    
+    setFormData({
+      ...formData,
+      releaseDate: state
+    })
+  }  
+
+  // validate Set Code
+  function validateSetCode(input: string): void {
+
+    const state: IFormValueState<string> = 
+
+      // non-ASCII
+      input.length && !isASCII(input) 
+        ? genErrorState<string>('Set Code must only contain ASCII characters')
+
+      // valid
+      : genValidState<string>(input)
+
+    setFormData({
+      ...formData,
+      setCode: state
+    })
+  }
+
+  // validate TCG
+  function getValidatedTCGState(input: string): IFormValueState<TCG> {
+
+    const state: IFormValueState<TCG> = 
+
+      // empty
+      input.length === 0
+        ? genErrorState<TCG>('TCG is required')
+
+      // unrecognized TCG
+      : (!Object.values(TCG).includes(input as TCG)) 
+        ? genErrorState<TCG>('Unrecognized TCG')
+
+      // valid
+      : genValidState<TCG>(input as TCG)
+    
+    return state
+  }
+
+  // validate TCGPlayerID
+  function validateTCGPlayerID(input: string): void {
+
+    // TODO: check if TCGPlayer ID already exists
+
+    const state: IFormValueState<number> = 
+
+      // empty
+      input.length === 0 
+        ? genErrorState<number>('TCGPlayerID is required')
+
+      // valid
+      : genValidState<number>(parseInt(input))
+
+    setFormData({
+      ...formData,
+      tcgplayerId: state
+    })
   }
 
   // -----------------
@@ -585,22 +637,19 @@ export const AddProductForm = () => {
     A TPostFormData with the Product data
   */
   function getPostFormData(): IProduct {
-
     let data: IProduct = {
-      tcgplayerId: TCGPlayerIdState.tcgPlayerId as number,
-      name: nameState.name,
-      tcg: TCGState.tcg as TCG,
-      type: productTypeState.productType as ProductType,
-      releaseDate: releaseDateState.releaseDate as Date,
-      language: languageState.language,
-      msrp: msrpState.msrp as number
+      tcgplayerId: formData.tcgplayerId.value as number,
+      name: formData.name.value as string,
+      tcg: formData.tcg.value as TCG,
+      type: formData.type.value as ProductType,
+      releaseDate: formData.releaseDate.value as Date,
+      language: formData.language.value as ProductLanguage,
+      msrp: formData.msrp.value as number
     }
-    if (productSubtypeState.productSubtype.length > 0) {
-      data.subtype = productSubtypeState.productSubtype as ProductSubtype
-    }
-    if (setCodeState.setCode.length > 0) {
-      data.setCode = setCodeState.setCode
-    }
+    if (formData.subtype.value) 
+      data.subtype = formData.subtype.value as ProductSubtype
+    if (formData.setCode) 
+      data.setCode = formData.setCode.value as string
 
     return data
   }
@@ -609,25 +658,6 @@ export const AddProductForm = () => {
   // =====
   // hooks
   // =====
-
-  // handle TCG changes
-  useEffect(() => {
-
-    // update Product Type
-    updateProductTypeInput(TCGState.tcg)
-
-    // update Product Subtype
-    updateProductSubypeInput(TCGState.tcg, productTypeState.productType)
-
-  }, [TCGState.tcg])
-
-  // handle Product Type changes
-  useEffect(() => {
-
-    // update Product Subtype
-    updateProductSubypeInput(TCGState.tcg, productTypeState.productType)
-
-  }, [productTypeState.productType])
 
   // Axios response toast
   const toast = useToast()
@@ -653,11 +683,11 @@ export const AddProductForm = () => {
           {/* TCGPlayer ID */}
           <InputErrorWrapper 
             leftLabel='TCGPlayer ID'
-            errorMessage={TCGPlayerIdState.errorMessage}
-            isErrorDisplayed={TCGPlayerIdState.isInvalid && isAddProductForm}
+            errorMessage={formData.tcgplayerId.errorMessage}
+            isErrorDisplayed={formData.tcgplayerId.isInvalid && isAddProductForm}
           >
             <NumberInput
-              isInvalid={TCGPlayerIdState.isInvalid || false}
+              isInvalid={formData.tcgplayerId.isInvalid}
               isRequired={true} 
               min={1}
               precision={0}
@@ -671,11 +701,11 @@ export const AddProductForm = () => {
           {/* Name */}
           <InputErrorWrapper 
             leftLabel='Name'
-            errorMessage={nameState.errorMessage}
-            isErrorDisplayed={nameState.isInvalid && isAddProductForm}          
+            errorMessage={formData.name.errorMessage}
+            isErrorDisplayed={formData.name.isInvalid && isAddProductForm}          
           >
             <Input 
-              isInvalid={nameState.isInvalid || false}
+              isInvalid={formData.name.isInvalid}
               isRequired={true}
               placeholder='Kaladesh'
               onBlur={e => validateName(e.target.value)}
@@ -685,22 +715,15 @@ export const AddProductForm = () => {
           {/* TCG */}
           <InputErrorWrapper 
             leftLabel='TCG'
-            errorMessage={TCGState.errorMessage}
-            isErrorDisplayed={TCGState.isInvalid && isAddProductForm}
+            errorMessage={formData.tcg.errorMessage}
+            isErrorDisplayed={formData.tcg.isInvalid && isAddProductForm}
           >
             <Select
-              value={TCGState.tcg.length === 0
-                ? undefined
-                : TCGState.tcg}
-              isInvalid={TCGState.isInvalid || false}
+              value={formData.tcg.value}
+              isInvalid={formData.tcg.isInvalid}
               isRequired={true} 
               placeholder={TCG_SELECT_DEFAULT}
-              onBlur={e => validateTCG(e.target.value)}
-              onChange={e => setTCGState({
-                tcg: e.target.value as TCG,
-                isInvalid: TCGState.isInvalid,
-                errorMessage: TCGState.errorMessage,
-              })}
+              onChange={e => handleTCGOnChange(e.target.value)}
             >      
               {Object.values(TCG).map(value => {
                 return (
@@ -715,23 +738,19 @@ export const AddProductForm = () => {
             leftLabel='Type'
           >
             <Select
-              value={productTypeState.productType.length === 0
-                ? undefined
-                : productTypeState.productType}
-              isDisabled={productTypeState.isDisabled}
+              value={formData.type.value}
+              isDisabled={formData.type.value === undefined}
               isRequired={true} 
-              placeholder={productTypeState.isDisabled 
+              placeholder={formData.type.value === undefined 
                 ? PRODUCT_TYPE_PLACEHOLDER
                 : undefined}
-                onChange={e => setProductTypeState({
-                  productType: e.target.value as ProductType,
-                  isDisabled: productTypeState.isDisabled,
-                  values: productTypeState.values,
-                })}            
+              onChange={e => handleProductTypeOnChange(e.target.value)}
             >      
-              {productTypeState.values.map(value => {
+              {formData.type.stringValues.map(value => {
                 return (
-                  <option key={value} value={value}>{value}</option>
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
                 )
               })}
             </Select>        
@@ -742,24 +761,20 @@ export const AddProductForm = () => {
             leftLabel='Subtype'
           >
             <Select
-              value={productSubtypeState.productSubtype.length === 0
-                ? undefined
-                : productSubtypeState.productSubtype}
-              isDisabled={productSubtypeState.isDisabled}
-              placeholder={productSubtypeState.isDisabled
-                ? productTypeState.isDisabled 
+              value={formData.subtype.value}
+              isDisabled={formData.subtype.value === undefined}
+              placeholder={formData.subtype.value === undefined
+                ? formData.type.value === undefined 
                   ? PRODUCT_SUBTYPE_DEFAULT_PLACEHOLDER
                   : PRODUCT_SUBTYPE_EMPTY_PLACEHOLDER
                 : undefined}
-                onChange={e => setProductSubtypeState({
-                  productSubtype: e.target.value as ProductSubtype,
-                  isDisabled: productSubtypeState.isDisabled,
-                  values: productSubtypeState.values,
-                })}              
+                onChange={e => handleProductSubtypeOnChange(e.target.value)}              
             >      
-              {productSubtypeState.values.map(value => {
+              {formData.subtype.stringValues.map(value => {
                 return (
-                  <option key={value} value={value}>{value}</option>
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
                 )
               })}
             </Select>        
@@ -768,12 +783,12 @@ export const AddProductForm = () => {
           {/* Release Date */}
           <InputErrorWrapper 
             leftLabel='Release Date'
-            errorMessage={releaseDateState.errorMessage}
-            isErrorDisplayed={releaseDateState.isInvalid && isAddProductForm}
+            errorMessage={formData.releaseDate.errorMessage}
+            isErrorDisplayed={formData.releaseDate.isInvalid && isAddProductForm}
           >
             <Input
               type='date'
-              isInvalid={releaseDateState.isInvalid || false}
+              isInvalid={formData.releaseDate.isInvalid}
               isRequired={true} 
               onBlur={e => validateReleaseDate(e.target.value)}
             />       
@@ -782,11 +797,11 @@ export const AddProductForm = () => {
           {/* Set Code */}
           <InputErrorWrapper 
             leftLabel='Set Code'
-            errorMessage={setCodeState.errorMessage}
-            isErrorDisplayed={setCodeState.isInvalid && isAddProductForm}
+            errorMessage={formData.setCode.errorMessage}
+            isErrorDisplayed={formData.setCode.isInvalid && isAddProductForm}
           >
             <Input 
-              isInvalid={setCodeState.isInvalid}
+              isInvalid={formData.setCode.isInvalid}
               onBlur={e => validateSetCode(e.target.value)}
             />
           </InputErrorWrapper>
@@ -796,14 +811,18 @@ export const AddProductForm = () => {
             leftLabel='Language'
           >
             <Select 
-              value={languageState.language}
-              onChange={e => setLanguageState({
-                language: e.target.value as ProductLanguage
+              value={formData.language.value}
+              onChange={e => setFormData({
+                ...formData,
+                language: genValidState<ProductLanguage>(
+                  e.target.value as ProductLanguage)
               })}
             >      
               {Object.values(ProductLanguage).map(value => {
                 return (
-                  <option key={value} value={value}>{value}</option>
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
                 )
               })}
             </Select>        
@@ -812,11 +831,11 @@ export const AddProductForm = () => {
           {/* MSRP */}
           <InputErrorWrapper 
             leftLabel='MSRP'
-            errorMessage={msrpState.errorMessage}
-            isErrorDisplayed={msrpState.isInvalid && isAddProductForm}
+            errorMessage={formData.msrp.errorMessage}
+            isErrorDisplayed={formData.msrp.isInvalid && isAddProductForm}
           >
             <NumberInput
-              isInvalid={msrpState.isInvalid}
+              isInvalid={formData.msrp.isInvalid}
               min={1}
               precision={2}
               width='100%'
@@ -829,22 +848,22 @@ export const AddProductForm = () => {
           {/* Image URL */}
           <InputErrorWrapper 
             leftLabel='Image URL'
-            errorMessage={imageUrlState.errorMessage}
-            isErrorDisplayed={imageUrlState.isInvalid && isAddProductForm}
+            errorMessage={formData.imageUrl.errorMessage}
+            isErrorDisplayed={formData.imageUrl.isInvalid && isAddProductForm}
           >
             <Input
               placeholder={IMAGE_URL_PLACEHOLDER}
-              isInvalid={imageUrlState.isInvalid}
+              isInvalid={formData.imageUrl.isInvalid}
               onBlur={e => validateImageURL(e.target.value)}
             />
           </InputErrorWrapper>
 
           {/* Image */}
-          { imageUrlState.imageUrl.length > 0 && !imageUrlState.isInvalid
+          {formData.imageUrl.value && !formData.imageUrl.isInvalid
             ? (
               <Image 
                 boxSize='200px'
-                src={imageUrlState.imageUrl}
+                src={formData.imageUrl.value}
               />
             ) : undefined
           }
@@ -855,23 +874,15 @@ export const AddProductForm = () => {
           <Button
             colorScheme='teal'
             type='submit'
-            isDisabled={
-              (TCGPlayerIdState.isInvalid ?? true)
-              || (nameState.isInvalid ?? true)
-              || (TCGState.isInvalid ?? true)
-              || (releaseDateState.isInvalid ?? true)
-              || (setCodeState.isInvalid ?? true)
-              || (imageUrlState.isInvalid ?? true)
-            }
+            isDisabled={!isFormSubmitEnabled()}
           >
             Submit
           </Button>
           <Button
             colorScheme='purple'
             onClick={() => handleLoadLatestPriceOnClick(
-              Number(TCGPlayerIdState.tcgPlayerId)
-            )}
-            isDisabled={TCGPlayerIdState.isInvalid ?? true}
+              Number(formData.tcgplayerId.value))}
+            isDisabled={formData.tcgplayerId.isInvalid ?? true}
             isLoading={isLoadingLatestPrice}
           >
             Load Latest Price
