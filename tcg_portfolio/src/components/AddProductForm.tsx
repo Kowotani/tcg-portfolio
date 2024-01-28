@@ -211,16 +211,38 @@ export const AddProductForm = () => {
     ], Boolean)
   }
 
-  // ------------
-  // form control
-  // ------------
+  // -------------
+  // form handlers
+  // -------------
 
-  /*
-  DESC
-    Handles onChange event for the ProductSubtype form input
-  INPUT
-    value: The input value from the form 
-  */
+  function handleImageUrlOnChange(value: string): void {
+    setFormData({
+      ...formData,
+      imageUrl: genImageUrlState(value)
+    })
+  }
+
+  function handleMsrpOnChange(value: string): void {
+    setFormData({
+      ...formData,
+      msrp: genMsrpState(value)
+    })
+  }
+
+  function handleNameOnChange(value: string): void {
+    setFormData({
+      ...formData,
+      name: genNameState(value)
+    })
+  }
+
+  function handleReleaseDateOnChange(value: string): void {
+    setFormData({
+      ...formData,
+      releaseDate: genReleaseDateState(value)
+    })
+  }
+
   function handleProductSubtypeOnChange(value: string): void {
 
     // validate input value
@@ -235,12 +257,6 @@ export const AddProductForm = () => {
     })
   }
 
-  /*
-  DESC
-    Handles onChange event for the ProductType form input
-  INPUT
-    value: The input value from the form 
-  */
   function handleProductTypeOnChange(value: string): void {
   
     // validate input value
@@ -266,16 +282,17 @@ export const AddProductForm = () => {
     })
   }
 
-  /*
-  DESC
-    Handles onChange event for the TCG form input
-  INPUT
-    value: The input value from the form 
-  */
-  function handleTCGOnChange(value: string): void {
+  function handleSetCodeOnChange(value: string): void {
+    setFormData({
+      ...formData,
+      setCode: genSetCodeState(value)
+    })
+  }
+
+  function handleTcgOnChange(value: string): void {
 
     // validate input value
-    const tcgState = getValidatedTCGState(value)
+    const tcgState = genTcgState(value)
 
     // invalid TCG
     if (tcgState.isInvalid) {
@@ -317,6 +334,13 @@ export const AddProductForm = () => {
         subtype: subtypeState
       })
     }
+  }
+
+  function handleTcgPlayerIdOnChange(value: string): void {
+    setFormData({
+      ...formData,
+      tcgplayerId: genTcgPlayerIdState(value)
+    })
   }
 
   // -----------
@@ -437,10 +461,8 @@ export const AddProductForm = () => {
   // ---------------
 
   // validate Image URL
-  function validateImageURL(input: string): void {
-
-    const state: IFormValueState<string> = 
-
+  function genImageUrlState(input: string): IFormValueState<string> {
+    return (
       // non-ASCII
       input.length && !isASCII(input) 
         ? genErrorState<string>('Image URL must only contain ASCII characters')
@@ -451,18 +473,12 @@ export const AddProductForm = () => {
       
       // valid
       : genValidState<string>(input)
-
-    setFormData({
-      ...formData,
-      imageUrl: state
-    })
+    )
   }
 
   // validate MSRP
-  function validateMSRP(input: string): void {
-
-    const state: IFormValueState<number> = 
-
+  function genMsrpState(input: string): IFormValueState<number> {
+    return (
       // empty
       input.length === 0 
         ? genErrorState<number>('MSRP is required')
@@ -473,18 +489,12 @@ export const AddProductForm = () => {
 
       // valid
       : genValidState<number>(Number(input))
-
-    setFormData({
-      ...formData,
-      msrp: state
-    })
+    )
   }  
 
   // validate Name
-  function validateName(input: string): void {
-
-    const state: IFormValueState<string> = 
-
+  function genNameState(input: string): IFormValueState<string> {
+    return ( 
       // empty
       input.length === 0 
         ? genErrorState<string>('Name is required')
@@ -495,54 +505,36 @@ export const AddProductForm = () => {
 
       // valid
       : genValidState<string>(input)
-
-    setFormData({
-      ...formData,
-      name: state
-    })
+    )
   }
 
   // validate Release Date
-  function validateReleaseDate(input: string): void {
-
-    const state: IFormValueState<Date> = 
-
+  function genReleaseDateState(input: string): IFormValueState<Date> {
+    return (
       // empty
       input.length === 0
         ? genErrorState<Date>('Release Date is required')
 
       // valid
       : genValidState<Date>(new Date(Date.parse(input)))
-    
-    setFormData({
-      ...formData,
-      releaseDate: state
-    })
+    )
   }  
 
   // validate Set Code
-  function validateSetCode(input: string): void {
-
-    const state: IFormValueState<string> = 
-
+  function genSetCodeState(input: string): IFormValueState<string> {
+    return (
       // non-ASCII
       input.length && !isASCII(input) 
         ? genErrorState<string>('Set Code must only contain ASCII characters')
 
       // valid
       : genValidState<string>(input)
-
-    setFormData({
-      ...formData,
-      setCode: state
-    })
+    )
   }
 
   // validate TCG
-  function getValidatedTCGState(input: string): IFormValueState<TCG> {
-
-    const state: IFormValueState<TCG> = 
-
+  function genTcgState(input: string): IFormValueState<TCG> {
+    return (
       // empty
       input.length === 0
         ? genErrorState<TCG>('TCG is required')
@@ -553,28 +545,20 @@ export const AddProductForm = () => {
 
       // valid
       : genValidState<TCG>(input as TCG)
-    
-    return state
+    )
   }
 
   // validate TCGPlayerID
-  function validateTCGPlayerID(input: string): void {
-
+  function genTcgPlayerIdState(input: string): IFormValueState<number>  {
     // TODO: check if TCGPlayer ID already exists
-
-    const state: IFormValueState<number> = 
-
+    return (
       // empty
       input.length === 0 
         ? genErrorState<number>('TCGPlayerID is required')
 
       // valid
       : genValidState<number>(parseInt(input))
-
-    setFormData({
-      ...formData,
-      tcgplayerId: state
-    })
+    )
   }
 
   // -----------------
@@ -691,7 +675,7 @@ export const AddProductForm = () => {
               isRequired={true} 
               min={1}
               precision={0}
-              onBlur={e => validateTCGPlayerID(e.target.value)}
+              onBlur={e => handleTcgPlayerIdOnChange(e.target.value)}
               width='100%'
             >
               <NumberInputField />
@@ -708,7 +692,7 @@ export const AddProductForm = () => {
               isInvalid={formData.name.isInvalid}
               isRequired={true}
               placeholder='Kaladesh'
-              onBlur={e => validateName(e.target.value)}
+              onBlur={e => handleNameOnChange(e.target.value)}
             />
           </InputErrorWrapper>
 
@@ -723,7 +707,7 @@ export const AddProductForm = () => {
               isInvalid={formData.tcg.isInvalid}
               isRequired={true} 
               placeholder={TCG_SELECT_DEFAULT}
-              onChange={e => handleTCGOnChange(e.target.value)}
+              onChange={e => handleTcgOnChange(e.target.value)}
             >      
               {Object.values(TCG).map(value => {
                 return (
@@ -790,7 +774,7 @@ export const AddProductForm = () => {
               type='date'
               isInvalid={formData.releaseDate.isInvalid}
               isRequired={true} 
-              onBlur={e => validateReleaseDate(e.target.value)}
+              onBlur={e => handleReleaseDateOnChange(e.target.value)}
             />       
           </InputErrorWrapper>
 
@@ -802,7 +786,7 @@ export const AddProductForm = () => {
           >
             <Input 
               isInvalid={formData.setCode.isInvalid}
-              onBlur={e => validateSetCode(e.target.value)}
+              onBlur={e => handleSetCodeOnChange(e.target.value)}
             />
           </InputErrorWrapper>
 
@@ -839,7 +823,7 @@ export const AddProductForm = () => {
               min={1}
               precision={2}
               width='100%'
-              onBlur={e => validateMSRP(e.target.value)}
+              onBlur={e => handleMsrpOnChange(e.target.value)}
             >
               <NumberInputField />
             </NumberInput>
@@ -854,7 +838,7 @@ export const AddProductForm = () => {
             <Input
               placeholder={IMAGE_URL_PLACEHOLDER}
               isInvalid={formData.imageUrl.isInvalid}
-              onBlur={e => validateImageURL(e.target.value)}
+              onBlur={e => handleImageUrlOnChange(e.target.value)}
             />
           </InputErrorWrapper>
 
