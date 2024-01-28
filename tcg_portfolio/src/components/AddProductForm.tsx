@@ -647,9 +647,9 @@ export const AddProductForm = () => {
       msrp: formData.msrp.value as number
     }
     if (formData.subtype.value) 
-      data.subtype = formData.subtype.value as ProductSubtype
-    if (formData.setCode) 
-      data.setCode = formData.setCode.value as string
+      data.subtype = formData.subtype.value
+    if (formData.setCode.value) 
+      data.setCode = formData.setCode.value
 
     return data
   }
