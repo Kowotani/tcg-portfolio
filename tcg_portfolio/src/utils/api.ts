@@ -1,16 +1,16 @@
 import { 
   // data models
-  IPopulatedHolding, IPopulatedPortfolio, IProduct, ITransaction, TDatedValue,
-  TPerformanceData,
+  IPopulatedHolding, IPopulatedPortfolio, IProduct, ITCProduct, ITransaction, 
+  TDatedValue, TPerformanceData,
 
   // type guards
   hasIDatedPriceDataKeys, hasIPopulatedHoldingKeys, hasIPopulatedPortfolioKeys, 
-  hasIProductKeys, hasITransactionKeys, hasTDatedValueKeys, 
+  hasIProductKeys, hasITCProductKeys, hasITransactionKeys, hasTDatedValueKeys, 
   hasTPerformanceDataKeys,
   
   isIDatedPriceData, isIPopulatedHolding, isIPopulatedPortfolio, 
-  isIPopulatedPortfolioArray, isIProduct, isITransaction, isTDatedvalue,
-  isTDatedvalueArray, isTPerformanceData,
+  isIPopulatedPortfolioArray, isIProduct, isITCProduct, isITransaction, 
+  isTDatedvalue, isTDatedvalueArray, isTPerformanceData,
 
   // generic
   assert, getLocalDateFromISOString, IDatedPriceData, PerformanceMetric
@@ -111,7 +111,7 @@ DESC
 INPUT
   response: The response corresponding to the return value
 RETURN
-  An IProduct
+  An IProduct[]
 */
 export function parseProductsEndpointResponse(
   response: any[]
@@ -125,18 +125,40 @@ export function parseProductsEndpointResponse(
   return products
 }
 
+/*
+ENDPOINT
+  GET:UNVALIDATED_TCPRODUCTS_URL
+DESC
+  Parses the input response object from the endpoint and returns an ITCProduct[]
+INPUT
+  response: The response corresponding to the return value
+RETURN
+  An ITCProduct[]
+*/
+export function parseUnvalidatedTCProductsEndpointResponse(
+  response: any[]
+): ITCProduct[] {
+
+  // parse ITCProduct
+  const products = response.map((json: any) => {
+    return parseTCProductJSON(json)
+  })
+
+  return products
+}
+
 
 // =======
 // generic
 // =======
 
 /*
-  DESC
-    Returns a TDatedValue after parsing the input json
-  INPUT
-    json: A JSON representation of a TDatedValue
-  RETURN
-    An TDatedValue
+DESC
+  Returns a TDatedValue after parsing the input json
+INPUT
+  json: A JSON representation of a TDatedValue
+RETURN
+  An TDatedValue
 */
 function parseTDatedValueJSON(json: any): TDatedValue {
 
@@ -153,12 +175,12 @@ function parseTDatedValueJSON(json: any): TDatedValue {
 }
 
 /*
-  DESC
-    Returns a TDatedValue[] after parsing the input json
-  INPUT
-    json: A JSON representation of a TDatedValue[]
-  RETURN
-    An TDatedValue[]
+DESC
+  Returns a TDatedValue[] after parsing the input json
+INPUT
+  json: A JSON representation of a TDatedValue[]
+RETURN
+  An TDatedValue[]
 */
 function parseTDatedValueArrayJSON(json: any): TDatedValue[] {
 
@@ -174,12 +196,12 @@ function parseTDatedValueArrayJSON(json: any): TDatedValue[] {
 }
 
 /*
-  DESC
-    Returns a TPerformanceData after parsing the input json
-  INPUT
-    json: A JSON representation of a TPerformanceData
-  RETURN
-    An TPerformanceData
+DESC
+  Returns a TPerformanceData after parsing the input json
+INPUT
+  json: A JSON representation of a TPerformanceData
+RETURN
+  An TPerformanceData
 */
 function parseTPerformanceDataJSON(json: any): TPerformanceData {
 
@@ -201,12 +223,12 @@ function parseTPerformanceDataJSON(json: any): TPerformanceData {
 // =======
 
 /*
-  DESC
-    Returns an IPopulatedHolding after parsing the input json
-  INPUT
-    json: A JSON representation of an IPopulatedHolding
-  RETURN
-    An IPopulatedHolding
+DESC
+  Returns an IPopulatedHolding after parsing the input json
+INPUT
+  json: A JSON representation of an IPopulatedHolding
+RETURN
+  An IPopulatedHolding
 */
 function parsePopulatedHoldingJSON(json: any): IPopulatedHolding {
 
@@ -230,12 +252,12 @@ function parsePopulatedHoldingJSON(json: any): IPopulatedHolding {
 // =========
 
 /*
-  DESC
-    Returns an IPopulatedPortfolio after parsing the input json
-  INPUT
-    json: A JSON representation of an IPopulatedPortfolio
-  RETURN
-    An IPopulatedPortfolio
+DESC
+  Returns an IPopulatedPortfolio after parsing the input json
+INPUT
+  json: A JSON representation of an IPopulatedPortfolio
+RETURN
+  An IPopulatedPortfolio
 */
 function parsePopulatedPortfolioJSON(json: any): IPopulatedPortfolio {
 
@@ -261,12 +283,12 @@ function parsePopulatedPortfolioJSON(json: any): IPopulatedPortfolio {
 // =====
 
 /*
-  DESC
-    Returns an IDatedPriceData after parsing the input json
-  INPUT
-    json: A JSON representation of an IDatedPriceData
-  RETURN
-    An IDatedPriceData
+DESC
+  Returns an IDatedPriceData after parsing the input json
+INPUT
+  json: A JSON representation of an IDatedPriceData
+RETURN
+  An IDatedPriceData
 */
 function parseDatedPriceDataJSON(json: any): IDatedPriceData {
 
@@ -289,12 +311,12 @@ function parseDatedPriceDataJSON(json: any): IDatedPriceData {
 // =======
 
 /*
-  DESC
-    Returns an IProduct after parsing the input json
-  INPUT
-    json: A JSON representation of an IProduct
-  RETURN
-    An IProduct
+DESC
+  Returns an IProduct after parsing the input json
+INPUT
+  json: A JSON representation of an IProduct
+RETURN
+  An IProduct
 */
 function parseProductJSON(json: any): IProduct {
 
@@ -311,17 +333,44 @@ function parseProductJSON(json: any): IProduct {
 }
 
 
+// =========
+// tcproduct
+// =========
+
+/*
+DESC
+  Returns an ITCProduct after parsing the input json
+INPUT
+  json: A JSON representation of an ITCProduct
+RETURN
+  An ITCProduct
+*/
+function parseTCProductJSON(json: any): ITCProduct {
+
+  // verify keys exist
+  assert(hasITCProductKeys(json), 'JSON is not ITCProduct shaped')
+
+  // parse json
+  const obj = {
+    ...json,
+    releaseDate: getLocalDateFromISOString(json.releaseDate)
+  }
+  assert(isITCProduct(obj), 'Object is not an ITCProduct')
+  return obj
+}
+
+
 // ===========
 // transaction
 // ===========
 
 /*
-  DESC
-    Returns an ITransaction after parsing the input json
-  INPUT
-    json: A JSON representation of an ITransaction
-  RETURN
-    An ITransaction
+DESC
+  Returns an ITransaction after parsing the input json
+INPUT
+  json: A JSON representation of an ITransaction
+RETURN
+  An ITransaction
 */
 function parseTransactionJSON(json: any): ITransaction {
 
