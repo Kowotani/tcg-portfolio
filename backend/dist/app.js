@@ -17,6 +17,7 @@ const express_1 = __importDefault(require("express"));
 const Portfolio_1 = require("./mongo/dbi/Portfolio");
 const Product_1 = require("./mongo/dbi/Product");
 const Price_1 = require("./mongo/dbi/Price");
+const TCProduct_1 = require("./mongo/dbi/TCProduct");
 const multer_1 = __importDefault(require("multer"));
 const scrapeManager_1 = require("./scraper/scrapeManager");
 const Holding_1 = require("./utils/Holding");
@@ -679,6 +680,44 @@ app.get(common_1.PRODUCTS_URL, (req, res) => __awaiter(void 0, void 0, void 0, f
         res.send(body);
     }
 }));
+// =========
+// tcproduct
+// =========
+/*
+DESC
+  Handle GET request for unvalidated TCProduct documents
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The TCProduct documents were returned successfully
+    500: An error occurred
+*/
+app.get(common_1.UNVALIDATED_TCPRODUCTS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // query TCProducts
+        const params = { status: common_1.ParsingStatus.Validated };
+        const data = yield (0, TCProduct_1.getTCProductDocs)(params);
+        // return TCProducts
+        res.status(200);
+        const body = {
+            data: data,
+            message: common_1.GetUnvalidatedTCProductsStatus.Success
+        };
+        res.send(body);
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: `${common_1.GetUnvalidatedTCProductsStatus.Error}: ${err}`
+        };
+        res.send(body);
+    }
+}));
+// ======
+// server
+// ======
 app.listen(port, () => {
     console.log(`Started server at http://localhost:${port}`);
 });

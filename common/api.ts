@@ -124,6 +124,17 @@ export enum GetProductsStatus {
   Error = 'Error retrieving Products',
 }
 
+// -- tcproduct
+
+/*
+  Endpoint:   UNVALIDATED_TCPRODUCTS_URL
+  Type:       GET
+*/
+export enum GetUnvalidatedTCProductsStatus {
+  Success = 'Successfully retrieved unvalidated TCProducts',
+  Error = 'Error retrieving unvalidated TCProducts',
+}
+
 
 // ======
 // routes
@@ -141,11 +152,13 @@ export const PRODUCT_URL = '/product'
 export const PRODUCT_PERFORMANCE_URL = '/product/performance'
 export const PRODUCTS_URL = '/products'
 
-// -- prices
+// -- price
 export const LATEST_PRICE_URL = '/price/latest'
 export const LATEST_PRICES_URL = '/prices/latest'
 export const PRICE_URL = '/price'
 
+// -- tcproduct
+export const UNVALIDATED_TCPRODUCTS_URL = '/tcproducts/unvalidated'
 
 
 // =====

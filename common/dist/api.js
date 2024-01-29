@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.PRICE_URL = exports.LATEST_PRICES_URL = exports.LATEST_PRICE_URL = exports.PRODUCTS_URL = exports.PRODUCT_PERFORMANCE_URL = exports.PRODUCT_URL = exports.PORTFOLIOS_URL = exports.PORTFOLIO_HOLDINGS_PERFORMANCE_URL = exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL = exports.GetProductsStatus = exports.GetProductPerformanceStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PostLatestPriceStatus = exports.GetPortfoliosStatus = exports.GetPortfolioPerformanceStatus = exports.GetPortfolioHoldingsPerformanceStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
+exports.UNVALIDATED_TCPRODUCTS_URL = exports.PRICE_URL = exports.LATEST_PRICES_URL = exports.LATEST_PRICE_URL = exports.PRODUCTS_URL = exports.PRODUCT_PERFORMANCE_URL = exports.PRODUCT_URL = exports.PORTFOLIOS_URL = exports.PORTFOLIO_HOLDINGS_PERFORMANCE_URL = exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL = exports.GetUnvalidatedTCProductsStatus = exports.GetProductsStatus = exports.GetProductPerformanceStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PostLatestPriceStatus = exports.GetPortfoliosStatus = exports.GetPortfolioPerformanceStatus = exports.GetPortfolioHoldingsPerformanceStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
 // =====
 // enums
 // =====
@@ -118,6 +118,16 @@ var GetProductsStatus;
     GetProductsStatus["Success"] = "Successfully retrieved Products";
     GetProductsStatus["Error"] = "Error retrieving Products";
 })(GetProductsStatus = exports.GetProductsStatus || (exports.GetProductsStatus = {}));
+// -- tcproduct
+/*
+  Endpoint:   UNVALIDATED_TCPRODUCTS_URL
+  Type:       GET
+*/
+var GetUnvalidatedTCProductsStatus;
+(function (GetUnvalidatedTCProductsStatus) {
+    GetUnvalidatedTCProductsStatus["Success"] = "Successfully retrieved unvalidated TCProducts";
+    GetUnvalidatedTCProductsStatus["Error"] = "Error retrieving unvalidated TCProducts";
+})(GetUnvalidatedTCProductsStatus = exports.GetUnvalidatedTCProductsStatus || (exports.GetUnvalidatedTCProductsStatus = {}));
 // ======
 // routes
 // ======
@@ -130,7 +140,9 @@ exports.PORTFOLIOS_URL = '/portfolios';
 exports.PRODUCT_URL = '/product';
 exports.PRODUCT_PERFORMANCE_URL = '/product/performance';
 exports.PRODUCTS_URL = '/products';
-// -- prices
+// -- price
 exports.LATEST_PRICE_URL = '/price/latest';
 exports.LATEST_PRICES_URL = '/prices/latest';
 exports.PRICE_URL = '/price';
+// -- tcproduct
+exports.UNVALIDATED_TCPRODUCTS_URL = '/tcproducts/unvalidated';

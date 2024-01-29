@@ -50,6 +50,10 @@ export declare enum GetProductsStatus {
     Success = "Successfully retrieved Products",
     Error = "Error retrieving Products"
 }
+export declare enum GetUnvalidatedTCProductsStatus {
+    Success = "Successfully retrieved unvalidated TCProducts",
+    Error = "Error retrieving unvalidated TCProducts"
+}
 export declare const PORTFOLIO_URL = "/portfolio";
 export declare const PORTFOLIO_PERFORMANCE_URL: string;
 export declare const PORTFOLIO_HOLDINGS_PERFORMANCE_URL: string;
@@ -60,6 +64,7 @@ export declare const PRODUCTS_URL = "/products";
 export declare const LATEST_PRICE_URL = "/price/latest";
 export declare const LATEST_PRICES_URL = "/prices/latest";
 export declare const PRICE_URL = "/price";
+export declare const UNVALIDATED_TCPRODUCTS_URL = "/tcproducts/unvalidated";
 export declare type TResBody = {
     message: string;
 };

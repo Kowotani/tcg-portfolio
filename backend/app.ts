@@ -1,7 +1,7 @@
 import {
   // data models 
   IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
-  IPrice, IPriceData, IProduct, TDatedValue, 
+  IPrice, IPriceData, IProduct, ITCProduct, ParsingStatus, TDatedValue, 
   THoldingPerformanceData, TPerformanceData,
   
   PerformanceMetric, TimeseriesGranularity,
@@ -10,8 +10,8 @@ import {
   DeletePortfolioStatus, GetPortfolioHoldingsPerformanceStatus, 
   GetPortfolioPerformanceStatus, GetPortfoliosStatus, 
   GetPricesStatus, GetProductPerformanceStatus, GetProductsStatus, 
-  PostLatestPriceStatus, PostPortfolioStatus, PostPriceStatus, 
-  PostProductStatus, PutPortfolioStatus,
+  GetUnvalidatedTCProductsStatus, PostLatestPriceStatus, PostPortfolioStatus, 
+  PostPriceStatus, PostProductStatus, PutPortfolioStatus,
   
   // request / response data models
   TDataResBody, TDeletePortfolioReqBody, TGetPortfolioHoldingsPerformanceResBody,
@@ -22,7 +22,7 @@ import {
   // endpoint URLs
   LATEST_PRICES_URL, PORTFOLIO_URL, PORTFOLIO_HOLDINGS_PERFORMANCE_URL, 
   PORTFOLIO_PERFORMANCE_URL, PORTFOLIOS_URL, PRICE_URL, PRODUCT_URL, 
-  PRODUCT_PERFORMANCE_URL, PRODUCTS_URL, 
+  PRODUCT_PERFORMANCE_URL, PRODUCTS_URL, UNVALIDATED_TCPRODUCTS_URL,
 
   // model helpers
   getPortfolioHoldings, getHoldingTcgplayerId,
@@ -37,6 +37,7 @@ import {
   getProductDoc, getProductDocs, insertProducts 
 } from './mongo/dbi/Product'
 import { getLatestPrices, insertPrices } from './mongo/dbi/Price'
+import { getTCProductDocs } from './mongo/dbi/TCProduct'
 import multer from 'multer'
 import { loadCurrentPrice } from './scraper/scrapeManager'
 import { 
@@ -795,6 +796,51 @@ app.get(PRODUCTS_URL, async (req: any, res: any) => {
   }
 })
 
+
+// =========
+// tcproduct
+// =========
+
+/*
+DESC
+  Handle GET request for unvalidated TCProduct documents
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The TCProduct documents were returned successfully
+    500: An error occurred
+*/
+app.get(UNVALIDATED_TCPRODUCTS_URL, async (req: any, res: any) => {
+
+  try {
+
+    // query TCProducts
+    const params = { status: ParsingStatus.ToBeValidated }
+    const data = await getTCProductDocs(params)
+
+    // return TCProducts
+    res.status(200)
+    const body: TDataResBody<ITCProduct[]> = {
+      data: data,
+      message: GetUnvalidatedTCProductsStatus.Success
+    }
+    res.send(body)
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: `${GetUnvalidatedTCProductsStatus.Error}: ${err}`
+    }
+    res.send(body)
+  }
+})
+
+
+// ======
+// server
+// ======
 
 app.listen(port, () => {
   console.log(`Started server at http://localhost:${port}`)
