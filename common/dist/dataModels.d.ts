@@ -50,6 +50,7 @@ export declare enum TCG {
     Sorcery = "Sorcery"
 }
 export declare enum ParsingStatus {
+    Ignored = "Ignored",
     ToBeValidated = "To be Validated",
     Validated = "Validated"
 }

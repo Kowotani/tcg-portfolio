@@ -73,6 +73,7 @@ var TCG;
 // TCGCSV parsing status
 var ParsingStatus;
 (function (ParsingStatus) {
+    ParsingStatus["Ignored"] = "Ignored";
     ParsingStatus["ToBeValidated"] = "To be Validated";
     ParsingStatus["Validated"] = "Validated";
 })(ParsingStatus = exports.ParsingStatus || (exports.ParsingStatus = {}));

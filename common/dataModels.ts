@@ -71,6 +71,7 @@ export enum TCG {
 
 // TCGCSV parsing status
 export enum ParsingStatus {
+  Ignored = 'Ignored',
   ToBeValidated = 'To be Validated',
   Validated = 'Validated'
 }
