@@ -274,19 +274,10 @@ export interface ITCGroup {
 
 // Product (to be validated)
 
-export interface ITCProduct {
-  tcgplayerId: number,
+export interface ITCProduct extends IProduct {
   groupId: number,
   categoryId: number,
-  tcg: TCG,
-  releaseDate: Date,
-  name: string,
-  type: ProductType,
-  language: ProductLanguage,
   status: ParsingStatus,
-  msrp?: number,
-  subtype?: ProductSubtype,
-  setCode?: string
 }
 
 // -- User
