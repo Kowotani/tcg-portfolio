@@ -115,12 +115,14 @@ export const TCProductCatalogue = (props: TTCProductCatalogueProps) => {
       url: UNVALIDATED_TCPRODUCTS_URL
     })
     .then(res => {
-      // set allProducts
+      // initialize all product states
       const data = res.data.data
       const products = parseUnvalidatedTCProductsEndpointResponse(data)
         .sort(sortFnProductSearchResults)
       setAllProducts(products)
       setFilteredProducts(products)
+      setPaginatedProducts(_.slice(
+        products, 0, Math.min(DEFAULT_NUM_ITEMS_PER_PAGE, products.length)))
     })
     .catch(err => {
       console.log('Error fetching unvalidated TCProducts: ' + err)
