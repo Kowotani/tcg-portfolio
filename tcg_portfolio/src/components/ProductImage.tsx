@@ -5,7 +5,8 @@ import {
   LinkBox,
   LinkOverlay,
 } from '@chakra-ui/react'
-import { IProduct, ProductSubtype, ProductType } from 'common'
+import { IProduct } from 'common'
+import { getProductImageUrl } from '../utils/generic'
 
 
 // =============
@@ -40,17 +41,11 @@ type TProductImageProps = BoxProps & {
 export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
 
 
-  // ===============
-  // image variables
-  // ===============
-  
-  const tcgplayerId = props.product.tcgplayerId
-  const isSecretLairNonCommanderDeck = 
-    props.product.type === ProductType.SecretLair
-    && !(props.product.subtype === ProductSubtype.CommanderDeck)
-  const imageUrl = isSecretLairNonCommanderDeck
-    ? `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_1_200w.jpg`
-    : `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_200w.jpg`
+  // =========
+  // constants
+  // =========
+
+  const IMG_SIZE = 200
 
 
   // =============
@@ -65,7 +60,8 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
         boxSize={props.boxSize}
         fallbackStrategy='onError'
         fit='contain'
-        src={imageUrl}
+        src={getProductImageUrl(props.product.tcgplayerId, props.product.type, 
+          IMG_SIZE, props.product.subtype)}
       />
     )
   }
@@ -79,7 +75,7 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
     <>
       {props.externalUrl
         ? (
-          <UrlWrapper tcgplayerId={tcgplayerId}>
+          <UrlWrapper tcgplayerId={props.product.tcgplayerId}>
             <ProductImage />  
           </UrlWrapper>
         ) : <ProductImage />

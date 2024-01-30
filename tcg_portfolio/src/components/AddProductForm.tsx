@@ -30,7 +30,7 @@ import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { SideBarNavContext } from '../state/SideBarNavContext'
 import { TCProductCatalogue } from './TCProductCatalogue'
-import { isHttpUrl } from '../utils/generic'
+import { getProductImageUrl, isHttpUrl } from '../utils/generic'
 import { ISideBarNavContext, SideBarNav } from '../utils/SideBar'
 
 
@@ -339,12 +339,8 @@ export const AddProductForm = () => {
   function setFormDataFromProduct(product: IProduct): void {
 
     // image URL
-    const isSecretLairNonCommanderDeck = 
-      product.type === ProductType.SecretLair
-      && !(product.subtype === ProductSubtype.CommanderDeck)
-    const imageUrl = isSecretLairNonCommanderDeck
-      ? `https://tcgplayer-cdn.tcgplayer.com/product/${product.tcgplayerId}_1_200w.jpg`
-      : `https://tcgplayer-cdn.tcgplayer.com/product/${product.tcgplayerId}_200w.jpg`
+    const imageUrl = getProductImageUrl(product.tcgplayerId, product.type, 
+      200, product.subtype)
 
     // ProductType
     const typeState = genValidStringValuesState<ProductType>(

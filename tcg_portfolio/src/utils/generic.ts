@@ -1,3 +1,4 @@
+import { ProductType, ProductSubtype } from 'common'
 import * as _ from 'lodash'
 import numeral from 'numeral'
 
@@ -119,6 +120,36 @@ export function getColorForText(
 
 /*
 DESC
+  Return the TCGPlayer Image URL for the input tcgplayerId / ProductType / 
+  Subtype with the (optional) input size
+INPUT
+  tcgplayerId: The Product tcgplayerId
+  type: A ProductType enum
+  size?: The desired size in pixels
+  subtype?: A ProductSubtype enum
+RETURN
+  The image URL for the Product
+*/
+export function getProductImageUrl(
+  tcgplayerId: number,
+  type: ProductType,
+  size?: number,
+  subtype?: ProductSubtype
+): string {
+
+  const urlPrefix = 'https://tcgplayer-cdn.tcgplayer.com/product'
+  const urlSuffix = size ? `${size}w.jpg` : '200w.jpg'
+
+  const isSecretLairNonCommanderDeck = type === ProductType.SecretLair 
+    && !(subtype === ProductSubtype.CommanderDeck)
+
+  return isSecretLairNonCommanderDeck
+    ? `${urlPrefix}/${tcgplayerId}_1_${urlSuffix}`
+    : `${urlPrefix}/${tcgplayerId}_${urlSuffix}`
+}
+
+/*
+DESC
   Check if the input is a valid HTTP URL
 INPUT
   input: a string that may be a URL
@@ -133,10 +164,10 @@ export function isHttpUrl(input: string): boolean {
   try {
     url = new URL(input)
   } catch (_) {
-    return false; 
+    return false
   }
   
-  return url.protocol === "http:" || url.protocol === "https:"
+  return url.protocol === 'http:' || url.protocol === 'https:'
 }
 
 
