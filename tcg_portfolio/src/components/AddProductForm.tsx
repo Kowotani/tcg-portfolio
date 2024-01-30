@@ -22,12 +22,14 @@ import {
   LATEST_PRICE_URL, PRICE_URL, PRODUCT_URL,
 
   // generic
-  assert, getProductSubtypes, isASCII
+  assert, formatAsISO, getProductSubtypes, isASCII
 } from 'common'
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField'
+import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { SideBarNavContext } from '../state/SideBarNavContext'
+import { TCProductCatalogue } from './TCProductCatalogue'
 import { isHttpUrl } from '../utils/generic'
 import { ISideBarNavContext, SideBarNav } from '../utils/SideBar'
 
@@ -322,6 +324,55 @@ export const AddProductForm = () => {
       ...formData,
       tcgplayerId: genTcgPlayerIdState(value)
     })
+  }
+
+  // -------------
+  // form populate
+  // -------------
+
+  /*
+  DESC
+    Sets the form data to match that of the input IProduct
+  INPUT
+    product: The IProduct whose data will be set in the form
+  */
+  function setFormDataFromProduct(product: IProduct): void {
+
+    // image URL
+    const isSecretLairNonCommanderDeck = 
+      product.type === ProductType.SecretLair
+      && !(product.subtype === ProductSubtype.CommanderDeck)
+    const imageUrl = isSecretLairNonCommanderDeck
+      ? `https://tcgplayer-cdn.tcgplayer.com/product/${product.tcgplayerId}_1_200w.jpg`
+      : `https://tcgplayer-cdn.tcgplayer.com/product/${product.tcgplayerId}_200w.jpg`
+
+    // ProductType
+    const typeState = genValidStringValuesState<ProductType>(
+      product.type, TCGToProductType[product.tcg])
+
+    // ProductSubtype
+    const subtypeState = product.subtype
+      ? genValidStringValuesState<ProductSubtype>(
+          product.subtype, getProductSubtypes(product.tcg, product.type))
+      : genEmptyStringValuesState<ProductSubtype>()
+
+    // Set Code
+    const setCodeState = product.setCode 
+      ? genValidState<string>(product.setCode)
+      : genEmptyState<string>()
+
+    setFormData({
+      imageUrl: genValidState<string>(imageUrl),
+      language: genValidState<ProductLanguage>(ProductLanguage.English),
+      msrp: genValidState<number>(product.msrp),
+      name: genValidState<string>(product.name),
+      releaseDate: genValidState<Date>(product.releaseDate),
+      setCode: setCodeState,
+      subtype: subtypeState,
+      tcg: genValidState<TCG>(product.tcg),
+      tcgplayerId: genValidState<number>(product.tcgplayerId),
+      type: typeState
+    })   
   }
 
   // -----------
@@ -661,227 +712,246 @@ export const AddProductForm = () => {
   // ==============
 
   return (
-    <Formik
-      initialValues={{}}
-      onSubmit={handleFormOnSubmit}
-    >
-      <Form>
-        <VStack 
-          align-items='stretch'
-          display='flex'
-          flex-direction='column'
-          spacing={8}
-          paddingBottom={8}
-        >
-          {/* TCGPlayer ID */}
-          <InputErrorWrapper 
-            leftLabel='TCGPlayer ID'
-            errorMessage={formData.tcgplayerId.errorMessage}
-            isErrorDisplayed={formData.tcgplayerId.isInvalid && isAddProductForm}
+
+    <>
+      {/* TC Products */}
+      <SectionHeader header='Products to Validate' />
+      
+      <TCProductCatalogue onProductCardClick={setFormDataFromProduct}/>
+
+      {/* Add Product */}
+      <SectionHeader header='Add Product' />
+
+      <Formik
+        initialValues={{}}
+        onSubmit={handleFormOnSubmit}
+      >
+        <Form>
+          <VStack 
+            align-items='stretch'
+            display='flex'
+            flex-direction='column'
+            spacing={8}
+            paddingBottom={8}
           >
-            <NumberInput
-              isInvalid={formData.tcgplayerId.isInvalid}
-              isRequired={true} 
-              min={1}
-              precision={0}
-              onBlur={e => handleTcgPlayerIdOnChange(e.target.value)}
-              width='100%'
+            {/* TCGPlayer ID */}
+            <InputErrorWrapper 
+              leftLabel='TCGPlayer ID'
+              errorMessage={formData.tcgplayerId.errorMessage}
+              isErrorDisplayed={formData.tcgplayerId.isInvalid && isAddProductForm}
             >
-              <NumberInputField />
-            </NumberInput>
-          </InputErrorWrapper>
+              <NumberInput
+                value={formData.tcgplayerId.value}
+                isInvalid={formData.tcgplayerId.isInvalid}
+                isRequired={true} 
+                min={1}
+                precision={0}
+                onChange={valueAsString => handleTcgPlayerIdOnChange(valueAsString)}
+                width='100%'
+              >
+                <NumberInputField />
+              </NumberInput>
+            </InputErrorWrapper>
 
-          {/* Name */}
-          <InputErrorWrapper 
-            leftLabel='Name'
-            errorMessage={formData.name.errorMessage}
-            isErrorDisplayed={formData.name.isInvalid && isAddProductForm}          
-          >
-            <Input 
-              isInvalid={formData.name.isInvalid}
-              isRequired={true}
-              placeholder='Kaladesh'
-              onBlur={e => handleNameOnChange(e.target.value)}
-            />
-          </InputErrorWrapper>
-
-          {/* TCG */}
-          <InputErrorWrapper 
-            leftLabel='TCG'
-            errorMessage={formData.tcg.errorMessage}
-            isErrorDisplayed={formData.tcg.isInvalid && isAddProductForm}
-          >
-            <Select
-              value={formData.tcg.value}
-              isInvalid={formData.tcg.isInvalid}
-              isRequired={true} 
-              placeholder={TCG_SELECT_DEFAULT}
-              onChange={e => handleTcgOnChange(e.target.value)}
-            >      
-              {Object.values(TCG).map(value => {
-                return (
-                  <option key={value} value={value}>{value}</option>
-                )
-              })}
-            </Select>        
-          </InputErrorWrapper>
-
-          {/* Product Type */}
-          <InputErrorWrapper 
-            leftLabel='Type'
-          >
-            <Select
-              value={formData.type.value}
-              isDisabled={formData.type.value === undefined}
-              isRequired={true} 
-              placeholder={formData.type.value === undefined 
-                ? PRODUCT_TYPE_PLACEHOLDER
-                : undefined}
-              onChange={e => handleProductTypeOnChange(e.target.value)}
-            >      
-              {formData.type.stringValues.map(value => {
-                return (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                )
-              })}
-            </Select>        
-          </InputErrorWrapper>
-
-          {/* Product Subtype */}
-          <InputErrorWrapper 
-            leftLabel='Subtype'
-          >
-            <Select
-              value={formData.subtype.value}
-              isDisabled={formData.subtype.value === undefined}
-              placeholder={formData.subtype.value === undefined
-                ? formData.type.value === undefined 
-                  ? PRODUCT_SUBTYPE_DEFAULT_PLACEHOLDER
-                  : PRODUCT_SUBTYPE_EMPTY_PLACEHOLDER
-                : undefined}
-                onChange={e => handleProductSubtypeOnChange(e.target.value)}              
-            >      
-              {formData.subtype.stringValues.map(value => {
-                return (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                )
-              })}
-            </Select>        
-          </InputErrorWrapper>
-
-          {/* Release Date */}
-          <InputErrorWrapper 
-            leftLabel='Release Date'
-            errorMessage={formData.releaseDate.errorMessage}
-            isErrorDisplayed={formData.releaseDate.isInvalid && isAddProductForm}
-          >
-            <Input
-              type='date'
-              isInvalid={formData.releaseDate.isInvalid}
-              isRequired={true} 
-              onBlur={e => handleReleaseDateOnChange(e.target.value)}
-            />       
-          </InputErrorWrapper>
-
-          {/* Set Code */}
-          <InputErrorWrapper 
-            leftLabel='Set Code'
-            errorMessage={formData.setCode.errorMessage}
-            isErrorDisplayed={formData.setCode.isInvalid && isAddProductForm}
-          >
-            <Input 
-              isInvalid={formData.setCode.isInvalid}
-              onBlur={e => handleSetCodeOnChange(e.target.value)}
-            />
-          </InputErrorWrapper>
-
-          {/* Product Language */}
-          <InputErrorWrapper 
-            leftLabel='Language'
-          >
-            <Select 
-              value={formData.language.value}
-              onChange={e => setFormData({
-                ...formData,
-                language: genValidState<ProductLanguage>(
-                  e.target.value as ProductLanguage)
-              })}
-            >      
-              {Object.values(ProductLanguage).map(value => {
-                return (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                )
-              })}
-            </Select>        
-          </InputErrorWrapper>
-
-          {/* MSRP */}
-          <InputErrorWrapper 
-            leftLabel='MSRP'
-            errorMessage={formData.msrp.errorMessage}
-            isErrorDisplayed={formData.msrp.isInvalid && isAddProductForm}
-          >
-            <NumberInput
-              isInvalid={formData.msrp.isInvalid}
-              min={1}
-              precision={2}
-              width='100%'
-              onBlur={e => handleMsrpOnChange(e.target.value)}
+            {/* Name */}
+            <InputErrorWrapper 
+              leftLabel='Name'
+              errorMessage={formData.name.errorMessage}
+              isErrorDisplayed={formData.name.isInvalid && isAddProductForm}          
             >
-              <NumberInputField />
-            </NumberInput>
-          </InputErrorWrapper>
-
-          {/* Image URL */}
-          <InputErrorWrapper 
-            leftLabel='Image URL'
-            errorMessage={formData.imageUrl.errorMessage}
-            isErrorDisplayed={formData.imageUrl.isInvalid && isAddProductForm}
-          >
-            <Input
-              placeholder={IMAGE_URL_PLACEHOLDER}
-              isInvalid={formData.imageUrl.isInvalid}
-              onBlur={e => handleImageUrlOnChange(e.target.value)}
-            />
-          </InputErrorWrapper>
-
-          {/* Image */}
-          {formData.imageUrl.value && !formData.imageUrl.isInvalid
-            ? (
-              <Image 
-                boxSize='200px'
-                src={formData.imageUrl.value}
+              <Input 
+                value={formData.name.value}
+                isInvalid={formData.name.isInvalid}
+                isRequired={true}
+                placeholder='Kaladesh'
+                onChange={e => handleNameOnChange(e.target.value)}
               />
-            ) : undefined
-          }
+            </InputErrorWrapper>
 
-        </VStack>
-        
-        <VStack spacing={4}>
-          <Button
-            colorScheme='teal'
-            type='submit'
-            isDisabled={!isFormSubmitEnabled()}
-          >
-            Submit
-          </Button>
-          <Button
-            colorScheme='purple'
-            onClick={() => handleLoadLatestPriceOnClick(
-              Number(formData.tcgplayerId.value))}
-            isDisabled={formData.tcgplayerId.isInvalid ?? true}
-            isLoading={isLoadingLatestPrice}
-          >
-            Load Latest Price
-          </Button>        
-        </VStack>
-      </Form>
-    </Formik>
+            {/* TCG */}
+            <InputErrorWrapper 
+              leftLabel='TCG'
+              errorMessage={formData.tcg.errorMessage}
+              isErrorDisplayed={formData.tcg.isInvalid && isAddProductForm}
+            >
+              <Select
+                value={formData.tcg.value}
+                isInvalid={formData.tcg.isInvalid}
+                isRequired={true} 
+                placeholder={TCG_SELECT_DEFAULT}
+                onChange={e => handleTcgOnChange(e.target.value)}
+              >      
+                {Object.values(TCG).map(value => {
+                  return (
+                    <option key={value} value={value}>{value}</option>
+                  )
+                })}
+              </Select>        
+            </InputErrorWrapper>
+
+            {/* Product Type */}
+            <InputErrorWrapper 
+              leftLabel='Type'
+            >
+              <Select
+                value={formData.type.value}
+                isDisabled={formData.type.value === undefined}
+                isRequired={true} 
+                placeholder={formData.type.value === undefined 
+                  ? PRODUCT_TYPE_PLACEHOLDER
+                  : undefined}
+                onChange={e => handleProductTypeOnChange(e.target.value)}
+              >      
+                {formData.type.stringValues.map(value => {
+                  return (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  )
+                })}
+              </Select>        
+            </InputErrorWrapper>
+
+            {/* Product Subtype */}
+            <InputErrorWrapper 
+              leftLabel='Subtype'
+            >
+              <Select
+                value={formData.subtype.value}
+                isDisabled={formData.subtype.value === undefined}
+                placeholder={formData.subtype.value === undefined
+                  ? formData.type.value === undefined 
+                    ? PRODUCT_SUBTYPE_DEFAULT_PLACEHOLDER
+                    : PRODUCT_SUBTYPE_EMPTY_PLACEHOLDER
+                  : undefined}
+                  onChange={e => handleProductSubtypeOnChange(e.target.value)}              
+              >      
+                {formData.subtype.stringValues.map(value => {
+                  return (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  )
+                })}
+              </Select>        
+            </InputErrorWrapper>
+
+            {/* Release Date */}
+            <InputErrorWrapper 
+              leftLabel='Release Date'
+              errorMessage={formData.releaseDate.errorMessage}
+              isErrorDisplayed={formData.releaseDate.isInvalid && isAddProductForm}
+            >
+              <Input
+                value={formData.releaseDate.value 
+                  ? formatAsISO(formData.releaseDate.value)
+                  : undefined}
+                type='date'
+                isInvalid={formData.releaseDate.isInvalid}
+                isRequired={true} 
+                onChange={e => handleReleaseDateOnChange(e.target.value)}
+              />       
+            </InputErrorWrapper>
+
+            {/* Set Code */}
+            <InputErrorWrapper 
+              leftLabel='Set Code'
+              errorMessage={formData.setCode.errorMessage}
+              isErrorDisplayed={formData.setCode.isInvalid && isAddProductForm}
+            >
+              <Input 
+                value={formData.setCode.value}
+                isInvalid={formData.setCode.isInvalid}
+                onChange={e => handleSetCodeOnChange(e.target.value)}
+              />
+            </InputErrorWrapper>
+
+            {/* Product Language */}
+            <InputErrorWrapper 
+              leftLabel='Language'
+            >
+              <Select 
+                value={formData.language.value}
+                onChange={e => setFormData({
+                  ...formData,
+                  language: genValidState<ProductLanguage>(
+                    e.target.value as ProductLanguage)
+                })}
+              >      
+                {Object.values(ProductLanguage).map(value => {
+                  return (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  )
+                })}
+              </Select>        
+            </InputErrorWrapper>
+
+            {/* MSRP */}
+            <InputErrorWrapper 
+              leftLabel='MSRP'
+              errorMessage={formData.msrp.errorMessage}
+              isErrorDisplayed={formData.msrp.isInvalid && isAddProductForm}
+            >
+              <NumberInput
+                value={formData.msrp.value}
+                isInvalid={formData.msrp.isInvalid}
+                min={1}
+                precision={2}
+                width='100%'
+                onChange={valueAsString => handleMsrpOnChange(valueAsString)}
+              >
+                <NumberInputField />
+              </NumberInput>
+            </InputErrorWrapper>
+
+            {/* Image URL */}
+            <InputErrorWrapper 
+              leftLabel='Image URL'
+              errorMessage={formData.imageUrl.errorMessage}
+              isErrorDisplayed={formData.imageUrl.isInvalid && isAddProductForm}
+            >
+              <Input
+                value={formData.imageUrl.value}
+                placeholder={IMAGE_URL_PLACEHOLDER}
+                isInvalid={formData.imageUrl.isInvalid}
+                onChange={e => handleImageUrlOnChange(e.target.value)}
+              />
+            </InputErrorWrapper>
+
+            {/* Image */}
+            {formData.imageUrl.value && !formData.imageUrl.isInvalid
+              ? (
+                <Image 
+                  boxSize='200px'
+                  src={formData.imageUrl.value}
+                />
+              ) : undefined
+            }
+
+          </VStack>
+          
+          <VStack spacing={4}>
+            <Button
+              colorScheme='teal'
+              type='submit'
+              isDisabled={!isFormSubmitEnabled()}
+            >
+              Submit
+            </Button>
+            <Button
+              colorScheme='purple'
+              onClick={() => handleLoadLatestPriceOnClick(
+                Number(formData.tcgplayerId.value))}
+              isDisabled={formData.tcgplayerId.isInvalid ?? true}
+              isLoading={isLoadingLatestPrice}
+            >
+              Load Latest Price
+            </Button>        
+          </VStack>
+        </Form>
+      </Formik>
+    </>
   )
 }
