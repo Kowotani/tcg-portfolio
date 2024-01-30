@@ -45,15 +45,12 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
   // ===============
   
   const tcgplayerId = props.product.tcgplayerId
-  const imageUrl = 
-    `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_200w.jpg`
-  const secretLairImageUrl = 
-    `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_1_200w.jpg`
-
-  // isSecretLair
   const isSecretLairNonCommanderDeck = 
     props.product.type === ProductType.SecretLair
     && !(props.product.subtype === ProductSubtype.CommanderDeck)
+  const imageUrl = isSecretLairNonCommanderDeck
+    ? `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_1_200w.jpg`
+    : `https://tcgplayer-cdn.tcgplayer.com/product/${tcgplayerId}_200w.jpg`
 
 
   // =============
@@ -68,7 +65,7 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
         boxSize={props.boxSize}
         fallbackStrategy='onError'
         fit='contain'
-        src={isSecretLairNonCommanderDeck ? secretLairImageUrl : imageUrl}
+        src={imageUrl}
       />
     )
   }
