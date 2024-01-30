@@ -261,24 +261,17 @@ export const AddProductForm = () => {
   
     // validate input value
     assert(Object.values(ProductType).includes(value as ProductType),
-      'Input value is not a ProductType')
+      'Input value is not a ProductType')  
     const type = value as ProductType
-    
-    // get types
+
+    // get TCG
     const tcg = formData.tcg.value
     assert(tcg, 'TCG is undefined')
-    const types = TCGToProductType[tcg]
-
-    // get subtypes
-    const subtypes = getProductSubtypes(tcg, type)
-    const defaultSubtype = _.head(subtypes)
 
     setFormData({
       ...formData,
-      type: genValidStringValuesState<ProductType>(type, types),
-      subtype: defaultSubtype
-        ? genValidStringValuesState<ProductSubtype>(defaultSubtype, subtypes)
-        : genEmptyStringValuesState<ProductSubtype>()
+      type: genProductTypeState(tcg),
+      subtype: genProductSubtypeState(tcg, type)
     })
   }
 
@@ -308,30 +301,18 @@ export const AddProductForm = () => {
     } else {
 
       const tcg = tcgState.value
-
       assert(tcg, 'TCG is undefined in valid TCG state')
 
       // get ProductTypes
       const types = TCGToProductType[tcg]
       const defaultType = _.head(types)
-
       assert(defaultType, 'defaultType is undefined in valid TCG state')
-      const typeState = genValidStringValuesState<ProductType>(
-        defaultType, types)
-
-      // get Subtypes
-      const subtypes = getProductSubtypes(tcg, defaultType)
-      const defaultSubtype = _.head(subtypes)
-      const subtypeState = defaultSubtype
-        ? genValidStringValuesState<ProductSubtype>(
-            defaultSubtype, subtypes as ProductSubtype[])
-        : genEmptyStringValuesState<ProductSubtype>()
 
       setFormData({
         ...formData,
         tcg: tcgState,
-        type: typeState,
-        subtype: subtypeState
+        type: genProductTypeState(tcg),
+        subtype: genProductSubtypeState(tcg, defaultType)
       })
     }
   }
@@ -347,6 +328,10 @@ export const AddProductForm = () => {
   // form submit
   // -----------
 
+  /*
+  DESC
+    Handles the form submission
+  */
   function handleFormOnSubmit(): void {
 
     // create POST body         
@@ -506,6 +491,30 @@ export const AddProductForm = () => {
       // valid
       : genValidState<string>(input)
     )
+  }
+
+  // ProductType state from TCG
+  function genProductTypeState(
+    tcg: TCG
+  ): IFormValueWithStringValuesState<ProductType> {
+    const types = TCGToProductType[tcg]
+    const defaultType = _.head(types)
+
+    assert(defaultType, `defaultType is undefined for valid TCG: ${tcg}`)
+    return genValidStringValuesState<ProductType>(defaultType, types)    
+  }
+
+  // ProductSubtype state from TCG, ProductType
+  function genProductSubtypeState(
+    tcg: TCG, 
+    type: ProductType
+  ): IFormValueWithStringValuesState<ProductSubtype> {
+    const subtypes = getProductSubtypes(tcg, type)
+    const defaultSubtype = _.head(subtypes)
+    
+    return defaultSubtype
+      ? genValidStringValuesState<ProductSubtype>(defaultSubtype, subtypes)
+      : genEmptyStringValuesState<ProductSubtype>()   
   }
 
   // validate Release Date
