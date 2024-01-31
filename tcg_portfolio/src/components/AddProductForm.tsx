@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 import axios from 'axios'
 import { 
   Button,
@@ -329,6 +329,17 @@ export const AddProductForm = () => {
   // -------------
   // form populate
   // -------------
+
+  /*
+  DESC
+    Handles the TCProduct card onClick event
+  INPUT
+    product: An IProduct[]
+  */
+  function handleTCProductCardOnClick(product: IProduct): void {
+    setFormDataFromProduct(product)
+    submitButtonRef.current?.scrollIntoView({behavior: 'smooth'})
+  }
 
   /*
   DESC
@@ -702,6 +713,8 @@ export const AddProductForm = () => {
   // Axios response toast
   const toast = useToast()
 
+  const submitButtonRef = useRef<HTMLButtonElement>(null)
+
 
   // ==============
   // main component
@@ -713,7 +726,7 @@ export const AddProductForm = () => {
       {/* TC Products */}
       <SectionHeader header='Products to Validate' />
       
-      <TCProductCatalogue onProductCardClick={setFormDataFromProduct}/>
+      <TCProductCatalogue onProductCardClick={handleTCProductCardOnClick}/>
 
       {/* Add Product */}
       <SectionHeader header='Add Product' />
@@ -931,6 +944,7 @@ export const AddProductForm = () => {
           <VStack spacing={4}>
             <Button
               colorScheme='teal'
+              ref={submitButtonRef}
               type='submit'
               isDisabled={!isFormSubmitEnabled()}
             >
