@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setTCProductProperty = exports.insertTCProducts = exports.getTCProductDocs = exports.getTCProductDoc = void 0;
+exports.setTCProductProperty = exports.setTCProduct = exports.insertTCProducts = exports.getTCProductDocs = exports.getTCProductDoc = void 0;
 const common_1 = require("common");
 const mongoose_1 = __importDefault(require("mongoose"));
 const tcproductSchema_1 = require("../models/tcproductSchema");
@@ -97,6 +97,35 @@ function insertTCProducts(docs) {
 exports.insertTCProducts = insertTCProducts;
 /*
 DESC
+  Sets an existing TCProduct to be equal to a new TCProduct
+INPUT
+  existingTCProduct: The TCProduct to update
+  newTCProduct: The new state of the TCProduct
+RETURN
+  TRUE if the TCProduct was successfully set, FALSE otherwise
+*/
+function setTCProduct(existingTCProduct, newTCProduct) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect to db
+        yield mongoose_1.default.connect(url);
+        try {
+            // check if TCProduct exists
+            const productDoc = yield getTCProductDoc(existingTCProduct.tcgplayerId);
+            (0, common_1.assert)((0, common_1.isITCProduct)(productDoc), (0, Product_1.genProductNotFoundError)('setTCProduct()', existingTCProduct.tcgplayerId).toString());
+            // overwrite TCProduct
+            productDoc.overwrite(newTCProduct);
+            yield productDoc.save();
+            return true;
+        }
+        catch (err) {
+            const errMsg = `An error occurred in setTCProduct(): ${err}`;
+            throw new Error(errMsg);
+        }
+    });
+}
+exports.setTCProduct = setTCProduct;
+/*
+DESC
   Sets a property on a TCProduct document to the input value using the
   tcgplayerId to find the TCProduct
 INPUT
@@ -113,9 +142,6 @@ function setTCProductProperty(tcgplayerId, key, value) {
         try {
             // check if TCProduct exists
             const productDoc = yield getTCProductDoc(tcgplayerId);
-            if (!(0, common_1.isITCProduct)(productDoc)) {
-                throw (0, Product_1.genProductNotFoundError)('setTCProductProperty()', tcgplayerId);
-            }
             (0, common_1.assert)((0, common_1.isITCProduct)(productDoc), (0, Product_1.genProductNotFoundError)('setTCProductProperty()', tcgplayerId).toString());
             // update TCProduct
             productDoc.set(key, value);

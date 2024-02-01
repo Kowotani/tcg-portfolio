@@ -122,6 +122,45 @@ export async function insertTCProducts(docs: ITCProduct[]): Promise<number> {
 
 /*
 DESC
+  Sets an existing TCProduct to be equal to a new TCProduct
+INPUT 
+  existingTCProduct: The TCProduct to update
+  newTCProduct: The new state of the TCProduct
+RETURN
+  TRUE if the TCProduct was successfully set, FALSE otherwise
+*/
+export async function setTCProduct(
+  existingTCProduct: ITCProduct,
+  newTCProduct: ITCProduct
+): Promise<boolean> {
+  
+  // connect to db
+  await mongoose.connect(url)
+
+  try {
+
+    // check if TCProduct exists
+    const productDoc = await getTCProductDoc(existingTCProduct.tcgplayerId)
+    assert(
+      isITCProduct(productDoc),
+      genProductNotFoundError('setTCProduct()', 
+        existingTCProduct.tcgplayerId).toString()
+    )
+
+    // overwrite TCProduct
+    productDoc.overwrite(newTCProduct)
+    await productDoc.save()
+    return true
+
+  } catch(err) {
+
+    const errMsg = `An error occurred in setTCProduct(): ${err}`
+    throw new Error(errMsg)
+  }
+}
+
+/*
+DESC
   Sets a property on a TCProduct document to the input value using the
   tcgplayerId to find the TCProduct
 INPUT 
@@ -144,9 +183,6 @@ export async function setTCProductProperty(
 
     // check if TCProduct exists
     const productDoc = await getTCProductDoc(tcgplayerId)
-    if (!isITCProduct(productDoc)) {
-      throw genProductNotFoundError('setTCProductProperty()', tcgplayerId)
-    }
     assert(
       isITCProduct(productDoc),
       genProductNotFoundError('setTCProductProperty()', tcgplayerId).toString()
