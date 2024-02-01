@@ -1,5 +1,5 @@
 import { 
-  IPortfolio, IProduct, THoldingPerformanceData, TPerformanceData 
+  IPortfolio, IProduct, ITCProduct, THoldingPerformanceData, TPerformanceData 
 } from './dataModels'
 
 
@@ -135,6 +135,15 @@ export enum GetUnvalidatedTCProductsStatus {
   Error = 'Error retrieving unvalidated TCProducts',
 }
 
+/*
+  Endpoint:   TCPRODUCT_URL
+  Type:       POST
+*/
+export enum PutTCProductStatus {
+  Success = 'Successfully updated TCProduct',
+  Error = 'Error updating TCProduct',
+}
+
 
 // ======
 // routes
@@ -158,6 +167,7 @@ export const LATEST_PRICES_URL = '/prices/latest'
 export const PRICE_URL = '/price'
 
 // -- tcproduct
+export const TCPRODUCT_URL = '/tcproduct'
 export const UNVALIDATED_TCPRODUCTS_URL = '/tcproducts/unvalidated'
 
 
@@ -296,4 +306,16 @@ export type TPostProductReqBody = {
 */
 export type TGetProductPerformanceReqBody = {
   tcgplayerId: number
+}
+
+// -- tcproduct
+
+/*
+  Endpoint:   TCPRODUCT_URL
+  Type:       PUT
+  Req / Res:  Request
+*/
+export type TPutTCProductReqBody = {
+  tcgplayerId: number,
+  newTCProduct: ITCProduct
 }

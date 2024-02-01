@@ -1,4 +1,4 @@
-import { IPortfolio, IProduct, THoldingPerformanceData, TPerformanceData } from './dataModels';
+import { IPortfolio, IProduct, ITCProduct, THoldingPerformanceData, TPerformanceData } from './dataModels';
 export declare enum DeletePortfolioStatus {
     Success = "Successfully deleted Portfolio",
     DoesNotExist = "Portfolio does not exist",
@@ -54,6 +54,10 @@ export declare enum GetUnvalidatedTCProductsStatus {
     Success = "Successfully retrieved unvalidated TCProducts",
     Error = "Error retrieving unvalidated TCProducts"
 }
+export declare enum PutTCProductStatus {
+    Success = "Successfully updated TCProduct",
+    Error = "Error updating TCProduct"
+}
 export declare const PORTFOLIO_URL = "/portfolio";
 export declare const PORTFOLIO_PERFORMANCE_URL: string;
 export declare const PORTFOLIO_HOLDINGS_PERFORMANCE_URL: string;
@@ -64,6 +68,7 @@ export declare const PRODUCTS_URL = "/products";
 export declare const LATEST_PRICE_URL = "/price/latest";
 export declare const LATEST_PRICES_URL = "/prices/latest";
 export declare const PRICE_URL = "/price";
+export declare const TCPRODUCT_URL = "/tcproduct";
 export declare const UNVALIDATED_TCPRODUCTS_URL = "/tcproducts/unvalidated";
 export declare type TResBody = {
     message: string;
@@ -104,4 +109,8 @@ export declare type TPostProductReqBody = {
 };
 export declare type TGetProductPerformanceReqBody = {
     tcgplayerId: number;
+};
+export declare type TPutTCProductReqBody = {
+    tcgplayerId: number;
+    newTCProduct: ITCProduct;
 };

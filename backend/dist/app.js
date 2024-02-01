@@ -696,7 +696,7 @@ RETURN
 app.get(common_1.UNVALIDATED_TCPRODUCTS_URL, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // query TCProducts
-        const params = { status: common_1.ParsingStatus.Validated };
+        const params = { status: common_1.ParsingStatus.ToBeValidated };
         const data = yield (0, TCProduct_1.getTCProductDocs)(params);
         // return TCProducts
         res.status(200);
@@ -711,6 +711,53 @@ app.get(common_1.UNVALIDATED_TCPRODUCTS_URL, (req, res) => __awaiter(void 0, voi
         res.status(500);
         const body = {
             message: `${common_1.GetUnvalidatedTCProductsStatus.Error}: ${err}`
+        };
+        res.send(body);
+    }
+}));
+/*
+DESC
+  Handle PUT request to update a TCProduct document
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The TCProduct document was updated successfully
+    500: An error occurred
+*/
+app.put(common_1.TCPRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // variables
+        const body = req.body;
+        const tcgplayerId = body.tcgplayerId;
+        const newTCProduct = body.newTCProduct;
+        // get existing TCProduct
+        const existingTCProduct = yield (0, TCProduct_1.getTCProductDoc)(tcgplayerId);
+        (0, common_1.assert)(existingTCProduct, `TCProduct not found: ${tcgplayerId}`);
+        // update TCProduct
+        const isUpdated = yield (0, TCProduct_1.setTCProduct)(existingTCProduct, newTCProduct);
+        // success
+        if (isUpdated) {
+            res.status(200);
+            const body = {
+                message: common_1.PutTCProductStatus.Success
+            };
+            res.send(body);
+            // error
+        }
+        else {
+            res.status(500);
+            const body = {
+                message: common_1.PutTCProductStatus.Error
+            };
+            res.send(body);
+        }
+        // error
+    }
+    catch (err) {
+        res.status(500);
+        const body = {
+            message: `${common_1.PutTCProductStatus.Error}: ${err}`
         };
         res.send(body);
     }

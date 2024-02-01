@@ -11,18 +11,20 @@ import {
   GetPortfolioPerformanceStatus, GetPortfoliosStatus, 
   GetPricesStatus, GetProductPerformanceStatus, GetProductsStatus, 
   GetUnvalidatedTCProductsStatus, PostLatestPriceStatus, PostPortfolioStatus, 
-  PostPriceStatus, PostProductStatus, PutPortfolioStatus,
+  PostPriceStatus, PostProductStatus, PutPortfolioStatus, PutTCProductStatus,
   
   // request / response data models
   TDataResBody, TDeletePortfolioReqBody, TGetPortfolioHoldingsPerformanceResBody,
   TGetPortfolioPerformanceResBody, TGetProductPerformanceResBody, 
   TPostLatestPriceReqBody, TPostPortfolioReqBody, TPostPriceReqBody, 
-  TPutPortfolioReqBody, TPostProductReqBody, TProductPostResBody, TResBody, 
+  TPutPortfolioReqBody, TPostProductReqBody, TProductPostResBody, 
+  TPutTCProductReqBody, TResBody, 
 
   // endpoint URLs
   LATEST_PRICES_URL, PORTFOLIO_URL, PORTFOLIO_HOLDINGS_PERFORMANCE_URL, 
   PORTFOLIO_PERFORMANCE_URL, PORTFOLIOS_URL, PRICE_URL, PRODUCT_URL, 
-  PRODUCT_PERFORMANCE_URL, PRODUCTS_URL, UNVALIDATED_TCPRODUCTS_URL,
+  PRODUCT_PERFORMANCE_URL, PRODUCTS_URL, TCPRODUCT_URL, 
+  UNVALIDATED_TCPRODUCTS_URL,
 
   // model helpers
   getPortfolioHoldings, getHoldingTcgplayerId,
@@ -37,7 +39,9 @@ import {
   getProductDoc, getProductDocs, insertProducts 
 } from './mongo/dbi/Product'
 import { getLatestPrices, insertPrices } from './mongo/dbi/Price'
-import { getTCProductDocs } from './mongo/dbi/TCProduct'
+import { 
+  getTCProductDoc, getTCProductDocs, setTCProduct 
+} from './mongo/dbi/TCProduct'
 import multer from 'multer'
 import { loadCurrentPrice } from './scraper/scrapeManager'
 import { 
@@ -832,6 +836,59 @@ app.get(UNVALIDATED_TCPRODUCTS_URL, async (req: any, res: any) => {
     res.status(500)
     const body: TResBody = {
       message: `${GetUnvalidatedTCProductsStatus.Error}: ${err}`
+    }
+    res.send(body)
+  }
+})
+
+/*
+DESC
+  Handle PUT request to update a TCProduct document
+RETURN
+  Response body with status codes and messages
+
+  Status Code
+    200: The TCProduct document was updated successfully
+    500: An error occurred
+*/
+app.put(TCPRODUCT_URL, upload.none(), async (req: any, res: any) => {
+
+  try {
+
+    // variables
+    const body: TPutTCProductReqBody = req.body
+    const tcgplayerId = body.tcgplayerId
+    const newTCProduct = body.newTCProduct
+
+    // get existing TCProduct
+    const existingTCProduct = await getTCProductDoc(tcgplayerId)
+    assert(existingTCProduct, `TCProduct not found: ${tcgplayerId}`)
+
+    // update TCProduct
+    const isUpdated = await setTCProduct(existingTCProduct, newTCProduct)
+
+    // success
+    if (isUpdated) {
+      res.status(200)
+      const body: TResBody = {
+        message: PutTCProductStatus.Success
+      }
+      res.send(body)
+
+    // error
+    } else {
+      res.status(500)
+      const body: TResBody = {
+        message: PutTCProductStatus.Error
+      }
+      res.send(body)
+    }
+
+  // error
+  } catch (err) {
+    res.status(500)
+    const body: TResBody = {
+      message: `${PutTCProductStatus.Error}: ${err}`
     }
     res.send(body)
   }

@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.UNVALIDATED_TCPRODUCTS_URL = exports.PRICE_URL = exports.LATEST_PRICES_URL = exports.LATEST_PRICE_URL = exports.PRODUCTS_URL = exports.PRODUCT_PERFORMANCE_URL = exports.PRODUCT_URL = exports.PORTFOLIOS_URL = exports.PORTFOLIO_HOLDINGS_PERFORMANCE_URL = exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL = exports.GetUnvalidatedTCProductsStatus = exports.GetProductsStatus = exports.GetProductPerformanceStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PostLatestPriceStatus = exports.GetPortfoliosStatus = exports.GetPortfolioPerformanceStatus = exports.GetPortfolioHoldingsPerformanceStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
+exports.UNVALIDATED_TCPRODUCTS_URL = exports.TCPRODUCT_URL = exports.PRICE_URL = exports.LATEST_PRICES_URL = exports.LATEST_PRICE_URL = exports.PRODUCTS_URL = exports.PRODUCT_PERFORMANCE_URL = exports.PRODUCT_URL = exports.PORTFOLIOS_URL = exports.PORTFOLIO_HOLDINGS_PERFORMANCE_URL = exports.PORTFOLIO_PERFORMANCE_URL = exports.PORTFOLIO_URL = exports.PutTCProductStatus = exports.GetUnvalidatedTCProductsStatus = exports.GetProductsStatus = exports.GetProductPerformanceStatus = exports.PostProductStatus = exports.PostPriceStatus = exports.GetPricesStatus = exports.PostLatestPriceStatus = exports.GetPortfoliosStatus = exports.GetPortfolioPerformanceStatus = exports.GetPortfolioHoldingsPerformanceStatus = exports.PutPortfolioStatus = exports.PostPortfolioStatus = exports.DeletePortfolioStatus = void 0;
 // =====
 // enums
 // =====
@@ -128,6 +128,15 @@ var GetUnvalidatedTCProductsStatus;
     GetUnvalidatedTCProductsStatus["Success"] = "Successfully retrieved unvalidated TCProducts";
     GetUnvalidatedTCProductsStatus["Error"] = "Error retrieving unvalidated TCProducts";
 })(GetUnvalidatedTCProductsStatus = exports.GetUnvalidatedTCProductsStatus || (exports.GetUnvalidatedTCProductsStatus = {}));
+/*
+  Endpoint:   TCPRODUCT_URL
+  Type:       POST
+*/
+var PutTCProductStatus;
+(function (PutTCProductStatus) {
+    PutTCProductStatus["Success"] = "Successfully updated TCProduct";
+    PutTCProductStatus["Error"] = "Error updating TCProduct";
+})(PutTCProductStatus = exports.PutTCProductStatus || (exports.PutTCProductStatus = {}));
 // ======
 // routes
 // ======
@@ -145,4 +154,5 @@ exports.LATEST_PRICE_URL = '/price/latest';
 exports.LATEST_PRICES_URL = '/prices/latest';
 exports.PRICE_URL = '/price';
 // -- tcproduct
+exports.TCPRODUCT_URL = '/tcproduct';
 exports.UNVALIDATED_TCPRODUCTS_URL = '/tcproducts/unvalidated';
