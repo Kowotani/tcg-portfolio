@@ -387,6 +387,30 @@ export const AddProductForm = () => {
 
   /*
   DESC
+    Creates the body for the POST request to add a new Product
+  RETURN
+    A TPostFormData with the Product data
+  */
+    function getPostFormData(): IProduct {
+      let data: IProduct = {
+        tcgplayerId: formData.tcgplayerId.value as number,
+        name: formData.name.value as string,
+        tcg: formData.tcg.value as TCG,
+        type: formData.type.value as ProductType,
+        releaseDate: formData.releaseDate.value as Date,
+        language: formData.language.value as ProductLanguage,
+        msrp: formData.msrp.value as number
+      }
+      if (formData.subtype.value) 
+        data.subtype = formData.subtype.value
+      if (formData.setCode.value) 
+        data.setCode = formData.setCode.value
+  
+      return data
+    }
+
+  /*
+  DESC
     Handles the form submission
   */
   function handleFormOnSubmit(): void {
@@ -679,30 +703,6 @@ export const AddProductForm = () => {
   //   // unset loading state
   //   setIsLoadingLatestPrice(false)
   // }
-
-  /*
-  DESC
-    Creates the body for the POST request to add a new Product
-  RETURN
-    A TPostFormData with the Product data
-  */
-  function getPostFormData(): IProduct {
-    let data: IProduct = {
-      tcgplayerId: formData.tcgplayerId.value as number,
-      name: formData.name.value as string,
-      tcg: formData.tcg.value as TCG,
-      type: formData.type.value as ProductType,
-      releaseDate: formData.releaseDate.value as Date,
-      language: formData.language.value as ProductLanguage,
-      msrp: formData.msrp.value as number
-    }
-    if (formData.subtype.value) 
-      data.subtype = formData.subtype.value
-    if (formData.setCode.value) 
-      data.setCode = formData.setCode.value
-
-    return data
-  }
 
 
   // =====
