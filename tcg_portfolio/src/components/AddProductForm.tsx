@@ -29,39 +29,11 @@ import { SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { SideBarNavContext } from '../state/SideBarNavContext'
 import { TCProductCatalogue } from './TCProductCatalogue'
+import { 
+  IAddProductFormDataState, IFormValueState, IFormValueWithStringValuesState 
+} from '../utils/form'
 import { getProductImageUrl, isHttpUrl } from '../utils/generic'
 import { ISideBarNavContext, SideBarNav } from '../utils/SideBar'
-
-
-// ==========
-// interfaces
-// ==========
-
-interface IBaseState {
-  errorMessage?: string
-  isInvalid?: boolean, 
-}
-
-interface IFormValueState<Type> extends IBaseState {
-  value?: Type
-}
-
-interface IFormValueWithStringValuesState<Type> extends IFormValueState<Type> {
-  stringValues: string[]
-}
-
-interface IFormDataState {
-  imageUrl: IFormValueState<string>,
-  language: IFormValueState<ProductLanguage>,
-  msrp: IFormValueState<number>,
-  name: IFormValueState<string>,
-  releaseDate: IFormValueState<Date>,
-  setCode: IFormValueState<string>,
-  subtype: IFormValueWithStringValuesState<ProductSubtype>,
-  tcg: IFormValueState<TCG>,
-  tcgplayerId: IFormValueState<number>,
-  type: IFormValueWithStringValuesState<ProductType>,
-}
 
 
 // ==============
@@ -86,7 +58,7 @@ export const AddProductForm = () => {
   // state
   // =====
 
-  const [ formData, setFormData ] = useState<IFormDataState>({
+  const [ formData, setFormData ] = useState<IAddProductFormDataState>({
     imageUrl: { value: undefined },
     language: { value: ProductLanguage.English},
     msrp: { value: undefined },
