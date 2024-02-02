@@ -111,6 +111,6 @@ export declare type TGetProductPerformanceReqBody = {
     tcgplayerId: number;
 };
 export declare type TPutTCProductReqBody = {
-    tcgplayerId: number;
+    existingTCProduct: ITCProduct;
     newTCProduct: ITCProduct;
 };

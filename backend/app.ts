@@ -857,12 +857,8 @@ app.put(TCPRODUCT_URL, upload.none(), async (req: any, res: any) => {
 
     // variables
     const body: TPutTCProductReqBody = req.body
-    const tcgplayerId = body.tcgplayerId
+    const existingTCProduct = body.existingTCProduct
     const newTCProduct = body.newTCProduct
-
-    // get existing TCProduct
-    const existingTCProduct = await getTCProductDoc(tcgplayerId)
-    assert(existingTCProduct, `TCProduct not found: ${tcgplayerId}`)
 
     // update TCProduct
     const isUpdated = await setTCProduct(existingTCProduct, newTCProduct)

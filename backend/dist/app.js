@@ -729,11 +729,8 @@ app.put(common_1.TCPRODUCT_URL, upload.none(), (req, res) => __awaiter(void 0, v
     try {
         // variables
         const body = req.body;
-        const tcgplayerId = body.tcgplayerId;
+        const existingTCProduct = body.existingTCProduct;
         const newTCProduct = body.newTCProduct;
-        // get existing TCProduct
-        const existingTCProduct = yield (0, TCProduct_1.getTCProductDoc)(tcgplayerId);
-        (0, common_1.assert)(existingTCProduct, `TCProduct not found: ${tcgplayerId}`);
         // update TCProduct
         const isUpdated = yield (0, TCProduct_1.setTCProduct)(existingTCProduct, newTCProduct);
         // success

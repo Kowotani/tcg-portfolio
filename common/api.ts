@@ -316,6 +316,6 @@ export type TGetProductPerformanceReqBody = {
   Req / Res:  Request
 */
 export type TPutTCProductReqBody = {
-  tcgplayerId: number,
+  existingTCProduct: ITCProduct,
   newTCProduct: ITCProduct
 }
