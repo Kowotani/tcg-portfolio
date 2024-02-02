@@ -16,10 +16,9 @@ import {
   TCGToProductType, 
   
   // api
-  PostLatestPriceStatus, PostPriceStatus, PostProductStatus, 
-  TPostLatestPriceReqBody, TPostPriceReqBody, TPostProductReqBody, 
+  PostPriceStatus, PostProductStatus, TPostPriceReqBody, TPostProductReqBody, 
 
-  LATEST_PRICE_URL, PRICE_URL, PRODUCT_URL,
+  PRICE_URL, PRODUCT_URL,
 
   // generic
   assert, formatAsISO, getProductSubtypes, isASCII
@@ -101,7 +100,7 @@ export const AddProductForm = () => {
   })
 
   // load latest price loading state
-  const [ isLoadingLatestPrice, setIsLoadingLatestPrice] = useState(false)
+  // const [ isLoadingLatestPrice, setIsLoadingLatestPrice] = useState(false)
 
   // SideBar context
   const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
@@ -632,54 +631,54 @@ export const AddProductForm = () => {
   // load latest price
   // -----------------
 
-  function handleLoadLatestPriceOnClick(tcgplayerId: number) {
+  // function handleLoadLatestPriceOnClick(tcgplayerId: number) {
 
-    // set loading state
-    setIsLoadingLatestPrice(true)
+  //   // set loading state
+  //   setIsLoadingLatestPrice(true)
 
-    // create body
-    const body: TPostLatestPriceReqBody = {
-      tcgplayerId: tcgplayerId
-    }
+  //   // create body
+  //   const body: TPostLatestPriceReqBody = {
+  //     tcgplayerId: tcgplayerId
+  //   }
 
-    // submit
-    axios({
-      method: 'post',
-      url: LATEST_PRICE_URL,
-      data: body,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
+  //   // submit
+  //   axios({
+  //     method: 'post',
+  //     url: LATEST_PRICE_URL,
+  //     data: body,
+  //     headers: {
+  //       'Content-Type': 'multipart/form-data',
+  //     },
+  //   })
 
-    // success
-    .then(res => {
+  //   // success
+  //   .then(res => {
       
-      toast({
-        title: 'Latest Price Loaded',
-        description: `${PostLatestPriceStatus.Success}`,
-        status: 'success',
-        isClosable: true,
-      })
-    })
+  //     toast({
+  //       title: 'Latest Price Loaded',
+  //       description: `${PostLatestPriceStatus.Success}`,
+  //       status: 'success',
+  //       isClosable: true,
+  //     })
+  //   })
 
-    // error
-    .catch(res => {
+  //   // error
+  //   .catch(res => {
 
-      // TODO: type check
-      const resData = res.data
+  //     // TODO: type check
+  //     const resData = res.data
 
-      toast({
-        title: 'Error Loading Latest Price',
-        description: `${res.statusText}: ${resData}`,
-        status: 'error',
-        isClosable: true,
-      })
-    })
+  //     toast({
+  //       title: 'Error Loading Latest Price',
+  //       description: `${res.statusText}: ${resData}`,
+  //       status: 'error',
+  //       isClosable: true,
+  //     })
+  //   })
 
-    // unset loading state
-    setIsLoadingLatestPrice(false)
-  }
+  //   // unset loading state
+  //   setIsLoadingLatestPrice(false)
+  // }
 
   /*
   DESC
@@ -950,7 +949,7 @@ export const AddProductForm = () => {
             >
               Submit
             </Button>
-            <Button
+            {/*<Button
               colorScheme='purple'
               onClick={() => handleLoadLatestPriceOnClick(
                 Number(formData.tcgplayerId.value))}
@@ -958,7 +957,7 @@ export const AddProductForm = () => {
               isLoading={isLoadingLatestPrice}
             >
               Load Latest Price
-            </Button>        
+            </Button>*/}
           </VStack>
         </Form>
       </Formik>
