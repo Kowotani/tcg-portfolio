@@ -105,7 +105,7 @@ export const TCProductCatalogue = ({
     setFilteredProducts(products)
     setPaginatedProducts(_.slice(
       products, 0, Math.min(DEFAULT_NUM_ITEMS_PER_PAGE, products.length)))
-  }, products)
+  }, [products])
 
 
   // ==============
