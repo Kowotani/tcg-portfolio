@@ -6,10 +6,7 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react'
-import { 
-  // data models
-  IProduct
- } from 'common'
+import { IProduct, ITCProduct } from 'common'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
 import { LatestPricesContext } from '../state/LatestPricesContext'
@@ -19,14 +16,15 @@ import { getProductNameWithLanguage } from '../utils/Product'
 
 type TProductCardProps = {
   product: IProduct,
+  tcproduct?: ITCProduct,
   height?: string | number,
   width?: string | number,
-  onClick: (product: IProduct) => void
+  onClick: (product: IProduct) => void,
+  onTCProductClick?: (tcproduct: ITCProduct) => void,
 }
 export const ProductCard = (
   props: PropsWithChildren<TProductCardProps>
 ) => {
-
 
   // =========
   // constants
@@ -38,9 +36,11 @@ export const ProductCard = (
 
   const {
     product,
+    tcproduct,
     height = DEFAULT_CARD_HEIGHT,
     width = DEFAULT_CARD_WIDTH,
-    onClick
+    onClick,
+    onTCProductClick
   } = props
 
 
@@ -63,7 +63,9 @@ export const ProductCard = (
       cursor='pointer'
       height={height}
       width={width}
-      onClick={() => onClick(product)}
+      onClick={() => {tcproduct && onTCProductClick
+        ? onTCProductClick(tcproduct)
+        : onClick(product)}}
     >
       <CardBody>
         <HStack 
