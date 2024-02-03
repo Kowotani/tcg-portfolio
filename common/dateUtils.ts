@@ -481,6 +481,24 @@ export function getDateFromJSON(json: string): Date {
   return parseJSON(json)
 }
 
+/*
+DESC
+  Returns a UTC date with the same year, month, and day as the input date but 
+  the time is set to midnight
+INPUT
+  localDate: A date in local timezone (eg. 2020-01-01T05:00:00.000Z)
+RETURN
+  A new date in UTC timezone (eg. 2020-01-01T00:00:00.000Z)
+*/
+export function getUTCDateFromLocalDate(localDate: Date): Date {
+
+  return new Date(Date.UTC(
+    localDate.getFullYear(),
+    localDate.getMonth(),
+    localDate.getDate()
+  ))
+}
+
 
 // =====
 // types

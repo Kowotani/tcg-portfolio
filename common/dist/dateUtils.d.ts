@@ -23,6 +23,7 @@ export declare function formatInTimeZone(date: Date, dateFormat: string, timezon
 export declare function getClientTimezone(): string;
 export declare function getLocalDateFromISOString(ISOString: string): Date;
 export declare function getDateFromJSON(json: string): Date;
+export declare function getUTCDateFromLocalDate(localDate: Date): Date;
 declare type TDateMathDuration = {
     years?: number;
     months?: number;

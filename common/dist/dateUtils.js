@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getDateFromJSON = exports.getLocalDateFromISOString = exports.getClientTimezone = exports.formatInTimeZone = exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getStartOfDate = exports.getDaysBetween = exports.getClampedDate = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateDiff = exports.dateAdd = exports.areDatesEqual = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getUTCDateFromLocalDate = exports.getDateFromJSON = exports.getLocalDateFromISOString = exports.getClientTimezone = exports.formatInTimeZone = exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getStartOfDate = exports.getDaysBetween = exports.getClampedDate = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateDiff = exports.dateAdd = exports.areDatesEqual = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 var date_fns_tz_1 = require("date-fns-tz");
 var _ = require("lodash");
@@ -396,3 +396,16 @@ function getDateFromJSON(json) {
     return (0, date_fns_1.parseJSON)(json);
 }
 exports.getDateFromJSON = getDateFromJSON;
+/*
+DESC
+  Returns a UTC date with the same year, month, and day as the input date but
+  the time is set to midnight
+INPUT
+  localDate: A date in local timezone (eg. 2020-01-01T05:00:00.000Z)
+RETURN
+  A new date in UTC timezone (eg. 2020-01-01T00:00:00.000Z)
+*/
+function getUTCDateFromLocalDate(localDate) {
+    return new Date(Date.UTC(localDate.getFullYear(), localDate.getMonth(), localDate.getDate()));
+}
+exports.getUTCDateFromLocalDate = getUTCDateFromLocalDate;
