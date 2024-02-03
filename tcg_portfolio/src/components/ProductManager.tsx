@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
-import { Box } from '@chakra-ui/react'
+import { Button, Flex, useToast } from '@chakra-ui/react'
 import { 
   // data models
   IProduct, ITCProduct, ParsingStatus, ProductLanguage, ProductSubtype, 
   ProductType, TCG,
 
   // api
-  UNVALIDATED_TCPRODUCTS_URL,
+  TCPRODUCT_URL, UNVALIDATED_TCPRODUCTS_URL, 
+
+  PutTCProductStatus, TPutTCProductReqBody, TResBody, 
 
   // generic
-  getProductSubtypes, TCGToProductType
+  getProductSubtypes, getUTCDateFromLocalDate, TCGToProductType
 } from 'common'
 import * as _ from 'lodash'
 import { AddProductForm } from './AddProductForm'
@@ -107,6 +109,61 @@ export const ProductManager = () => {
 
   /*
   DESC
+    Handles Ignore TCProduct button onClick event
+  */
+  function handleIgnoreTCProductOnClick(): void {
+
+    // create new TCProduct
+    const newTCProduct = {
+      ...TCProduct,
+      releaseDate: getUTCDateFromLocalDate(TCProduct.releaseDate),
+      status: ParsingStatus.Ignored
+    }
+
+    const body: TPutTCProductReqBody = {
+      existingTCProduct: TCProduct,
+      newTCProduct: newTCProduct
+    }
+
+    // call endpoint
+    axios({
+      method: 'put',
+      url: TCPRODUCT_URL,
+      data: body,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }      
+    })
+    .then(res => {
+      const data: TResBody = res.data
+
+      // success
+      if (data.message === PutTCProductStatus.Success) {
+
+        toast({
+          title: 'TCProduct Ignored',
+          description: `${PutTCProductStatus.Success}: ${TCProduct.tcgplayerId}`,
+          status: 'success',
+          isClosable: true,
+        })   
+
+        // update TCProductCatalogue
+        removeTCProductFromCatalogue(TCProduct)    
+
+        topAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
+
+      // error
+      } else {
+        console.log('Error updating unvalidated TCProduct')  
+      }
+    })
+    .catch(err => {
+      console.log('Error updating unvalidated TCProduct: ' + err)
+    })
+  }
+
+  /*
+  DESC
     Handles the TCProduct card onClick event
   INPUT
     product: An ITCProduct
@@ -114,7 +171,22 @@ export const ProductManager = () => {
   function handleTCProductCardOnClick(product: ITCProduct): void {
     setFormDataFromProduct(product)
     setTCProduct(product)
-    anchorRef.current?.scrollIntoView({behavior: 'smooth'})
+    bottomAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
+  }
+
+  /*
+  DESC
+    Removes the input TCProduct from the catalogue. To be used after the 
+    TCProduct has been validated or ignored
+  INPUT
+    product: The ITCProduct to remove
+  */
+  function removeTCProductFromCatalogue(product: ITCProduct): void {
+    const newTCProducts = TCProducts.filter((tcproduct: ITCProduct) => {
+      return tcproduct.tcgplayerId !== product.tcgplayerId
+    })
+    setTCProducts(newTCProducts)
+    setTCProduct({} as ITCProduct)
   }
 
 
@@ -142,7 +214,11 @@ export const ProductManager = () => {
     })
   }, [])
 
-  const anchorRef = useRef<HTMLDivElement>(null)
+  const bottomAnchorRef = useRef<HTMLDivElement>(null)
+  const topAnchorRef = useRef<HTMLDivElement>(null)
+
+  // Axios response toast
+  const toast = useToast()
 
 
   // ==============
@@ -151,6 +227,9 @@ export const ProductManager = () => {
 
   return (
     <>
+      {/* Top Anchor */}
+      <Flex ref={topAnchorRef}/>
+
       {/* TC Product Catalogue */}
       <SectionHeader header='Products to Validate' />
       
@@ -167,8 +246,18 @@ export const ProductManager = () => {
         setFormData={setAddProductFormData}
       />
 
-      {/* Anchor */}
-      <Box ref={anchorRef}/>
+      <Flex justifyContent='center' p={4}>
+        <Button
+          colorScheme='orange'
+          isDisabled={Object.keys(TCProduct).length === 0}
+          onClick={() => handleIgnoreTCProductOnClick()}
+        >
+          Ignore TCProduct
+        </Button>
+      </Flex>
+
+      {/* Bottom Anchor */}
+      <Flex ref={bottomAnchorRef}/>
     </>
   )
 }
