@@ -1,33 +1,29 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import { 
   Box,
   Icon,
   Flex,
   Text
 } from '@chakra-ui/react'
-import { 
-  // datamodels
-  IProduct, ITCProduct,
-
-  // api
-  UNVALIDATED_TCPRODUCTS_URL
-} from 'common'
+import { ITCProduct } from 'common'
 import { FilterInput } from './FilterInput'
 import * as _ from 'lodash'
 import { Paginator } from './Paginator'
 import { ProductCard } from './ProductCard'
 import { FaSearch } from 'react-icons/fa'
-import { parseUnvalidatedTCProductsEndpointResponse } from '../utils/api'
 import { 
   filterFnProductSearchResult, sortFnProductSearchResults 
 } from '../utils/Product'
 
 
 type TTCProductCatalogueProps = {
-  onProductCardClick: (product: IProduct) => void
+  products: ITCProduct[],
+  onProductCardClick: (product: ITCProduct) => void
 }
-export const TCProductCatalogue = (props: TTCProductCatalogueProps) => {
+export const TCProductCatalogue = ({
+  products, 
+  onProductCardClick
+}: TTCProductCatalogueProps) => {
 
   // =========
   // constants
@@ -42,7 +38,6 @@ export const TCProductCatalogue = (props: TTCProductCatalogueProps) => {
   // state
   // =====
 
-  const [ allProducts, setAllProducts ] = useState([] as ITCProduct[])
   const [ filteredProducts, setFilteredProducts ] = useState([] as ITCProduct[])
   const [ paginatedProducts, setPaginatedProducts ] = useState([] as ITCProduct[])
   const [ productFilter, setProductFilter ] = useState('')
@@ -59,7 +54,7 @@ export const TCProductCatalogue = (props: TTCProductCatalogueProps) => {
     input: The input from the FilterInput
   */
   function handleOnFilterChange(query: string): void {
-    const newFilteredProducts = allProducts
+    const newFilteredProducts = products
       .filter(filterFnProductSearchResult(query))
       .sort(sortFnProductSearchResults)
     setFilteredProducts(newFilteredProducts)
@@ -72,7 +67,7 @@ export const TCProductCatalogue = (props: TTCProductCatalogueProps) => {
     Handles the FilterInput filterClear event
   */
   function handleOnFilterClear(): void {
-    setFilteredProducts(allProducts)
+    setFilteredProducts(products)
     updatePaginatedProducts(1)
     setProductFilter('')
   }
@@ -81,10 +76,10 @@ export const TCProductCatalogue = (props: TTCProductCatalogueProps) => {
   DESC
     Handles the ProductCard onClick event
   INPUT
-    product: The IProduct associated witht he ProductCard
+    product: The ITCProduct associated witht he ProductCard
   */
-  function handleProductCardOnClick(product: IProduct): void {
-    props.onProductCardClick(product)
+  function handleProductCardOnClick(product: ITCProduct): void {
+    onProductCardClick(product)
   }
 
   /*
@@ -106,28 +101,11 @@ export const TCProductCatalogue = (props: TTCProductCatalogueProps) => {
   // hooks
   // =====
 
-  // initial load of all TCProducts
   useEffect(() => {
-
-    // call endpoint
-    axios({
-      method: 'get',
-      url: UNVALIDATED_TCPRODUCTS_URL
-    })
-    .then(res => {
-      // initialize all product states
-      const data = res.data.data
-      const products = parseUnvalidatedTCProductsEndpointResponse(data)
-        .sort(sortFnProductSearchResults)
-      setAllProducts(products)
-      setFilteredProducts(products)
-      setPaginatedProducts(_.slice(
-        products, 0, Math.min(DEFAULT_NUM_ITEMS_PER_PAGE, products.length)))
-    })
-    .catch(err => {
-      console.log('Error fetching unvalidated TCProducts: ' + err)
-    })
-  }, [])
+    setFilteredProducts(products)
+    setPaginatedProducts(_.slice(
+      products, 0, Math.min(DEFAULT_NUM_ITEMS_PER_PAGE, products.length)))
+  }, products)
 
 
   // ==============
@@ -150,9 +128,9 @@ export const TCProductCatalogue = (props: TTCProductCatalogueProps) => {
           <Text as='em' fontSize='lg'>
             {filteredProducts.length}
             &nbsp;of&nbsp;
-            {allProducts.length} 
+            {products.length} 
             &nbsp;product
-            {allProducts.length > 1 ? 's': ''}
+            {products.length > 1 ? 's': ''}
             &nbsp;displayed
           </Text>
         </Flex>
@@ -173,9 +151,11 @@ export const TCProductCatalogue = (props: TTCProductCatalogueProps) => {
             >
               <ProductCard 
                 height={DEFAULT_CARD_HEIGHT}
-                product={product}
+                product={product}   // TODO: consider refactoring this
+                tcproduct={product}
                 width={DEFAULT_CARD_WIDTH}
-                onClick={handleProductCardOnClick}
+                onClick={() => {}}  // TODO: consider refactoring this
+                onTCProductClick={handleProductCardOnClick}
               />
             </Box>
           )

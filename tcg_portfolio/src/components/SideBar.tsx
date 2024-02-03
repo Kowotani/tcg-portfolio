@@ -12,9 +12,9 @@ import {
   Text,
   useColorMode
 } from '@chakra-ui/react'
-import { AddProductForm } from './AddProductForm'
 import { PortfolioPanelManager } from './PortfolioPanelManager'
 import { ProductCatalogue } from './ProductCatalogue'
+import { ProductManager } from './ProductManager'
 import { IconType } from 'react-icons'
 import { FaBox, FaFolderOpen, FaHouse, FaForward } from 'react-icons/fa6'
 import { CSSTransition } from 'react-transition-group'
@@ -314,7 +314,7 @@ const SideBarContent = (props: PropsWithChildren<TSideBarContentProps>) => {
             <ProductCatalogue />
           </TabPanel>
           <TabPanel>
-            <AddProductForm />
+            <ProductManager />
           </TabPanel>
         </TabPanels>
       </Tabs>
