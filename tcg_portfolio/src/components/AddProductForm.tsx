@@ -21,7 +21,7 @@ import {
   PRICE_URL, PRODUCT_URL,
 
   // generic
-  assert, formatAsISO
+  assert, formatAsISO, getUTCDateFromLocalDate
 } from 'common'
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField'
@@ -236,7 +236,8 @@ export const AddProductForm = ({formData, setFormData}: TAddProductFormProps) =>
         name: formData.name.value as string,
         tcg: formData.tcg.value as TCG,
         type: formData.type.value as ProductType,
-        releaseDate: formData.releaseDate.value as Date,
+        releaseDate: getUTCDateFromLocalDate(
+          formData.releaseDate.value as Date),
         language: formData.language.value as ProductLanguage,
         msrp: formData.msrp.value as number
       }
