@@ -4,6 +4,7 @@ import {
   Button,
   Image,
   Input,
+  Link,
   NumberInput,
   NumberInputField,
   Select,
@@ -61,6 +62,7 @@ export const AddProductForm = ({formData, setFormData}: TAddProductFormProps) =>
   const PRODUCT_SUBTYPE_EMPTY_PLACEHOLDER = 'No Subtypes'
   const PRODUCT_TYPE_PLACEHOLDER = 'Select TCG first'
   const TCG_SELECT_DEFAULT = 'Select TCG'
+  const TCGPLAYER_URL = 'https://www.tcgplayer.com/product'
 
 
   // =====
@@ -628,6 +630,15 @@ export const AddProductForm = ({formData, setFormData}: TAddProductFormProps) =>
               onChange={e => handleImageUrlOnChange(e.target.value)}
             />
           </InputErrorWrapper>
+
+          {/* TCGPlayer URL */}
+          <Link 
+            color='blue.500'
+            href={`${TCGPLAYER_URL}/${formData.tcgplayerId.value}`}
+            isExternal
+          >
+            TCGPlayer URL
+          </Link>
 
           {/* Image */}
           {formData.imageUrl.value && !formData.imageUrl.isInvalid
