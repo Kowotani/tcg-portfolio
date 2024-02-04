@@ -68,6 +68,20 @@ export function getColorForBackgroundHover(
 
 /*
 DESC
+  Get the appropriate color to style icons used as image placeholders
+INPUT
+  colorMode: Either light or dark
+RETURN
+  The Chakra color to style the background when hovered
+*/
+export function getColorForImagePlaceholderIcon(
+  colorMode: 'light' | 'dark'
+): 'gray.200' | 'gray.600' {
+  return colorMode === 'light' ? 'gray.200' : 'gray.600'
+}
+
+/*
+DESC
   Get the appropriate color to style the input number based on the app colorMode
   and the sign of the input
 INPUT

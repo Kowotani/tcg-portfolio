@@ -1,12 +1,17 @@
 import { PropsWithChildren } from 'react'
+import { FaImage } from 'react-icons/fa6'
 import { 
   BoxProps, 
+  Icon,
   Image, 
   LinkBox,
   LinkOverlay,
+  useColorMode
 } from '@chakra-ui/react'
 import { IProduct } from 'common'
-import { getProductImageUrl } from '../utils/generic'
+import { 
+  getColorForImagePlaceholderIcon, getProductImageUrl 
+} from '../utils/generic'
 
 
 // =============
@@ -48,10 +53,17 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
   const IMG_SIZE = 200
 
 
+  // =====
+  // hooks
+  // =====
+
+  const { colorMode } = useColorMode()
+
+
   // =============
   // sub component
   // =============
-  
+
   const ProductImage = () => {
     return (
       <Image 
@@ -59,6 +71,12 @@ export const ProductImage = (props: PropsWithChildren<TProductImageProps>) => {
         borderRadius={12} 
         boxSize={props.boxSize}
         fallbackStrategy='onError'
+        fallback={
+          <Icon 
+            as={FaImage}
+            boxSize='120px'
+            color={getColorForImagePlaceholderIcon(colorMode)}
+          />}
         fit='contain'
         src={getProductImageUrl(props.product.tcgplayerId, props.product.type, 
           IMG_SIZE, props.product.subtype)}
