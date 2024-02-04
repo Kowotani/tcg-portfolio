@@ -58,7 +58,7 @@ export const TCProductCatalogue = ({
       .filter(filterFnProductSearchResult(query))
       .sort(sortFnProductSearchResults)
     setFilteredProducts(newFilteredProducts)
-    updatePaginatedProducts(1)
+    updatePaginatedProducts(newFilteredProducts, 1)
     setProductFilter(query)
   }
 
@@ -68,7 +68,7 @@ export const TCProductCatalogue = ({
   */
   function handleOnFilterClear(): void {
     setFilteredProducts(products)
-    updatePaginatedProducts(1)
+    updatePaginatedProducts(products, 1)
     setProductFilter('')
   }
 
@@ -84,11 +84,15 @@ export const TCProductCatalogue = ({
 
   /*
   DESC
-    Updates paginatedProducts based on the active page number
+    Updates paginatedProducts based on the input products and page number
   INPUT
+    products: An ITCProduct[] of the products
     page: The active page number (the first page is 1)
   */
-  function updatePaginatedProducts(page: number): void {
+  function updatePaginatedProducts(
+    filteredProducts: ITCProduct[], 
+    page: number
+  ): void {
     const startIx = (page - 1) * DEFAULT_NUM_ITEMS_PER_PAGE
     const endIx = Math.min(
       page * DEFAULT_NUM_ITEMS_PER_PAGE, 
@@ -102,9 +106,7 @@ export const TCProductCatalogue = ({
   // =====
 
   useEffect(() => {
-    setFilteredProducts(products)
-    setPaginatedProducts(_.slice(
-      products, 0, Math.min(DEFAULT_NUM_ITEMS_PER_PAGE, products.length)))
+    handleOnFilterChange(productFilter)
   }, [products])
 
 
@@ -170,7 +172,7 @@ export const TCProductCatalogue = ({
         <Paginator 
           numItems={filteredProducts.length}
           numItemsPerPage={DEFAULT_NUM_ITEMS_PER_PAGE}
-          onPageClick={updatePaginatedProducts}
+          onPageClick={_.curry(updatePaginatedProducts)(filteredProducts)}
         />
       </Flex>
 
