@@ -7,8 +7,10 @@ tcgcsvUtils.TCG_TO_TCCATEGORY.forEach(async (value, key) => {
     .loadTCGroups(value.categoryId)
     .then(res => {
       console.log(`${res} TCGroup documents were loaded for ${key}`)
+      process.exit(0)
     })
     .catch(err => {
-      console.log(err)  
+      console.error(err)
+      process.exit(1)  
     })
 })

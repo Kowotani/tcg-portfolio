@@ -1,2 +1,2 @@
 #!/bin/sh
-node loadTCGroups.js
+node /home/vmuser/tcg-portfolio/backend/scripts/loadTCGroups.js
