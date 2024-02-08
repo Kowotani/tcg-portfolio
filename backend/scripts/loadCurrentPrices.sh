@@ -1,2 +1,2 @@
 #!/bin/sh
-node loadCurrentPrices.js
+node /home/vmuser/tcg-portfolio/backend/scripts/loadCurrentPrices.js

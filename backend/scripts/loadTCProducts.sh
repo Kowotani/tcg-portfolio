@@ -1,2 +1,2 @@
 #!/bin/sh
-node loadTCProducts.js
+node /home/vmuser/tcg-portfolio/backend/scripts/loadTCProducts.js

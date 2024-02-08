@@ -1,2 +1,2 @@
 #!/bin/sh
-node loadHistoricalPrices.js
+node /home/vmuser/tcg-portfolio/backend/scripts/loadHistoricalPrices.js
