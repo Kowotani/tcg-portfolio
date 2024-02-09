@@ -2,22 +2,37 @@ const scrapeManager = require('../dist/scraper/scrapeManager')
 const tcgcsvUtils = require('../dist/utils/tcgcsv')
 const commonUtils = require('common')
 
+
 // load non Secret Lair Products
-tcgcsvUtils.TCG_TO_TCCATEGORY.forEach(async (value, key) => {
-  console.log(`Scraping Products for TCG [${key}, ${value.categoryId}]...`)
+const main = async function() {
+
+  // log TCGroups
+  tcgcsvUtils.TCG_TO_TCCATEGORY.forEach((value) => {
+    console.log(`Scraping Products for TCG [${value.name}, ${value.categoryId}]...`)
+  })
+
+  // get releaseDate cutoff
   const releaseDate = commonUtils.getDateOneMonthAgo()
-  const params = {
-    categoryId: value.categoryId,
-    releaseDate: releaseDate
-  }
-  await scrapeManager
-    .loadTCProducts(params)
-    .then(res => {
-      console.log(`${res} TCProduct documents were loaded for: ${key}`)
-      process.exit(0)
-    })
-    .catch(err => {
-      console.error(err)
-      process.exit(1)  
-    })
-})
+
+  // construct promises
+  const promises = [...tcgcsvUtils.TCG_TO_TCCATEGORY.values()].map((value) => {
+    const params = {
+      categoryId: value.categoryId,
+      releaseDate: releaseDate
+    }
+
+    return scrapeManager
+      .loadTCProducts(params)
+      .then(res => {
+        console.log(`${res} TCProduct documents were loaded for ${value.name}`)
+      })
+      .catch(err => {
+        console.error(err)  
+      })
+  })
+
+  const res = await Promise.all(promises)
+  process.exit(0)
+}
+
+main()
