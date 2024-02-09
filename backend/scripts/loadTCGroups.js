@@ -17,7 +17,8 @@ const main = async function() {
         console.log(`${res} TCGroup documents were loaded for ${value.name}`)
       })
       .catch(err => {
-        console.error(err)  
+        console.error(err)
+        process.exit(1)  
       })
   })
 
