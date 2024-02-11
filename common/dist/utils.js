@@ -25,9 +25,8 @@ INPUT
   msg: An optional message to display
 */
 function assert(condition, msg) {
-    if (!condition) {
+    if (!condition)
         throw new Error('Assertion Error: ' + msg);
-    }
 }
 exports.assert = assert;
 /*
@@ -144,14 +143,13 @@ RETURN
 */
 function isASCII(value) {
     return /^[\x00-\x7F]*$/.test(value);
-    ;
 }
 exports.isASCII = isASCII;
 /*
 DESC
   Returns whether the input is a valid price string
   The expected unescaped regex format is:
-    ^\$\d+\.\d{2}$
+    ^\$\d+(,?\d+)*\.\d{2}$
 INPUT
   A string to check
 RETURN

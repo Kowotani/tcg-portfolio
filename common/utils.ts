@@ -33,9 +33,8 @@ INPUT
   msg: An optional message to display
 */
 export function assert(condition: any, msg?: string): asserts condition {
-  if (!condition) {
+  if (!condition)
     throw new Error('Assertion Error: ' + msg)
-  }
 }
 
 /*
@@ -82,9 +81,9 @@ export function getProductSubtypes(
   tcg: TCG, 
   productType: ProductType
 ): ProductSubtype[] {
-  const tcgArray = TCGToProductSubtype[tcg];
-  const productTypeArray = ProductTypeToProductSubtype[productType];
-  return _.intersection(tcgArray, productTypeArray);
+  const tcgArray = TCGToProductSubtype[tcg]
+  const productTypeArray = ProductTypeToProductSubtype[productType]
+  return _.intersection(tcgArray, productTypeArray)
 }
 
 /*
@@ -169,14 +168,14 @@ RETURN
   TRUE if the input contains only ASCII characters, FALSE otherwise
 */
 export function isASCII(value: string): boolean {
-  return /^[\x00-\x7F]*$/.test(value);;
+  return /^[\x00-\x7F]*$/.test(value)
 }
 
 /*
 DESC
   Returns whether the input is a valid price string
   The expected unescaped regex format is:
-    ^\$\d+\.\d{2}$
+    ^\$\d+(,?\d+)*\.\d{2}$
 INPUT
   A string to check
 RETURN
@@ -184,8 +183,8 @@ RETURN
     to numbers like $123.45), FALSE otherwise
 */
 export function isPriceString(value: string): boolean {
-  const regexp = new RegExp('^\\$\\d+(,?\\d+)*\\.\\d{2}$');
-  return regexp.test(value);
+  const regexp = new RegExp('^\\$\\d+(,?\\d+)*\\.\\d{2}$')
+  return regexp.test(value)
 }
 
 /*
@@ -197,8 +196,8 @@ RETURN
   TRUE if the input matches a TCGPriceType value
 */
 export function isTCGPriceTypeValue(value: string): boolean {
-  const arr = Object.values(TCGPriceType).map(v => v.toString());
-  return arr.includes(value);
+  const arr = Object.values(TCGPriceType).map(v => v.toString())
+  return arr.includes(value)
 }
 
 /*
