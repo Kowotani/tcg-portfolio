@@ -22,9 +22,9 @@ export const SideBarNav = {
     name: 'Product',
     authorizedRoles: [UserType.Admin, UserType.User]
   } as ISideBarNav,
-  ADD_PRODUCT: {
+  PRODUCT_MANAGER: {
     order: 3,
-    name: 'Add',
+    name: 'Manage',
     authorizedRoles: [UserType.Admin]
   } as ISideBarNav
 }

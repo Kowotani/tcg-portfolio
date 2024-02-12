@@ -193,9 +193,9 @@ const SideBarOverlay = () => {
       isActive: sideBarNav === SideBarNav.PRODUCT
     },
     {
-      sideBarNav: SideBarNav.ADD_PRODUCT,
+      sideBarNav: SideBarNav.PRODUCT_MANAGER,
       icon: FaForward,
-      isActive: sideBarNav === SideBarNav.ADD_PRODUCT
+      isActive: sideBarNav === SideBarNav.PRODUCT_MANAGER
     },
   ]
 

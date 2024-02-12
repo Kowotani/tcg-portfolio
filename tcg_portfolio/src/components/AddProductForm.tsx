@@ -79,7 +79,7 @@ export const AddProductForm = ({
 
   // SideBar context
   const { sideBarNav } = useContext(SideBarNavContext) as ISideBarNavContext
-  const isAddProductForm = sideBarNav === SideBarNav.ADD_PRODUCT
+  const isProductManager = sideBarNav === SideBarNav.PRODUCT_MANAGER
 
 
   // =========
@@ -457,7 +457,7 @@ export const AddProductForm = ({
           <InputErrorWrapper 
             leftLabel='TCGPlayer ID'
             errorMessage={formData.tcgplayerId.errorMessage}
-            isErrorDisplayed={formData.tcgplayerId.isInvalid && isAddProductForm}
+            isErrorDisplayed={formData.tcgplayerId.isInvalid && isProductManager}
           >
             <NumberInput
               value={formData.tcgplayerId.value}
@@ -476,7 +476,7 @@ export const AddProductForm = ({
           <InputErrorWrapper 
             leftLabel='Name'
             errorMessage={formData.name.errorMessage}
-            isErrorDisplayed={formData.name.isInvalid && isAddProductForm}          
+            isErrorDisplayed={formData.name.isInvalid && isProductManager}          
           >
             <Input 
               value={formData.name.value}
@@ -491,7 +491,7 @@ export const AddProductForm = ({
           <InputErrorWrapper 
             leftLabel='TCG'
             errorMessage={formData.tcg.errorMessage}
-            isErrorDisplayed={formData.tcg.isInvalid && isAddProductForm}
+            isErrorDisplayed={formData.tcg.isInvalid && isProductManager}
           >
             <Select
               value={formData.tcg.value}
@@ -559,7 +559,7 @@ export const AddProductForm = ({
           <InputErrorWrapper 
             leftLabel='Release Date'
             errorMessage={formData.releaseDate.errorMessage}
-            isErrorDisplayed={formData.releaseDate.isInvalid && isAddProductForm}
+            isErrorDisplayed={formData.releaseDate.isInvalid && isProductManager}
           >
             <Input
               value={formData.releaseDate.value 
@@ -576,7 +576,7 @@ export const AddProductForm = ({
           <InputErrorWrapper 
             leftLabel='Set Code'
             errorMessage={formData.setCode.errorMessage}
-            isErrorDisplayed={formData.setCode.isInvalid && isAddProductForm}
+            isErrorDisplayed={formData.setCode.isInvalid && isProductManager}
           >
             <Input 
               value={formData.setCode.value}
@@ -611,7 +611,7 @@ export const AddProductForm = ({
           <InputErrorWrapper 
             leftLabel='MSRP'
             errorMessage={formData.msrp.errorMessage}
-            isErrorDisplayed={formData.msrp.isInvalid && isAddProductForm}
+            isErrorDisplayed={formData.msrp.isInvalid && isProductManager}
           >
             <NumberInput
               value={formData.msrp.value}
@@ -629,7 +629,7 @@ export const AddProductForm = ({
           <InputErrorWrapper 
             leftLabel='Image URL'
             errorMessage={formData.imageUrl.errorMessage}
-            isErrorDisplayed={formData.imageUrl.isInvalid && isAddProductForm}
+            isErrorDisplayed={formData.imageUrl.isInvalid && isProductManager}
           >
             <Input
               value={formData.imageUrl.value}
