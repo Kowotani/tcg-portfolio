@@ -1,5 +1,5 @@
 from airflow.decorators import dag, task
-from airflow.exceptions import AirflowFailException
+from utils import handleStderr, handleStdout
 import pendulum
 import subprocess
 
@@ -22,14 +22,9 @@ def scrape_tcgcsv_products() -> None:
     path = '/home/vmuser/tcg-portfolio/backend/scripts/loadTCGroups.sh'
     res = subprocess.run([path], capture_output=True, text=True)
 
-    print('--- stdout ---')
-    print(res.stdout)
+    handleStdout(res.stdout)
+    handleStderr(res.stderr, 'Error in scrape_tcgroups()')
 
-    print('--- stderr ---')
-    print(res.stderr)
-
-    if (res.stderr):
-      raise AirflowFailException('Error in scrape_tcgroups()')
 
   @task()
   def scrape_nonsl_tcproducts() -> None: 
@@ -40,14 +35,9 @@ def scrape_tcgcsv_products() -> None:
     path = '/home/vmuser/tcg-portfolio/backend/scripts/loadTCProducts.sh'
     res = subprocess.run([path], capture_output=True, text=True)
 
-    print('--- stdout ---')
-    print(res.stdout)
+    handleStdout(res.stdout)
+    handleStderr(res.stderr, 'Error in scrape_nonsl_tcproducts()')
 
-    print('--- stderr ---')
-    print(res.stderr)
-
-    if (res.stderr):
-      raise AirflowFailException('Error in scrape_nonsl_tcproducts()')
 
   @task()
   def scrape_sl_tcproducts() -> None: 
@@ -58,14 +48,9 @@ def scrape_tcgcsv_products() -> None:
     path = '/home/vmuser/tcg-portfolio/backend/scripts/loadSLTCProducts.sh'
     res = subprocess.run([path], capture_output=True, text=True)
 
-    print('--- stdout ---')
-    print(res.stdout)
-
-    print('--- stderr ---')
-    print(res.stderr)
-
-    if (res.stderr):
-      raise AirflowFailException('Error in scrape_sl_tcproducts()')    
+    handleStdout(res.stdout)
+    handleStderr(res.stderr, 'Error in scrape_sl_tcproducts()')
+   
 
   [scrape_sl_tcproducts(), scrape_tcgroups()] >> scrape_nonsl_tcproducts()
 
