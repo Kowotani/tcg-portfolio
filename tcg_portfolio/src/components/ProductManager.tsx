@@ -112,12 +112,72 @@ export const ProductManager = () => {
     Handles Ignore TCProduct button onClick event
   */
   function handleIgnoreTCProductOnClick(): void {
+    updateTCProductStatus(ParsingStatus.Ignored, 'TCProduct Ignored')
+  }
+
+  /*
+  DESC
+    Handles the TCProduct card onClick event
+  INPUT
+    product: An ITCProduct
+  */
+  function handleTCProductCardOnClick(product: ITCProduct): void {
+    setFormDataFromProduct(product)
+    setTCProduct(product)
+    bottomAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
+  }
+
+  /*
+  DESC
+    Handles marking the TCProduct as valid given the tcgplayerId
+  INPUT
+    tcgplayerId: The TCGPlayerID of the TCProduct
+  */
+  function handleMarkTCProductAsValid(tcgplayerId: number): void {
+
+    // check if tcgplayerID corresponds to a TCProduct
+    if (TCProducts.filter((tcproduct: ITCProduct) => {
+      return tcproduct.tcgplayerId === tcgplayerId
+    }).length) {
+
+      // update TCProduct
+      updateTCProductStatus(ParsingStatus.Validated, 'TCProduct Validated')
+    }
+  }
+
+  /*
+  DESC
+    Removes the input TCProduct from the catalogue. To be used after the 
+    TCProduct has been validated or ignored
+  INPUT
+    product: The ITCProduct to remove
+  */
+  function removeTCProductFromCatalogue(product: ITCProduct): void {
+    const newTCProducts = TCProducts.filter((tcproduct: ITCProduct) => {
+      return tcproduct.tcgplayerId !== product.tcgplayerId
+    })
+    setTCProducts(newTCProducts)
+    setTCProduct({} as ITCProduct)
+  }
+
+  /*
+  DESC
+    Removes the input TCProduct from the catalogue. To be used after the 
+    TCProduct has been validated or ignored
+  INPUT
+    status: The new ParsingStatus to set
+    toastTitle: The title for the toast popup
+  */
+  function updateTCProductStatus(
+    status: ParsingStatus, 
+    toastTitle: string
+  ): void {
 
     // create new TCProduct
     const newTCProduct = {
       ...TCProduct,
       releaseDate: getUTCDateFromLocalDate(TCProduct.releaseDate),
-      status: ParsingStatus.Ignored
+      status: status
     }
 
     const body: TPutTCProductReqBody = {
@@ -141,7 +201,7 @@ export const ProductManager = () => {
       if (data.message === PutTCProductStatus.Success) {
 
         toast({
-          title: 'TCProduct Ignored',
+          title: toastTitle,
           description: `${PutTCProductStatus.Success}: ${TCProduct.tcgplayerId}`,
           status: 'success',
           isClosable: true,
@@ -159,34 +219,7 @@ export const ProductManager = () => {
     })
     .catch(err => {
       console.log('Error updating unvalidated TCProduct: ' + err)
-    })
-  }
-
-  /*
-  DESC
-    Handles the TCProduct card onClick event
-  INPUT
-    product: An ITCProduct
-  */
-  function handleTCProductCardOnClick(product: ITCProduct): void {
-    setFormDataFromProduct(product)
-    setTCProduct(product)
-    bottomAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
-  }
-
-  /*
-  DESC
-    Removes the input TCProduct from the catalogue. To be used after the 
-    TCProduct has been validated or ignored
-  INPUT
-    product: The ITCProduct to remove
-  */
-  function removeTCProductFromCatalogue(product: ITCProduct): void {
-    const newTCProducts = TCProducts.filter((tcproduct: ITCProduct) => {
-      return tcproduct.tcgplayerId !== product.tcgplayerId
-    })
-    setTCProducts(newTCProducts)
-    setTCProduct({} as ITCProduct)
+    })    
   }
 
 
@@ -243,6 +276,7 @@ export const ProductManager = () => {
       
       <AddProductForm 
         formData={addProductFormData}
+        markTCProductAsValid={handleMarkTCProductAsValid}
         setFormData={setAddProductFormData}
       />
 

@@ -49,9 +49,14 @@ import { ISideBarNavContext, SideBarNav } from '../utils/SideBar'
 
 type TAddProductFormProps = {
   formData: IAddProductFormDataState,
+  markTCProductAsValid: (tcgplayerId: number) => void,
   setFormData: (formData: IAddProductFormDataState) => void
 }
-export const AddProductForm = ({formData, setFormData}: TAddProductFormProps) => {
+export const AddProductForm = ({
+  formData, 
+  markTCProductAsValid, 
+  setFormData
+}: TAddProductFormProps) => {
 
   // =========
   // constants
@@ -337,6 +342,9 @@ export const AddProductForm = ({formData, setFormData}: TAddProductFormProps) =>
             isClosable: true,
           })
         })
+
+        // -- mark the TCProduct as valid
+        markTCProductAsValid(body.formData.tcgplayerId)
 
       // product already exists
       } else if (res.status === 202) {
