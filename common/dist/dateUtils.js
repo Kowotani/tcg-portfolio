@@ -295,7 +295,7 @@ RETURN
 function isDateBetween(date, start, end, orEqual) {
     return orEqual
         ? ((0, date_fns_1.isAfter)(date, start) || (0, date_fns_1.isEqual)(date, start))
-            && ((0, date_fns_1.isBefore)(date, start) || (0, date_fns_1.isBefore)(date, start))
+            && ((0, date_fns_1.isBefore)(date, end) || (0, date_fns_1.isBefore)(date, end))
         : ((0, date_fns_1.isAfter)(date, start) && (0, date_fns_1.isBefore)(date, end));
 }
 exports.isDateBetween = isDateBetween;

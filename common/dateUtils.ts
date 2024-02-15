@@ -370,7 +370,7 @@ export function isDateBetween(
 ): boolean {
   return orEqual 
     ? (isAfter(date, start) || isEqual(date, start))
-      && (isBefore(date, start) || isBefore(date, start))
+      && (isBefore(date, end) || isBefore(date, end))
     : (isAfter(date, start) && isBefore(date, end))
 }
 
