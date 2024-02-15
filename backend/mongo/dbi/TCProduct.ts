@@ -50,26 +50,28 @@ export async function getTCProductDoc(
 /*
 DESC
   Returns all TCProducts, optionally for an input categoryId or groupId or by
-  parsing status
+  parsing status or by tcgplayerId
 INPUT
   categoryId?: The TCGCSV categoryId
   groupId?: The TCGCSV groupId
   status?: The ParsingStatus enum
+  tcgplayerIds?: The tcgplayerIds
 RETURN
   An ITCProduct[]
 */
 type IGetTCProductDocsProps = {
   categoryId?: number,
   groupId?: number,
-  status?: ParsingStatus  
+  status?: ParsingStatus,
+  tcgplayerIds?: number[]  
 }
 export async function getTCProductDocs({
-  categoryId, groupId, status
+  categoryId, groupId, status, tcgplayerIds
 }: IGetTCProductDocsProps = {}
 ): Promise<HydratedDocument<IMTCProduct>[]> {
 
   // connect to db
-  await mongoose.connect(url);
+  await mongoose.connect(url)
 
   try {
 
@@ -80,6 +82,9 @@ export async function getTCProductDocs({
       filter['groupId'] = groupId
     if (status)
       filter['status'] = status
+    if (tcgplayerIds)
+      filter['tcgplayerId'] = { '$in': tcgplayerIds }
+    
     const docs = await TCProduct.find(filter)
     return docs
 

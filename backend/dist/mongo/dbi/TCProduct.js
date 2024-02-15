@@ -47,7 +47,7 @@ function getTCProductDoc(tcgplayerId) {
     });
 }
 exports.getTCProductDoc = getTCProductDoc;
-function getTCProductDocs({ categoryId, groupId, status } = {}) {
+function getTCProductDocs({ categoryId, groupId, status, tcgplayerIds } = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
@@ -59,6 +59,8 @@ function getTCProductDocs({ categoryId, groupId, status } = {}) {
                 filter['groupId'] = groupId;
             if (status)
                 filter['status'] = status;
+            if (tcgplayerIds)
+                filter['tcgplayerId'] = { '$in': tcgplayerIds };
             const docs = yield tcproductSchema_1.TCProduct.find(filter);
             return docs;
         }
