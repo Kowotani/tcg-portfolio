@@ -273,6 +273,18 @@ export interface ITCGroup {
   abbreviation?: string
 }
 
+// Price (to be parsed)
+
+export interface ITCPrice {
+  productId: number,
+  marketPrice: number,
+  lowPrice?: number,
+  midPrice?: number,
+  highPrice?: number,
+  directLowPrice?: number,
+  subTypeName?: string
+}
+
 // Product (to be validated)
 
 export interface ITCProduct extends IProduct {

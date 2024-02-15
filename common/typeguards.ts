@@ -4,8 +4,8 @@ import {
 import {
   // data models
   IDatedPriceData, IHolding, IPopulatedHolding, IPopulatedPortfolio, IPortfolio, 
-  IPrice, IPriceData, IProduct, ITCCategory, ITCGroup, ITCProduct, ITransaction,
-  TDatedValue, TPerformanceData,
+  IPrice, IPriceData, IProduct, ITCCategory, ITCGroup, ITCPrice, ITCProduct, 
+  ITransaction, TDatedValue, TPerformanceData,
 
   // enums
   ParsingStatus, PerformanceMetric, ProductLanguage, ProductSubtype, 
@@ -553,6 +553,54 @@ export function isITCGroup(arg: any): arg is ITCGroup {
     // optional
     && hasKeys(arg, ['abbrevation']) 
       ? typeof(arg.abbreviation) === 'string' 
+      : true
+}
+
+
+// ========
+// ITCPrice
+// ========
+
+/*
+DESC
+  Returns whether or not the input has all ITCPrice keys
+INPUT
+  arg: An object that might be an ITCPrice
+RETURN
+  TRUE if the input has all ITCPrice keys, FALSE otherwise
+*/
+export function hasITCPriceKeys(arg: any): boolean {
+  return arg
+    && hasKeys(arg, ['productId', 'marketPrice'])
+}
+
+/*
+DESC
+  Returns whether or not the input is an ITCPrice
+INPUT
+  arg: An object that might be an ITCPrice 
+RETURN
+  TRUE if the input is an ITCPrice, FALSE otherwise
+*/
+export function isITCPrice(arg: any): arg is ITCPrice {
+  return arg
+    // required
+    && hasITCPriceKeys(arg)
+    && typeof(arg.productId) === 'number'
+    && typeof(arg.marketPrice) === 'number'
+
+    // optional
+    && hasKeys(arg, ['lowPrice']) 
+      ? typeof(arg.lowPrice) === 'number' 
+      : true
+    && hasKeys(arg, ['midPrice']) 
+      ? typeof(arg.midPrice) === 'number' 
+      : true
+    && hasKeys(arg, ['highPrice']) 
+      ? typeof(arg.highPrice) === 'number' 
+      : true
+    && hasKeys(arg, ['subTypeName']) 
+      ? typeof(arg.subTypeName) === 'string' 
       : true
 }
 

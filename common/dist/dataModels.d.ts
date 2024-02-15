@@ -179,6 +179,15 @@ export interface ITCGroup {
     publishedOn: Date;
     abbreviation?: string;
 }
+export interface ITCPrice {
+    productId: number;
+    marketPrice: number;
+    lowPrice?: number;
+    midPrice?: number;
+    highPrice?: number;
+    directLowPrice?: number;
+    subTypeName?: string;
+}
 export interface ITCProduct extends IProduct {
     groupId: number;
     categoryId: number;
