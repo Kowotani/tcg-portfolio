@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -19,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseTCProducts = exports.parseTCGroups = exports.parseTCCategories = void 0;
+exports.parseTCProducts = exports.parseTCPrices = exports.parseTCGroups = exports.parseTCCategories = void 0;
 const common_1 = require("common");
 const tcgcsv_1 = require("./tcgcsv");
 const _ = __importStar(require("lodash"));
@@ -71,6 +75,30 @@ function parseTCGroups(response) {
     return groups;
 }
 exports.parseTCGroups = parseTCGroups;
+/*
+ENDPOINT
+  GET:tcgcsvm.com/{categoryId}/{groupId}/prices
+DESC
+  Parses the input response object from the endpoint and returns an
+  ITCPrice[]
+INPUT
+  response: The response corresponding to the return value
+RETURN
+  An ITCProduct[]
+*/
+function parseTCPrices(response) {
+    // check if response is Array-shaped
+    (0, common_1.assert)(Array.isArray(response), 'Input is not an Array');
+    let prices = [];
+    // parse each element
+    response.forEach((el) => {
+        const price = parseITCPriceJSON(el);
+        if (prices)
+            prices.push(price);
+    });
+    return prices;
+}
+exports.parseTCPrices = parseTCPrices;
 /*
 ENDPOINT
   GET:tcgcsvm.com/{categoryId}/{groupId}/products
@@ -558,6 +586,35 @@ function parseITCGroupJSON(json) {
         obj['publishedOn'] = publishedOnDate;
     }
     (0, common_1.assert)((0, common_1.isITCGroup)(obj), 'Object is not an ITCGroup');
+    return obj;
+}
+/*
+DESC
+  Returns an ITCPrice after parsing the input json
+INPUT
+  json: A JSON representation of an ITCPrice
+RETURN
+  An ITCPrice
+*/
+function parseITCPriceJSON(json) {
+    // verify keys exist
+    (0, common_1.assert)((0, common_1.hasITCPriceKeys)(json), 'JSON is not ITCPrice shaped');
+    // parse json
+    const obj = {
+        productId: json.productId,
+        marketPrice: json.marketPrice
+    };
+    if (json.lowPrice)
+        obj['lowPrice'] = json.lowPrice;
+    if (json.midPrice)
+        obj['midPrice'] = json.midPrice;
+    if (json.highPrice)
+        obj['highPrice'] = json.highPrice;
+    if (json.directLowPrice)
+        obj['directLowPrice'] = json.directLowPrice;
+    if (json.subTypeName && json.subTypeName.length)
+        obj['subTypeName'] = json.subTypeName;
+    (0, common_1.assert)((0, common_1.isITCPrice)(obj), 'Object is not an isITCPrice');
     return obj;
 }
 /*

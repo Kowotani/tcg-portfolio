@@ -1,10 +1,11 @@
 import { 
   // data models
-  ITCCategory, ITCGroup, ITCProduct, ParsingStatus, ProductLanguage, 
+  ITCCategory, ITCGroup, ITCPrice, ITCProduct, ParsingStatus, ProductLanguage, 
   ProductType, ProductSubtype, TCG,
 
   // typeguards
-  hasTCCategoryKeys, hasITCGroupKeys, isITCCategory, isITCGroup, isITCProduct,
+  hasTCCategoryKeys, hasITCGroupKeys, hasITCPriceKeys, isITCCategory, 
+  isITCGroup, isITCPrice, isITCProduct,
 
   // generic
   assert, getDateFromJSON
@@ -142,6 +143,35 @@ export function parseTCGroups(
   })
   
   return groups
+}
+
+/*
+ENDPOINT
+  GET:tcgcsvm.com/{categoryId}/{groupId}/prices
+DESC
+  Parses the input response object from the endpoint and returns an 
+  ITCPrice[]
+INPUT
+  response: The response corresponding to the return value
+RETURN
+  An ITCProduct[]
+*/
+export function parseTCPrices(
+  response: any[]
+): ITCPrice[] {
+
+  // check if response is Array-shaped
+  assert(Array.isArray(response), 'Input is not an Array')
+
+  let prices = [] as ITCPrice[]
+
+  // parse each element
+  response.forEach((el: any) => {
+    const price = parseITCPriceJSON(el)
+    if (prices) prices.push(price)
+  })
+  
+  return prices
 }
 
 /*
@@ -732,6 +762,35 @@ function parseITCGroupJSON(json: any): ITCGroup {
   }
 
   assert(isITCGroup(obj), 'Object is not an ITCGroup')
+  return obj
+}
+
+/*
+DESC
+  Returns an ITCPrice after parsing the input json
+INPUT
+  json: A JSON representation of an ITCPrice
+RETURN
+  An ITCPrice
+*/
+function parseITCPriceJSON(json: any): ITCPrice {
+
+  // verify keys exist
+  assert(hasITCPriceKeys(json), 'JSON is not ITCPrice shaped')
+
+  // parse json
+  const obj: any = {
+    productId: json.productId,
+    marketPrice: json.marketPrice
+  }
+  if (json.lowPrice) obj['lowPrice'] = json.lowPrice
+  if (json.midPrice) obj['midPrice'] = json.midPrice
+  if (json.highPrice) obj['highPrice'] = json.highPrice
+  if (json.directLowPrice) obj['directLowPrice'] = json.directLowPrice
+  if (json.subTypeName && json.subTypeName.length)
+    obj['subTypeName'] = json.subTypeName
+
+  assert(isITCPrice(obj), 'Object is not an isITCPrice')
   return obj
 }
 

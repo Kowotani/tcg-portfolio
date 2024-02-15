@@ -1,7 +1,7 @@
 import axios from 'axios'
 import {
   // data models
-  ITCCategory, ITCGroup, ITCProduct,
+  ITCCategory, ITCGroup, ITCPrice, ITCProduct,
 
   // generic
   assert
@@ -9,7 +9,9 @@ import {
 import * as _ from 'lodash' 
 import { getTCGroupDoc } from '../mongo/dbi/TCGroup'
 import { TCCATEGORYID_TO_TCG_MAP } from '../utils/tcgcsv'
-import { parseTCCategories, parseTCGroups, parseTCProducts } from '../utils/api'
+import { 
+  parseTCCategories, parseTCGroups, parseTCPrices, parseTCProducts 
+} from '../utils/api'
 
 
 // =========
@@ -67,6 +69,35 @@ export async function getParsedTCGroups(
   })
 
   return parseTCGroups(res.data.results)
+}
+
+// ----------
+// ITCProduct
+// ----------
+
+/*
+DESC
+  Returns an ITCPrice[] of scraped Prices for the input categoryId and 
+  groupId
+INPUT
+  categoryId: The categoryId to scrape
+  groupId: The groupId to scrape
+RETURN
+  An ITCPrice[]
+*/
+export async function getParsedTCPrices(
+  categoryId: number,
+  groupId: number
+): Promise<ITCPrice[]> {
+
+
+  const url = `${URL_BASE}/${categoryId}/${groupId}/prices`
+  const res = await axios({
+    method: 'get',
+    url: url,
+  })
+
+  return parseTCPrices(res.data.results)
 }
 
 // ----------
