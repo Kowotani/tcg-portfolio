@@ -1,10 +1,10 @@
 import { 
   // data models
-  IDatedPriceData, IPrice, IPriceData, IProduct, ITCGroup, ITCProduct, 
-  TimeseriesGranularity,
+  IDatedPriceData, IPrice, IPriceData, IProduct, ITCGroup, ITCPrice, ITCProduct, 
+  ParsingStatus, TimeseriesGranularity,
 
   // generic
-  assert, formatAsISO, isDateBetween
+  assert, formatAsISO, getUTCDateFromLocalDate, isDateBetween
 } from 'common'
 import * as _ from 'lodash'
 import { IMProduct } from '../mongo/models/productSchema'
@@ -15,7 +15,9 @@ import {
 import { getTCGroupDocs, insertTCGroups } from '../mongo/dbi/TCGroup'
 import { getTCProductDocs, insertTCProducts } from '../mongo/dbi/TCProduct'
 import { scrapeCurrent, scrapeHistorical } from './scraper'
-import { getParsedTCGroups, getParsedTCProducts } from './tcgcsv'
+import { 
+  getParsedTCGroups, getParsedTCPrices, getParsedTCProducts 
+} from './tcgcsv'
 import { TcgPlayerChartDateRange } from '../utils/Chart'
 import { TCCATEGORYID_TO_TCG_MAP } from '../utils/tcgcsv'
 
@@ -236,6 +238,58 @@ export async function loadTCGroups(
 
 /*
 DESC
+  Loads TCGCSV Prices for the input TCGCSV categoryId and groupId
+INPUT
+  categoryId: The TCGCSV categoryId
+  groupId: The TCGCSV groupId
+RETURN
+  The number of documents loaded for the input Category and Group
+*/
+export async function loadTCPrices(
+  categoryId: number,
+  groupId: number
+): Promise<number> {
+
+  // get validated TCProducts
+  const params = {
+    categoryId: categoryId,
+    groupId: groupId,
+    status: ParsingStatus.Validated
+  }
+  const tcproducts = await getTCProductDocs(params)
+  const tcgplayerIds = tcproducts.map((tcproduct: ITCProduct) => {
+    return tcproduct.tcgplayerId
+  })
+  if (tcgplayerIds.length === 0) {
+    console.log(`No tcgplayerIds found for [${categoryId}, ${groupId}]`)
+    return 0
+  }
+
+  // get TCPrices for validated TCProducts
+  const allTcprices = await getParsedTCPrices(categoryId, groupId)
+  const tcprices = allTcprices.filter((tcprice: ITCPrice) => {
+    return tcgplayerIds.includes(tcprice.productId)
+  })
+
+  // convert TCPrices to Prices
+  const priceDate = getUTCDateFromLocalDate(new Date())
+  const prices = tcprices.map((tcprice: ITCPrice) => {
+    return {
+      priceDate: priceDate,
+      tcgplayerId: tcprice.productId,
+      granularity: TimeseriesGranularity.Hours,
+      prices: { marketPrice: tcprice.marketPrice } as IPriceData
+    } as IPrice
+  })
+
+  // insert Prices
+  if (prices) await insertPrices(prices)
+
+  return 0
+}
+
+/*
+DESC
   Loads TCGCSV Products for the input TCGCSV categoryId, and optionally for the
   input TCGCSV groupId and / or releaseDates
 INPUT
@@ -326,8 +380,8 @@ async function main() {
 
   // const numInserted = await loadHistoricalPrices(TcgPlayerChartDateRange.OneYear)
   // console.log(`Inserted ${numInserted} docs`)
-  // const categoryId = 1
-  // const groupId = 22937
+  const categoryId = 1
+  const groupId = 23303
   // const startReleaseDate = new Date(Date.parse('2016-01-01'))
   // const endReleaseDate = new Date(Date.parse('2017-01-01'))
   // const params = {
@@ -343,8 +397,8 @@ async function main() {
   // console.log(`Inserted ${res} docs for: ${TCCATEGORYID_TO_TCG_MAP.get(categoryId)}`)
   // const tcprices = await getParsedTCPrices(71, 22937)
 
-  // const res = await loadTCProducts(params)
-  // console.log(res)
+  const res = await loadTCPrices(categoryId, groupId)
+  console.log(`Inserted ${res} docs for: ${TCCATEGORYID_TO_TCG_MAP.get(categoryId)}`)
   process.exit(0)
 }
 
