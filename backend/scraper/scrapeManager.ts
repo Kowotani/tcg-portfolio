@@ -4,7 +4,7 @@ import {
   TimeseriesGranularity,
 
   // generic
-  assert, formatAsISO, isDateAfter
+  assert, formatAsISO, isDateBetween
 } from 'common'
 import * as _ from 'lodash'
 import { IMProduct } from '../mongo/models/productSchema'
@@ -237,30 +237,33 @@ export async function loadTCGroups(
 /*
 DESC
   Loads TCGCSV Products for the input TCGCSV categoryId, and optionally for the
-  input TCGCSV groupId
+  input TCGCSV groupId and / or releaseDates
 INPUT
   categoryId: The TCGCSV categoryId
   groupId?: The TCGCSV groupId
-  releaseDate?: The Date cutoff
+  startReleaseDate?: The starting releaseDate cutoff
+  endReleaseDate?: The ending releaseDate cutoff
 RETURN
   The number of documents loaded for the input Category and Group
 */
 interface ILoadTCProductsParameters {
   categoryId: number, 
   groupId?: number, 
-  releaseDate?: Date
+  startReleaseDate?: Date,
+  endReleaseDate?: Date
 }
 export async function loadTCProducts({ 
   categoryId, 
   groupId, 
-  releaseDate 
+  startReleaseDate,
+  endReleaseDate
 }: ILoadTCProductsParameters = {
   categoryId: 0
 }): Promise<number> {
 
-  // verify that groupId or releaseDate is provided
-  assert(groupId || releaseDate, 
-    'Either groupId or releaseDate must be provided')
+  // verify that groupId or startReleaseDate is provided
+  assert(groupId || startReleaseDate, 
+    'Either groupId or startReleaseDate must be provided')
 
   // verify categoryId is recognized
   assert(TCCATEGORYID_TO_TCG_MAP.get(categoryId), 
@@ -272,14 +275,14 @@ export async function loadTCProducts({
     .filter((group: ITCGroup) => {
       return groupId 
         ? group.groupId === groupId
-        : releaseDate 
+        : startReleaseDate 
           && group.publishedOn 
-          && isDateAfter(group.publishedOn, releaseDate, true)
+          && isDateBetween(group.publishedOn, startReleaseDate, 
+            endReleaseDate ?? new Date(), true)
     })
     .map((group: ITCGroup) => { 
       return group.groupId
     })
-
   const promises = groupIds.map((id: number) => {
     return getParsedTCProducts(categoryId, id)
   })
@@ -324,16 +327,25 @@ async function main() {
   // const numInserted = await loadHistoricalPrices(TcgPlayerChartDateRange.OneYear)
   // console.log(`Inserted ${numInserted} docs`)
   // const categoryId = 1
-  // const groupId = 2576
-  // const releaseDate = new Date(Date.parse('2023-01-01'))
+  // const groupId = 22937
+  // const startReleaseDate = new Date(Date.parse('2016-01-01'))
+  // const endReleaseDate = new Date(Date.parse('2017-01-01'))
   // const params = {
   //   categoryId: categoryId,
-  //   releaseDate: releaseDate
+  //   startReleaseDate: startReleaseDate,
+  //   endReleaseDate: endReleaseDate,
   // }
+  // const date = new Date(Date.parse('2023-02-01'))
+  // console.log(isDateBetween(date, startReleaseDate, endReleaseDate, true))
   // const tcgplayerId = 521581
   // const res = await setTCProductProperty(tcgplayerId, 'status', ParsingStatus.ToBeValidated)
   // const res = await loadTCProducts(params)
   // console.log(`Inserted ${res} docs for: ${TCCATEGORYID_TO_TCG_MAP.get(categoryId)}`)
+  // const tcprices = await getParsedTCPrices(71, 22937)
+
+  // const res = await loadTCProducts(params)
+  // console.log(res)
+  process.exit(0)
 }
 
 main()
