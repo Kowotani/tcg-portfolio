@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.getUTCDateFromLocalDate = exports.getDateFromJSON = exports.getLocalDateFromISOString = exports.getClientTimezone = exports.formatInTimeZone = exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBefore = exports.isDateAfter = exports.getStartOfDate = exports.getDaysBetween = exports.getClampedDate = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateDiff = exports.dateAdd = exports.areDatesEqual = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
+exports.getUTCDateFromLocalDate = exports.getDateFromJSON = exports.getLocalDateFromISOString = exports.getClientTimezone = exports.formatInTimeZone = exports.getDateOneYearAgo = exports.getDateSixMonthsAgo = exports.getDateThreeMonthsAgo = exports.getDateOneMonthAgo = exports.getDateThirtyDaysAgo = exports.isDateBetween = exports.isDateBefore = exports.isDateAfter = exports.getStartOfDate = exports.getDaysBetween = exports.getClampedDate = exports.formatDateDiffAsYearsMonthsDays = exports.formatAsISO = exports.dateSub = exports.dateDiff = exports.dateAdd = exports.areDatesEqual = exports.genSundayOfWeekDateRange = exports.genFirstOfYearDateRange = exports.genFirstOfQuarterDateRange = exports.genFirstOfMonthDateRange = exports.genDateRange = void 0;
 var date_fns_1 = require("date-fns");
 var date_fns_tz_1 = require("date-fns-tz");
 var _ = require("lodash");
@@ -259,9 +259,8 @@ RETURN
   TRUE if the first date is after (or equal to) the second date, FALSE otherwise
 */
 function isDateAfter(first, second, orEqual) {
-    return orEqual
-        ? (0, date_fns_1.isAfter)(first, second) || (0, date_fns_1.isEqual)(first, second)
-        : (0, date_fns_1.isAfter)(first, second);
+    return (0, date_fns_1.isAfter)(first, second)
+        || orEqual ? (0, date_fns_1.isEqual)(first, second) : false;
 }
 exports.isDateAfter = isDateAfter;
 /*
@@ -276,11 +275,30 @@ RETURN
   TRUE if the first date is before (or equal to) the second date, FALSE otherwise
 */
 function isDateBefore(first, second, orEqual) {
-    return orEqual
-        ? (0, date_fns_1.isBefore)(first, second) || (0, date_fns_1.isEqual)(first, second)
-        : (0, date_fns_1.isBefore)(first, second);
+    return (0, date_fns_1.isBefore)(first, second)
+        || orEqual ? (0, date_fns_1.isEqual)(first, second) : false;
 }
 exports.isDateBefore = isDateBefore;
+/*
+DESC
+  Returns whether the date is between the start and end dates, or equal to if
+  orEqual is TRUE
+INPUT
+  date: The date
+  startDate: The start date
+  endDate: The end date
+  orEqual?: Whether equality should be TRUE
+RETURN
+  TRUE if the date is between (or equal to) the start and end dates,
+  FALSE otherwise
+*/
+function isDateBetween(date, start, end, orEqual) {
+    return orEqual
+        ? ((0, date_fns_1.isAfter)(date, start) || (0, date_fns_1.isEqual)(date, start))
+            && ((0, date_fns_1.isBefore)(date, start) || (0, date_fns_1.isBefore)(date, start))
+        : ((0, date_fns_1.isAfter)(date, start) && (0, date_fns_1.isBefore)(date, end));
+}
+exports.isDateBetween = isDateBetween;
 // =====================
 // n periods ago helpers
 // =====================

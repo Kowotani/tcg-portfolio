@@ -325,9 +325,8 @@ export function isDateAfter(
   second: Date, 
   orEqual?: boolean
 ): boolean {
-  return orEqual 
-    ? isAfter(first, second) || isEqual(first, second)
-    : isAfter(first, second)
+  return isAfter(first, second) 
+    || orEqual ? isEqual(first, second) : false
 }
 
 /*
@@ -346,9 +345,33 @@ export function isDateBefore(
   second: Date, 
   orEqual?: boolean
 ): boolean {
+  return isBefore(first, second) 
+    || orEqual ? isEqual(first, second) : false
+}
+
+/*
+DESC
+  Returns whether the date is between the start and end dates, or equal to if
+  orEqual is TRUE
+INPUT
+  date: The date
+  startDate: The start date
+  endDate: The end date
+  orEqual?: Whether equality should be TRUE
+RETURN
+  TRUE if the date is between (or equal to) the start and end dates, 
+  FALSE otherwise
+*/
+export function isDateBetween(
+  date: Date,
+  start: Date, 
+  end: Date, 
+  orEqual?: boolean
+): boolean {
   return orEqual 
-    ? isBefore(first, second) || isEqual(first, second)
-    : isBefore(first, second)
+    ? (isAfter(date, start) || isEqual(date, start))
+      && (isBefore(date, start) || isBefore(date, start))
+    : (isAfter(date, start) && isBefore(date, end))
 }
 
 

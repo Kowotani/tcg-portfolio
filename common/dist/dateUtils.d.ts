@@ -14,6 +14,7 @@ export declare function getDaysBetween(startDate: Date, endDate: Date): number;
 export declare function getStartOfDate(date: Date): Date;
 export declare function isDateAfter(first: Date, second: Date, orEqual?: boolean): boolean;
 export declare function isDateBefore(first: Date, second: Date, orEqual?: boolean): boolean;
+export declare function isDateBetween(date: Date, start: Date, end: Date, orEqual?: boolean): boolean;
 export declare function getDateThirtyDaysAgo(): Date;
 export declare function getDateOneMonthAgo(): Date;
 export declare function getDateThreeMonthsAgo(): Date;
