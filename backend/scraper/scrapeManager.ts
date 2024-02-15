@@ -238,29 +238,37 @@ export async function loadTCGroups(
 
 /*
 DESC
-  Loads TCGCSV Prices for the input TCGCSV categoryId and groupId
+  Loads TCGCSV Prices for the input TCGCSV categoryId and groupId, and 
+  optionally a list of tcgplayerIds
 INPUT
   categoryId: The TCGCSV categoryId
   groupId: The TCGCSV groupId
+  tcgplayerIds?: A list of tcgplayerIds for which to load prices
 RETURN
-  The number of documents loaded for the input Category and Group
+  The number of documents loaded for the input Category and Group, and 
+  optionally a list of tcgplayerIds
 */
 export async function loadTCPrices(
   categoryId: number,
-  groupId: number
+  groupId: number,
+  tcgplayerIds?: number[]
 ): Promise<number> {
 
   // get validated TCProducts
-  const params = {
+  const params = tcgplayerIds 
+  ? {
+    tcgplayerIds: tcgplayerIds
+  } : {
     categoryId: categoryId,
     groupId: groupId,
     status: ParsingStatus.Validated
   }
   const tcproducts = await getTCProductDocs(params)
-  const tcgplayerIds = tcproducts.map((tcproduct: ITCProduct) => {
-    return tcproduct.tcgplayerId
-  })
-  if (tcgplayerIds.length === 0) {
+  const filteredTcgplayerIds = 
+    tcgplayerIds ?? tcproducts.map((tcproduct: ITCProduct) => {
+      return tcproduct.tcgplayerId
+    })
+  if (filteredTcgplayerIds.length === 0) {
     console.log(`No tcgplayerIds found for [${categoryId}, ${groupId}]`)
     return 0
   }
@@ -268,7 +276,7 @@ export async function loadTCPrices(
   // get TCPrices for validated TCProducts
   const allTcprices = await getParsedTCPrices(categoryId, groupId)
   const tcprices = allTcprices.filter((tcprice: ITCPrice) => {
-    return tcgplayerIds.includes(tcprice.productId)
+    return filteredTcgplayerIds.includes(tcprice.productId)
   })
 
   // convert TCPrices to Prices
