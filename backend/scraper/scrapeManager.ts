@@ -380,8 +380,8 @@ async function main() {
 
   // const numInserted = await loadHistoricalPrices(TcgPlayerChartDateRange.OneYear)
   // console.log(`Inserted ${numInserted} docs`)
-  const categoryId = 1
-  const groupId = 23303
+  // const categoryId = 1
+  // const groupId = 23303
   // const startReleaseDate = new Date(Date.parse('2016-01-01'))
   // const endReleaseDate = new Date(Date.parse('2017-01-01'))
   // const params = {
@@ -397,8 +397,8 @@ async function main() {
   // console.log(`Inserted ${res} docs for: ${TCCATEGORYID_TO_TCG_MAP.get(categoryId)}`)
   // const tcprices = await getParsedTCPrices(71, 22937)
 
-  const res = await loadTCPrices(categoryId, groupId)
-  console.log(`Inserted ${res} docs for: ${TCCATEGORYID_TO_TCG_MAP.get(categoryId)}`)
+  // const res = await loadTCPrices(categoryId, groupId)
+  // console.log(`Inserted ${res} docs for: ${TCCATEGORYID_TO_TCG_MAP.get(categoryId)}`)
   process.exit(0)
 }
 
