@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadTCProducts = exports.loadTCPrices = exports.loadTCGroups = exports.loadHistoricalPrices = exports.loadCurrentPrices = exports.loadCurrentPrice = void 0;
+exports.loadTCProducts = exports.loadTCPrices = exports.loadTCGroups = exports.loadTcgcsvPrices = exports.loadHistoricalPrices = exports.loadCurrentPrices = exports.loadCurrentPrice = void 0;
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
 const Price_1 = require("../mongo/dbi/Price");
@@ -184,6 +184,51 @@ exports.loadHistoricalPrices = loadHistoricalPrices;
 // =======
 /*
 DESC
+  Loads Prices from TCGCSV for all Products with a validated TCProduct
+INPUT
+  categoryId: The TCGCSV categoryId
+RETURN
+  The number of documents loaded for the input Category
+*/
+function loadTcgcsvPrices(categoryId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get Products
+        const products = yield (0, Product_1.getProductDocs)();
+        const tcgplayerIds = (0, common_1.getReleasedProducts)(products)
+            .map((product) => {
+            return product.tcgplayerId;
+        });
+        // get validated TCProducts
+        const params = {
+            categoryId: categoryId,
+            status: common_1.ParsingStatus.Validated,
+            tcgplayerIds: tcgplayerIds
+        };
+        const tcProducts = yield (0, TCProduct_1.getTCProductDocs)(params);
+        // construct map of groupId -> tcgplayerIds
+        let groupIdMap = new Map();
+        tcProducts.forEach((product) => {
+            var _a;
+            // create groupValues
+            let groupValues = (_a = groupIdMap.get(product.groupId)) !== null && _a !== void 0 ? _a : [];
+            groupValues.push(product.tcgplayerId);
+            // update maps
+            groupIdMap.set(product.groupId, groupValues);
+        });
+        // create loadTCPrices promises
+        const promises = [...groupIdMap.keys()].map((groupId) => {
+            const tcgplayerIds = groupIdMap.get(groupId);
+            return loadTCPrices(categoryId, groupId, tcgplayerIds);
+        });
+        // call loadTCPrices
+        yield Promise.all(promises);
+        // TODO: Figure out how to capture the return values properly
+        return tcProducts.length;
+    });
+}
+exports.loadTcgcsvPrices = loadTcgcsvPrices;
+/*
+DESC
   Loads TCGCSV Groups for the input TCGCSV categoryId
 INPUT
   categoryId: The TCGCSV categoryId
@@ -322,7 +367,7 @@ function main() {
         // console.log(`Inserted ${numInserted} docs`)
         // const numInserted = await loadHistoricalPrices(TcgPlayerChartDateRange.OneYear)
         // console.log(`Inserted ${numInserted} docs`)
-        // const categoryId = 1
+        // const categoryId = 62
         // const groupId = 23303
         // const startReleaseDate = new Date(Date.parse('2016-01-01'))
         // const endReleaseDate = new Date(Date.parse('2017-01-01'))
@@ -340,6 +385,8 @@ function main() {
         // const tcprices = await getParsedTCPrices(71, 22937)
         // const res = await loadTCPrices(categoryId, groupId)
         // console.log(`Inserted ${res} docs for: ${TCCATEGORYID_TO_TCG_MAP.get(categoryId)}`)
+        // const res = await loadTcgcsvPrices(categoryId)
+        // console.log(`Loaded ${res} Price documents for categoryId ${categoryId}`)
         process.exit(0);
     });
 }
