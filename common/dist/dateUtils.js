@@ -260,7 +260,7 @@ RETURN
 */
 function isDateAfter(first, second, orEqual) {
     return (0, date_fns_1.isAfter)(first, second)
-        || orEqual ? (0, date_fns_1.isEqual)(first, second) : false;
+        || (orEqual ? (0, date_fns_1.isEqual)(first, second) : false);
 }
 exports.isDateAfter = isDateAfter;
 /*
@@ -276,7 +276,7 @@ RETURN
 */
 function isDateBefore(first, second, orEqual) {
     return (0, date_fns_1.isBefore)(first, second)
-        || orEqual ? (0, date_fns_1.isEqual)(first, second) : false;
+        || (orEqual ? (0, date_fns_1.isEqual)(first, second) : false);
 }
 exports.isDateBefore = isDateBefore;
 /*

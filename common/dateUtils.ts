@@ -326,7 +326,7 @@ export function isDateAfter(
   orEqual?: boolean
 ): boolean {
   return isAfter(first, second) 
-    || orEqual ? isEqual(first, second) : false
+    || (orEqual ? isEqual(first, second) : false)
 }
 
 /*
@@ -346,7 +346,7 @@ export function isDateBefore(
   orEqual?: boolean
 ): boolean {
   return isBefore(first, second) 
-    || orEqual ? isEqual(first, second) : false
+    || (orEqual ? isEqual(first, second) : false)
 }
 
 /*
