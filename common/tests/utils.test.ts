@@ -4,9 +4,9 @@ import {
 } from '../utils'
 
 
-// -------
+// =======
 // generic
-// -------
+// =======
 
 
 // -- genSequentialArray
