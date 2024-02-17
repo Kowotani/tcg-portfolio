@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadTCProducts = exports.loadTCPrices = exports.loadTCGroups = exports.loadTcgcsvPrices = exports.loadHistoricalPrices = exports.loadCurrentPrices = exports.loadCurrentPrice = void 0;
+exports.loadTCProducts = exports.loadTCPrices = exports.loadTCGroups = exports.loadTcgcsvPrices = exports.loadTcgplayerHistoricalPrices = exports.loadTcgplayerCurrentPrices = exports.loadTcgplayerCurrentPrice = void 0;
 const common_1 = require("common");
 const _ = __importStar(require("lodash"));
 const Price_1 = require("../mongo/dbi/Price");
@@ -49,7 +49,7 @@ INPUT
 RETURN
   TRUE if the price data was successfully loaded, FALSE otherwise
 */
-function loadCurrentPrice(tcgplayerId) {
+function loadTcgplayerCurrentPrice(tcgplayerId) {
     return __awaiter(this, void 0, void 0, function* () {
         // scrape price data
         const scrapedPrices = yield (0, scraper_1.scrapeCurrent)([tcgplayerId]);
@@ -74,14 +74,14 @@ function loadCurrentPrice(tcgplayerId) {
         return numInserted === 1;
     });
 }
-exports.loadCurrentPrice = loadCurrentPrice;
+exports.loadTcgplayerCurrentPrice = loadTcgplayerCurrentPrice;
 /*
 DESC
   Loads current price data for all known products
 RETURN
   The number of Price documents inserted
 */
-function loadCurrentPrices() {
+function loadTcgplayerCurrentPrices() {
     return __awaiter(this, void 0, void 0, function* () {
         // get all Products
         const allProductDocs = yield (0, Product_1.getProductDocs)();
@@ -131,7 +131,7 @@ function loadCurrentPrices() {
         return numInserted;
     });
 }
-exports.loadCurrentPrices = loadCurrentPrices;
+exports.loadTcgplayerCurrentPrices = loadTcgplayerCurrentPrices;
 /*
 DESC
   Loads historical price data for all known products
@@ -140,7 +140,7 @@ INPUT
 RETURN
   The number of Price documents inserted
 */
-function loadHistoricalPrices(dateRange) {
+function loadTcgplayerHistoricalPrices(dateRange) {
     return __awaiter(this, void 0, void 0, function* () {
         // get TcgplayerIds that are missing data
         const tcgplayerIds = yield (0, Product_1.getTcgplayerIdsForHistoricalScrape)(dateRange);
@@ -178,7 +178,7 @@ function loadHistoricalPrices(dateRange) {
         return numInserted;
     });
 }
-exports.loadHistoricalPrices = loadHistoricalPrices;
+exports.loadTcgplayerHistoricalPrices = loadTcgplayerHistoricalPrices;
 // =======
 // TCG CSV
 // =======

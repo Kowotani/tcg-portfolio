@@ -428,7 +428,7 @@ app.post(common_1.LATEST_PRICES_URL, upload.none(), (req, res) => __awaiter(void
             throw new Error(errMsg);
         }
         // load latest Price
-        const isLoaded = yield (0, scrapeManager_1.loadCurrentPrice)(tcgplayerId);
+        const isLoaded = yield (0, scrapeManager_1.loadTcgplayerCurrentPrice)(tcgplayerId);
         if (isLoaded) {
             res.status(201);
             const body = {

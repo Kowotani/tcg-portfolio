@@ -35,7 +35,9 @@ INPUT
 RETURN
   TRUE if the price data was successfully loaded, FALSE otherwise
 */
-export async function loadCurrentPrice(tcgplayerId: number): Promise<boolean> {
+export async function loadTcgplayerCurrentPrice(
+  tcgplayerId: number
+): Promise<boolean> {
 
   // scrape price data
   const scrapedPrices = await scrapeCurrent([tcgplayerId])
@@ -70,7 +72,7 @@ DESC
 RETURN
   The number of Price documents inserted
 */
-export async function loadCurrentPrices(): Promise<number> {
+export async function loadTcgplayerCurrentPrices(): Promise<number> {
 
   // get all Products
   const allProductDocs = await getProductDocs()
@@ -144,7 +146,7 @@ INPUT
 RETURN
   The number of Price documents inserted
 */
-export async function loadHistoricalPrices(
+export async function loadTcgplayerHistoricalPrices(
   dateRange: TcgPlayerChartDateRange
 ): Promise<number> {
 

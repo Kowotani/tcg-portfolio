@@ -1,7 +1,7 @@
 const scrapeManager = require('../dist/scraper/scrapeManager')
 
 scrapeManager
-  .loadCurrentPrices()
+  .loadTcgplayerCurrentPrices()
   .then(res => {
     console.log(`${res} price documents were loaded`)
     process.exit(0) 

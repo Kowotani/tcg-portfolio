@@ -39,11 +39,9 @@ import {
   getProductDoc, getProductDocs, insertProducts 
 } from './mongo/dbi/Product'
 import { getLatestPrices, insertPrices } from './mongo/dbi/Price'
-import { 
-  getTCProductDoc, getTCProductDocs, setTCProduct 
-} from './mongo/dbi/TCProduct'
+import { getTCProductDocs, setTCProduct } from './mongo/dbi/TCProduct'
 import multer from 'multer'
-import { loadCurrentPrice } from './scraper/scrapeManager'
+import { loadTcgplayerCurrentPrice } from './scraper/scrapeManager'
 import { 
   genReleaseDateProductHolding, getHoldingCumPnLAsDatedValues, 
   getHoldingMarketValueAsDatedValues, getHoldingTotalCostAsDatedValues 
@@ -516,7 +514,7 @@ app.post(LATEST_PRICES_URL, upload.none(), async (req: any, res: any) => {
     }
 
     // load latest Price
-    const isLoaded = await loadCurrentPrice(tcgplayerId)
+    const isLoaded = await loadTcgplayerCurrentPrice(tcgplayerId)
     if (isLoaded) {
       res.status(201)
       const body: TResBody = {
