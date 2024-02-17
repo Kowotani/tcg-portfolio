@@ -221,9 +221,8 @@ function loadTcgcsvPrices(categoryId) {
             return loadTCPrices(categoryId, groupId, tcgplayerIds);
         });
         // call loadTCPrices
-        yield Promise.all(promises);
-        // TODO: Figure out how to capture the return values properly
-        return tcProducts.length;
+        const res = yield Promise.all(promises);
+        return _.sum(res);
     });
 }
 exports.loadTcgcsvPrices = loadTcgcsvPrices;

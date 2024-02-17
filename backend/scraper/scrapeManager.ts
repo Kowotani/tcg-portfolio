@@ -247,10 +247,9 @@ export async function loadTcgcsvPrices(categoryId: number): Promise<number> {
   })
 
   // call loadTCPrices
-  await Promise.all(promises)
+  const res = await Promise.all(promises)
 
-  // TODO: Figure out how to capture the return values properly
-  return tcProducts.length
+  return _.sum(res)
 }
 
 /*
