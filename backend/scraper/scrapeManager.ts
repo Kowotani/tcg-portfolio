@@ -134,8 +134,7 @@ export async function loadTcgplayerCurrentPrices(): Promise<number> {
     } 
   })
 
-  const numInserted = await insertPrices(priceDocs)
-  return numInserted
+  return await insertPrices(priceDocs)
 }
 
 /*
@@ -194,8 +193,7 @@ export async function loadTcgplayerHistoricalPrices(
     } 
   })
 
-  const numInserted = await insertPrices(priceDocs)
-  return numInserted
+  return await insertPrices(priceDocs)
 }
 
 
@@ -240,6 +238,8 @@ export async function loadTcgcsvPrices(categoryId: number): Promise<number> {
     groupIdMap.set(product.groupId, groupValues)
   })
 
+  console.log(groupIdMap)
+
   // create loadTCPrices promises
   const promises = [...groupIdMap.keys()].map((groupId: number) => {
     const tcgplayerIds = groupIdMap.get(groupId) as number[]
@@ -281,10 +281,7 @@ export async function loadTCGroups(
   })
 
   // insert new Groups
-  if (newGroups) 
-    return await insertTCGroups(newGroups)
-    
-  return 0
+  return newGroups ? await insertTCGroups(newGroups) : 0
 }
 
 /*
@@ -340,11 +337,10 @@ export async function loadTCPrices(
       prices: { marketPrice: tcprice.marketPrice } as IPriceData
     } as IPrice
   })
+  console.log(prices)
 
   // insert Prices
-  if (prices) await insertPrices(prices)
-
-  return 0
+  return prices ? await insertPrices(prices) : 0
 }
 
 /*
@@ -419,9 +415,7 @@ export async function loadTCProducts({
   })
 
   // insert new Products
-  if (newProducts) return await insertTCProducts(newProducts)
-
-  return 0
+  return newProducts ? await insertTCProducts(newProducts) : 0
 }
 
 
@@ -439,7 +433,7 @@ async function main() {
 
   // const numInserted = await loadHistoricalPrices(TcgPlayerChartDateRange.OneYear)
   // console.log(`Inserted ${numInserted} docs`)
-  // const categoryId = 62
+  // const categoryId = 1
   // const groupId = 23303
   // const startReleaseDate = new Date(Date.parse('2016-01-01'))
   // const endReleaseDate = new Date(Date.parse('2017-01-01'))
@@ -460,7 +454,7 @@ async function main() {
   // console.log(`Inserted ${res} docs for: ${TCCATEGORYID_TO_TCG_MAP.get(categoryId)}`)
   // const res = await loadTcgcsvPrices(categoryId)
   // console.log(`Loaded ${res} Price documents for categoryId ${categoryId}`)
-  process.exit(0)
+  // process.exit(0)
 }
 
 main()

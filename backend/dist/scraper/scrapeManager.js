@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -127,8 +131,7 @@ function loadTcgplayerCurrentPrices() {
                 console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
             }
         });
-        const numInserted = yield (0, Price_1.insertPrices)(priceDocs);
-        return numInserted;
+        return yield (0, Price_1.insertPrices)(priceDocs);
     });
 }
 exports.loadTcgplayerCurrentPrices = loadTcgplayerCurrentPrices;
@@ -174,8 +177,7 @@ function loadTcgplayerHistoricalPrices(dateRange) {
                 console.log(`No price data found for tcgplayerId: ${tcgplayerId}`);
             }
         });
-        const numInserted = yield (0, Price_1.insertPrices)(priceDocs);
-        return numInserted;
+        return yield (0, Price_1.insertPrices)(priceDocs);
     });
 }
 exports.loadTcgplayerHistoricalPrices = loadTcgplayerHistoricalPrices;
@@ -215,6 +217,7 @@ function loadTcgcsvPrices(categoryId) {
             // update maps
             groupIdMap.set(product.groupId, groupValues);
         });
+        console.log(groupIdMap);
         // create loadTCPrices promises
         const promises = [...groupIdMap.keys()].map((groupId) => {
             const tcgplayerIds = groupIdMap.get(groupId);
@@ -249,9 +252,7 @@ function loadTCGroups(categoryId) {
             return !existingGroupIds.includes(group.groupId);
         });
         // insert new Groups
-        if (newGroups)
-            return yield (0, TCGroup_1.insertTCGroups)(newGroups);
-        return 0;
+        return newGroups ? yield (0, TCGroup_1.insertTCGroups)(newGroups) : 0;
     });
 }
 exports.loadTCGroups = loadTCGroups;
@@ -301,10 +302,9 @@ function loadTCPrices(categoryId, groupId, tcgplayerIds) {
                 prices: { marketPrice: tcprice.marketPrice }
             };
         });
+        console.log(prices);
         // insert Prices
-        if (prices)
-            yield (0, Price_1.insertPrices)(prices);
-        return 0;
+        return prices ? yield (0, Price_1.insertPrices)(prices) : 0;
     });
 }
 exports.loadTCPrices = loadTCPrices;
@@ -348,9 +348,7 @@ function loadTCProducts({ categoryId, groupId, startReleaseDate, endReleaseDate 
             return !existingTcgplayerIds.includes(product.tcgplayerId);
         });
         // insert new Products
-        if (newProducts)
-            return yield (0, TCProduct_1.insertTCProducts)(newProducts);
-        return 0;
+        return newProducts ? yield (0, TCProduct_1.insertTCProducts)(newProducts) : 0;
     });
 }
 exports.loadTCProducts = loadTCProducts;
@@ -366,7 +364,7 @@ function main() {
         // console.log(`Inserted ${numInserted} docs`)
         // const numInserted = await loadHistoricalPrices(TcgPlayerChartDateRange.OneYear)
         // console.log(`Inserted ${numInserted} docs`)
-        // const categoryId = 62
+        const categoryId = 1;
         // const groupId = 23303
         // const startReleaseDate = new Date(Date.parse('2016-01-01'))
         // const endReleaseDate = new Date(Date.parse('2017-01-01'))
@@ -384,8 +382,8 @@ function main() {
         // const tcprices = await getParsedTCPrices(71, 22937)
         // const res = await loadTCPrices(categoryId, groupId)
         // console.log(`Inserted ${res} docs for: ${TCCATEGORYID_TO_TCG_MAP.get(categoryId)}`)
-        // const res = await loadTcgcsvPrices(categoryId)
-        // console.log(`Loaded ${res} Price documents for categoryId ${categoryId}`)
+        const res = yield loadTcgcsvPrices(categoryId);
+        console.log(`Loaded ${res} Price documents for categoryId ${categoryId}`);
         process.exit(0);
     });
 }
