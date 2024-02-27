@@ -238,8 +238,6 @@ export async function loadTcgcsvPrices(categoryId: number): Promise<number> {
     groupIdMap.set(product.groupId, groupValues)
   })
 
-  console.log(groupIdMap)
-
   // create loadTCPrices promises
   const promises = [...groupIdMap.keys()].map((groupId: number) => {
     const tcgplayerIds = groupIdMap.get(groupId) as number[]
@@ -337,7 +335,6 @@ export async function loadTCPrices(
       prices: { marketPrice: tcprice.marketPrice } as IPriceData
     } as IPrice
   })
-  console.log(prices)
 
   // insert Prices
   return prices ? await insertPrices(prices) : 0
