@@ -1,7 +1,9 @@
-import { PropsWithChildren } from 'react'
 import { 
-  Box
+  Box,
+  Button,
+  Icon
 } from '@chakra-ui/react'
+import { FiPlus } from 'react-icons/fi'
 
 
 // ==========
@@ -11,9 +13,7 @@ import {
 type TSectionHeaderProps = {
   header: string
 }
-export const SectionHeader = (
-  props: PropsWithChildren<TSectionHeaderProps>
-) => {
+export const SectionHeader = (props: TSectionHeaderProps) => {
 
   return (
     <Box 
@@ -26,5 +26,21 @@ export const SectionHeader = (
     >
       {props.header}
     </Box>    
+  )
+}
+
+type TAddButtonProps = {
+  label: string,
+  onClick: () => void
+}
+export const AddButton = (props: TAddButtonProps) => {
+  return (
+    <Button 
+      colorScheme='green'
+      leftIcon={<Icon as={FiPlus} />}
+      onClick={() => props.onClick()}
+    >
+      {props.label}
+    </Button>
   )
 }

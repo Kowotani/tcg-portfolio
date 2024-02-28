@@ -19,7 +19,7 @@ import {
 } from 'common'
 import { FiPlus } from 'react-icons/fi'
 import { PortfolioCard } from './PortfolioCard'
-import { SectionHeader } from './Layout'
+import { AddButton, SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { LatestPricesContext } from '../state/LatestPricesContext'
@@ -214,13 +214,10 @@ export const AllPortfolios = (
 
       {/* Add Portfolio Button */}
       <Box display='flex' alignContent='flex-start' m='16px 0px'>
-        <Button 
-          colorScheme='green'
-          leftIcon={<Icon as={FiPlus} />}
-          onClick={() => props.onAddClick()}
-        >
-          Add Portfolio
-        </Button>
+        <AddButton 
+          label='Add Portfolio'
+          onClick={props.onAddClick}
+        />
       </Box>
 
       {isLoading
