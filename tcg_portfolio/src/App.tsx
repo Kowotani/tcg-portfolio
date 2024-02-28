@@ -29,9 +29,6 @@ export const App = () => (
               <>
                 <Header />
                 <SideBar />
-                <Flex justify='center'>
-                  <Logo h='30vmin' />
-                </Flex>
               </>
               
             </UserProvider>
