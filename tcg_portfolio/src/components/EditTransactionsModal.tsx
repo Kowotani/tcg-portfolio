@@ -54,7 +54,7 @@ import { formatNumber, getColorForNumber } from '../utils/generic'
 
 
 // ==============
-// Sub Components
+// sub components
 // ==============
 
 // ------------------
@@ -365,6 +365,7 @@ const AddTransactionForm = (
 type TEditTransactionsModalProps = {
   isOpen: boolean,
   marketPrice: number,
+  mode: 'ADD' | 'EDIT',
   product: IProduct,
   transactions: ITransaction[],
   onClose: () => void,

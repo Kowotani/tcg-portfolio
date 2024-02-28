@@ -32,7 +32,7 @@ type THoldingCardProps = {
   onHoldingDelete: (holding: IPopulatedHolding) => void,
   onHoldingUpdate: (holding: IPopulatedHolding) => void,
 }
-export const HoldingInputCard = (
+export const HoldingEditCard = (
   props: PropsWithChildren<THoldingCardProps>
 ) => {
 
@@ -226,6 +226,7 @@ export const HoldingInputCard = (
       <EditTransactionsModal 
         isOpen={isOpen} 
         marketPrice={props.marketPrice}
+        mode='EDIT'
         onClose={onClose} 
         product={props.populatedHolding.product}
         setTransactions={handleSetTransactions}
