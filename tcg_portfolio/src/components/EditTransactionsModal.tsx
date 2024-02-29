@@ -42,11 +42,11 @@ import {
   // generic
   assert, formatAsISO, getClampedDate, 
 } from 'common'
-import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
-  FormikProps } from 'formik'
+import { 
+  Field, FieldInputProps, Form, Formik, FormikHelpers, FormikProps 
+} from 'formik'
 import * as _ from 'lodash'
-import { MetricSummary, TMetricSummaryItem 
-  } from './MetricSummary'
+import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
 import { ProductSearchResult } from './ProductSearchResult'
@@ -381,8 +381,8 @@ type TEditTransactionsModalProps = {
   searchableProducts?: IProduct[],
   transactions?: ITransaction[],
   onClose: () => void,
-  handleAddHolding?: (product: IProduct, transactions: ITransaction[]) => void,
-  handleSetTransactions?: (txns: ITransaction[]) => void
+  onAddHolding?: (product: IProduct, transactions: ITransaction[]) => void,
+  onSetTransactions?: (txns: ITransaction[]) => void
 }
 export const EditTransactionsModal = (
   props: PropsWithChildren<TEditTransactionsModalProps>
@@ -404,8 +404,8 @@ export const EditTransactionsModal = (
   const [ searchInput, setSearchInput ] = useState('')
 
   // searchable products (that can be added)
-  const [ searchableProducts, setSearchableProducts ] =
-    useState(props.searchableProducts ?? [] as IProduct[])
+  // const [ searchableProducts, setSearchableProducts ] =
+  //   useState(props.searchableProducts ?? [] as IProduct[])
 
   // search results
   const [ searchResults, setSearchResults ] = useState([] as IProduct[])
@@ -510,14 +510,14 @@ export const EditTransactionsModal = (
       // Add mode - add new Holding
       if (props.mode === TransactionsModalMode.Add) {
         assert(isIProduct(product), 'Product is undefined')
-        assert(props.handleAddHolding, 'handleAddHolding() is undefined')
-        props.handleAddHolding(product, transactions)
+        assert(props.onAddHolding, 'onAddHolding() is undefined')
+        props.onAddHolding(product, transactions)
         resetState()
 
       // Edit mode - update parent transactions
       } else if (props.mode === TransactionsModalMode.Edit) {
-        assert(props.handleSetTransactions, 'onSetTransactions() is undefined')
-        props.handleSetTransactions(transactions)
+        assert(props.onSetTransactions, 'onSetTransactions() is undefined')
+        props.onSetTransactions(transactions)
       }
       props.onClose()
 
@@ -574,11 +574,23 @@ export const EditTransactionsModal = (
 
   /*
   DESC
+    Get Products that are searchable from the search input
+  */
+  function getSearchableProducts(): IProduct[] {
+    const searchableProducts = props.searchableProducts ?? [] as IProduct[]
+    return product
+      ? searchableProducts.filter((p: IProduct) => {
+        return p.tcgplayerId !== product.tcgplayerId
+      }) : searchableProducts
+  }
+
+  /*
+  DESC
     Handler function for search input changes
   */
   function onSearchChange(query: string): void {
     setSearchInput(query)
-    const results = searchableProducts
+    const results = getSearchableProducts()
       .filter(filterFnProductSearchResult(query))
       .sort(sortFnProductSearchResults)
     setSearchResults(results)
@@ -592,16 +604,7 @@ export const EditTransactionsModal = (
     product: The IProduct that was clicked from the search results
   */
   function onSearchResultClick(product: IProduct): void {
-    // clear search 
     setSearchInput('')
-
-    // update searchable products
-    const newSearchableProducts = searchableProducts.filter((p: IProduct) => {
-        return p.tcgplayerId !== product.tcgplayerId
-    })
-    setSearchableProducts(newSearchableProducts)
-
-    // update selected product
     setProduct(product)
   }
 
@@ -703,10 +706,11 @@ export const EditTransactionsModal = (
 
   return (
     <Modal 
+      closeOnEsc={false}
       closeOnOverlayClick={false}
       isOpen={props.isOpen} 
-      onClose={props.onClose}
       size='3xl'
+      onClose={props.onClose}
     >
       <ModalOverlay />
       {/* Set modal z-index to be higher than the error tooltip (1800)*/}
@@ -746,13 +750,13 @@ export const EditTransactionsModal = (
                   textAlign='center'
                 />
 
-                {/* Product Image */}
-                <ProductImage boxSize='200px' product={product} />
-
                 {/* Market price */}
                 <Text fontSize='large'>
                   {props.marketPrice && formatAsPrice(props.marketPrice)}
                 </Text>
+
+                {/* Product Image */}
+                <ProductImage boxSize='200px' product={product} />
 
                 {/* Purchases */}
                 <Card>

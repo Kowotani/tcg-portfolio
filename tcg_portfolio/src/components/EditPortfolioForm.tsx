@@ -22,7 +22,7 @@ import {
 
   // others
   assert, getIPortfoliosFromIPopulatedPortfolios, getReleasedProducts, isASCII, 
-  isIPopulatedHolding, isIPortfolio, isTResBody
+  isIPortfolio, isTResBody
 } from 'common'
 import { 
   EditTransactionsModal, TransactionsModalMode 
@@ -371,40 +371,22 @@ export const EditPortfolioForm = (
 
   /*
   DESC
-    Handler function to update the Portfolio when one of its Holdings is updated
-    but not deleted (see onDeleteHolding()), such as when the underlying 
-    Transactions change
-  INPUT
-    holding: The updated IPopulatedHolding
-  */
-  function onUpdateHolding(holding: IPopulatedHolding): void {
-    // create new holdings
-    const ix = portfolio.populatedHoldings.findIndex((h: IPopulatedHolding) => {
-      return h.product.tcgplayerId === holding.product.tcgplayerId
-    })
-    assert(ix >= 0 && ix < portfolio.populatedHoldings.length)
-    const newHoldings = portfolio.populatedHoldings
-    newHoldings.splice(ix, 1, holding)
-
-    // set new holdings
-    setPortfolio({
-      ...portfolio,
-      populatedHoldings: newHoldings
-    })
-  }
-
-  /*
-  DESC
     Handler function to add an IPopulatedHOlding to the Portfolio, primarily 
     used via the Add Holding flow
   INPUT
     product: The Product of the Holding
     transactions: The Transactions of the Holding
   */
-  function handleAddHolding(
+  function onAddHolding(
     product: IProduct, 
     transactions: ITransaction[]
   ): void {
+    // update searchable products
+    const newSearchableProducts = searchableProducts.filter((p: IProduct) => {
+      return p.tcgplayerId !== product.tcgplayerId
+    })
+    setSearchableProducts(newSearchableProducts)
+
     // create new Holding
     const newHolding = {
       product: product, 
@@ -420,10 +402,6 @@ export const EditPortfolioForm = (
     })
   }
 
-  // --------------
-  // Product search
-  // --------------
-
   /*
   DESC
     Handler function to update various states after the user deletes a Holding
@@ -433,12 +411,7 @@ export const EditPortfolioForm = (
   */
   function onDeleteHolding(holding: IPopulatedHolding): void {
     // update searchable products
-    const matchingHolding = portfolio.populatedHoldings.find(
-      (h: IPopulatedHolding) => {
-        return h.product.tcgplayerId === holding.product.tcgplayerId
-    })
-    assert(isIPopulatedHolding(matchingHolding))
-    setSearchableProducts([...searchableProducts, matchingHolding.product])
+    setSearchableProducts([...searchableProducts, holding.product])
 
     // update portfolio
     const newHoldings = portfolio.populatedHoldings.filter(
@@ -451,6 +424,29 @@ export const EditPortfolioForm = (
     })
   }
   
+  /*
+  DESC
+    Handler function to update the Portfolio when one of its Holdings is updated
+    but not deleted (see onDeleteHolding()), such as when the underlying 
+    Transactions change
+  INPUT
+    holding: The updated IPopulatedHolding
+  */
+  function onUpdateHolding(holding: IPopulatedHolding): void {
+    // replace Holding
+    const newHoldings = portfolio.populatedHoldings.filter(
+      (h: IPopulatedHolding) => {
+        return h.product.tcgplayerId !== holding.product.tcgplayerId
+    })
+    newHoldings.push(holding)
+
+    // set new Holdings
+    setPortfolio({
+      ...portfolio,
+      populatedHoldings: newHoldings
+    })
+  }
+
 
   // =====
   // hooks
@@ -686,7 +682,7 @@ export const EditPortfolioForm = (
           isOpen={isOpen} 
           mode={TransactionsModalMode.Add}
           searchableProducts={searchableProducts}
-          handleAddHolding={handleAddHolding}
+          onAddHolding={onAddHolding}
           onClose={onClose} 
         />
       }

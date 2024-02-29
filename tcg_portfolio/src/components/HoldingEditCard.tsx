@@ -53,7 +53,7 @@ export const HoldingEditCard = (
   // functions
   // =========
   
-  function handleSetTransactions(txns: ITransaction[]): void {
+  function onSetTransactions(txns: ITransaction[]): void {
     const newHolding: IPopulatedHolding = {...holding, transactions: txns}
     setHolding(newHolding)
     props.onUpdateHolding(newHolding)
@@ -211,7 +211,7 @@ export const HoldingEditCard = (
         mode={TransactionsModalMode.Edit}
         product={props.populatedHolding.product}
         transactions={holding.transactions}
-        handleSetTransactions={handleSetTransactions}
+        onSetTransactions={onSetTransactions}
         onClose={onClose} 
       />
     </>
