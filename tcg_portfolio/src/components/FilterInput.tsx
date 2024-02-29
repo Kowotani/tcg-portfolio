@@ -9,7 +9,7 @@ import {
   InputLeftElement,
   InputRightElement,   
 } from '@chakra-ui/react'
-import { FaFilter, FaRegTimesCircle, FaSearch } from 'react-icons/fa'
+import { FaRegTimesCircle, FaSearch } from 'react-icons/fa'
 
 // https://github.com/GastonKhouri/chakra-ui-search/blob/main/src/components/Search.tsx
 
@@ -27,7 +27,7 @@ export const FilterInput = (props: PropsWithChildren<TFilterInput>) => {
   const {
 		value,
 		onFilterChange,
-    icon = <Icon as={FaFilter} color='gray.500' />,
+    icon = <Icon as={FaSearch} color='gray.500' />,
 		placeholder = '',
     clearFilter
 	} = props
