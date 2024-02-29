@@ -9,39 +9,38 @@ import {
   FormLabel,
   Input,
   Text,
+  useDisclosure,
   useToast,
   VStack
 } from '@chakra-ui/react'
 import { 
   // data models
-  IPopulatedHolding, IPopulatedPortfolio, IProduct, 
+  IPopulatedHolding, IPopulatedPortfolio, IProduct, ITransaction,
 
   // api
   PORTFOLIO_URL, PRODUCTS_URL, TPostPortfolioReqBody, TPutPortfolioReqBody,
 
   // others
   assert, getIPortfoliosFromIPopulatedPortfolios, getReleasedProducts, isASCII, 
-  isIPopulatedHolding, isIPortfolio, isTResBody,
+  isIPopulatedHolding, isIPortfolio, isTResBody
 } from 'common'
+import { 
+  EditTransactionsModal, TransactionsModalMode 
+} from './EditTransactionsModal'
 import { FilterInput } from './FilterInput'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
 import { HoldingEditCard } from './HoldingEditCard'
-import { SectionHeader } from './Layout'
+import { AddButton, SectionHeader } from './Layout'
 import * as _ from 'lodash'
-import { ProductSearchResult } from './ProductSearchResult';
-import { SearchInput } from './SearchInput'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { CascadingSlideFade } from './Transitions'
 import { parseProductsEndpointResponse } from '../utils/api'
-import { filterFnHoldingCard, sortFnPopulatedHoldingAsc } from '../utils/Holding'
+import { filterFnHoldingCard } from '../utils/Holding'
 import { PortfolioPanelNav } from '../utils/PortfolioPanel'
 import { 
   ILatestPricesContext, getIPriceDataMapFromIDatedPriceDataMap 
 } from '../utils/Price'
-import { 
-  filterFnProductSearchResult, sortFnProductSearchResults 
-} from '../utils/Product'
 
 
 type TEditPortfolioProps = {
@@ -54,6 +53,8 @@ export const EditPortfolioForm = (
   props: PropsWithChildren<TEditPortfolioProps>
 ) => {
 
+  // modal
+  const { isOpen, onOpen, onClose } = useDisclosure() 
 
   // ======
   // states
@@ -71,26 +72,20 @@ export const EditPortfolioForm = (
 
   const [ portfolio, setPortfolio ] = useState(props.portfolio)
 
-  // --------------
-  // Product search
-  // --------------
-
-  // Search input
-  const [ searchInput, setSearchInput ] = useState('')
+  // ------------------------------------------
+  // Product search (for EditTransactionsModal)
+  // ------------------------------------------
 
   // Searchable products (that can be added)
   const [ searchableProducts, setSearchableProducts ] =
     useState([] as IProduct[])
-
-  // Search results
-  const [ searchResults, setSearchResults ] = useState([] as IProduct[])
 
   // -----
   // Price
   // -----
 
   const { latestPrices } 
-  = useContext(LatestPricesContext) as ILatestPricesContext
+    = useContext(LatestPricesContext) as ILatestPricesContext
   const prices = getIPriceDataMapFromIDatedPriceDataMap(latestPrices)
 
 
@@ -114,7 +109,7 @@ export const EditPortfolioForm = (
     }
   }
 
-    function handlePortfolioNameOnBlur(
+  function handlePortfolioNameOnBlur(
     e: React.FocusEvent<HTMLInputElement, Element>,
     form: FormikProps<IInputValues>
   ): void {
@@ -368,19 +363,19 @@ export const EditPortfolioForm = (
     return emptyHolding
   }
 
-  // --------------
-  // Holding change
-  // --------------
+  // -------
+  // Holding 
+  // -------
 
   /*
   DESC
     Handler function to update the Portfolio when one of its Holdings is updated
-    but not deleted (see onHoldingDelete()), such as when the underlying 
+    but not deleted (see onDeleteHolding()), such as when the underlying 
     Transactions change
   INPUT
     holding: The updated IPopulatedHolding
   */
-  function onHoldingUpdate(holding: IPopulatedHolding): void {
+  function onUpdateHolding(holding: IPopulatedHolding): void {
     // create new holdings
     const ix = portfolio.populatedHoldings.findIndex((h: IPopulatedHolding) => {
       return h.product.tcgplayerId === holding.product.tcgplayerId
@@ -396,39 +391,36 @@ export const EditPortfolioForm = (
     })
   }
 
-  // --------------
-  // Product search
-  // --------------
-
   /*
   DESC
-    Handler function to update various states after the user selects a Product
-    from the search results to add to the Portfolio
+    Handler function to add an IPopulatedHOlding to the Portfolio, primarily 
+    used via the Add Holding flow
   INPUT
-    product: The IProduct that was clicked from the search results
+    product: The Product of the Holding
+    transactions: The Transactions of the Holding
   */
-  function onSearchResultClick(product: IProduct): void {
-    // clear search 
-    setSearchInput('')
-
-    // update searchable products
-    const newSearchableProducts = searchableProducts.filter((p: IProduct) => {
-        return p.tcgplayerId !== product.tcgplayerId
-    })
-    setSearchableProducts(newSearchableProducts)
-
-    // update portfolio
+  function handleAddHolding(
+    product: IProduct, 
+    transactions: ITransaction[]
+  ): void {
+    // create new Holding
+    const newHolding = {
+      product: product, 
+      transactions: transactions
+    } as IPopulatedHolding 
     const newHoldings = portfolio.populatedHoldings
-      .concat([{
-        product: product,
-        transactions: []
-      }])
-      .sort(sortFnPopulatedHoldingAsc)
+    newHoldings.push(newHolding)
+
+    // set new Holdings
     setPortfolio({
-      ...portfolio, 
+      ...portfolio,
       populatedHoldings: newHoldings
     })
   }
+
+  // --------------
+  // Product search
+  // --------------
 
   /*
   DESC
@@ -437,7 +429,7 @@ export const EditPortfolioForm = (
   INPUT
     holding: The IPopulatedHolding to delete
   */
-  function onHoldingDelete(holding: IPopulatedHolding): void {
+  function onDeleteHolding(holding: IPopulatedHolding): void {
     // update searchable products
     const matchingHolding = portfolio.populatedHoldings.find(
       (h: IPopulatedHolding) => {
@@ -455,9 +447,6 @@ export const EditPortfolioForm = (
       ...portfolio,
       populatedHoldings: newHoldings
     })
-
-    // clear search 
-    setSearchInput('')
   }
   
 
@@ -487,14 +476,6 @@ export const EditPortfolioForm = (
       console.log('Error fetching products: ' + err)
     })
   }, [])
-
-  // update Product seach results
-  useEffect(() => {
-    const productResults = searchableProducts
-      .filter(filterFnProductSearchResult(searchInput))
-      .sort(sortFnProductSearchResults)
-    setSearchResults(productResults)
-  }, [searchInput, searchableProducts])
 
   // Axios response toast
   const toast = useToast()
@@ -637,27 +618,17 @@ export const EditPortfolioForm = (
       {/* Holdings Header */}
       <SectionHeader header={'Holdings'}/>
 
-      {/* Search Product to Add */}
-      <SearchInput 
-        placeholder='Search for a Product'
-        maxSearchResults={5}
-        onSearchChange={e => setSearchInput(e.target.value)}
-        onSearchResultSelect={e => onSearchResultClick(e as IProduct)}
-        searchResultRenderer={(res: IProduct) => (
-          <ProductSearchResult 
-            product={res} 
-            searchInput={searchInput}
-          />
-        )}
-        searchResults={searchResults}
-        searchResultKey='tcgplayerId'
-        value={searchInput}
-        clearSearch={() => setSearchInput('')}
-      />
+      {/* Add Holding */}
+      <Flex my={4}>
+        <AddButton 
+          label='Add Holding'
+          onClick={onOpen}
+        />
+      </Flex>
 
       {/* Filter Holdings */}
       <FilterInput 
-        placeholder='Filter for a Holding'
+        placeholder='Search for a Holding'
         onFilterChange={e => setHoldingFilter(e.target.value)}
         value={holdingFilter}
         clearFilter={() => setHoldingFilter('')}
@@ -697,13 +668,24 @@ export const EditPortfolioForm = (
                 <HoldingEditCard
                   marketPrice={marketPrice}    
                   populatedHolding={holding}
-                  onHoldingDelete={onHoldingDelete}
-                  onHoldingUpdate={onHoldingUpdate}
+                  onDeleteHolding={onDeleteHolding}
+                  onUpdateHolding={onUpdateHolding}
                 />
               </Box>
             </CascadingSlideFade>
           )
         })
+      }
+
+      {/* Modal */}
+      {searchableProducts.length > 0 &&
+        <EditTransactionsModal 
+          isOpen={isOpen} 
+          mode={TransactionsModalMode.Add}
+          searchableProducts={searchableProducts}
+          handleAddHolding={handleAddHolding}
+          onClose={onClose} 
+        />
       }
     </>
   )

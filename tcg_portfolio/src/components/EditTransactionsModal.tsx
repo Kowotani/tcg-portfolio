@@ -28,14 +28,19 @@ import {
   useToast,
   VStack
 } from '@chakra-ui/react'
-import { 
+import {
+  // data models 
   IHolding, IReactTableTransaction, IProduct, ITransaction, TransactionType,
 
-  formatAsISO, getClampedDate, getHoldingAverageCost, 
-  getHoldingAverageRevenue, getHoldingPurchaseQuantity, getHoldingSaleQuantity, 
-  getHoldingTotalCost, getHoldingTotalRevenue,
+  // data model helpers
+  getHoldingAverageCost, getHoldingAverageRevenue, getHoldingPurchaseQuantity, 
+  getHoldingSaleQuantity, getHoldingTotalCost, getHoldingTotalRevenue,
 
-  assert
+  // typeguards
+  isIProduct, isITransactionArray, 
+
+  // generic
+  assert, formatAsISO, getClampedDate, 
 } from 'common'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
@@ -44,22 +49,23 @@ import { MetricSummary, TMetricSummaryItem
   } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
+import { ProductSearchResult } from './ProductSearchResult'
+import { SearchInput } from './SearchInput'
 import { FiPlus } from 'react-icons/fi'
 import { createColumnHelper } from '@tanstack/react-table'
 import { TransactionTable } from './TransactionTable'
 import { hasNonNegativeQuantity } from '../utils/Holding'
 import { formatAsPrice } from '../utils/Price'
-import { getProductNameWithLanguage } from '../utils/Product'
+import { 
+  filterFnProductSearchResult, getProductNameWithLanguage,
+  sortFnProductSearchResults 
+} from '../utils/Product'
 import { formatNumber, getColorForNumber } from '../utils/generic'
 
 
-// ==============
-// sub components
-// ==============
-
-// ------------------
+// ==================
 // AddTransactionForm
-// ------------------
+// ==================
 
 interface IInputValues {
   date: Date,
@@ -358,18 +364,25 @@ const AddTransactionForm = (
 }
 
 
-// ==============
-// Main Component
-// ==============
+// =====================
+// EditTransactionsModal
+// =====================
+
+export enum TransactionsModalMode {
+  Add = 'ADD',
+  Edit = 'EDIT'
+}
 
 type TEditTransactionsModalProps = {
   isOpen: boolean,
-  marketPrice: number,
-  mode: 'ADD' | 'EDIT',
-  product: IProduct,
-  transactions: ITransaction[],
+  mode: TransactionsModalMode,
+  marketPrice?: number,
+  product?: IProduct,
+  searchableProducts?: IProduct[],
+  transactions?: ITransaction[],
   onClose: () => void,
-  setTransactions: (txns: ITransaction[]) => void
+  handleAddHolding?: (product: IProduct, transactions: ITransaction[]) => void,
+  handleSetTransactions?: (txns: ITransaction[]) => void
 }
 export const EditTransactionsModal = (
   props: PropsWithChildren<TEditTransactionsModalProps>
@@ -379,7 +392,23 @@ export const EditTransactionsModal = (
   // state
   // =====
 
-  const [ transactions, setTransactions ] = useState(props.transactions)
+  const [ transactions, setTransactions ] = 
+    useState(props.transactions ?? [] as ITransaction[])
+  const [ product, setProduct ] = useState(props.product)
+
+  // --------------
+  // product search
+  // --------------
+
+  // search input
+  const [ searchInput, setSearchInput ] = useState('')
+
+  // searchable products (that can be added)
+  const [ searchableProducts, setSearchableProducts ] =
+    useState(props.searchableProducts ?? [] as IProduct[])
+
+  // search results
+  const [ searchResults, setSearchResults ] = useState([] as IProduct[])
 
 
   // ===================
@@ -440,46 +469,140 @@ export const EditTransactionsModal = (
   // functions
   // =========
 
-  // add transaction to local state only
+  // ----------------
+  // add transactions
+  // ----------------
+
+  /*
+  DESC 
+    Handle Add Transaction button onclick
+  */
   function handleAddTransaction(txn: ITransaction): void {
     setTransactions([...transactions, txn])
   }
 
-  // exit without save
+  // -----
+  // modal
+  // ----- 
+
+  /*
+  DESC 
+    Handle Cancel button onclick
+  */
   function handleOnExit(): void {
-    // reset local transactions
-    setTransactions(props.transactions)
+    if (props.mode === TransactionsModalMode.Add) {
+      resetState()
+    } else if (props.mode === TransactionsModalMode.Edit) {
+      setTransactions(props.transactions as ITransaction[])
+    }
     props.onClose()
   }
 
-  // exit and save 
+  /*
+  DESC 
+    Handle Save button onclick
+  */
   function handleOnSave(): void {
 
     // check that purchaes >= sales
     if (hasNonNegativeQuantity(holding)) {
 
-      // update parent transactions
-      props.setTransactions(transactions)
+      // Add mode - add new Holding
+      if (props.mode === TransactionsModalMode.Add) {
+        assert(isIProduct(product), 'Product is undefined')
+        assert(props.handleAddHolding, 'handleAddHolding() is undefined')
+        props.handleAddHolding(product, transactions)
+        resetState()
+
+      // Edit mode - update parent transactions
+      } else if (props.mode === TransactionsModalMode.Edit) {
+        assert(props.handleSetTransactions, 'onSetTransactions() is undefined')
+        props.handleSetTransactions(transactions)
+      }
       props.onClose()
 
+      const description = props.mode === TransactionsModalMode.Add 
+        ? 'Holding was added'
+        : 'Transactions were updated'
+
       toast({
-        title: `${props.product.name}`,
-        description: 'Transactions were updated',
+        title: `${product ? product.name : ''}`,
+        description: description,
         status: 'success',
         isClosable: true,
       })   
 
-    // alert via toast
+    // alert via toast that Sales < Purchases
     } else {
       
       toast({
         title: 'Error',
-        description: 'Cannot sell more than purchased',
+        description: 'Sales exceed Purchases',
         status: 'error',
         variant: 'subtle',
         isClosable: true,
       })          
     }
+  }
+
+  /*
+  DESC
+    Returns whether the data is valid to save for the Holding
+  RETURN
+    TRUE if the data is valid, FALSE otherwise
+  */
+  function isDataValid(): boolean {
+    return isIProduct(product) 
+      && isITransactionArray(transactions) 
+      && transactions.length > 0
+  }
+
+  /*
+  DESC
+    Resets state to initial values
+  */
+  function resetState(): void {
+    setProduct(undefined)
+    setTransactions([] as ITransaction[])
+    setSearchInput('')
+    setSearchResults([] as IProduct[])
+  }
+
+  // --------------
+  // product search
+  // --------------
+
+  /*
+  DESC
+    Handler function for search input changes
+  */
+  function onSearchChange(query: string): void {
+    setSearchInput(query)
+    const results = searchableProducts
+      .filter(filterFnProductSearchResult(query))
+      .sort(sortFnProductSearchResults)
+    setSearchResults(results)
+  }
+
+  /*
+  DESC
+    Handler function to update various states after the user selects a Product
+    from the search results to add to the Portfolio
+  INPUT
+    product: The IProduct that was clicked from the search results
+  */
+  function onSearchResultClick(product: IProduct): void {
+    // clear search 
+    setSearchInput('')
+
+    // update searchable products
+    const newSearchableProducts = searchableProducts.filter((p: IProduct) => {
+        return p.tcgplayerId !== product.tcgplayerId
+    })
+    setSearchableProducts(newSearchableProducts)
+
+    // update selected product
+    setProduct(product)
   }
 
 
@@ -565,6 +688,11 @@ export const EditTransactionsModal = (
   // -- hidden columns
   const hiddenColumns = ['type']
 
+
+  // =====
+  // hooks
+  // =====
+
   // toast for validation alerts
   const toast = useToast()
 
@@ -578,84 +706,103 @@ export const EditTransactionsModal = (
       closeOnOverlayClick={false}
       isOpen={props.isOpen} 
       onClose={props.onClose}
+      size='3xl'
     >
       <ModalOverlay />
       {/* Set modal z-index to be higher than the error tooltip (1800)*/}
       <Box zIndex={1850}>
         <ModalContent>
-          <ModalHeader textAlign='center'
-          >
-            {getProductNameWithLanguage(props.product)}
+          <ModalHeader textAlign='center'>
+            {props.mode === TransactionsModalMode.Add &&
+                <SearchInput 
+                placeholder='Search for a Product'
+                maxSearchResults={5}
+                onSearchChange={e => onSearchChange(e.target.value)}
+                onSearchResultSelect={
+                  e => onSearchResultClick(e as IProduct)
+                }
+                searchResultRenderer={(res: IProduct) => (
+                  <ProductSearchResult 
+                    product={res} 
+                    searchInput={searchInput}
+                  />
+                )}
+                searchResults={searchResults}
+                searchResultKey='tcgplayerId'
+                value={searchInput}
+                clearSearch={() => setSearchInput('')}
+              />
+            }
+            {product && getProductNameWithLanguage(product)}
           </ModalHeader>
           <ModalBody>
-            <VStack>
+            {product && 
+              <VStack>
+                {/* Description */}
+                <ProductDescription 
+                  product={product} 
+                  showHeader={false}
+                  fontSize='large' 
+                  textAlign='center'
+                />
 
-              {/* Description */}
-              <ProductDescription 
-                product={props.product} 
-                showHeader={false}
-                fontSize='large' 
-                textAlign='center'
-              />
+                {/* Product Image */}
+                <ProductImage boxSize='200px' product={product} />
 
-              {/* Product Image */}
-              <ProductImage boxSize='200px' product={props.product} />
+                {/* Market price */}
+                <Text fontSize='large'>
+                  {props.marketPrice && formatAsPrice(props.marketPrice)}
+                </Text>
 
-              {/* Market price */}
-              <Text fontSize='large'>
-                {formatAsPrice(props.marketPrice)}
-              </Text>
+                {/* Purchases */}
+                <Card>
+                  <CardBody>
+                    <MetricSummary 
+                      summaryItems={purchaseSummaryItems}
+                      variant='hcard'
+                    />
+                  </CardBody>
+                </Card>
+                
+                {/* Sales */}
+                {getHoldingSaleQuantity(holding) &&  
+                  <Card>
+                    <CardBody>
+                      <MetricSummary 
+                        summaryItems={saleSummaryItems}
+                        variant='hcard'
+                      />
+                    </CardBody>
+                  </Card>
+                }
 
-              {/* Purchases */}
-              <Card>
-                <CardBody>
-                  <MetricSummary 
-                    summaryItems={purchaseSummaryItems}
-                    variant='hcard'
-                  />
-                </CardBody>
-              </Card>
-              
-              {/* Sales */}
-              {
-                getHoldingSaleQuantity(holding) > 0 
-                  ? (
-                    <Card>
-                      <CardBody>
-                        <MetricSummary 
-                          summaryItems={saleSummaryItems}
-                          variant='hcard'
-                        />
-                      </CardBody>
-                    </Card>
-                  ) : undefined
-              }
-
-              {/* Add Transaction Form */}
-              <AddTransactionForm
-                releaseDate={props.product.releaseDate} 
-                handleAddTransaction={handleAddTransaction}
-              />
-              <Card>
-                <CardBody>
-                  <TransactionTable 
-                    columns={columns} 
-                    data={transactions}
-                    hiddenColumns={hiddenColumns}
-                  />
-                </CardBody>
-              </Card>
-            </VStack>
+                {/* Add Transaction Form */}
+                <AddTransactionForm
+                  releaseDate={product.releaseDate} 
+                  handleAddTransaction={handleAddTransaction}
+                />
+                <Card>
+                  <CardBody>
+                    <TransactionTable 
+                      columns={columns} 
+                      data={transactions}
+                      hiddenColumns={hiddenColumns}
+                    />
+                  </CardBody>
+                </Card>
+              </VStack>
+            }
           </ModalBody>
           <ModalFooter display='flex' justifyContent='space-evenly'>
             <Button 
               variant='ghost' 
               onClick={handleOnExit}
             >
-              Exit Without Saving
+              Cancel
             </Button>
             <Button 
               colorScheme='blue'
+              isDisabled={!isDataValid()}
               onClick={handleOnSave}
             >
               Save

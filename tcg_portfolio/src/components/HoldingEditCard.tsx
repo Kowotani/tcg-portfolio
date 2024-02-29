@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { PropsWithChildren, useState } from 'react'
 import { 
   Badge,
   Box,
@@ -18,7 +18,9 @@ import {
   getHoldingMarketValue, getHoldingPercentPnl, getHoldingQuantity, 
   getHoldingTotalCost, getHoldingTotalPnl
 } from 'common'
-import { EditTransactionsModal } from './EditTransactionsModal'
+import { 
+  EditTransactionsModal, TransactionsModalMode 
+} from './EditTransactionsModal'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
@@ -29,8 +31,8 @@ import { getProductNameWithLanguage } from '../utils/Product'
 type THoldingCardProps = {
   marketPrice: number,
   populatedHolding: IPopulatedHolding,
-  onHoldingDelete: (holding: IPopulatedHolding) => void,
-  onHoldingUpdate: (holding: IPopulatedHolding) => void,
+  onDeleteHolding: (holding: IPopulatedHolding) => void,
+  onUpdateHolding: (holding: IPopulatedHolding) => void,
 }
 export const HoldingEditCard = (
   props: PropsWithChildren<THoldingCardProps>
@@ -45,7 +47,6 @@ export const HoldingEditCard = (
   // =====
 
   const [ holding, setHolding ] = useState(props.populatedHolding)
-  const [ transactions, setTransactions ] = useState(holding.transactions)
 
     
   // =========
@@ -53,8 +54,9 @@ export const HoldingEditCard = (
   // =========
   
   function handleSetTransactions(txns: ITransaction[]): void {
-    setHolding({...holding, transactions: txns})
-    setTransactions(txns)
+    const newHolding: IPopulatedHolding = {...holding, transactions: txns}
+    setHolding(newHolding)
+    props.onUpdateHolding(newHolding)
   }
 
   // Holding Summary
@@ -99,15 +101,6 @@ export const HoldingEditCard = (
     },
   ]
 
-  // =====
-  // hooks
-  // =====
-
-  // update the parent Portfolio when the Holding changes
-  useEffect(() => {
-    props.onHoldingUpdate(holding)
-  }, [holding])
-
 
   // ==============
   // Main Component
@@ -146,19 +139,6 @@ export const HoldingEditCard = (
                 {/* Tag and Close Button */}
                 <Box display='flex' alignItems='center'>
 
-                  {/* Empty Holding */}
-                  {isEmpty && (
-                    <Badge 
-                      colorScheme='red' 
-                      variant='subtle' 
-                      borderRadius={10}
-                      fontSize='sm'
-                      m='0px 8px'                     
-                    >
-                      Empty Holding
-                    </Badge>
-                  )} 
-
                   {/* Inactive Holding */}
                   {!isEmpty && isInactive && (
                     <Badge 
@@ -175,7 +155,7 @@ export const HoldingEditCard = (
                   {/* Close Button */}
                   <CloseButton 
                     onClick={
-                      () => props.onHoldingDelete(props.populatedHolding)
+                      () => props.onDeleteHolding(props.populatedHolding)
                     }
                   />
                 </Box>
@@ -216,21 +196,23 @@ export const HoldingEditCard = (
                   colorScheme='blue' 
                   onClick={onOpen}
                 >
-                  Transactions
+                  Edit
                 </Button>
               </HStack>
             </VStack>
           </HStack>
         </CardBody>
       </Card>
+
+      {/* Modal */}
       <EditTransactionsModal 
         isOpen={isOpen} 
         marketPrice={props.marketPrice}
-        mode='EDIT'
-        onClose={onClose} 
+        mode={TransactionsModalMode.Edit}
         product={props.populatedHolding.product}
-        setTransactions={handleSetTransactions}
-        transactions={transactions}
+        transactions={holding.transactions}
+        handleSetTransactions={handleSetTransactions}
+        onClose={onClose} 
       />
     </>
   )
