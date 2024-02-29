@@ -376,7 +376,6 @@ export enum TransactionsModalMode {
 type TEditTransactionsModalProps = {
   isOpen: boolean,
   mode: TransactionsModalMode,
-  marketPrice?: number,
   product?: IProduct,
   searchableProducts?: IProduct[],
   transactions?: ITransaction[],
@@ -749,11 +748,6 @@ export const EditTransactionsModal = (
                   fontSize='large' 
                   textAlign='center'
                 />
-
-                {/* Market price */}
-                <Text fontSize='large'>
-                  {props.marketPrice && formatAsPrice(props.marketPrice)}
-                </Text>
 
                 {/* Product Image */}
                 <ProductImage boxSize='200px' product={product} />

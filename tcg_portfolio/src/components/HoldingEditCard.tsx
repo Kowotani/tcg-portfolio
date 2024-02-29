@@ -207,7 +207,6 @@ export const HoldingEditCard = (
       {/* Modal */}
       <EditTransactionsModal 
         isOpen={isOpen} 
-        marketPrice={props.marketPrice}
         mode={TransactionsModalMode.Edit}
         product={props.populatedHolding.product}
         transactions={holding.transactions}
