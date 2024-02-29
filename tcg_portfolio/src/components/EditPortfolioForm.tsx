@@ -36,7 +36,9 @@ import * as _ from 'lodash'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { CascadingSlideFade } from './Transitions'
 import { parseProductsEndpointResponse } from '../utils/api'
-import { filterFnHoldingCard } from '../utils/Holding'
+import { 
+  filterFnHoldingCard, sortFnPopulatedHoldingAsc 
+} from '../utils/Holding'
 import { PortfolioPanelNav } from '../utils/PortfolioPanel'
 import { 
   ILatestPricesContext, getIPriceDataMapFromIDatedPriceDataMap 
@@ -651,6 +653,7 @@ export const EditPortfolioForm = (
       {/* Holding Cards */}
       {portfolio.populatedHoldings
         .filter(filterFnHoldingCard(holdingFilter))
+        .sort(sortFnPopulatedHoldingAsc)
         .map((holding: IPopulatedHolding, ix: number) => {
 
           const marketPrice 
