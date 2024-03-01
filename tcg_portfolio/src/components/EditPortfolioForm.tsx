@@ -24,9 +24,6 @@ import {
   assert, getIPortfoliosFromIPopulatedPortfolios, getReleasedProducts, isASCII, 
   isIPortfolio, isTResBody
 } from 'common'
-import { 
-  EditTransactionsModal, TransactionsModalMode 
-} from './EditTransactionsModal'
 import { FilterInput } from './FilterInput'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
@@ -34,6 +31,9 @@ import { HoldingEditCard } from './HoldingEditCard'
 import { AddButton, SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { LatestPricesContext } from '../state/LatestPricesContext'
+import { 
+  TransactionsModal, TransactionsModalMode 
+} from './TransactionsModal'
 import { CascadingSlideFade } from './Transitions'
 import { parseProductsEndpointResponse } from '../utils/api'
 import { 
@@ -75,7 +75,7 @@ export const EditPortfolioForm = (
   const [ portfolio, setPortfolio ] = useState(props.portfolio)
 
   // ------------------------------------------
-  // Product search (for EditTransactionsModal)
+  // Product search (for TransactionsModal)
   // ------------------------------------------
 
   // Searchable products (that can be added)
@@ -678,7 +678,7 @@ export const EditPortfolioForm = (
 
       {/* Modal */}
       {searchableProducts.length > 0 &&
-        <EditTransactionsModal 
+        <TransactionsModal 
           isOpen={isOpen} 
           mode={TransactionsModalMode.Add}
           searchableProducts={searchableProducts}

@@ -52,7 +52,7 @@ export enum TransactionsModalMode {
   Edit = 'EDIT'
 }
 
-type TEditTransactionsModalProps = {
+type TTransactionsModalProps = {
   isOpen: boolean,
   mode: TransactionsModalMode,
   product?: IProduct,
@@ -62,7 +62,7 @@ type TEditTransactionsModalProps = {
   onAddHolding?: (product: IProduct, transactions: ITransaction[]) => void,
   onSetTransactions?: (txns: ITransaction[]) => void
 }
-export const EditTransactionsModal = (props: TEditTransactionsModalProps) => {
+export const TransactionsModal = (props: TTransactionsModalProps) => {
 
   // =====
   // state

@@ -18,12 +18,12 @@ import {
   getHoldingMarketValue, getHoldingPercentPnl, getHoldingQuantity, 
   getHoldingTotalCost, getHoldingTotalPnl
 } from 'common'
-import { 
-  EditTransactionsModal, TransactionsModalMode 
-} from './EditTransactionsModal'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
+import { 
+  TransactionsModal, TransactionsModalMode 
+} from './TransactionsModal'
 import { formatAsPrice } from '../utils/Price'
 import { getProductNameWithLanguage } from '../utils/Product'
 
@@ -205,7 +205,7 @@ export const HoldingEditCard = (
       </Card>
 
       {/* Modal */}
-      <EditTransactionsModal 
+      <TransactionsModal 
         isOpen={isOpen} 
         mode={TransactionsModalMode.Edit}
         product={props.populatedHolding.product}
