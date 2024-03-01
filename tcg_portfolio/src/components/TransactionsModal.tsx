@@ -145,9 +145,9 @@ export const TransactionsModal = (props: TTransactionsModalProps) => {
   // functions
   // =========
 
-  // ----------------
-  // add transactions
-  // ----------------
+  // ------------
+  // transactions
+  // ------------
 
   /*
   DESC 
@@ -155,6 +155,14 @@ export const TransactionsModal = (props: TTransactionsModalProps) => {
   */
   function handleAddTransaction(txn: ITransaction): void {
     setTransactions([...transactions, txn])
+  }
+
+  /*
+  DESC 
+    Delete all transactions
+  */
+  function deleteTransactions(): void {
+    setTransactions([] as ITransaction[])
   }
 
   // -----
@@ -282,6 +290,7 @@ export const TransactionsModal = (props: TTransactionsModalProps) => {
   function onSearchResultClick(product: IProduct): void {
     setSearchInput('')
     setProduct(product)
+    deleteTransactions()
   }
 
 
