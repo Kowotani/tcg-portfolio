@@ -1,6 +1,7 @@
 import { 
   Box,
   Button,
+  ButtonProps,
   Icon
 } from '@chakra-ui/react'
 import { FiPlus } from 'react-icons/fi'
@@ -29,16 +30,15 @@ export const SectionHeader = (props: TSectionHeaderProps) => {
   )
 }
 
-type TAddButtonProps = {
-  label: string,
-  onClick: () => void
+type TAddButtonProps = ButtonProps & {
+  label: string
 }
 export const AddButton = (props: TAddButtonProps) => {
   return (
-    <Button 
+    <Button
+      {...props}
       colorScheme='green'
       leftIcon={<Icon as={FiPlus} />}
-      onClick={() => props.onClick()}
     >
       {props.label}
     </Button>
