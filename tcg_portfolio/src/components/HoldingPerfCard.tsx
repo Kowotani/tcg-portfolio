@@ -4,7 +4,6 @@ import {
   getHoldingMarketValue, getHoldingPercentPnl, getHoldingTotalCost, 
   getHoldingTotalPnl
 } from 'common'
-import { PropsWithChildren } from 'react'
 import { 
   Box,
   Card,
@@ -24,7 +23,7 @@ import { formatAsPrice } from '../utils/Price'
 import { getProductNameWithLanguage } from '../utils/Product'
 
 
-type THoldingPerformanceCardProps = {
+type THoldingPerfCardProps = {
   marketPrice: number,
   populatedHolding: IPopulatedHolding,
   chartDataKeys?: {[key: string]: string}
@@ -32,9 +31,7 @@ type THoldingPerformanceCardProps = {
   chartDateRange?: ChartDateRange,
   chartType?: PerformanceMetric
 }
-export const HoldingPerfCard = (
-  props: PropsWithChildren<THoldingPerformanceCardProps>
-) => {
+export const HoldingPerfCard = (props: THoldingPerfCardProps) => {
 
 
   // =========

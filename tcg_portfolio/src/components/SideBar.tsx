@@ -1,6 +1,4 @@
-import { 
-  createRef, PropsWithChildren, useContext
-} from 'react'
+import { createRef, useContext} from 'react'
 import {  
   Box,  
   Flex,
@@ -51,7 +49,7 @@ type TNavButtonProps = {
   sideBarNav: ISideBarNav,
 
 }
-const NavButton = (props: PropsWithChildren<TNavButtonProps>) => {
+const NavButton = (props: TNavButtonProps) => {
 
   
   // =========
@@ -273,7 +271,7 @@ const SideBarOverlay = () => {
 type TSideBarContentProps = {
   index: number
 }
-const SideBarContent = (props: PropsWithChildren<TSideBarContentProps>) => {
+const SideBarContent = (props: TSideBarContentProps) => {
 
 
   // =========

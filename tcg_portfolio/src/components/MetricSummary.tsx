@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react'
 import { 
   Box,
   Flex,
@@ -40,9 +39,7 @@ export type TMetricSummaryItem = {
 type TMetricSummaryItemProps = TMetricSummaryItem & {
   variant: string
 }
-const MetricSummaryItem = (
-  props: PropsWithChildren<TMetricSummaryItemProps>
-) => {
+const MetricSummaryItem = (props: TMetricSummaryItemProps) => {
 
   // desstructure props
   const {
@@ -126,9 +123,7 @@ export type TMetricSummaryProps = {
   twoDimSummaryItems?: TMetricSummaryItem[][],
   variant?: 'hcard' | 'vcard' | 'list'
 }
-export const MetricSummary = (
-  props: PropsWithChildren<TMetricSummaryProps>
-) => {
+export const MetricSummary = (props: TMetricSummaryProps) => {
  
   const {
     summaryItems = [],

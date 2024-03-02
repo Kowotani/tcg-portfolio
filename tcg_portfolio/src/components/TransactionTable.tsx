@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { 
   Box,
   Icon,
@@ -49,7 +49,7 @@ export type TTransactionTableProps<Data extends object> = {
 // ==============
 
 export const TransactionTable = (
-  props: PropsWithChildren<TTransactionTableProps<IReactTableTransaction>>
+  props: TTransactionTableProps<IReactTableTransaction>
 ) => {
 
   const [sorting, setSorting] = useState<SortingState>(DEFAULT_SORT);

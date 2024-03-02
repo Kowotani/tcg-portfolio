@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext } from 'react'
+import { useContext } from 'react'
 import { 
   Box,
   Card,
@@ -25,9 +25,7 @@ import {
 type TPortfolioPerfCardProps = {
   populatedPortfolio: IPopulatedPortfolio
 }
-export const PortfolioPerfCard = (
-  props: PropsWithChildren<TPortfolioPerfCardProps>
-) => {
+export const PortfolioPerfCard = (props: TPortfolioPerfCardProps) => {
 
   const portfolio = props.populatedPortfolio
 

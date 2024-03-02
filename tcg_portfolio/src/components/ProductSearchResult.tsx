@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react'
 import { 
   Box, 
   Highlight, 
@@ -12,9 +11,7 @@ type TProductSearchResult = {
   product: IProduct,
   searchInput: string,
 }
-export const ProductSearchResult = (
-  props: PropsWithChildren<TProductSearchResult>
-) => {
+export const ProductSearchResult = (props: TProductSearchResult) => {
 
   const product = props.product
   const subtype = product.subtype 

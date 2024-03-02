@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { 
   Box,
   Button,
@@ -31,7 +31,7 @@ type PaginatorProps = {
   onPageClick: (page: number) => void,
   initialPage?: number
 }
-export const Paginator = (props: PropsWithChildren<PaginatorProps>) => {
+export const Paginator = (props: PaginatorProps) => {
 
   const {
     numItems,
@@ -170,9 +170,7 @@ export const Paginator = (props: PropsWithChildren<PaginatorProps>) => {
     pages: number[],
     isCenter?: boolean
   }
-  const PaginatorButtons = (
-    props: PropsWithChildren<TPaginatorButtonsProps>
-  ) => {
+  const PaginatorButtons = (props: TPaginatorButtonsProps) => {
 
     return (
       <HStack spacing={1}>

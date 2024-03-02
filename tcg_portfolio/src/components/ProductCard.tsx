@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext } from 'react'
+import { useContext } from 'react'
 import { 
   Card,
   CardBody,
@@ -22,9 +22,7 @@ type TProductCardProps = {
   onClick: (product: IProduct) => void,
   onTCProductClick?: (tcproduct: ITCProduct) => void,
 }
-export const ProductCard = (
-  props: PropsWithChildren<TProductCardProps>
-) => {
+export const ProductCard = (props: TProductCardProps) => {
 
   // =========
   // constants
