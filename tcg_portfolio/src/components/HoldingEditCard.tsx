@@ -1,8 +1,7 @@
-import { PropsWithChildren, useState } from 'react'
+import { useState } from 'react'
 import { 
   Badge,
   Box,
-  Button,
   Card,
   CardBody,
   CloseButton,
@@ -18,6 +17,7 @@ import {
   getHoldingMarketValue, getHoldingPercentPnl, getHoldingQuantity, 
   getHoldingTotalCost, getHoldingTotalPnl
 } from 'common'
+import { PrimaryButton } from './Layout'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
@@ -28,15 +28,13 @@ import { formatAsPrice } from '../utils/Price'
 import { getProductNameWithLanguage } from '../utils/Product'
 
 
-type THoldingCardProps = {
+type THoldingEditCardProps = {
   marketPrice: number,
   populatedHolding: IPopulatedHolding,
   onDeleteHolding: (holding: IPopulatedHolding) => void,
   onUpdateHolding: (holding: IPopulatedHolding) => void,
 }
-export const HoldingEditCard = (
-  props: PropsWithChildren<THoldingCardProps>
-) => {
+export const HoldingEditCard = (props: THoldingEditCardProps) => {
 
   // modal
   const { isOpen, onOpen, onClose } = useDisclosure() 
@@ -192,12 +190,10 @@ export const HoldingEditCard = (
                 </Box>
 
                 {/* Edit Transactions */}
-                <Button 
-                  colorScheme='blue' 
+                <PrimaryButton 
+                  label='Edit'
                   onClick={onOpen}
-                >
-                  Edit
-                </Button>
+                />
               </HStack>
             </VStack>
           </HStack>

@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useState } from 'react'
+import React, { useState } from 'react'
 import { 
   Box,
   BoxProps, 
@@ -35,7 +35,7 @@ type TSearchInput = BoxProps & {
   clearSearch?: () => void
 }
 
-export const SearchInput = (props: PropsWithChildren<TSearchInput>) => {
+export const SearchInput = (props: TSearchInput) => {
 
 
   // =========

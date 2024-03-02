@@ -1,7 +1,6 @@
 import { useContext } from 'react'
 import axios from 'axios'
 import { 
-  Button,
   Image,
   Input,
   Link,
@@ -26,6 +25,7 @@ import {
 } from 'common'
 import { Form, Formik } from 'formik'
 import { InputErrorWrapper } from './InputField'
+import { PrimaryButton } from './Layout'
 import * as _ from 'lodash'
 import { SideBarNavContext } from '../state/SideBarNavContext'
 import { 
@@ -661,22 +661,11 @@ export const AddProductForm = ({
         </VStack>
         
         <VStack spacing={4}>
-          <Button
-            colorScheme='teal'
-            type='submit'
+          <PrimaryButton
             isDisabled={!isFormSubmitEnabled()}
-          >
-            Submit
-          </Button>
-          {/*<Button
-            colorScheme='purple'
-            onClick={() => handleLoadLatestPriceOnClick(
-              Number(formData.tcgplayerId.value))}
-            isDisabled={formData.tcgplayerId.isInvalid ?? true}
-            isLoading={isLoadingLatestPrice}
-          >
-            Load Latest Price
-          </Button>*/}
+            label='Submit'
+            type='submit'
+          />
         </VStack>
       </Form>
     </Formik>

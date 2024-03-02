@@ -1,8 +1,7 @@
-import { PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { 
   Box,
-  Button,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -28,7 +27,9 @@ import { FilterInput } from './FilterInput'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
 import { HoldingEditCard } from './HoldingEditCard'
-import { AddButton, SectionHeader } from './Layout'
+import { 
+  AddButton, PrimaryButton, SecondaryButton, SectionHeader 
+} from './Layout'
 import * as _ from 'lodash'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { 
@@ -51,9 +52,7 @@ type TEditPortfolioProps = {
   portfolio: IPopulatedPortfolio,
   onExit: () => void,
 }
-export const EditPortfolioForm = (
-  props: PropsWithChildren<TEditPortfolioProps>
-) => {
+export const EditPortfolioForm = (props: TEditPortfolioProps) => {
 
   // modal
   const { isOpen, onOpen, onClose } = useDisclosure() 
@@ -521,21 +520,19 @@ export const EditPortfolioForm = (
 
             {/* Exit and Save Buttons */}
             <Box display='flex' justifyContent='flex-end'>
-              <Button 
+              <SecondaryButton 
+                label='Back'
                 variant='ghost' 
                 onClick={props.onExit}
-              >
-                Back to All Portfolios
-              </Button>
+              />
               <Box w='16px' />
-              <Button 
+              <PrimaryButton 
                 colorScheme='blue'
                 isDisabled={!form.isValid}
                 isLoading={form.isSubmitting}
+                label='Save'
                 type='submit'
-              >
-                Save Changes
-              </Button>
+              />
             </Box>
 
             <VStack spacing={4} m='16px 0px'>

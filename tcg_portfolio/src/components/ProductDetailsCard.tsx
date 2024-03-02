@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext } from 'react'
+import { useContext } from 'react'
 import { 
   Card,
   CardBody,
@@ -36,9 +36,7 @@ type TProductCardProps = {
   marketValue: TDatedValue[],
   product: IProduct,
 }
-export const ProductDetailsCard = (
-  props: PropsWithChildren<TProductCardProps>
-) => {
+export const ProductDetailsCard = (props: TProductCardProps) => {
   
 
   // =====

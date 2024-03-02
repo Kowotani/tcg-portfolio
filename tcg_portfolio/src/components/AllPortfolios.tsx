@@ -1,12 +1,10 @@
-import { PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { 
   Box,
-  Button,
   Card,
   CardBody,
   HStack,
-  Icon,
   Progress,
   StackDivider
 } from '@chakra-ui/react'
@@ -17,7 +15,6 @@ import {
 
   getAggPortfolioMarketValue, getAggPortfolioTotalCost, getPortfolioNames
 } from 'common'
-import { FiPlus } from 'react-icons/fi'
 import { PortfolioCard } from './PortfolioCard'
 import { AddButton, SectionHeader } from './Layout'
 import * as _ from 'lodash'
@@ -41,7 +38,7 @@ type TAllPortfoliosProps = {
   onViewPerformanceClick: (portfolio: IPopulatedPortfolio) => void
 }
 export const AllPortfolios = (
-  props: PropsWithChildren<TAllPortfoliosProps>
+  props: TAllPortfoliosProps
 ) => {
 
   // =====

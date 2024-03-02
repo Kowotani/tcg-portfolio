@@ -1,4 +1,4 @@
-import { PropsWithChildren, useState } from 'react'
+import { useState } from 'react'
 import { 
   Box,
   Card,
@@ -165,7 +165,7 @@ type TCustomTooltipProps<MyValue extends ValueType, MyName extends NameType> =
   referenceKey?: string,
 }
 const CustomTooltip = (
-  props: PropsWithChildren<TCustomTooltipProps<ValueType, NameType>>
+  props: TCustomTooltipProps<ValueType, NameType>
 ) => {
 
   // get colorMode
@@ -278,7 +278,7 @@ const RadioCard = (props: any) => {
 type TPnlChartProps = TChartProps & {
   data: Map<string, TDatedValue[]>,
 }
-export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
+export const PnlChart = (props: TPnlChartProps) => {
 
   // =====
   // state
@@ -462,7 +462,7 @@ export const PnlChart = (props: PropsWithChildren<TPnlChartProps>) => {
 type TPriceChartProps = TChartProps & {
   data: Map<string, TDatedValue[]>,
 }
-export const PriceChart = (props: PropsWithChildren<TPriceChartProps>) => {
+export const PriceChart = (props: TPriceChartProps) => {
 
   // =====
   // state

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { 
   Box,
-  Button,
   Card,
   CardBody,
   CloseButton,
@@ -31,6 +30,7 @@ import {
   // generic
   assert, formatAsISO
 } from 'common'
+import { PrimaryButton, SecondaryButton } from './Layout'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { ProductDescription } from './ProductDescription'
 import { ProductImage } from './ProductImage'
@@ -478,19 +478,15 @@ export const TransactionsModal = (props: TTransactionsModalProps) => {
             }
           </ModalBody>
           <ModalFooter display='flex' justifyContent='space-evenly'>
-            <Button 
-              variant='ghost' 
+            <SecondaryButton 
+              label='Cancel'
               onClick={handleOnExit}
-            >
-              Cancel
-            </Button>
-            <Button 
-              colorScheme='blue'
+            />
+            <PrimaryButton 
               isDisabled={!isDataValid()}
+              label='Save'
               onClick={handleOnSave}
-            >
-              Save
-            </Button>
+            />
           </ModalFooter>
         </ModalContent>
       </Box>

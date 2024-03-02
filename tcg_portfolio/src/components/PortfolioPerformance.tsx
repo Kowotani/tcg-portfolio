@@ -1,8 +1,7 @@
-import { PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { 
   Box,
-  Button,
   HStack,
   Radio,
   RadioGroup,
@@ -22,7 +21,7 @@ import {
   // rest
   getHoldingTcgplayerId
 } from 'common'
-import { SectionHeader } from './Layout'
+import { SecondaryButton, SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { PnlChart, PriceChart } from './Charts'
 import { HoldingPerfCard } from './HoldingPerfCard'
@@ -56,9 +55,7 @@ type TPortfolioPerformanceProps = {
   portfolio: IPopulatedPortfolio,
   onExit: () => void
 }
-export const PortfolioPerformance = (
-  props: PropsWithChildren<TPortfolioPerformanceProps>
-) => {
+export const PortfolioPerformance = (props: TPortfolioPerformanceProps) => {
   
 
   // =====
@@ -241,12 +238,10 @@ export const PortfolioPerformance = (
       {/* Overview */}
       <SectionHeader header='Overview'/>
       <Box display='flex' justifyContent='flex-end'>
-        <Button 
-          variant='ghost' 
+        <SecondaryButton 
+          label='Back'
           onClick={props.onExit}
-        >
-          Back to All Portfolios
-        </Button>
+        />
       </Box>
 
       {/* Portfolio Summary and Chart */}

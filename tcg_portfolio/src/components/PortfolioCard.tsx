@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import { 
   Box,
   Button,
@@ -29,6 +29,7 @@ import {
   getPortfolioMarketValue, getPortfolioPercentPnl, getPortfolioTotalCost, 
   getPortfolioTotalPnl
 } from 'common'
+import { PrimaryButton } from './Layout'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { 
@@ -42,9 +43,7 @@ type TPortfolioCardProps = {
   onEditClick: (portfolio: IPopulatedPortfolio) => void,
   onViewPerformanceClick: (portfolio: IPopulatedPortfolio) => void
 }
-export const PortfolioCard = (
-  props: PropsWithChildren<TPortfolioCardProps>
-) => {
+export const PortfolioCard = (props: TPortfolioCardProps) => {
 
   // modal
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -249,21 +248,16 @@ export const PortfolioCard = (
                 </Box>
 
                 {/* Edit */}
-                <Button 
-                  colorScheme='blue' 
+                <PrimaryButton 
+                  label='Edit'
                   onClick={() => props.onEditClick(portfolio)}
-                >
-                  Edit
-                </Button>
-
+                />
 
                 {/* View Performance */}
-                <Button 
-                  colorScheme='blue' 
+                <PrimaryButton 
+                  label='View'
                   onClick={() => props.onViewPerformanceClick(portfolio)}
-                >
-                  View
-                </Button>
+                />
 
               </HStack>
             </VStack>
