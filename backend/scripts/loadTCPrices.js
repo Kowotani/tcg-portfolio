@@ -15,6 +15,7 @@ const main = async function() {
       .loadTcgcsvPrices(value.categoryId)
       .then(res => {
         console.log(`${res} Price documents from TCGCSV were loaded for ${value.name}`)
+        return res
       })
       .catch(err => {
         console.error(err)
@@ -22,12 +23,12 @@ const main = async function() {
       })
   })
 
-  const res = await Promise.all(promises)
-  const total = res.reduce((acc, cur) => {
-    return acc + cur
-  }, 0)
-  console.log(`Loaded ${total} Price documents in total`)
-  process.exit(0)
+  Promise.all(promises)
+    .then(res => {
+      const total = res.reduce((acc, cur) => acc + cur, 0)
+      console.log(`Loaded ${total} Price documents in total`)
+      process.exit(0)
+    })
 }
 
 main()
