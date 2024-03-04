@@ -14,7 +14,6 @@ import {
   // generic
   getProductSubtypes, getUTCDateFromLocalDate, TCGToProductType
 } from 'common'
-import * as _ from 'lodash'
 import { AddProductForm } from './AddProductForm'
 import { SectionHeader } from './Layout'
 import { TCProductCatalogue } from './TCProductCatalogue'
@@ -203,6 +202,7 @@ export const ProductManager = () => {
         toast({
           title: toastTitle,
           description: `${PutTCProductStatus.Success}: ${TCProduct.tcgplayerId}`,
+          duration: 2000,
           status: 'success',
           isClosable: true,
         })   

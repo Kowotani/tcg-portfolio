@@ -291,6 +291,7 @@ export const AddProductForm = ({
           toast({
             title: 'Product Added',
             description: `${PostProductStatus.Added}: ${resData.tcgplayerId}`,
+            duration: 2000,
             status: 'success',
             isClosable: true,
           })        
@@ -324,6 +325,7 @@ export const AddProductForm = ({
           toast({
             title: 'MSRP Price Loaded',
             description: `${PostPriceStatus.Success}: ${resData.prices.marketPrice}`,
+            duration: 2000,
             status: 'success',
             isClosable: true,
           })
@@ -371,61 +373,6 @@ export const AddProductForm = ({
       })          
     })
   }
-
-
-
-  // -----------------
-  // load latest price
-  // -----------------
-
-  // function handleLoadLatestPriceOnClick(tcgplayerId: number) {
-
-  //   // set loading state
-  //   setIsLoadingLatestPrice(true)
-
-  //   // create body
-  //   const body: TPostLatestPriceReqBody = {
-  //     tcgplayerId: tcgplayerId
-  //   }
-
-  //   // submit
-  //   axios({
-  //     method: 'post',
-  //     url: LATEST_PRICE_URL,
-  //     data: body,
-  //     headers: {
-  //       'Content-Type': 'multipart/form-data',
-  //     },
-  //   })
-
-  //   // success
-  //   .then(res => {
-      
-  //     toast({
-  //       title: 'Latest Price Loaded',
-  //       description: `${PostLatestPriceStatus.Success}`,
-  //       status: 'success',
-  //       isClosable: true,
-  //     })
-  //   })
-
-  //   // error
-  //   .catch(res => {
-
-  //     // TODO: type check
-  //     const resData = res.data
-
-  //     toast({
-  //       title: 'Error Loading Latest Price',
-  //       description: `${res.statusText}: ${resData}`,
-  //       status: 'error',
-  //       isClosable: true,
-  //     })
-  //   })
-
-  //   // unset loading state
-  //   setIsLoadingLatestPrice(false)
-  // }
 
 
   // =====
