@@ -361,13 +361,11 @@ export const AddProductForm = ({
     })
     // error
     .catch(res => {
-
-      // TODO: type check
-      const resData = res.data
+      const response = res.response
                 
       toast({
         title: 'Error Adding Product',
-        description: `${res.statusText}: ${resData}`,
+        description: `${response.statusText}: ${response.data.message}`,
         status: 'error',
         isClosable: true,
       })          
