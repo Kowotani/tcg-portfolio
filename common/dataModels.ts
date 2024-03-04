@@ -43,6 +43,7 @@ export enum ProductSubtype {
   IllumineersTrove = `Illumineer's Trove`,
   NonFoil = 'Non-Foil',
   Play = 'Play',
+  PokemonCenterEliteTrainerBox = 'Pokemon Center Elite Trainer Box',
   SecondEdition = '2nd Edition',
   Set = 'Set',
   TexturedFoil = 'Textured Foil',
@@ -369,6 +370,7 @@ export const ProductTypeToProductSubtype: { [key in ProductType]?: ProductSubtyp
     ProductSubtype.BoosterBundle,
     ProductSubtype.EliteTrainerBox,
     ProductSubtype.IllumineersTrove,
+    ProductSubtype.PokemonCenterEliteTrainerBox,
     ProductSubtype.UltraPremiumCollection,
   ],
 
@@ -424,6 +426,7 @@ export const TCGToProductSubtype: { [key in TCG]?: ProductSubtype[] } = {
   [TCG.Pokemon]: [
     ProductSubtype.BoosterBundle,
     ProductSubtype.EliteTrainerBox,
+    ProductSubtype.PokemonCenterEliteTrainerBox,
     ProductSubtype.UltraPremiumCollection,
   ],  
 

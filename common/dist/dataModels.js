@@ -45,6 +45,7 @@ var ProductSubtype;
     ProductSubtype["IllumineersTrove"] = "Illumineer's Trove";
     ProductSubtype["NonFoil"] = "Non-Foil";
     ProductSubtype["Play"] = "Play";
+    ProductSubtype["PokemonCenterEliteTrainerBox"] = "Pokemon Center Elite Trainer Box";
     ProductSubtype["SecondEdition"] = "2nd Edition";
     ProductSubtype["Set"] = "Set";
     ProductSubtype["TexturedFoil"] = "Textured Foil";
@@ -147,6 +148,7 @@ exports.ProductTypeToProductSubtype = (_b = {},
         ProductSubtype.BoosterBundle,
         ProductSubtype.EliteTrainerBox,
         ProductSubtype.IllumineersTrove,
+        ProductSubtype.PokemonCenterEliteTrainerBox,
         ProductSubtype.UltraPremiumCollection,
     ],
     // Secret Lair
@@ -195,6 +197,7 @@ exports.TCGToProductSubtype = (_c = {},
     _c[TCG.Pokemon] = [
         ProductSubtype.BoosterBundle,
         ProductSubtype.EliteTrainerBox,
+        ProductSubtype.PokemonCenterEliteTrainerBox,
         ProductSubtype.UltraPremiumCollection,
     ],
     _c);

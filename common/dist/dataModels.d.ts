@@ -28,6 +28,7 @@ export declare enum ProductSubtype {
     IllumineersTrove = "Illumineer's Trove",
     NonFoil = "Non-Foil",
     Play = "Play",
+    PokemonCenterEliteTrainerBox = "Pokemon Center Elite Trainer Box",
     SecondEdition = "2nd Edition",
     Set = "Set",
     TexturedFoil = "Textured Foil",
