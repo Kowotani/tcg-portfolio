@@ -116,6 +116,10 @@ export const PKM_BOOSTER_BUNDLE_NAME = /.*(?= Booster Bundle$)/g
 export const PKM_ETB_FORMAT = /Elite Trainer Box($| \[(?!Set of).*\])/
 export const PKM_ETB_SET_NAME = /.*(?= Elite Trainer Box($| \[(?!Set of).*\]))/g
 export const PKM_ETB_TYPE_NAME = /(?<=\[).*(?=\]$)/g
+export const PKM_PC_ETB_FORMAT = 
+  /Pokemon Center Elite Trainer Box($| \[(?!Set of).*\])/
+export const PKM_PC_ETB_SET_NAME = 
+  /.*(?= Pokemon Center Elite Trainer Box($| \[(?!Set of).*\]))/g
 export const PKM_UPC_NAME = /.*(?= Ultra-Premium Collection$)/g
 
 // -- msrp

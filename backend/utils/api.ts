@@ -67,6 +67,8 @@ import {
 
   PKM_ETB_FORMAT, PKM_ETB_MSRP, PKM_ETB_SET_NAME, PKM_ETB_TYPE_NAME,
 
+  PKM_PC_ETB_FORMAT, PKM_PC_ETB_SET_NAME,
+
   PKM_UPC_MSRP, PKM_UPC_NAME,
 
   SORCERY_BOOSTER_BOX_MSRP, SORCERY_BOOSTER_BOX_NAME
@@ -657,6 +659,14 @@ function getProductMetadata(tcg: TCG, json: any): IProductMetadata | null {
           name: _.head(json.name.match(PKM_BOOSTER_BUNDLE_NAME)),
           type: ProductType.Bundle,
           subtype: ProductSubtype.BoosterBundle
+        } as IProductMetadata 
+
+      // Pokemon Center elite trainer box
+      } else if (PKM_PC_ETB_FORMAT.test(json.name)) {
+        return {
+          name: _.head(json.name.match(PKM_PC_ETB_SET_NAME)),
+          type: ProductType.Bundle,
+          subtype: ProductSubtype.PokemonCenterEliteTrainerBox
         } as IProductMetadata 
 
       // elite trainer box

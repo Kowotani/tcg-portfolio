@@ -501,6 +501,14 @@ function getProductMetadata(tcg, json) {
                     type: common_1.ProductType.Bundle,
                     subtype: common_1.ProductSubtype.BoosterBundle
                 };
+                // Pokemon Center elite trainer box
+            }
+            else if (tcgcsv_1.PKM_PC_ETB_FORMAT.test(json.name)) {
+                return {
+                    name: _.head(json.name.match(tcgcsv_1.PKM_PC_ETB_SET_NAME)),
+                    type: common_1.ProductType.Bundle,
+                    subtype: common_1.ProductSubtype.PokemonCenterEliteTrainerBox
+                };
                 // elite trainer box
             }
             else if (tcgcsv_1.PKM_ETB_FORMAT.test(json.name)) {
