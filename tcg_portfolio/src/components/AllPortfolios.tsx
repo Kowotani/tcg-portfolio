@@ -4,6 +4,7 @@ import {
   Box,
   Card,
   CardBody,
+  Flex,
   HStack,
   Progress,
   StackDivider
@@ -16,7 +17,7 @@ import {
   getAggPortfolioMarketValue, getAggPortfolioTotalCost, getPortfolioNames
 } from 'common'
 import { PortfolioCard } from './PortfolioCard'
-import { AddButton, SectionHeader } from './Layout'
+import { AddButton, Breadcrumbs, SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { MetricSummary, TMetricSummaryItem } from './MetricSummary'
 import { LatestPricesContext } from '../state/LatestPricesContext'
@@ -40,6 +41,15 @@ type TAllPortfoliosProps = {
 export const AllPortfolios = (
   props: TAllPortfoliosProps
 ) => {
+
+  // =========
+  // constants
+  // =========
+
+  const BREADCRUMB_PATH = [
+    'Portfolios',
+    'All'
+  ]
 
   // =====
   // state
@@ -167,6 +177,9 @@ export const AllPortfolios = (
 
   return (
     <>
+      {/* Breadcrumbs */}
+      <Breadcrumbs path={BREADCRUMB_PATH}/>
+      
       {/* Portfolios Header */}
       <SectionHeader header={'Summary'}/>
 

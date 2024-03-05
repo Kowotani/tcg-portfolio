@@ -1,11 +1,6 @@
 import { useContext, useEffect, useState, } from 'react'
 import axios from 'axios'
-import { 
-  Breadcrumb,
-  BreadcrumbItem,
-  Progress,
-  Text
-} from '@chakra-ui/react'
+import { Progress } from '@chakra-ui/react'
 import * as _ from 'lodash'
 import { AllPortfolios } from './AllPortfolios'
 import { 
@@ -58,22 +53,6 @@ export const PortfolioPanelManager = () => {
   // ----
 
   const { user } = useContext(UserContext) as IUserContext
-
-  
-  // ==========
-  // breadcrumb
-  // ==========
-
-  const breadcrumbBase = ['Portfolio']
-
-  const breadcrumbTrailMap: Map<PortfolioPanelNav, string[]> = new Map([
-    [ PortfolioPanelNav.Add, breadcrumbBase.concat(['Add']) ],
-    [ PortfolioPanelNav.All, breadcrumbBase.concat(['All']) ],
-    [ PortfolioPanelNav.Edit, breadcrumbBase.concat(['Edit']) ],
-    [ PortfolioPanelNav.Performance, breadcrumbBase.concat(['Performance']) ],
-  ])
-
-  const breadcrumbTrail = breadcrumbTrailMap.get(nav) ?? breadcrumbBase
 
 
   // =========
@@ -173,17 +152,6 @@ export const PortfolioPanelManager = () => {
 
   return (
     <>
-      {/* Breadcrumb */}
-      <Breadcrumb spacing='8px'>
-        {breadcrumbTrail.map((path: string) => {
-          return (
-            <BreadcrumbItem key={path}>
-              <Text>{path}</Text>
-            </BreadcrumbItem>
-          )
-        })}
-      </Breadcrumb>
-      
       {isLoadingLatestPrices
         ? (
           <Progress 

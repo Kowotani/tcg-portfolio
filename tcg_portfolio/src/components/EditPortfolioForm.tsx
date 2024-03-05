@@ -28,7 +28,7 @@ import { Field, FieldInputProps, Form, Formik, FormikHelpers,
   FormikProps } from 'formik'
 import { HoldingEditCard } from './HoldingEditCard'
 import { 
-  AddButton, PrimaryButton, SecondaryButton, SectionHeader 
+  AddButton, Breadcrumbs, PrimaryButton, SecondaryButton, SectionHeader 
 } from './Layout'
 import * as _ from 'lodash'
 import { LatestPricesContext } from '../state/LatestPricesContext'
@@ -53,6 +53,11 @@ type TEditPortfolioProps = {
   onExit: () => void,
 }
 export const EditPortfolioForm = (props: TEditPortfolioProps) => {
+
+  // breadcrumbs
+  const BREADCRUMB_PATH = props.mode === PortfolioPanelNav.Add
+    ? ['Portfolios', 'Add Portfolio']
+    : ['Portfolios', props.portfolio.portfolioName, 'Edit']
 
   // modal
   const { isOpen, onOpen, onClose } = useDisclosure() 
@@ -499,6 +504,10 @@ export const EditPortfolioForm = (props: TEditPortfolioProps) => {
 
   return (
     <>
+      <Flex justifyContent='space-between'>
+        <Breadcrumbs path={BREADCRUMB_PATH}/>
+      </Flex>
+
       {/* Portfolio Header */}
       <SectionHeader header={'Details'} />
 

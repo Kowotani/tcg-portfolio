@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { 
   Box,
+  Flex,
   HStack,
   Radio,
   RadioGroup,
@@ -21,7 +22,7 @@ import {
   // rest
   getHoldingTcgplayerId
 } from 'common'
-import { SecondaryButton, SectionHeader } from './Layout'
+import { Breadcrumbs, SecondaryButton, SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { PnlChart, PriceChart } from './Charts'
 import { HoldingPerfCard } from './HoldingPerfCard'
@@ -57,6 +58,13 @@ type TPortfolioPerformanceProps = {
 }
 export const PortfolioPerformance = (props: TPortfolioPerformanceProps) => {
   
+  // breadcrumbs
+  const BREADCRUMB_PATH = [
+    'Portfolios', 
+    props.portfolio.portfolioName, 
+    'Performance'
+  ]
+
 
   // =====
   // state
@@ -235,6 +243,10 @@ export const PortfolioPerformance = (props: TPortfolioPerformanceProps) => {
 
   return (
     <>
+      <Flex justifyContent='space-between'>
+        <Breadcrumbs path={BREADCRUMB_PATH}/>
+      </Flex>
+
       {/* Overview */}
       <SectionHeader header='Overview'/>
       <Box display='flex' justifyContent='flex-end'>
