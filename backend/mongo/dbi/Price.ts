@@ -1,10 +1,12 @@
 import { 
-  IDatedPriceData, IPrice, TDatedValue, TimeseriesGranularity, assert
+  IDatedPriceData, IPrice, TCG, TDatedValue, TimeseriesGranularity, assert
 } from 'common'
 import * as df from 'danfojs-node'
 import { getProductDocs } from './Product'
 import mongoose from 'mongoose'
-import { HistoricalPrice, IMHistoricalPrice } from '../models/historicalPriceSchema'
+import { 
+  HistoricalPrice, IMHistoricalPrice 
+} from '../models/historicalPriceSchema'
 import { Price } from '../models/priceSchema'
 import { IMProduct, Product } from '../models/productSchema'
 import { getSeriesFromDatedValues } from '../../utils/danfo'
@@ -466,13 +468,18 @@ export async function resetPrices(
 // =====
 
 /*
+TODO
+  Consider changing how this pipeline works when the 500,000 document limit
+  is reached at the TCG level
 DESC
   This pipeline creates a price summary for all Products that is designed to
   be used when calculating historical returns
+INPUT
+  tcg: The TCG to update
 OUTPUT
   historicalPrices collection of IHistoricalPrice documents
 */
-export async function updateHistoricalPrices(): Promise<boolean> {
+export async function updateHistoricalPrices(tcg: TCG): Promise<boolean> {
 
   // connect to db
   await mongoose.connect(url)
@@ -494,9 +501,11 @@ export async function updateHistoricalPrices(): Promise<boolean> {
         $unwind: '$productDoc'
       },
 
+      // match to the input TCG
       // keep prices on or after the release date
       {
         $match: {
+          'productDoc.tcg': tcg,
           $expr: {
             $gte: [
               '$priceDate', 
@@ -543,7 +552,28 @@ export async function updateHistoricalPrices(): Promise<boolean> {
           range: {
             step: 1,
             unit: 'day',
-            bounds: 'full'
+            bounds: 'partition'
+          }
+        }
+      },
+
+      // TODO: figure out why sortBy { date: 1 } seemingly causes duplication
+      // add unique-ish timestamp field to bypass above
+      {
+        $addFields: {
+          timestamp: {
+            $dateAdd: {
+              startDate: '$date',
+              unit: 'millisecond',
+              amount: { 
+                $round: {
+                  $multiply: [
+                    { $rand: {} }, 
+                    1000
+                  ] 
+                }
+              }
+            }
           }
         }
       },
@@ -552,30 +582,12 @@ export async function updateHistoricalPrices(): Promise<boolean> {
       {
         $fill: {
           partitionByFields: ['tcgplayerId'],
-          sortBy: {'date': 1},
+          sortBy: {'timestamp': 1},
           output: {
             'tcgplayerId': {method: 'locf'},
             'marketPrice': {method: 'linear'},
             'isInterpolated': {value: true}
           }
-        }
-      },
-
-      // filter out null marketPrices
-      // this is due to the releaseDate of Products being different
-      {
-        $match: {
-          marketPrice: {
-            $ne: null
-          }
-        }
-      },
-
-      // sort results
-      {
-        $sort: {
-          tcgplayerId: 1,
-          date: 1
         }
       },
 
@@ -601,7 +613,7 @@ export async function updateHistoricalPrices(): Promise<boolean> {
 
 async function main(): Promise<number> {  
 
-  let res
+  // let res
 
   // const tcgplayerId = 493975
   // const startDate = new Date(Date.parse('2023-06-01'))
@@ -617,11 +629,12 @@ async function main(): Promise<number> {
   // }
 
   // // -- Create historicalPrices
-  // res = await updateHistoricalPrices()
+  // const tcg = TCG.MagicTheGathering
+  // res = await updateHistoricalPrices(tcg)
   // if (res) {
-  //   console.log('historicalPrices updated')
+  //   console.log(`historicalPrices updated for ${tcg}`)
   // } else {
-  //   console.log('historicalPrices not updated')
+  //   console.log(`historicalPrices not updated for ${tcg}`)
   // }
 
   // // -- Reset Prices
@@ -642,7 +655,6 @@ async function main(): Promise<number> {
   // // console.log(priceSeries)
 
   // res = await insertMissingReleaseDatePrices()
-
   return 0
 }
 

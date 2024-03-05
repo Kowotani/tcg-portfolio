@@ -399,13 +399,18 @@ exports.resetPrices = resetPrices;
 // views
 // =====
 /*
+TODO
+  Consider changing how this pipeline works when the 500,000 document limit
+  is reached at the TCG level
 DESC
   This pipeline creates a price summary for all Products that is designed to
   be used when calculating historical returns
+INPUT
+  tcg: The TCG to update
 OUTPUT
   historicalPrices collection of IHistoricalPrice documents
 */
-function updateHistoricalPrices() {
+function updateHistoricalPrices(tcg) {
     return __awaiter(this, void 0, void 0, function* () {
         // connect to db
         yield mongoose_1.default.connect(url);
@@ -423,9 +428,11 @@ function updateHistoricalPrices() {
                 {
                     $unwind: '$productDoc'
                 },
+                // match to the input TCG
                 // keep prices on or after the release date
                 {
                     $match: {
+                        'productDoc.tcg': tcg,
                         $expr: {
                             $gte: [
                                 '$priceDate',
@@ -469,7 +476,27 @@ function updateHistoricalPrices() {
                         range: {
                             step: 1,
                             unit: 'day',
-                            bounds: 'full'
+                            bounds: 'partition'
+                        }
+                    }
+                },
+                // TODO: figure out why sortBy { date: 1 } seemingly causes duplication
+                // add unique-ish timestamp field to bypass above
+                {
+                    $addFields: {
+                        timestamp: {
+                            $dateAdd: {
+                                startDate: '$date',
+                                unit: 'millisecond',
+                                amount: {
+                                    $round: {
+                                        $multiply: [
+                                            { $rand: {} },
+                                            1000
+                                        ]
+                                    }
+                                }
+                            }
                         }
                     }
                 },
@@ -477,28 +504,12 @@ function updateHistoricalPrices() {
                 {
                     $fill: {
                         partitionByFields: ['tcgplayerId'],
-                        sortBy: { 'date': 1 },
+                        sortBy: { 'timestamp': 1 },
                         output: {
                             'tcgplayerId': { method: 'locf' },
                             'marketPrice': { method: 'linear' },
                             'isInterpolated': { value: true }
                         }
-                    }
-                },
-                // filter out null marketPrices
-                // this is due to the releaseDate of Products being different
-                {
-                    $match: {
-                        marketPrice: {
-                            $ne: null
-                        }
-                    }
-                },
-                // sort results
-                {
-                    $sort: {
-                        tcgplayerId: 1,
-                        date: 1
                     }
                 },
                 // write results
@@ -522,7 +533,7 @@ function updateHistoricalPrices() {
 exports.updateHistoricalPrices = updateHistoricalPrices;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        let res;
+        // let res
         // const tcgplayerId = 493975
         // const startDate = new Date(Date.parse('2023-06-01'))
         // const endDate = new Date(Date.parse('2023-07-01'))
@@ -535,11 +546,12 @@ function main() {
         //   console.log('Could not retrieve latest prices')
         // }
         // // -- Create historicalPrices
-        // res = await updateHistoricalPrices()
+        // const tcg = TCG.MagicTheGathering
+        // res = await updateHistoricalPrices(tcg)
         // if (res) {
-        //   console.log('historicalPrices updated')
+        //   console.log(`historicalPrices updated for ${tcg}`)
         // } else {
-        //   console.log('historicalPrices not updated')
+        //   console.log(`historicalPrices not updated for ${tcg}`)
         // }
         // // -- Reset Prices
         // const tcgplayerIds = [496041]
