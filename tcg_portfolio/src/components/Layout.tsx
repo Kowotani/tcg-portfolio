@@ -1,15 +1,42 @@
 import { 
   Box,
+  Breadcrumb,
+  BreadcrumbItem,
   Button,
   ButtonProps,
-  Icon
+  Icon,
+  Text
 } from '@chakra-ui/react'
-import { FiPlus } from 'react-icons/fi'
+import { FiChevronRight, FiPlus } from 'react-icons/fi'
 
 
 // ==========
 // components
 // ==========
+
+// -----------
+// breadcrumbs
+// -----------
+
+// TODO: Fix vertical alignment on separator
+type TBreadcrumbProps = {
+  path: string[]
+}
+export const Breadcrumbs = (props: TBreadcrumbProps) => {
+  return (
+    <Breadcrumb
+      separator={<Icon as={FiChevronRight}/>}
+    >
+        {props.path.map((step: string) => {
+          return (
+            <BreadcrumbItem key={step}>
+              <Text>{step}</Text>
+            </BreadcrumbItem>
+          )
+        })}
+    </Breadcrumb>
+  )
+}
 
 // -------
 // buttons
