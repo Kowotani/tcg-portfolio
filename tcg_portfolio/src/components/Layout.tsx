@@ -1,11 +1,11 @@
 import { 
   Box,
-  Breadcrumb,
-  BreadcrumbItem,
   Button,
   ButtonProps,
   Icon,
-  Text
+  ListItem,
+  Text,
+  UnorderedList
 } from '@chakra-ui/react'
 import { FiChevronRight, FiPlus } from 'react-icons/fi'
 
@@ -24,17 +24,27 @@ type TBreadcrumbProps = {
 }
 export const Breadcrumbs = (props: TBreadcrumbProps) => {
   return (
-    <Breadcrumb
-      separator={<Icon as={FiChevronRight}/>}
+    <UnorderedList 
+      display='flex' 
+      alignItems='center' 
+      h={10}
+      listStyleType='none'
+      m={0}
     >
-        {props.path.map((step: string) => {
-          return (
-            <BreadcrumbItem key={step}>
-              <Text>{step}</Text>
-            </BreadcrumbItem>
-          )
-        })}
-    </Breadcrumb>
+      {props.path.map((step: string, ix: number) => {
+        return (
+          <ListItem 
+            display='flex' 
+            alignItems='center' 
+            float='left'
+          >           
+            <Text>{step}</Text>
+            {ix < props.path.length - 1 
+              && <Icon as={FiChevronRight} boxSize={5} m={2}/>}
+          </ListItem>
+        )
+      })}
+    </UnorderedList>
   )
 }
 
