@@ -178,7 +178,7 @@ export const AllPortfolios = (
   return (
     <>
       {/* Breadcrumbs */}
-      <Breadcrumbs path={BREADCRUMB_PATH}/>
+      <Breadcrumbs height={10} path={BREADCRUMB_PATH}/>
       
       {/* Portfolios Header */}
       <SectionHeader header={'Summary'}/>

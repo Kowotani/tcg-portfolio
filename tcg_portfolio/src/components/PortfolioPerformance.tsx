@@ -26,6 +26,7 @@ import { Breadcrumbs, SecondaryButton, SectionHeader } from './Layout'
 import * as _ from 'lodash'
 import { PnlChart, PriceChart } from './Charts'
 import { HoldingPerfCard } from './HoldingPerfCard'
+import { useWindowDimensions } from '../hooks/WindowDimensions'
 import { PortfolioPerfCard } from './PortfolioPerfCard'
 import { LatestPricesContext } from '../state/LatestPricesContext'
 import { UserContext } from '../state/UserContext'
@@ -58,12 +59,20 @@ type TPortfolioPerformanceProps = {
 }
 export const PortfolioPerformance = (props: TPortfolioPerformanceProps) => {
   
+
+  // =========
+  // constants
+  // =========
+
   // breadcrumbs
   const BREADCRUMB_PATH = [
     'Portfolios', 
     props.portfolio.portfolioName, 
     'Performance'
   ]
+
+  // breadcrumbs and nav layout
+  const BREADCRUMB_NAV_WIDTH_BREAKPOINT = 400
 
 
   // =====
@@ -93,6 +102,7 @@ export const PortfolioPerformance = (props: TPortfolioPerformanceProps) => {
   // ----
 
   const { user } = useContext(UserContext) as IUserContext
+
 
   // =====
   // hooks
@@ -172,6 +182,9 @@ export const PortfolioPerformance = (props: TPortfolioPerformanceProps) => {
     setIsLoaded(!_.isEmpty(portfolioData) && !_.isEmpty(holdingsData))
   }, [portfolioData, holdingsData])
 
+  // window width
+  const { width } = useWindowDimensions()
+
 
   // =========
   // functions
@@ -243,17 +256,33 @@ export const PortfolioPerformance = (props: TPortfolioPerformanceProps) => {
 
   return (
     <>
-      <Flex justifyContent='space-between'>
-        <Breadcrumbs path={BREADCRUMB_PATH}/>
-      </Flex>
-
+      {/* Breadcrumbs and Nav */}
+      {width < BREADCRUMB_NAV_WIDTH_BREAKPOINT
+        ? <>
+          <Flex justifyContent='flex-start'>
+            <Breadcrumbs path={BREADCRUMB_PATH}/>
+          </Flex>
+          <Flex justifyContent='flex-end'>
+            <SecondaryButton 
+                label='Back'
+                onClick={props.onExit}
+              />
+          </Flex>
+        </> : <>
+          <Flex justifyContent='space-between'>
+            <Breadcrumbs path={BREADCRUMB_PATH}/>
+            <SecondaryButton 
+              label='Back'
+              onClick={props.onExit}
+            />
+          </Flex>
+        </>
+      }
+      
       {/* Overview */}
       <SectionHeader header='Overview'/>
       <Box display='flex' justifyContent='flex-end'>
-        <SecondaryButton 
-          label='Back'
-          onClick={props.onExit}
-        />
+        
       </Box>
 
       {/* Portfolio Summary and Chart */}

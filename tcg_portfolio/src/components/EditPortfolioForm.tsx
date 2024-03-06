@@ -27,6 +27,7 @@ import { FilterInput } from './FilterInput'
 import { Field, FieldInputProps, Form, Formik, FormikHelpers, 
   FormikProps } from 'formik'
 import { HoldingEditCard } from './HoldingEditCard'
+import { useWindowDimensions } from '../hooks/WindowDimensions'
 import { 
   AddButton, Breadcrumbs, PrimaryButton, SecondaryButton, SectionHeader 
 } from './Layout'
@@ -54,13 +55,18 @@ type TEditPortfolioProps = {
 }
 export const EditPortfolioForm = (props: TEditPortfolioProps) => {
 
+  // =========
+  // constants
+  // =========
+
   // breadcrumbs
   const BREADCRUMB_PATH = props.mode === PortfolioPanelNav.Add
-    ? ['Portfolios', 'Add Portfolio']
+    ? ['Portfolios', 'Add']
     : ['Portfolios', props.portfolio.portfolioName, 'Edit']
 
-  // modal
-  const { isOpen, onOpen, onClose } = useDisclosure() 
+  // breadcrumbs and form nav layout
+  const BREADCRUMB_NAV_WIDTH_BREAKPOINT = 400
+
 
   // ======
   // states
@@ -479,6 +485,12 @@ export const EditPortfolioForm = (props: TEditPortfolioProps) => {
     })
   }, [])
 
+  // window width
+  const { width } = useWindowDimensions()
+
+  // modal
+  const { isOpen, onOpen, onClose } = useDisclosure() 
+
   // Axios response toast
   const toast = useToast()
 
@@ -499,18 +511,40 @@ export const EditPortfolioForm = (props: TEditPortfolioProps) => {
 
 
   // ==============
+  // sub components
+  // ==============
+
+  type TFormNavButtons = {
+    isDisabled: boolean,
+    isLoading: boolean,
+    onExit: () => void
+  }
+  const FormNavButtons = (props: TFormNavButtons) => {
+    return (
+      <Flex>
+        <SecondaryButton 
+          label='Back'
+          variant='ghost' 
+          onClick={props.onExit}
+        />
+        <Box w={4} />
+        <PrimaryButton 
+          colorScheme='blue'
+          isDisabled={props.isDisabled}
+          isLoading={props.isLoading}
+          label='Save'
+          type='submit'
+        />
+      </Flex>
+    )
+  }
+
+  // ==============
   // main component
   // ==============
 
   return (
     <>
-      <Flex justifyContent='space-between'>
-        <Breadcrumbs path={BREADCRUMB_PATH}/>
-      </Flex>
-
-      {/* Portfolio Header */}
-      <SectionHeader header={'Details'} />
-
       {/* Portfolio Details Form */}
       <Formik
         initialValues={{
@@ -526,23 +560,35 @@ export const EditPortfolioForm = (props: TEditPortfolioProps) => {
         {(form: FormikProps<IInputValues>) => (
 
           <Form>
+            
+            {/* Breadcrumbs and Nav */}
+            {props.mode === PortfolioPanelNav.Edit 
+              && width < BREADCRUMB_NAV_WIDTH_BREAKPOINT
+              ? <>
+                <Flex justifyContent='flex-start'>
+                  <Breadcrumbs path={BREADCRUMB_PATH}/>
+                </Flex>
+                <Flex justifyContent='flex-end'>
+                  <FormNavButtons 
+                    isDisabled={!form.isValid}
+                    isLoading={form.isSubmitting}
+                    onExit={props.onExit}
+                  />
+                </Flex>
+              </> : <>
+                <Flex justifyContent='space-between'>                
+                  <Breadcrumbs path={BREADCRUMB_PATH}/>
+                  <FormNavButtons 
+                    isDisabled={!form.isValid}
+                    isLoading={form.isSubmitting}
+                    onExit={props.onExit}
+                  />
+                </Flex>
+              </>
+            }
 
-            {/* Exit and Save Buttons */}
-            <Box display='flex' justifyContent='flex-end'>
-              <SecondaryButton 
-                label='Back'
-                variant='ghost' 
-                onClick={props.onExit}
-              />
-              <Box w='16px' />
-              <PrimaryButton 
-                colorScheme='blue'
-                isDisabled={!form.isValid}
-                isLoading={form.isSubmitting}
-                label='Save'
-                type='submit'
-              />
-            </Box>
+            {/* Portfolio Header */}
+            <SectionHeader header={'Details'} />
 
             <VStack spacing={4} m='16px 0px'>
 
