@@ -1,5 +1,6 @@
 import { 
   Box,
+  BoxProps,
   Button,
   ButtonProps,
   Icon,
@@ -19,7 +20,7 @@ import { FiChevronRight, FiPlus } from 'react-icons/fi'
 // -----------
 
 // TODO: Fix vertical alignment on separator
-type TBreadcrumbProps = {
+type TBreadcrumbProps = BoxProps & {
   path: string[]
 }
 export const Breadcrumbs = (props: TBreadcrumbProps) => {
@@ -27,18 +28,20 @@ export const Breadcrumbs = (props: TBreadcrumbProps) => {
     <UnorderedList 
       display='flex' 
       alignItems='center' 
-      h={10}
+      height={props.height}
       listStyleType='none'
-      m={0}
+      marginLeft={0}
+      marginRight={4}
     >
       {props.path.map((step: string, ix: number) => {
         return (
-          <ListItem 
+          <ListItem
+            key={ix} 
             display='flex' 
             alignItems='center' 
             float='left'
           >           
-            <Text>{step}</Text>
+            <Text noOfLines={1}>{step}</Text>
             {ix < props.path.length - 1 
               && <Icon as={FiChevronRight} boxSize={5} m={2}/>}
           </ListItem>
