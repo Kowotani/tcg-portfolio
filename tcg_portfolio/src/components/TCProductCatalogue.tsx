@@ -25,6 +25,7 @@ export const TCProductCatalogue = ({
   onProductCardClick
 }: TTCProductCatalogueProps) => {
 
+
   // =========
   // constants
   // =========
@@ -40,7 +41,7 @@ export const TCProductCatalogue = ({
 
   const [ filteredProducts, setFilteredProducts ] = useState([] as ITCProduct[])
   const [ paginatedProducts, setPaginatedProducts ] = useState([] as ITCProduct[])
-  const [ productFilter, setProductFilter ] = useState('')
+  const [ filter, setFilter ] = useState('')
 
 
   // =========
@@ -53,13 +54,13 @@ export const TCProductCatalogue = ({
   INPUT
     input: The input from the FilterInput
   */
-  function handleOnFilterChange(query: string): void {
+  function handleOnFilterChange(filter: string): void {
     const newFilteredProducts = products
-      .filter(filterFnProductSearchResult(query))
+      .filter(filterFnProductSearchResult(filter))
       .sort(sortFnProductSearchResults)
     setFilteredProducts(newFilteredProducts)
     updatePaginatedProducts(newFilteredProducts, 1)
-    setProductFilter(query)
+    setFilter(filter)
   }
 
   /*
@@ -69,7 +70,7 @@ export const TCProductCatalogue = ({
   function handleOnFilterClear(): void {
     setFilteredProducts(products)
     updatePaginatedProducts(products, 1)
-    setProductFilter('')
+    setFilter('')
   }
 
   /*
@@ -105,8 +106,9 @@ export const TCProductCatalogue = ({
   // hooks
   // =====
 
+  // TODO: See if this useEffect can be removed
   useEffect(() => {
-    handleOnFilterChange(productFilter)
+    handleOnFilterChange(filter)
   }, [products])
 
 
@@ -121,11 +123,11 @@ export const TCProductCatalogue = ({
         icon={<Icon as={FaSearch} color='gray.500'/>}
         placeholder='Search for a TCProduct'
         onFilterChange={e => handleOnFilterChange(e.target.value)}
-        value={productFilter}
+        value={filter}
         clearFilter={() => handleOnFilterClear()}
       />
 
-      {productFilter.length > 0 &&
+      {filter.length > 0 &&
         <Flex justifyContent='center' width='100%'>
           <Text as='em' fontSize='lg'>
             {filteredProducts.length}
