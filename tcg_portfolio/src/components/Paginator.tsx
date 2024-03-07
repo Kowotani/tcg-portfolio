@@ -55,7 +55,7 @@ export const Paginator = (props: PaginatorProps) => {
     right: []
   } as PagesLayout
 
-  const numPages = Math.max(Math.floor(numItems / numItemsPerPage), 1)
+  const numPages = Math.max(Math.ceil(numItems / numItemsPerPage), 1)
 
 
   // =====
@@ -80,6 +80,7 @@ export const Paginator = (props: PaginatorProps) => {
     page: number
   ): void {
     setActivePage(page)
+    updatePageLayout(page)
     onPageClick(page)
   }
 
@@ -90,6 +91,7 @@ export const Paginator = (props: PaginatorProps) => {
   function handleOnPreviousClick(): void {
     const page = activePage - 1
     setActivePage(page)
+    updatePageLayout(page)
     onPageClick(page)
   }
 
@@ -100,14 +102,17 @@ export const Paginator = (props: PaginatorProps) => {
   function handleOnNextClick(): void {
     const page = activePage + 1
     setActivePage(page)
+    updatePageLayout(page)
     onPageClick(page)
   }
 
   /*
   DESC
     Updates the leftPages / centerPages / rightPages
+  INPUT
+    activePage: The active page
   */
-  function updatePages(): void {
+  function updatePageLayout(activePage: number): void {
     
     // populate all pages in center
     if (numPages <= NUM_EDGE_PAGES + NUM_OUTER_PAGES) {
@@ -156,10 +161,13 @@ export const Paginator = (props: PaginatorProps) => {
   // hooks
   // =====
 
-  // update layout of left / center / right pages
+  // TODO: See if this useEffect can be removed
+  // reset active page when props change
   useEffect(() => {
-    if (numItems && numItemsPerPage) updatePages()
-  }, [numItems, numItemsPerPage, activePage])
+    if (numItems && numItemsPerPage) 
+      setActivePage(1)
+      updatePageLayout(1)
+  }, [numItems, numItemsPerPage])
 
 
   // ==============
