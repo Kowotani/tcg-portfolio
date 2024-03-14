@@ -590,7 +590,7 @@ export const AddProductForm = ({
             href={`${TCGPLAYER_URL}/${formData.tcgplayerId.value}`}
             isExternal
           >
-            TCGPlayer URL
+            {`${TCGPLAYER_URL}/${formData.tcgplayerId.value}`}
           </Link>
 
           {/* Image */}
