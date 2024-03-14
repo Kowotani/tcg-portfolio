@@ -23,8 +23,8 @@ import {
   IAddProductFormDataState, 
 
   // validators
-  genEmptyState, genEmptyStringValuesState, genValidState, 
-  genValidStringValuesState,
+  genEmptyState, genEmptyStringValuesState, genErrorState, genValidState, 
+  genValidStringValuesState
 } from '../utils/form'
 import { getProductImageUrl } from '../utils/generic'
 import { sortFnProductSearchResults } from '../utils/Product'
@@ -67,40 +67,47 @@ export const ProductManager = () => {
   INPUT
     product: The IProduct whose data will be set in the form
   */
-    function setFormDataFromProduct(product: IProduct): void {
+  function setFormDataFromProduct(product: IProduct): void {
 
-      // image URL
-      const imageUrl = getProductImageUrl(product.tcgplayerId, product.type, 
-        200, product.subtype)
-  
-      // ProductType
-      const typeState = genValidStringValuesState<ProductType>(
-        product.type, TCGToProductType[product.tcg])
-  
-      // ProductSubtype
-      const subtypeState = product.subtype
-        ? genValidStringValuesState<ProductSubtype>(
-            product.subtype, getProductSubtypes(product.tcg, product.type))
-        : genEmptyStringValuesState<ProductSubtype>()
-  
-      // Set Code
-      const setCodeState = product.setCode 
-        ? genValidState<string>(product.setCode)
-        : genEmptyState<string>()
-  
-      setAddProductFormData({
-        imageUrl: genValidState<string>(imageUrl),
-        language: genValidState<ProductLanguage>(ProductLanguage.English),
-        msrp: genValidState<number>(product.msrp),
-        name: genValidState<string>(product.name),
-        releaseDate: genValidState<Date>(product.releaseDate),
-        setCode: setCodeState,
-        subtype: subtypeState,
-        tcg: genValidState<TCG>(product.tcg),
-        tcgplayerId: genValidState<number>(product.tcgplayerId),
-        type: typeState
-      })   
-    }
+    // image URL
+    const imageUrl = getProductImageUrl(product.tcgplayerId, product.type, 
+      200, product.subtype)
+
+    // ProductType
+    const typeState = genValidStringValuesState<ProductType>(
+      product.type, TCGToProductType[product.tcg])
+
+    // ProductSubtype
+    const subtypeState = product.subtype
+      ? genValidStringValuesState<ProductSubtype>(
+          product.subtype, getProductSubtypes(product.tcg, product.type))
+      : genEmptyStringValuesState<ProductSubtype>()
+
+    // Set Code
+    const setCodeState = product.setCode 
+      ? genValidState<string>(product.setCode)
+      : genEmptyState<string>()
+
+    // Release Date for SL Products
+    const releaseDateState = product.type === ProductType.SecretLair
+      ? addProductFormData.releaseDate.value === undefined
+        ? genErrorState<Date>('Secret Lair')
+        : addProductFormData.releaseDate
+      : genValidState<Date>(product.releaseDate)
+
+    setAddProductFormData({
+      imageUrl: genValidState<string>(imageUrl),
+      language: genValidState<ProductLanguage>(ProductLanguage.English),
+      msrp: genValidState<number>(product.msrp),
+      name: genValidState<string>(product.name),
+      releaseDate: releaseDateState,
+      setCode: setCodeState,
+      subtype: subtypeState,
+      tcg: genValidState<TCG>(product.tcg),
+      tcgplayerId: genValidState<number>(product.tcgplayerId),
+      type: typeState
+    })   
+  }
 
   // -------------------
   // tcproduct catalogue
