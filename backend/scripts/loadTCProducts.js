@@ -18,7 +18,7 @@ const main = async function() {
   const promises = [...tcgcsvUtils.TCG_TO_TCCATEGORY.values()].map((value) => {
     const params = {
       categoryId: value.categoryId,
-      releaseDate: releaseDate
+      startReleaseDate: releaseDate
     }
 
     return scrapeManager
